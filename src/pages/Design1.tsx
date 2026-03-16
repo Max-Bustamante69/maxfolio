@@ -13,32 +13,45 @@ import {
   contact
 } from '../data/portfolio-extended'
 
-// Theme Toggle
+// Theme Toggle - Brutalist Design
 const ThemeToggle = () => {
   const { isDark, toggleTheme } = useTheme()
   
   return (
     <motion.button
       onClick={toggleTheme}
-      className={`relative w-12 h-6 rounded-full p-0.5 transition-colors duration-300 ${
-        isDark ? 'bg-red-600' : 'bg-stone-300'
-      }`}
-      whileTap={{ scale: 0.95 }}
-      aria-label="Toggle theme"
+      className="relative w-10 h-10 flex items-center justify-center group"
+      whileTap={{ scale: 0.9 }}
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
     >
-      <motion.div
-        className={`w-5 h-5 rounded-full flex items-center justify-center ${
-          isDark ? 'bg-stone-900' : 'bg-white'
+      {/* Bold square frame */}
+      <motion.div 
+        className={`absolute inset-0 border-2 transition-colors duration-200 ${
+          isDark ? 'border-red-600 bg-red-600/10' : 'border-stone-900 bg-stone-900/5'
         }`}
-        animate={{ x: isDark ? 24 : 0 }}
-        transition={{ type: "spring", stiffness: 500, damping: 30 }}
+        animate={{ rotate: isDark ? 0 : 0 }}
+      />
+      
+      {/* Accent corner */}
+      <motion.div 
+        className={`absolute top-0 left-0 w-2 h-2 ${isDark ? 'bg-red-600' : 'bg-stone-900'}`}
+        animate={{ scale: isDark ? 1 : 0.5 }}
+        transition={{ duration: 0.2 }}
+      />
+      
+      {/* Icon */}
+      <motion.div
+        className="relative z-10"
+        animate={{ scale: [1, 0.8, 1] }}
+        transition={{ duration: 0.3 }}
+        key={isDark ? 'dark' : 'light'}
       >
         {isDark ? (
-          <svg className="w-3 h-3 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+          <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
             <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
           </svg>
         ) : (
-          <svg className="w-3 h-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+          <svg className="w-5 h-5 text-stone-700" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
             <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
           </svg>
         )}

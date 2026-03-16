@@ -14,7 +14,6 @@ export function ExploreDesignsBrutalist({ isDark }: ExploreDesignsBrutalistProps
   const textSecondary = isDark ? 'text-stone-400' : 'text-stone-600'
   const textMuted = isDark ? 'text-stone-500' : 'text-stone-500'
   const borderColor = isDark ? 'border-stone-700' : 'border-stone-300'
-  const bgCard = isDark ? 'bg-stone-950' : 'bg-white'
   const sectionBg = isDark ? 'bg-stone-900' : 'bg-stone-200'
 
   return (

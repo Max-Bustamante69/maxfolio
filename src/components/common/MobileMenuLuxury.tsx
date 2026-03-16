@@ -22,7 +22,6 @@ export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMen
   const textMuted = isDark ? 'text-deco-cream/40' : 'text-luxury-black/40'
   const accent = isDark ? 'text-deco-gold' : 'text-luxury-gold'
   const accentBg = isDark ? 'bg-deco-gold' : 'bg-luxury-gold'
-  const borderColor = isDark ? 'border-deco-gold/20' : 'border-luxury-black/10'
 
   const menuContent = (
     <AnimatePresence>
