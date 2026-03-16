@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { TransitionLink } from './TransitionLink'
 
@@ -17,6 +17,18 @@ interface MobileMenuBrutalistProps {
 export function MobileMenuBrutalist({ navItems, isDark, onContactClick }: MobileMenuBrutalistProps) {
   const [isOpen, setIsOpen] = useState(false)
 
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isOpen])
+
   const menuBg = isDark ? 'bg-stone-950' : 'bg-stone-100'
   const textPrimary = isDark ? 'text-stone-100' : 'text-stone-900'
   const textMuted = isDark ? 'text-stone-500' : 'text-stone-500'
@@ -29,6 +41,7 @@ export function MobileMenuBrutalist({ navItems, isDark, onContactClick }: Mobile
           animate={{ clipPath: 'circle(150% at calc(100% - 40px) 40px)' }}
           exit={{ clipPath: 'circle(0% at calc(100% - 40px) 40px)' }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          onClick={() => setIsOpen(false)}
           style={{
             position: 'fixed',
             top: 0,
@@ -36,6 +49,8 @@ export function MobileMenuBrutalist({ navItems, isDark, onContactClick }: Mobile
             right: 0,
             bottom: 0,
             zIndex: 9999,
+            overflow: 'hidden',
+            touchAction: 'none',
           }}
           className={menuBg}
         >
@@ -64,7 +79,7 @@ export function MobileMenuBrutalist({ navItems, isDark, onContactClick }: Mobile
           </motion.button>
 
           {/* Content */}
-          <div className="h-full flex flex-col items-center justify-center px-8 relative z-10">
+          <div className="h-full flex flex-col items-center justify-center px-8 relative z-10" onClick={(e) => e.stopPropagation()}>
             {/* Section Label */}
             <motion.div
               initial={{ opacity: 0, y: -20 }}

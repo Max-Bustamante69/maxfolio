@@ -15,7 +15,7 @@ export function LogoSelectorBrutalist({ isDark }: LogoSelectorBrutalistProps) {
   const borderColor = isDark ? 'border-stone-700' : 'border-stone-300'
 
   return (
-    <div className="relative">
+    <div className="relative flex items-center gap-2">
       {/* Logo Button */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
@@ -40,6 +40,21 @@ export function LogoSelectorBrutalist({ isDark }: LogoSelectorBrutalistProps) {
           <span className="font-mono text-sm font-bold text-white -mt-1">B</span>
         </div>
       </motion.button>
+      
+      {/* Subtle indicator - small arrow */}
+      <motion.div 
+        className={`hidden md:flex items-center ${textMuted} font-mono text-[10px] uppercase tracking-wider`}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5 }}
+      >
+        <motion.span
+          animate={{ x: [0, 3, 0] }}
+          transition={{ repeat: Infinity, duration: 1.5, delay: 2 }}
+        >
+          →
+        </motion.span>
+      </motion.div>
 
       {/* Dropdown Menu */}
       <AnimatePresence>

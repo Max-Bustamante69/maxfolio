@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { TransitionLink } from './TransitionLink'
 
@@ -17,6 +17,18 @@ interface MobileMenuLuxuryProps {
 export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMenuLuxuryProps) {
   const [isOpen, setIsOpen] = useState(false)
 
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isOpen])
+
   const menuBg = isDark ? 'bg-deco-navy' : 'bg-luxury-cream'
   const textPrimary = isDark ? 'text-deco-cream' : 'text-luxury-black'
   const textMuted = isDark ? 'text-deco-cream/40' : 'text-luxury-black/40'
@@ -31,6 +43,7 @@ export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMen
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
+          onClick={() => setIsOpen(false)}
           style={{
             position: 'fixed',
             top: 0,
@@ -38,6 +51,8 @@ export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMen
             right: 0,
             bottom: 0,
             zIndex: 9999,
+            overflow: 'hidden',
+            touchAction: 'none',
           }}
           className={menuBg}
         >
@@ -62,7 +77,7 @@ export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMen
           </motion.button>
 
           {/* Content */}
-          <div className="h-full flex flex-col items-center justify-center px-8">
+          <div className="h-full flex flex-col items-center justify-center px-8" onClick={(e) => e.stopPropagation()}>
             {/* Logo/Title */}
             <motion.div
               initial={{ opacity: 0, y: -20 }}

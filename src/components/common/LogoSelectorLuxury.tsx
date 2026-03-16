@@ -17,7 +17,7 @@ export function LogoSelectorLuxury({ isDark }: LogoSelectorLuxuryProps) {
   const borderColor = isDark ? 'border-deco-gold/20' : 'border-luxury-black/10'
 
   return (
-    <div className="relative">
+    <div className="relative flex items-center gap-2">
       {/* Logo Button */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
@@ -46,6 +46,26 @@ export function LogoSelectorLuxury({ isDark }: LogoSelectorLuxuryProps) {
           MB
         </span>
       </motion.button>
+      
+      {/* Subtle indicator - small chevron */}
+      <motion.div 
+        className={`hidden md:flex items-center ${textMuted} text-[10px]`}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5 }}
+      >
+        <motion.svg 
+          className="w-3 h-3" 
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+          animate={{ y: [0, 2, 0] }}
+          transition={{ repeat: Infinity, duration: 2, delay: 2 }}
+          aria-hidden="true"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </motion.svg>
+      </motion.div>
 
       {/* Dropdown Menu */}
       <AnimatePresence>
