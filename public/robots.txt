@@ -1,0 +1,11 @@
+# Robots.txt for maxfolio.co
+# Allow all crawlers to access all content
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://maxfolio.co/sitemap.xml
+
+# Crawl delay (optional, be nice to servers)
+Crawl-delay: 1

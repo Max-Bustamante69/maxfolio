@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Background -->
+  <rect width="32" height="32" fill="#FAF8F5"/>
+  
+  <!-- Corner accents - Gold -->
+  <path d="M0 6 L0 0 L6 0" stroke="#C9A962" stroke-width="2" fill="none"/>
+  <path d="M26 0 L32 0 L32 6" stroke="#C9A962" stroke-width="2" fill="none"/>
+  <path d="M32 26 L32 32 L26 32" stroke="#C9A962" stroke-width="2" fill="none"/>
+  <path d="M6 32 L0 32 L0 26" stroke="#C9A962" stroke-width="2" fill="none"/>
+  
+  <!-- Center diamond -->
+  <path d="M16 6 L26 16 L16 26 L6 16 Z" stroke="#C9A962" stroke-width="0.5" fill="none" opacity="0.4"/>
+  
+  <!-- Initials -->
+  <text x="16" y="18" text-anchor="middle" font-family="Georgia, serif" font-size="9" font-weight="500" fill="#1a1a1a" letter-spacing="1">MB</text>
+</svg>
