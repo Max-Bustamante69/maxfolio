@@ -93,7 +93,7 @@ const FadeInUp = ({
 
 // Main Design Component
 function Design4Content() {
-  const { isDark } = useTheme();
+  const { isDark, toggleTheme } = useTheme();
   const [selectedJob, setSelectedJob] = useState(experience[0]);
   const [activeTab, setActiveTab] = useState<"work" | "freelance">("work");
   const [isContactOpen, setIsContactOpen] = useState(false);
@@ -249,6 +249,7 @@ function Design4Content() {
               <MobileMenuLuxury
                 isDark={isDark}
                 onContactClick={() => setIsContactOpen(true)}
+                onThemeToggle={toggleTheme}
                 navItems={[
                   { label: nav.home, href: "#hero" },
                   { label: nav.experience, href: "#experience" },

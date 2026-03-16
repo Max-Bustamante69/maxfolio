@@ -152,7 +152,7 @@ MIT License - feel free to use this as inspiration for your own portfolio!
 ## Author
 
 **Maximiliano Bustamante**
-- LinkedIn: [maxbustamanteg](https://linkedin.com/in/maxbustamanteg)
+- LinkedIn: [maxbustamanteg](https://www.linkedin.com/in/maximiliano-bustamante-998b77173/)
 - GitHub: [Max-Bustamante69](https://github.com/Max-Bustamante69)
 - Email: maxbustamanteg@gmail.com
 

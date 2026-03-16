@@ -1,12 +1,12 @@
 export const config = {
-  web3formsKey: import.meta.env.VITE_WEB3FORMS_KEY || '',
-  
+  web3formsKey: import.meta.env.VITE_WEB3FORMS_KEY || "",
+
   social: {
-    linkedin: 'https://www.linkedin.com/in/maximiliano-bustamante',
-    github: 'https://github.com/maximilianobustamante',
+    linkedin: "https://www.linkedin.com/in/maximiliano-bustamante-998b77173/",
+    github: "https://github.com/Max-Bustamante69",
   },
-  
+
   contact: {
-    email: 'maximilianobustamantec@gmail.com',
+    email: "maxbustamanteg@gmail.com",
   },
-} as const
+} as const;

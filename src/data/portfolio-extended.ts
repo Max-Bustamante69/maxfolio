@@ -6,10 +6,11 @@ export const personalInfo = {
   email: "maxbustamanteg@gmail.com",
   phone: "+57 3195940522",
   location: "Medellín, Colombia",
-  linkedin: "https://linkedin.com/in/maxbustamanteg",
-  github: "https://github.com/maxbustamanteg",
+  linkedin: "https://www.linkedin.com/in/maximiliano-bustamante-998b77173/",
+  github: "https://github.com/Max-Bustamante69",
   portfolio: "https://maxfolio.co",
-  summary: "I'm a passionate Software Engineering student at EAFIT University with extensive experience in modern web development. I specialize in React, Next.js, and creating beautiful, functional user experiences that drive business results.",
+  summary:
+    "I'm a passionate Software Engineering student at EAFIT University with extensive experience in modern web development. I specialize in React, Next.js, and creating beautiful, functional user experiences that drive business results.",
   availability: "Available for freelance projects and full-time opportunities",
   responseTime: "Typical response time: 2-6 hours",
   currentQuarter: "Q1 2026",
@@ -26,7 +27,7 @@ export const hero = {
       "Freelance web development projects"
     ]
   },
-  buttons: {
+  buttons: {  
     getInTouch: "Get In Touch",
     downloadCV: "Download CV"
   }
