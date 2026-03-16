@@ -37,10 +37,10 @@ export function MobileMenuBrutalist({ navItems, isDark, onContactClick }: Mobile
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          initial={{ clipPath: 'circle(0% at calc(100% - 40px) 40px)' }}
-          animate={{ clipPath: 'circle(150% at calc(100% - 40px) 40px)' }}
-          exit={{ clipPath: 'circle(0% at calc(100% - 40px) 40px)' }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
           onClick={() => setIsOpen(false)}
           style={{
             position: 'fixed',

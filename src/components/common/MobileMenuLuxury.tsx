@@ -12,10 +12,9 @@ interface MobileMenuLuxuryProps {
   navItems: NavItem[]
   isDark: boolean
   onContactClick?: () => void
-  onThemeToggle?: () => void
 }
 
-export function MobileMenuLuxury({ navItems, isDark, onContactClick, onThemeToggle }: MobileMenuLuxuryProps) {
+export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMenuLuxuryProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   // Prevent body scroll when menu is open
@@ -63,47 +62,19 @@ export function MobileMenuLuxury({ navItems, isDark, onContactClick, onThemeTogg
           <div className={`absolute bottom-6 left-6 w-12 h-12 border-b border-l ${isDark ? 'border-deco-gold/30' : 'border-luxury-gold/30'}`} />
           <div className={`absolute bottom-6 right-6 w-12 h-12 border-b border-r ${isDark ? 'border-deco-gold/30' : 'border-luxury-gold/30'}`} />
 
-          {/* Top Actions: Theme Toggle & Close Button */}
-          <div className="absolute top-6 right-6 flex items-center gap-2 z-10">
-            {/* Theme Toggle Button */}
-            {onThemeToggle && (
-              <motion.button
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.15 }}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onThemeToggle()
-                }}
-                className={`w-12 h-12 flex items-center justify-center ${isDark ? 'bg-deco-gold/10 border border-deco-gold/30' : 'bg-luxury-gold/10 border border-luxury-gold/30'} ${accent} transition-colors`}
-                aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-              >
-                {isDark ? (
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
-                  </svg>
-                ) : (
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-                  </svg>
-                )}
-              </motion.button>
-            )}
-            
-            {/* Close Button */}
-            <motion.button
-              initial={{ opacity: 0, rotate: -90 }}
-              animate={{ opacity: 1, rotate: 0 }}
-              transition={{ delay: 0.2 }}
-              onClick={() => setIsOpen(false)}
-              className={`w-12 h-12 flex items-center justify-center ${textMuted} hover:${accent} transition-colors`}
-              aria-label="Close menu"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </motion.button>
-          </div>
+          {/* Close Button */}
+          <motion.button
+            initial={{ opacity: 0, rotate: -90 }}
+            animate={{ opacity: 1, rotate: 0 }}
+            transition={{ delay: 0.2 }}
+            onClick={() => setIsOpen(false)}
+            className={`absolute top-6 right-6 w-12 h-12 flex items-center justify-center ${textMuted} hover:${accent} transition-colors z-10`}
+            aria-label="Close menu"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </motion.button>
 
           {/* Content */}
           <div className="h-full flex flex-col items-center justify-center px-8" onClick={(e) => e.stopPropagation()}>
