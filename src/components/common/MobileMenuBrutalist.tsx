@@ -64,25 +64,22 @@ export function MobileMenuBrutalist({ navItems, isDark, onContactClick }: Mobile
             </span>
           </div>
 
-          {/* Close Button */}
-          <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            onClick={(e) => {
-              e.stopPropagation()
-              setIsOpen(false)
-            }}
-            className="absolute top-6 right-6 w-12 h-12 flex items-center justify-center text-red-600 hover:text-red-500 transition-colors z-10"
-            aria-label="Close menu"
-          >
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </motion.button>
-
           {/* Content */}
           <div className="h-full flex flex-col items-center justify-center px-8 relative z-10" onClick={(e) => e.stopPropagation()}>
+            {/* Close Button */}
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              onClick={() => setIsOpen(false)}
+              className="absolute top-6 right-6 w-12 h-12 flex items-center justify-center text-red-600 hover:text-red-500 transition-colors"
+              aria-label="Close menu"
+            >
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </motion.button>
+
             {/* Section Label */}
             <motion.div
               initial={{ opacity: 0, y: -20 }}
