@@ -24,20 +24,23 @@ import {
 } from "../data/portfolio-extended";
 
 // Theme Toggle Button - Luxury Minimal Design
-const ThemeToggle = () => {
+const ThemeToggle = ({ size = "md" }: { size?: "sm" | "md" }) => {
   const { isDark, toggleTheme } = useTheme();
+
+  const buttonSize = size === "sm" ? "w-9 h-9" : "w-10 h-10";
+  const iconSize = size === "sm" ? "w-3.5 h-3.5" : "w-4 h-4";
 
   return (
     <motion.button
       onClick={toggleTheme}
-      className="relative w-10 h-10 flex items-center justify-center group"
+      className={`relative ${buttonSize} flex items-center justify-center group`}
       whileTap={{ scale: 0.9 }}
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
     >
       {/* Elegant diamond frame */}
-      <svg 
-        viewBox="0 0 40 40" 
-        className="absolute inset-0 w-full h-full" 
+      <svg
+        viewBox="0 0 40 40"
+        className="absolute inset-0 w-full h-full"
         fill="none"
         aria-hidden="true"
       >
@@ -52,7 +55,7 @@ const ThemeToggle = () => {
           style={{ transformOrigin: "center" }}
         />
       </svg>
-      
+
       {/* Icon */}
       <motion.div
         initial={false}
@@ -60,12 +63,26 @@ const ThemeToggle = () => {
         transition={{ duration: 0.5 }}
       >
         {isDark ? (
-          <svg className="w-4 h-4 text-deco-gold" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+          <svg
+            className={`${iconSize} text-deco-gold`}
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            aria-hidden="true"
+          >
             <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
           </svg>
         ) : (
-          <svg className="w-4 h-4 text-luxury-gold" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-            <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
+          <svg
+            className={`${iconSize} text-luxury-gold`}
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            aria-hidden="true"
+          >
+            <path
+              fillRule="evenodd"
+              d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+              clipRule="evenodd"
+            />
           </svg>
         )}
       </motion.div>
@@ -242,22 +259,26 @@ function Design4Content() {
                 </svg>
                 <span className="hidden lg:inline">Quick Email</span>
               </motion.button>
+              {/* Desktop Theme Toggle */}
               <div className="hidden md:block">
                 <ThemeToggle />
               </div>
-              {/* Mobile Menu */}
-              <MobileMenuLuxury
-                isDark={isDark}
-                onContactClick={() => setIsContactOpen(true)}
-                onThemeToggle={toggleTheme}
-                navItems={[
-                  { label: nav.home, href: "#hero" },
-                  { label: nav.experience, href: "#experience" },
-                  { label: nav.skills, href: "#skills" },
-                  { label: nav.contact, href: "#contact" },
-                  { label: "Explore", href: "#explore" },
-                ]}
-              />
+              {/* Mobile Theme Toggle + Menu */}
+              <div className="flex items-center gap-2 md:hidden">
+                <ThemeToggle size="sm" />
+                <MobileMenuLuxury
+                  isDark={isDark}
+                  onContactClick={() => setIsContactOpen(true)}
+                  onThemeToggle={toggleTheme}
+                  navItems={[
+                    { label: nav.home, href: "#hero" },
+                    { label: nav.experience, href: "#experience" },
+                    { label: nav.skills, href: "#skills" },
+                    { label: nav.contact, href: "#contact" },
+                    { label: "Explore", href: "#explore" },
+                  ]}
+                />
+              </div>
             </div>
           </div>
         </div>

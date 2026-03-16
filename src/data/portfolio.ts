@@ -6,7 +6,7 @@ export const personalInfo = {
   location: "Medellín, Colombia",
   linkedin: "https://www.linkedin.com/in/maximiliano-bustamante-998b77173/",
   github: "https://github.com/Max-Bustamante69",
-  portfolio: "https://maxfolio.co",
+  portfolio: "https://www.maxfolio.dev/",
   summary: "Software Engineer with strong front-end expertise and extensive experience building modern, scalable web applications. Specialized in React, Next.js, and e-commerce development with Shopify Liquid. Proven ability to design front-end architectures, execute complex platform migrations, and deliver high-quality digital products. Focused on performance, clean code, and creating exceptional user experiences.",
   availability: "Available for freelance projects and full-time opportunities",
   responseTime: "Typical response time: 2-6 hours",

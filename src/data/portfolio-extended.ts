@@ -8,7 +8,7 @@ export const personalInfo = {
   location: "Medellín, Colombia",
   linkedin: "https://www.linkedin.com/in/maximiliano-bustamante-998b77173/",
   github: "https://github.com/Max-Bustamante69",
-  portfolio: "https://maxfolio.co",
+  portfolio: "https://www.maxfolio.dev/",
   summary:
     "I'm a passionate Software Engineering student at EAFIT University with extensive experience in modern web development. I specialize in React, Next.js, and creating beautiful, functional user experiences that drive business results.",
   availability: "Available for freelance projects and full-time opportunities",
