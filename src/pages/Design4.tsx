@@ -287,7 +287,7 @@ function Design4Content() {
       <main id="main-content">
         <section
           id="hero"
-          className="min-h-screen flex items-center pt-24 px-6 md:px-16"
+          className="min-h-screen flex items-center py-24 px-6 md:px-16  "
           aria-labelledby="hero-heading"
         >
         <div className="max-w-7xl mx-auto w-full">
@@ -430,7 +430,7 @@ function Design4Content() {
             </div>
 
             {/* Side Stats */}
-            <div className="lg:col-span-4">
+            <div className="lg:col-span-4 ">
               <motion.div
                 initial={{ opacity: 0, x: 30 }}
                 animate={{ opacity: 1, x: 0 }}
