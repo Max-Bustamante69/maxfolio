@@ -67,7 +67,7 @@ src/
 
 ```bash
 # Clone the repository
-git clone https://github.com/maxbustamanteg/maxfolio.git
+git clone https://github.com/Max-Bustamante69/maxfolio.git
 cd maxfolio
 
 # Install dependencies
@@ -153,7 +153,7 @@ MIT License - feel free to use this as inspiration for your own portfolio!
 
 **Maximiliano Bustamante**
 - LinkedIn: [maxbustamanteg](https://linkedin.com/in/maxbustamanteg)
-- GitHub: [maxbustamanteg](https://github.com/maxbustamanteg)
+- GitHub: [Max-Bustamante69](https://github.com/Max-Bustamante69)
 - Email: maxbustamanteg@gmail.com
 
 ---
