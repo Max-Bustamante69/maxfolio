@@ -69,7 +69,10 @@ export function MobileMenuBrutalist({ navItems, isDark, onContactClick }: Mobile
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-            onClick={() => setIsOpen(false)}
+            onClick={(e) => {
+              e.stopPropagation()
+              setIsOpen(false)
+            }}
             className="absolute top-6 right-6 w-12 h-12 flex items-center justify-center text-red-600 hover:text-red-500 transition-colors z-10"
             aria-label="Close menu"
           >
