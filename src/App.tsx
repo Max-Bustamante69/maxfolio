@@ -1,5 +1,6 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { useEffect, useRef } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import { PageTransitionProvider, usePageTransition } from './components'
 import Home from './pages/Home'
 import Design1 from './pages/Design1'
@@ -33,6 +34,7 @@ function App() {
         <Route path="/1" element={<Design4 />} />
         <Route path="/2" element={<Design1 />} />
       </Routes>
+      <Analytics />
     </PageTransitionProvider>
   )
 }
