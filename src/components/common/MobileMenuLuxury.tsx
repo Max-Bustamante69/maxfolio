@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { TransitionLink } from './TransitionLink'
+import { useI18n } from '../../hooks'
 
 interface NavItem {
   label: string
@@ -16,6 +17,7 @@ interface MobileMenuLuxuryProps {
 
 export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMenuLuxuryProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const { t } = useI18n()
 
   // Prevent body scroll when menu is open
   useEffect(() => {
@@ -86,7 +88,7 @@ export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMen
               className="mb-12"
             >
               <span className={`font-display text-sm tracking-[0.3em] uppercase ${accent}`}>
-                Navigation
+                {t('mobileMenu.navigation')}
               </span>
             </motion.div>
 
@@ -122,7 +124,7 @@ export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMen
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                Quick Message
+                {t('common.quickMessage')}
               </motion.button>
             )}
 
@@ -142,27 +144,27 @@ export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMen
               className="text-center"
             >
               <p className={`text-[10px] uppercase tracking-[0.3em] ${textMuted} mb-4`}>
-                Other Experiences
+                {t('logoSelector.otherExperiences')}
               </p>
               <div className="flex gap-4">
                 <TransitionLink
                   to="/menu"
                   transitionColor={isDark ? '#171717' : '#fafafa'}
                   transitionAccent={isDark ? '#ffffff' : '#171717'}
-                  transitionLabel="Design Menu"
+                  transitionLabel={t('logoSelector.designMenu')}
                   className={`text-xs ${textMuted} hover:${accent} transition-colors`}
                 >
-                  All Designs
+                  {t('logoSelector.allDesigns')}
                 </TransitionLink>
                 <span className={textMuted}>·</span>
                 <TransitionLink
                   to="/brutalist"
                   transitionColor="#1c1917"
                   transitionAccent="#dc2626"
-                  transitionLabel="Brutalist Editorial"
+                  transitionLabel={t('logoSelector.brutalistEditorial')}
                   className={`text-xs ${textMuted} hover:${accent} transition-colors`}
                 >
-                  Brutalist
+                  {t('logoSelector.brutalistEditorial')}
                 </TransitionLink>
               </div>
             </motion.div>

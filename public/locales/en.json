@@ -1,0 +1,151 @@
+{
+  "language": {
+    "selector": {
+      "ariaLabel": "Select language",
+      "title": "Language"
+    }
+  },
+  "common": {
+    "quickEmail": "Quick Email",
+    "quickMessage": "Quick Message",
+    "downloadCV": "Download CV",
+    "cancel": "Cancel",
+    "sending": "Sending...",
+    "sendMessage": "Send Message",
+    "messageSent": "Message Sent!",
+    "respondSoon": "I'll get back to you soon.",
+    "orEmailDirectly": "Or email directly:",
+    "name": "Your name",
+    "email": "Your email",
+    "subjectOptional": "Subject (optional)",
+    "subject": "Subject",
+    "yourMessage": "Your message...",
+    "yourMessageLabel": "Your message",
+    "send": "Send"
+  },
+  "nav": {
+    "home": "Home",
+    "experience": "Experience",
+    "skills": "Skills",
+    "contact": "Contact",
+    "explore": "Explore",
+    "work": "Work",
+    "freelance": "Freelance",
+    "companies": "Companies",
+    "otherStyles": "Other Styles"
+  },
+  "hero": {
+    "greeting": "Hi, I'm",
+    "description": "I'm a passionate Software Engineering student at EAFIT University with extensive experience in modern web development. I specialize in React, Next.js, and creating beautiful, functional user experiences that drive business results.",
+    "currentFocus": {
+      "title": "Current Focus",
+      "item1": "Lead Frontend Developer at Ellamau SAS",
+      "item2": "Building scalable e-commerce solutions with Shopify Liquid",
+      "item3": "Freelance web development projects"
+    },
+    "buttons": {
+      "getInTouch": "Get In Touch",
+      "downloadCV": "Download CV"
+    }
+  },
+  "personal": {
+    "title": "Software Engineer"
+  },
+  "sections": {
+    "experience": "Experience",
+    "skills": "Skills",
+    "contact": "Contact",
+    "exploreOtherDesigns": "Explore Other Designs",
+    "alternativeViews": "Alternative Views",
+    "experienceTabWork": "Work",
+    "experienceTabFreelance": "Freelance",
+    "section02": "Section 02",
+    "professionalExperience": "Professional",
+    "magazineProfile": "Profile",
+    "aboutSkills": "Skills",
+    "companies": "Companies"
+  },
+  "skills": {
+    "about": "About",
+    "languages": "Languages",
+    "frameworks": "Frameworks",
+    "databases": "Databases",
+    "platforms": "Platforms"
+  },
+  "mobileMenu": {
+    "navigation": "Navigation",
+    "menu": "Menu"
+  },
+  "contactPage": {
+    "getInTouch": "Get in Touch",
+    "email": "Email",
+    "phone": "Phone",
+    "location": "Location"
+  },
+  "exploreLuxury": {
+    "tagline": "Alternative Views",
+    "headlinePrefix": "Explore",
+    "headlineRest": "Other Aesthetics",
+    "description": "The same professional journey, expressed through different design languages.",
+    "cardBrutalistTitle": "Brutalist Editorial",
+    "cardBrutalistSubtitle": "Bold & Impactful",
+    "cardMenuTitle": "Design Menu",
+    "cardMenuSubtitle": "Compare Options",
+    "currently": "Currently:",
+    "viewingLuxury": "Luxury Minimal"
+  },
+  "exploreBrutalist": {
+    "styles": "Styles",
+    "description": "Same projects, same skills — presented through a completely different visual language.",
+    "viewing": "Viewing:",
+    "viewingBrutalist": "Brutalist"
+  },
+  "menuPage": {
+    "seoTitle": "Maximiliano Bustamante | Portfolio Design Selector",
+    "seoDescription": "Choose your preferred portfolio experience. Frontend Developer specialized in React, Next.js, TypeScript, and e-commerce development.",
+    "mainPortfolio": "← Main Portfolio",
+    "designSelector": "Design Selector",
+    "oneDeveloper": "One Developer",
+    "vision": "Vision",
+    "subtitle": "Choose your preferred aesthetic. Same content, different design language.",
+    "availableDesigns": "Available Designs",
+    "options": "options",
+    "default": "Default",
+    "viewAll": "View All Designs",
+    "whyTwoVersions": "Why two versions?",
+    "whyTwoVersionsDesc": "Different aesthetics for different contexts. Same skills, proven versatility.",
+    "startWithDefault": "Start with default",
+    "visionStyles": {
+      "elegant": "Elegant",
+      "bold": "Bold"
+    },
+    "designNames": {
+      "luxuryMinimal": "Luxury Minimal",
+      "brutalistEditorial": "Brutalist Editorial"
+    },
+    "designSubtitles": {
+      "luxuryMinimal": "Elegant & Refined",
+      "brutalistEditorial": "Bold & Raw"
+    }
+  },
+  "contactModal": {
+    "title": "Quick Message",
+    "description": "Send me a message and I'll get back to you soon.",
+    "sentTitle": "Message Sent!",
+    "sentSubtitle": "I'll respond as soon as possible.",
+    "successSent": "Sent!"
+  },
+  "logoSelector": {
+    "selectExperience": "Select Experience",
+    "portfolioExperience": "Portfolio Experience",
+    "selectYourStyle": "Select Your Style",
+    "currentlyViewing": "Currently viewing",
+    "switchExperience": "Switch Experience",
+    "otherExperiences": "Other Experiences",
+    "designMenu": "Design Menu",
+    "allDesigns": "All Designs",
+    "luxuryMinimal": "Luxury Minimal",
+    "brutalistEditorial": "Brutalist Editorial"
+  }
+}
+

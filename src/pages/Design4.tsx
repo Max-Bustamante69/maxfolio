@@ -8,9 +8,11 @@ import {
   TransitionLink,
   MobileMenuLuxury,
   LogoSelectorLuxury,
+  LanguageSelectorLuxury,
   SEOHead,
 } from "../components";
 import { useDynamicFavicon } from "../hooks";
+import { useI18n } from "../hooks";
 import {
   personalInfo,
   hero,
@@ -111,6 +113,7 @@ const FadeInUp = ({
 // Main Design Component
 function Design4Content() {
   const { isDark } = useTheme();
+  const { t } = useI18n();
   const [selectedJob, setSelectedJob] = useState(experience[0]);
   const [activeTab, setActiveTab] = useState<"work" | "freelance">("work");
   const [isContactOpen, setIsContactOpen] = useState(false);
@@ -209,31 +212,31 @@ function Design4Content() {
                 href="#hero"
                 className={`text-xs tracking-[0.2em] uppercase ${textMuted} hover:${accent} transition-colors`}
               >
-                {nav.home}
+                {t('nav.home')}
               </a>
               <a
                 href="#experience"
                 className={`text-xs tracking-[0.2em] uppercase ${textMuted} hover:${accent} transition-colors`}
               >
-                {nav.experience}
+                {t('nav.experience')}
               </a>
               <a
                 href="#skills"
                 className={`text-xs tracking-[0.2em] uppercase ${textMuted} hover:${accent} transition-colors`}
               >
-                {nav.skills}
+                {t('nav.skills')}
               </a>
               <a
                 href="#contact"
                 className={`text-xs tracking-[0.2em] uppercase ${textMuted} hover:${accent} transition-colors`}
               >
-                {nav.contact}
+                {t('nav.contact')}
               </a>
               <a
                 href="#explore"
                 className={`text-xs tracking-[0.2em] uppercase ${textMuted} hover:${accent} transition-colors`}
               >
-                Explore
+                {t('nav.explore')}
               </a>
             </div>
             <div className="flex items-center gap-3">
@@ -257,24 +260,26 @@ function Design4Content() {
                     d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                   />
                 </svg>
-                <span className="hidden lg:inline">Quick Email</span>
+                <span className="hidden lg:inline">{t('common.quickEmail')}</span>
               </motion.button>
               {/* Desktop Theme Toggle */}
-              <div className="hidden md:block">
+              <div className="hidden md:flex items-center gap-2">
+                <LanguageSelectorLuxury />
                 <ThemeToggle />
               </div>
               {/* Mobile Theme Toggle + Menu */}
               <div className="flex items-center gap-2 md:hidden">
                 <ThemeToggle size="sm" />
+                <LanguageSelectorLuxury size="sm" />
                 <MobileMenuLuxury
                   isDark={isDark}
                   onContactClick={() => setIsContactOpen(true)}
                   navItems={[
-                    { label: nav.home, href: "#hero" },
-                    { label: nav.experience, href: "#experience" },
-                    { label: nav.skills, href: "#skills" },
-                    { label: nav.contact, href: "#contact" },
-                    { label: "Explore", href: "#explore" },
+                    { label: t('nav.home'), href: '#hero' },
+                    { label: t('nav.experience'), href: '#experience' },
+                    { label: t('nav.skills'), href: '#skills' },
+                    { label: t('nav.contact'), href: '#contact' },
+                    { label: t('nav.explore'), href: '#explore' },
                   ]}
                 />
               </div>
@@ -309,12 +314,12 @@ function Design4Content() {
                   <p
                     className={`text-xs tracking-[0.5em] uppercase ${textMuted} mb-2`}
                   >
-                    {hero.greeting}
+                    {t('hero.greeting')}
                   </p>
                   <p
                     className={`text-xs tracking-[0.5em] uppercase ${textMuted} mb-4`}
                   >
-                    {personalInfo.title}
+                    {t('personal.title')}
                   </p>
                 </div>
 
@@ -343,7 +348,7 @@ function Design4Content() {
                   transition={{ duration: 0.8, delay: 0.8 }}
                   className={`text-base md:text-xl ${textSecondary} max-w-xl leading-relaxed font-light mb-6 md:mb-8`}
                 >
-                  {hero.description}
+                    {t('hero.description')}
                 </motion.p>
 
                 {/* Current Focus */}
@@ -356,17 +361,23 @@ function Design4Content() {
                   <p
                     className={`text-xs tracking-[0.2em] uppercase ${accent} mb-3`}
                   >
-                    {hero.currentFocus.title}
+                    {t('hero.currentFocus.title')}
                   </p>
                   <ul className={`space-y-2 ${textSecondary} text-sm`}>
-                    {hero.currentFocus.items.map((item, i) => (
-                      <li key={i} className="flex items-center gap-2">
-                        <span
-                          className={`w-1.5 h-1.5 ${accentBg} rotate-45 flex-shrink-0`}
-                        />
-                        {item}
-                      </li>
-                    ))}
+                    {[1, 2, 3].map((i) => {
+                      const text =
+                        i === 1
+                          ? t('hero.currentFocus.item1')
+                          : i === 2
+                            ? t('hero.currentFocus.item2')
+                            : t('hero.currentFocus.item3')
+                      return (
+                        <li key={i} className="flex items-center gap-2">
+                          <span className={`w-1.5 h-1.5 ${accentBg} rotate-45 flex-shrink-0`} />
+                          {text}
+                        </li>
+                      )
+                    })}
                   </ul>
                 </motion.div>
 
@@ -396,7 +407,7 @@ function Design4Content() {
                         d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                       />
                     </svg>
-                    {hero.buttons.getInTouch}
+                    {t('hero.buttons.getInTouch')}
                   </motion.button>
                   <button
                     onClick={() => {
@@ -423,7 +434,7 @@ function Design4Content() {
                         d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                       />
                     </svg>
-                    {hero.buttons.downloadCV}
+                    {t('hero.buttons.downloadCV')}
                   </button>
                 </motion.div>
               </motion.div>
@@ -469,7 +480,7 @@ function Design4Content() {
                 <p
                   className={`text-xs tracking-[0.5em] uppercase ${accent} mb-4`}
                 >
-                  Experience
+                  {t('sections.experience')}
                 </p>
                 <h2 className="font-display text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
                   Professional{" "}
@@ -494,7 +505,7 @@ function Design4Content() {
                       : `${isDark ? "text-deco-cream/60" : "text-white/60"} hover:text-white`
                   }`}
                 >
-                  Work
+                  {t('sections.experienceTabWork')}
                 </button>
                 <button
                   onClick={() => setActiveTab("freelance")}
@@ -504,7 +515,7 @@ function Design4Content() {
                       : `${isDark ? "text-deco-cream/60" : "text-white/60"} hover:text-white`
                   }`}
                 >
-                  Freelance
+                  {t('sections.experienceTabFreelance')}
                 </button>
               </div>
             </div>
@@ -770,7 +781,7 @@ function Design4Content() {
                 <p
                   className={`text-xs tracking-[0.5em] uppercase ${accent} mb-4`}
                 >
-                  About
+                  {t('skills.about')}
                 </p>
                 <h2 className="font-display text-3xl md:text-4xl lg:text-5xl leading-tight">
                   Crafting Digital
@@ -793,10 +804,10 @@ function Design4Content() {
                 className={`grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 pt-6 md:pt-8 border-t ${borderColor}`}
               >
                 {[
-                  { title: "Languages", items: skills.languages.slice(0, 4) },
-                  { title: "Frameworks", items: skills.frameworks },
-                  { title: "Databases", items: skills.databases.slice(0, 4) },
-                  { title: "Platforms", items: skills.platforms.slice(0, 4) },
+                  { title: t('skills.languages'), items: skills.languages.slice(0, 4) },
+                  { title: t('skills.frameworks'), items: skills.frameworks },
+                  { title: t('skills.databases'), items: skills.databases.slice(0, 4) },
+                  { title: t('skills.platforms'), items: skills.platforms.slice(0, 4) },
                 ].map((category, index) => (
                   <FadeInUp key={index} delay={0.3 + index * 0.1}>
                     <h3
@@ -832,7 +843,7 @@ function Design4Content() {
               <p
                 className={`text-xs tracking-[0.5em] uppercase ${accent} mb-6 md:mb-8`}
               >
-                Get in Touch
+                {t('contactPage.getInTouch')}
               </p>
 
               <h2 className="font-display text-3xl md:text-4xl lg:text-5xl xl:text-6xl mb-6 md:mb-8">
@@ -885,7 +896,7 @@ function Design4Content() {
                     />
                   </svg>
                   <span className="text-sm tracking-[0.2em] uppercase">
-                    {contact.quickHire.button}
+                    {t('common.quickEmail')}
                   </span>
                   <svg
                     className="w-4 h-4 group-hover:translate-x-2 transition-transform"
@@ -909,7 +920,7 @@ function Design4Content() {
                   <p
                     className={`text-xs tracking-[0.2em] uppercase ${textMuted} mb-2`}
                   >
-                    Email
+                    {t('contactPage.email')}
                   </p>
                   <a
                     href={`mailto:${personalInfo.email}`}
@@ -922,7 +933,7 @@ function Design4Content() {
                   <p
                     className={`text-xs tracking-[0.2em] uppercase ${textMuted} mb-2`}
                   >
-                    Phone
+                    {t('contactPage.phone')}
                   </p>
                   <a
                     href={`tel:${personalInfo.phone}`}
@@ -935,7 +946,7 @@ function Design4Content() {
                   <p
                     className={`text-xs tracking-[0.2em] uppercase ${textMuted} mb-2`}
                   >
-                    Location
+                    {t('contactPage.location')}
                   </p>
                   <p className={`${textSecondary} text-sm md:text-base`}>
                     {personalInfo.location}
