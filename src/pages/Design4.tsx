@@ -205,34 +205,34 @@ function Design4Content() {
           <div className="flex justify-between items-center">
             {/* Logo + Design Selector */}
             <LogoSelectorLuxury isDark={isDark} />
-            <div className="hidden md:flex items-center gap-8 lg:gap-12">
+            <div className="hidden md:flex items-center gap-8 lg:gap-12 h-10">
               <a
                 href="#hero"
-                className={`text-xs tracking-[0.2em] uppercase ${textMuted} hover:${accent} transition-colors`}
+                className={`inline-flex items-center h-10 text-xs tracking-[0.2em] uppercase leading-none ${textMuted} hover:${accent} transition-colors`}
               >
                 {t('nav.home')}
               </a>
               <a
                 href="#experience"
-                className={`text-xs tracking-[0.2em] uppercase ${textMuted} hover:${accent} transition-colors`}
+                className={`inline-flex items-center h-10 text-xs tracking-[0.2em] uppercase leading-none ${textMuted} hover:${accent} transition-colors`}
               >
                 {t('nav.experience')}
               </a>
               <a
                 href="#skills"
-                className={`text-xs tracking-[0.2em] uppercase ${textMuted} hover:${accent} transition-colors`}
+                className={`inline-flex items-center h-10 text-xs tracking-[0.2em] uppercase leading-none ${textMuted} hover:${accent} transition-colors`}
               >
                 {t('nav.skills')}
               </a>
               <a
                 href="#contact"
-                className={`text-xs tracking-[0.2em] uppercase ${textMuted} hover:${accent} transition-colors`}
+                className={`inline-flex items-center h-10 text-xs tracking-[0.2em] uppercase leading-none ${textMuted} hover:${accent} transition-colors`}
               >
                 {t('nav.contact')}
               </a>
               <a
                 href="#explore"
-                className={`text-xs tracking-[0.2em] uppercase ${textMuted} hover:${accent} transition-colors`}
+                className={`inline-flex items-center h-10 text-xs tracking-[0.2em] uppercase leading-none ${textMuted} hover:${accent} transition-colors`}
               >
                 {t('nav.explore')}
               </a>
@@ -262,13 +262,13 @@ function Design4Content() {
               </motion.button>
               {/* Desktop Theme Toggle */}
               <div className="hidden md:flex items-center gap-2">
-                <LanguageSelectorLuxury />
+                <LanguageSelectorLuxury isDark={isDark} />
                 <ThemeToggle />
               </div>
               {/* Mobile Theme Toggle + Menu */}
               <div className="flex items-center gap-2 md:hidden">
                 <ThemeToggle size="sm" />
-                <LanguageSelectorLuxury size="sm" />
+                <LanguageSelectorLuxury isDark={isDark} size="sm" />
                 <MobileMenuLuxury
                   isDark={isDark}
                   onContactClick={() => setIsContactOpen(true)}

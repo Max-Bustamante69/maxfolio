@@ -111,15 +111,15 @@ function Design1Content() {
             {/* Logo + Design Selector */}
             <LogoSelectorBrutalist isDark={isDark} />
           </div>
-          <div className="hidden md:flex gap-8 font-mono text-xs uppercase tracking-[0.2em]">
-            <a href="#work" className={`${textMuted} hover:text-red-600 transition-colors`}>{t('nav.work')}</a>
-            <a href="#about" className={`${textMuted} hover:text-red-600 transition-colors`}>{t('nav.skills')}</a>
-            <a href="#contact" className={`${textMuted} hover:text-red-600 transition-colors`}>{t('nav.contact')}</a>
+          <div className="hidden md:flex items-center gap-8 font-mono text-xs uppercase tracking-[0.2em] h-10">
+            <a href="#work" className={`inline-flex items-center h-10 leading-none ${textMuted} hover:text-red-600 transition-colors`}>{t('nav.work')}</a>
+            <a href="#about" className={`inline-flex items-center h-10 leading-none ${textMuted} hover:text-red-600 transition-colors`}>{t('nav.skills')}</a>
+            <a href="#contact" className={`inline-flex items-center h-10 leading-none ${textMuted} hover:text-red-600 transition-colors`}>{t('nav.contact')}</a>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsContactOpen(true)}
-              className="hidden sm:flex font-mono text-xs uppercase tracking-[0.2em] text-red-600 hover:text-red-500 transition-colors items-center gap-2"
+              className="hidden sm:flex items-center h-10 font-mono text-xs uppercase tracking-[0.2em] leading-none text-red-600 hover:text-red-500 transition-colors gap-2"
             >
               <span className="hidden sm:inline">{t('common.quickEmail')}</span>
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

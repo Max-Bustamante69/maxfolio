@@ -26,7 +26,7 @@ export function LanguageSelectorMenu({ size = 'md' }: { size?: 'sm' | 'md' }) {
         aria-label={t('language.selector.ariaLabel')}
         aria-expanded={open}
         aria-haspopup="menu"
-        className={`relative ${buttonClass} flex items-center justify-center border border-neutral-300/70 rounded-full overflow-hidden backdrop-blur-sm hover:border-neutral-900/50 transition-colors`}
+        className={`relative ${buttonClass} flex items-center justify-center border border-neutral-300/70 rounded-full overflow-hidden backdrop-blur-sm hover:border-neutral-900/50 transition-colors bg-white/70 dark:bg-neutral-950/30`}
         whileHover={{ y: -1 }}
         whileTap={{ y: 0, scale: 0.98 }}
       >

@@ -9,7 +9,13 @@ function localeLabel(locale: Locale) {
   return 'JA'
 }
 
-export function LanguageSelectorLuxury({ size = 'md' }: { size?: 'sm' | 'md' }) {
+export function LanguageSelectorLuxury({
+  isDark,
+  size = 'md',
+}: {
+  isDark: boolean
+  size?: 'sm' | 'md'
+}) {
   const { locale, setLocale } = useLanguage()
   const { t } = useI18n()
   const [open, setOpen] = useState(false)
@@ -17,11 +23,13 @@ export function LanguageSelectorLuxury({ size = 'md' }: { size?: 'sm' | 'md' }) 
   const buttonSize = size === 'sm' ? 'w-9 h-9' : 'w-10 h-10'
   const textSize = size === 'sm' ? 'text-[10px]' : 'text-xs'
 
-  const menuBg = 'bg-deco-navy'
-  const textPrimary = 'text-deco-cream'
-  const textMuted = 'text-deco-cream/60'
-  const accent = 'text-deco-gold'
-  const borderColor = 'border-deco-gold/20'
+  const menuBg = isDark ? 'bg-deco-navy' : 'bg-luxury-cream'
+  const textPrimary = isDark ? 'text-deco-cream' : 'text-luxury-black'
+  const textMuted = isDark ? 'text-deco-cream/60' : 'text-luxury-black/60'
+  const accent = isDark ? 'text-deco-gold' : 'text-luxury-gold'
+  const borderColor = isDark ? 'border-deco-gold/20' : 'border-luxury-gold/20'
+  const buttonBg = isDark ? 'bg-deco-navy/40' : 'bg-luxury-cream/70'
+  const buttonBorder = isDark ? 'border-deco-gold/30' : 'border-luxury-gold/30'
 
   const options = useMemo(() => supportedLocales, [])
 
@@ -35,15 +43,21 @@ export function LanguageSelectorLuxury({ size = 'md' }: { size?: 'sm' | 'md' }) 
         aria-expanded={open}
         aria-haspopup="menu"
       >
+        <div className={`absolute inset-0 rounded-md ${buttonBg} border ${buttonBorder}`} aria-hidden="true" />
         {/* Diamond frame corners */}
         <svg viewBox="0 0 40 40" className="absolute inset-0 w-full h-full" fill="none" aria-hidden="true">
           <path
             d="M20 4 L36 20 L20 36 L4 20 Z"
-            stroke="#d4af37"
+            stroke={isDark ? '#d4af37' : '#C9A962'}
             strokeWidth="1"
             className="opacity-60 group-hover:opacity-100 transition-opacity"
           />
-          <path d="M20 11 L29 20 L20 29 L11 20 Z" stroke="#d4af37" strokeWidth="0.5" className="opacity-30" />
+          <path
+            d="M20 11 L29 20 L20 29 L11 20 Z"
+            stroke={isDark ? '#d4af37' : '#C9A962'}
+            strokeWidth="0.5"
+            className="opacity-30"
+          />
         </svg>
 
         <span className={`relative z-10 ${textSize} font-display tracking-[0.25em] ${textPrimary}`}>
