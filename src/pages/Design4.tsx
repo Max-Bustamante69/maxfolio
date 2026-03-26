@@ -15,13 +15,11 @@ import { useDynamicFavicon } from "../hooks";
 import { useI18n } from "../hooks";
 import {
   personalInfo,
-  hero,
   skills,
   experience,
   freelanceProjects,
   stats,
   contact,
-  nav,
   footer as footerData,
 } from "../data/portfolio-extended";
 
