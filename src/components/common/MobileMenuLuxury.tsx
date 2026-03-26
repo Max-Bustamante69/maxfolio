@@ -58,6 +58,18 @@ export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMen
           }}
           className={menuBg}
         >
+          {/* Large decorative background monogram */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+            <span
+              className={`font-display italic leading-none select-none ${
+                isDark ? 'text-deco-gold/10' : 'text-luxury-gold/10'
+              }`}
+              style={{ fontSize: '44vw' }}
+            >
+              M
+            </span>
+          </div>
+
           {/* Decorative corner elements */}
           <div className={`absolute top-6 left-6 w-12 h-12 border-t border-l ${isDark ? 'border-deco-gold/30' : 'border-luxury-gold/30'}`} />
           <div className={`absolute top-6 right-6 w-12 h-12 border-t border-r ${isDark ? 'border-deco-gold/30' : 'border-luxury-gold/30'}`} />
@@ -79,7 +91,7 @@ export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMen
           </motion.button>
 
           {/* Content */}
-          <div className="h-full flex flex-col items-center justify-center px-8" onClick={(e) => e.stopPropagation()}>
+          <div className="h-full flex flex-col items-center justify-center px-8 relative z-10" onClick={(e) => e.stopPropagation()}>
             {/* Logo/Title */}
             <motion.div
               initial={{ opacity: 0, y: -20 }}

@@ -59,7 +59,7 @@ const ThemeToggle = ({ size = "md" }: { size?: "sm" | "md" }) => {
       {/* Icon */}
       <motion.div
         initial={false}
-        animate={{ rotate: isDark ? 180 : 0 }}
+        animate={{ rotate: 0 }}
         transition={{ duration: 0.5 }}
       >
         {isDark ? (
@@ -913,8 +913,9 @@ function Design4Content() {
               </div>
 
               {/* Contact Info */}
-              <div className="flex flex-col md:flex-row justify-center gap-6 md:gap-8 mb-12 md:mb-16">
-                <div className="text-center">
+              <div className="max-w-3xl mx-auto w-full mb-12 md:mb-16">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-start">
+                  <div className="text-center">
                   <p
                     className={`text-xs tracking-[0.2em] uppercase ${textMuted} mb-2`}
                   >
@@ -926,8 +927,8 @@ function Design4Content() {
                   >
                     {personalInfo.email}
                   </a>
-                </div>
-                <div className="text-center">
+                  </div>
+                  <div className="text-center">
                   <p
                     className={`text-xs tracking-[0.2em] uppercase ${textMuted} mb-2`}
                   >
@@ -939,8 +940,8 @@ function Design4Content() {
                   >
                     {personalInfo.phone}
                   </a>
-                </div>
-                <div className="text-center">
+                  </div>
+                  <div className="text-center">
                   <p
                     className={`text-xs tracking-[0.2em] uppercase ${textMuted} mb-2`}
                   >
@@ -949,10 +950,11 @@ function Design4Content() {
                   <p className={`${textSecondary} text-sm md:text-base`}>
                     {personalInfo.location}
                   </p>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex justify-center gap-6 md:gap-8">
+              <div className="flex justify-center gap-6 md:gap-8 max-w-3xl mx-auto">
                 {["LinkedIn", "GitHub", "Portfolio"].map((platform) => (
                   <a
                     key={platform}
