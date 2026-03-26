@@ -78,12 +78,12 @@ function HomeContent() {
             transitionColor="#FAF8F5"
             transitionAccent="#C9A962"
             transitionLabel={t('menuPage.designNames.luxuryMinimal')}
-            className={`text-xs uppercase tracking-[0.2em] ${textMuted} hover:${text} transition-colors`}
+            className={`inline-flex items-center h-10 text-xs uppercase tracking-[0.2em] leading-none ${textMuted} hover:${text} transition-colors`}
           >
             {t('menuPage.mainPortfolio')}
           </TransitionLink>
           <div className="flex items-center gap-4">
-            <span className={`hidden sm:block text-xs ${textMuted}`}>{personalInfo.name}</span>
+            <span className={`hidden sm:block text-xs leading-none ${textMuted}`}>{personalInfo.name}</span>
             <LanguageSelectorMenu />
             <ThemeToggle />
           </div>
