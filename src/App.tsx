@@ -1,5 +1,6 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { useEffect, useRef } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import { PageTransitionProvider, usePageTransition } from './components'
 import { LanguageProvider } from './context/LanguageContext'
 import Home from './pages/Home'
