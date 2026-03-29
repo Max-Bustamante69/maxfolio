@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useState, FormEvent } from 'react'
 import { config } from '../../config'
 import { personalInfo } from '../../data/portfolio-extended'
+import { useI18n } from '../../hooks'
 
 interface ContactFormModalProps {
   isOpen: boolean
@@ -23,6 +24,7 @@ export function ContactFormModal({
     message: ''
   })
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
+  const { t } = useI18n()
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -143,9 +145,9 @@ export function ContactFormModal({
 
                 {/* Header */}
                 <div className="mb-6">
-                  <h3 id="contact-modal-title" className={`font-display text-2xl mb-2 ${styles.textPrimary}`}>Quick Message</h3>
+                  <h3 id="contact-modal-title" className={`font-display text-2xl mb-2 ${styles.textPrimary}`}>{t('contactModal.title')}</h3>
                   <p className={`text-sm ${styles.textSecondary}`}>
-                    Send me a message and I'll get back to you soon.
+                    {t('contactModal.description')}
                   </p>
                 </div>
 
@@ -161,14 +163,14 @@ export function ContactFormModal({
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
-                    <p className={`font-display text-xl ${styles.textPrimary}`}>Message Sent!</p>
-                    <p className={`text-sm ${styles.textSecondary} mt-2`}>I'll respond as soon as possible.</p>
+                    <p className={`font-display text-xl ${styles.textPrimary}`}>{t('contactModal.sentTitle')}</p>
+                    <p className={`text-sm ${styles.textSecondary} mt-2`}>{t('contactModal.sentSubtitle')}</p>
                   </motion.div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-4" aria-label="Contact form">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label htmlFor="contact-name" className="sr-only">Your name</label>
+                        <label htmlFor="contact-name" className="sr-only">{t('common.name')}</label>
                         <input
                           id="contact-name"
                           type="text"
@@ -176,12 +178,12 @@ export function ContactFormModal({
                           value={formData.name}
                           onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                           className={`w-full border px-4 py-3 text-sm focus:outline-none transition-colors ${styles.bgInput}`}
-                          placeholder="Name"
+                          placeholder={t('common.name')}
                           autoComplete="name"
                         />
                       </div>
                       <div>
-                        <label htmlFor="contact-email" className="sr-only">Your email</label>
+                        <label htmlFor="contact-email" className="sr-only">{t('common.email')}</label>
                         <input
                           id="contact-email"
                           type="email"
@@ -189,23 +191,23 @@ export function ContactFormModal({
                           value={formData.email}
                           onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                           className={`w-full border px-4 py-3 text-sm focus:outline-none transition-colors ${styles.bgInput}`}
-                          placeholder="Email"
+                          placeholder={t('common.email')}
                           autoComplete="email"
                         />
                       </div>
                     </div>
                     
-                    <label htmlFor="contact-subject" className="sr-only">Subject</label>
+                    <label htmlFor="contact-subject" className="sr-only">{t('common.subject')}</label>
                     <input
                       id="contact-subject"
                       type="text"
                       value={formData.subject}
                       onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
                       className={`w-full border px-4 py-3 text-sm focus:outline-none transition-colors ${styles.bgInput}`}
-                      placeholder="Subject (optional)"
+                      placeholder={t('common.subjectOptional')}
                     />
                     
-                    <label htmlFor="contact-message" className="sr-only">Your message</label>
+                    <label htmlFor="contact-message" className="sr-only">{t('common.yourMessageLabel')}</label>
                     <textarea
                       id="contact-message"
                       required
@@ -213,7 +215,7 @@ export function ContactFormModal({
                       value={formData.message}
                       onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
                       className={`w-full border px-4 py-3 text-sm focus:outline-none transition-colors resize-none ${styles.bgInput}`}
-                      placeholder="Your message..."
+                      placeholder={t('common.yourMessage')}
                     />
 
                     <div className="flex gap-3 pt-2">
@@ -222,7 +224,7 @@ export function ContactFormModal({
                         onClick={onClose}
                         className={`flex-1 py-3 border text-sm transition-colors ${styles.btnSecondary}`}
                       >
-                        Cancel
+                        {t('common.cancel')}
                       </button>
                       <button
                         type="submit"
@@ -235,9 +237,9 @@ export function ContactFormModal({
                               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                             </svg>
-                            Sending...
+                            {t('common.sending')}
                           </>
-                        ) : 'Send Message'}
+                        ) : t('common.sendMessage')}
                       </button>
                     </div>
                   </form>
@@ -245,7 +247,7 @@ export function ContactFormModal({
 
                 <div className="mt-6 text-center">
                   <p className={`text-xs ${styles.textMuted}`}>
-                    Or email directly:{' '}
+                    {t('common.orEmailDirectly')}{' '}
                     <a href={`mailto:${personalInfo.email}`} target="_blank" rel="noopener noreferrer" className={styles.accent}>
                       {personalInfo.email}
                     </a>
@@ -275,8 +277,8 @@ export function ContactFormModal({
               {/* Header */}
               <div className="flex justify-between items-start mb-6">
                 <div>
-                  <h3 id="contact-modal-title-mobile" className={`font-display text-xl mb-1 ${styles.textPrimary}`}>Quick Message</h3>
-                  <p className={`text-xs ${styles.textSecondary}`}>I'll respond as soon as possible.</p>
+                  <h3 id="contact-modal-title-mobile" className={`font-display text-xl mb-1 ${styles.textPrimary}`}>{t('contactModal.title')}</h3>
+                  <p className={`text-xs ${styles.textSecondary}`}>{t('contactModal.sentSubtitle')}</p>
                 </div>
                 <button onClick={onClose} className={styles.textMuted} aria-label="Close contact form">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -296,11 +298,11 @@ export function ContactFormModal({
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <p className={`font-display text-lg ${styles.textPrimary}`}>Sent!</p>
+                  <p className={`font-display text-lg ${styles.textPrimary}`}>{t('contactModal.successSent')}</p>
                 </motion.div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4" aria-label="Contact form">
-                  <label htmlFor="contact-name-mobile" className="sr-only">Your name</label>
+                  <label htmlFor="contact-name-mobile" className="sr-only">{t('common.name')}</label>
                   <input
                     id="contact-name-mobile"
                     type="text"
@@ -308,11 +310,11 @@ export function ContactFormModal({
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                     className={`w-full border-2 px-4 py-3.5 rounded-xl text-base focus:outline-none transition-colors ${styles.bgInput}`}
-                    placeholder="Your name"
+                    placeholder={t('common.name')}
                     autoComplete="name"
                   />
                   
-                  <label htmlFor="contact-email-mobile" className="sr-only">Your email</label>
+                  <label htmlFor="contact-email-mobile" className="sr-only">{t('common.email')}</label>
                   <input
                     id="contact-email-mobile"
                     type="email"
@@ -320,11 +322,11 @@ export function ContactFormModal({
                     value={formData.email}
                     onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                     className={`w-full border-2 px-4 py-3.5 rounded-xl text-base focus:outline-none transition-colors ${styles.bgInput}`}
-                    placeholder="Your email"
+                    placeholder={t('common.email')}
                     autoComplete="email"
                   />
                   
-                  <label htmlFor="contact-message-mobile" className="sr-only">Your message</label>
+                  <label htmlFor="contact-message-mobile" className="sr-only">{t('common.yourMessageLabel')}</label>
                   <textarea
                     id="contact-message-mobile"
                     required
@@ -332,7 +334,7 @@ export function ContactFormModal({
                     value={formData.message}
                     onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
                     className={`w-full border-2 px-4 py-3.5 rounded-xl text-base focus:outline-none transition-colors resize-none ${styles.bgInput}`}
-                    placeholder="Your message..."
+                    placeholder={t('common.yourMessage')}
                   />
 
                   <div className="flex gap-3 pt-2">
@@ -341,14 +343,14 @@ export function ContactFormModal({
                       onClick={onClose}
                       className={`flex-1 py-4 rounded-xl border-2 text-sm ${styles.btnSecondary}`}
                     >
-                      Cancel
+                      {t('common.cancel')}
                     </button>
                     <button
                       type="submit"
                       disabled={status === 'sending'}
                       className={`flex-1 py-4 rounded-xl text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2 ${styles.btnPrimary}`}
                     >
-                      {status === 'sending' ? 'Sending...' : 'Send'}
+                      {status === 'sending' ? t('common.sending') : t('common.send')}
                     </button>
                   </div>
                 </form>

@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { TransitionLink } from "./TransitionLink";
 
 interface LogoSelectorLuxuryProps {
@@ -9,12 +9,40 @@ interface LogoSelectorLuxuryProps {
 export function LogoSelectorLuxury({ isDark }: LogoSelectorLuxuryProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Show hint after a delay, then pulse it
   useEffect(() => {
     const timer = setTimeout(() => setShowHint(true), 2000);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+
+    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node | null;
+      if (containerRef.current && target && !containerRef.current.contains(target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+    };
+  }, [isOpen]);
 
   const menuBg = isDark ? "bg-deco-navy" : "bg-luxury-cream";
   const textPrimary = isDark ? "text-deco-cream" : "text-luxury-black";
@@ -25,7 +53,7 @@ export function LogoSelectorLuxury({ isDark }: LogoSelectorLuxuryProps) {
   const glowColor = isDark ? "rgba(212, 175, 55, 0.3)" : "rgba(201, 169, 98, 0.3)";
 
   return (
-    <div className="relative flex items-center gap-1">
+    <div ref={containerRef} className="relative flex items-center gap-1">
       {/* Logo Button with Glow Effect */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}

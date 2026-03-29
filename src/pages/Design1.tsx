@@ -1,8 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 import { ThemeProvider, useTheme } from '../context/ThemeContext'
-import { ContactFormModal, ExploreDesignsBrutalist, CompanyLogo, MobileMenuBrutalist, LogoSelectorBrutalist, SEOHead } from '../components'
-import { useDynamicFavicon } from '../hooks'
+import { ContactFormModal, ExploreDesignsBrutalist, CompanyLogo, MobileMenuBrutalist, LogoSelectorBrutalist, SEOHead, LanguageSelectorBrutalist } from '../components'
+import { useDynamicFavicon, useI18n } from '../hooks'
 import { 
   personalInfo, 
   hero,
@@ -66,6 +66,7 @@ const ThemeToggle = ({ size = 'md' }: { size?: 'sm' | 'md' }) => {
 
 function Design1Content() {
   const { isDark } = useTheme()
+  const { t } = useI18n()
   const [isContactOpen, setIsContactOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<'work' | 'freelance'>('work')
 
@@ -110,36 +111,38 @@ function Design1Content() {
             {/* Logo + Design Selector */}
             <LogoSelectorBrutalist isDark={isDark} />
           </div>
-          <div className="hidden md:flex gap-8 font-mono text-xs uppercase tracking-[0.2em]">
-            <a href="#work" className={`${textMuted} hover:text-red-600 transition-colors`}>Work</a>
-            <a href="#about" className={`${textMuted} hover:text-red-600 transition-colors`}>About</a>
-            <a href="#contact" className={`${textMuted} hover:text-red-600 transition-colors`}>Contact</a>
+          <div className="hidden md:flex items-center gap-8 font-mono text-xs uppercase tracking-[0.2em] h-10">
+            <a href="#work" className={`inline-flex items-center h-10 leading-none ${textMuted} hover:text-red-600 transition-colors`}>{t('nav.work')}</a>
+            <a href="#about" className={`inline-flex items-center h-10 leading-none ${textMuted} hover:text-red-600 transition-colors`}>{t('nav.skills')}</a>
+            <a href="#contact" className={`inline-flex items-center h-10 leading-none ${textMuted} hover:text-red-600 transition-colors`}>{t('nav.contact')}</a>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsContactOpen(true)}
-              className="hidden sm:flex font-mono text-xs uppercase tracking-[0.2em] text-red-600 hover:text-red-500 transition-colors items-center gap-2"
+              className="hidden sm:flex items-center h-10 font-mono text-xs uppercase tracking-[0.2em] leading-none text-red-600 hover:text-red-500 transition-colors gap-2"
             >
-              <span className="hidden sm:inline">Quick Email</span>
+              <span className="hidden sm:inline">{t('common.quickEmail')}</span>
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             </button>
             {/* Desktop Theme Toggle */}
-            <div className="hidden md:block">
+            <div className="hidden md:flex items-center gap-2">
+              <LanguageSelectorBrutalist />
               <ThemeToggle />
             </div>
             {/* Mobile Theme Toggle + Menu */}
             <div className="flex items-center gap-2 md:hidden">
               <ThemeToggle size="sm" />
+              <LanguageSelectorBrutalist size="sm" />
               <MobileMenuBrutalist
                 isDark={isDark}
                 onContactClick={() => setIsContactOpen(true)}
                 navItems={[
-                  { label: 'Work', href: '#work' },
-                  { label: 'Skills', href: '#about' },
-                  { label: 'Contact', href: '#contact' },
-                  { label: 'Other Styles', href: '#explore' },
+                  { label: t('nav.work'), href: '#work' },
+                  { label: t('nav.skills'), href: '#about' },
+                  { label: t('nav.contact'), href: '#contact' },
+                  { label: t('nav.otherStyles'), href: '#explore' },
                 ]}
               />
             </div>
@@ -237,7 +240,7 @@ function Design1Content() {
                     className="flex-1 border-2 border-red-600 px-6 py-3 hover:bg-red-600 transition-colors group"
                   >
                     <span className="font-mono text-xs uppercase tracking-wider text-red-500 group-hover:text-white">
-                      Quick Message
+                      {t('common.quickMessage')}
                     </span>
                   </button>
                   <button
@@ -256,7 +259,7 @@ function Design1Content() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                     <span className="font-mono text-xs uppercase tracking-wider">
-                      Download CV
+                      {t('common.downloadCV')}
                     </span>
                   </button>
                 </div>
@@ -275,10 +278,11 @@ function Design1Content() {
             viewport={{ once: true }}
             className="mb-12 md:mb-16"
           >
-            <span className={`font-mono text-xs uppercase tracking-[0.5em] ${textMuted}`}>Section 02</span>
+            <span className={`font-mono text-xs uppercase tracking-[0.5em] ${textMuted}`}>{t('sections.section02')}</span>
             <h2 className="font-editorial text-[12vw] md:text-[8vw] leading-[0.85] tracking-tight italic mt-4">
-              Professional<br />
-              <span className="not-italic text-red-600">Experience</span>
+              {t('sections.professionalExperience')}
+              <br />
+              <span className="not-italic text-red-600">{t('sections.experience')}</span>
             </h2>
           </motion.div>
 
@@ -292,7 +296,7 @@ function Design1Content() {
                   : `${borderColor} ${textMuted} hover:border-red-600`
               }`}
             >
-              Companies
+              {t('nav.companies')}
             </button>
             <button
               onClick={() => setActiveTab('freelance')}
@@ -302,7 +306,7 @@ function Design1Content() {
                   : `${borderColor} ${textMuted} hover:border-red-600`
               }`}
             >
-              Freelance
+              {t('nav.freelance')}
             </button>
           </div>
 
@@ -481,7 +485,7 @@ function Design1Content() {
               {contact.title}
             </p>
             <h2 className="font-editorial text-[10vw] md:text-[6vw] leading-[0.85] tracking-tight italic mb-8 md:mb-12">
-              Get In<br />Touch
+              {t('contactPage.getInTouch')}
             </h2>
             
             <p className="text-red-100 max-w-xl mx-auto mb-8 md:mb-12 text-sm md:text-base">
@@ -496,7 +500,7 @@ function Design1Content() {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                Quick Email
+                {t('common.quickEmail')}
               </button>
               <button
                 onClick={() => {
@@ -513,19 +517,23 @@ function Design1Content() {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
-                Download CV
+                {t('common.downloadCV')}
               </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto mb-12">
               <div>
-                <p className="font-mono text-xs uppercase tracking-wider text-red-200 mb-2">Phone</p>
+                <p className="font-mono text-xs uppercase tracking-wider text-red-200 mb-2">
+                  {t('contactPage.phone')}
+                </p>
                 <a href={`tel:${personalInfo.phone}`} className="hover:text-red-200 transition-colors">
                   {personalInfo.phone}
                 </a>
               </div>
               <div>
-                <p className="font-mono text-xs uppercase tracking-wider text-red-200 mb-2">Location</p>
+                <p className="font-mono text-xs uppercase tracking-wider text-red-200 mb-2">
+                  {t('contactPage.location')}
+                </p>
                 <p>{personalInfo.location}</p>
               </div>
               <div>

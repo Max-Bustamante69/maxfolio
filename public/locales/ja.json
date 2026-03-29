@@ -1,0 +1,151 @@
+{
+  "language": {
+    "selector": {
+      "ariaLabel": "言語を選択",
+      "title": "言語"
+    }
+  },
+  "common": {
+    "quickEmail": "クイックメール",
+    "quickMessage": "クイックメッセージ",
+    "downloadCV": "CVをダウンロード",
+    "cancel": "キャンセル",
+    "sending": "送信中...",
+    "sendMessage": "メッセージを送信",
+    "messageSent": "メッセージを送信しました！",
+    "respondSoon": "できるだけ早く返信します。",
+    "orEmailDirectly": "またはメールで直接：",
+    "name": "お名前",
+    "email": "メールアドレス",
+    "subjectOptional": "件名（任意）",
+    "subject": "件名",
+    "yourMessage": "メッセージを入力...",
+    "yourMessageLabel": "メッセージ",
+    "send": "送信"
+  },
+  "nav": {
+    "home": "ホーム",
+    "experience": "経験",
+    "skills": "スキル",
+    "contact": "連絡先",
+    "explore": "探索",
+    "work": "仕事",
+    "freelance": "フリーランス",
+    "companies": "企業",
+    "otherStyles": "他のスタイル"
+  },
+  "hero": {
+    "greeting": "こんにちは、私は",
+    "description": "EAFIT大学のソフトウェアエンジニアリング学生で、モダンなWeb開発に幅広い経験があります。React、Next.jsを中心に、ビジネスの成果につながる美しく機能的なユーザー体験を作ることを得意としています。",
+    "currentFocus": {
+      "title": "現在の注力",
+      "item1": "Ellamau SAS でフロントエンドリード",
+      "item2": "Shopify Liquid でスケーラブルなECソリューションを構築",
+      "item3": "フリーランスのWeb開発案件"
+    },
+    "buttons": {
+      "getInTouch": "お問い合わせ",
+      "downloadCV": "CVをダウンロード"
+    }
+  },
+  "personal": {
+    "title": "ソフトウェアエンジニア"
+  },
+  "sections": {
+    "experience": "経験",
+    "skills": "スキル",
+    "contact": "連絡先",
+    "exploreOtherDesigns": "他のデザインを探す",
+    "alternativeViews": "別の視点",
+    "experienceTabWork": "仕事",
+    "experienceTabFreelance": "フリーランス",
+    "section02": "セクション02",
+    "professionalExperience": "プロフェッショナル",
+    "magazineProfile": "プロフィール",
+    "aboutSkills": "スキル",
+    "companies": "企業"
+  },
+  "skills": {
+    "about": "概要",
+    "languages": "言語",
+    "frameworks": "フレームワーク",
+    "databases": "データベース",
+    "platforms": "プラットフォーム"
+  },
+  "mobileMenu": {
+    "navigation": "ナビゲーション",
+    "menu": "メニュー"
+  },
+  "contactPage": {
+    "getInTouch": "連絡を取ろう",
+    "email": "メール",
+    "phone": "電話",
+    "location": "所在地"
+  },
+  "exploreLuxury": {
+    "tagline": "別の視点",
+    "headlinePrefix": "探索",
+    "headlineRest": "その他の美学",
+    "description": "同じプロフェッショナルな道のりを、異なるデザイン言語で表現します。",
+    "cardBrutalistTitle": "ブルータリスト・エディトリアル",
+    "cardBrutalistSubtitle": "大胆でインパクト抜群",
+    "cardMenuTitle": "デザインメニュー",
+    "cardMenuSubtitle": "オプションを比較",
+    "currently": "現在：",
+    "viewingLuxury": "ラグジュアリー・ミニマル"
+  },
+  "exploreBrutalist": {
+    "styles": "スタイル",
+    "description": "同じプロジェクト、同じスキル。まったく別のビジュアル言語で提示します。",
+    "viewing": "閲覧中：",
+    "viewingBrutalist": "ブルータリスト"
+  },
+  "menuPage": {
+    "seoTitle": "Maximiliano Bustamante | ポートフォリオ デザインセレクター",
+    "seoDescription": "お気に入りのポートフォリオ体験を選択してください。React、Next.js、TypeScript、そしてEC開発に特化したフロントエンドデベロッパーです。",
+    "mainPortfolio": "← メインポートフォリオ",
+    "designSelector": "デザインセレクター",
+    "oneDeveloper": "ひとりの開発者",
+    "vision": "ビジョン",
+    "subtitle": "好みの世界観を選べます。同じ内容、違うデザイン言語。",
+    "availableDesigns": "利用可能なデザイン",
+    "options": "オプション",
+    "default": "デフォルト",
+    "viewAll": "すべてのデザインを見る",
+    "whyTwoVersions": "なぜ2つのバージョン？",
+    "whyTwoVersionsDesc": "状況に合わせて、異なる美学を。同じスキルで、確かな汎用性。",
+    "startWithDefault": "デフォルトから始める",
+    "visionStyles": {
+      "elegant": "エレガント",
+      "bold": "大胆"
+    },
+    "designNames": {
+      "luxuryMinimal": "ラグジュアリー・ミニマル",
+      "brutalistEditorial": "ブルータリスト・エディトリアル"
+    },
+    "designSubtitles": {
+      "luxuryMinimal": "エレガント＆洗練",
+      "brutalistEditorial": "大胆で生っぽい"
+    }
+  },
+  "contactModal": {
+    "title": "クイックメッセージ",
+    "description": "メッセージを送ってください。できるだけ早く返信します。",
+    "sentTitle": "メッセージを送信しました！",
+    "sentSubtitle": "できるだけ早く返信します。",
+    "successSent": "送信完了！"
+  },
+  "logoSelector": {
+    "selectExperience": "体験を選択",
+    "portfolioExperience": "ポートフォリオ体験",
+    "selectYourStyle": "スタイルを選択",
+    "currentlyViewing": "現在表示中",
+    "switchExperience": "体験を切り替える",
+    "otherExperiences": "他の体験",
+    "designMenu": "デザインメニュー",
+    "allDesigns": "すべてのデザイン",
+    "luxuryMinimal": "ラグジュアリー・ミニマル",
+    "brutalistEditorial": "ブルータリスト・エディトリアル"
+  }
+}
+

@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { LuxuryPreview, MenuPreview } from '../previews'
 import { TransitionLink } from '../common'
 import { useState } from 'react'
+import { useI18n } from '../../hooks'
 
 interface ExploreDesignsBrutalistProps {
   isDark: boolean
@@ -9,6 +10,7 @@ interface ExploreDesignsBrutalistProps {
 
 export function ExploreDesignsBrutalist({ isDark }: ExploreDesignsBrutalistProps) {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
+  const { t } = useI18n()
   
   const textPrimary = isDark ? 'text-stone-100' : 'text-stone-900'
   const textSecondary = isDark ? 'text-stone-400' : 'text-stone-600'
@@ -26,13 +28,13 @@ export function ExploreDesignsBrutalist({ isDark }: ExploreDesignsBrutalistProps
           </span>
           <h2 className={`font-editorial text-[14vw] sm:text-[10vw] md:text-[8vw] leading-[0.85] tracking-tight italic mt-4 ${textPrimary}`}>
             Other<br />
-            <span className="text-red-600">Styles</span>
+            <span className="text-red-600">{t('exploreBrutalist.styles')}</span>
           </h2>
           
           {/* Description - prominent position below headline */}
           <div className={`mt-8 pt-6 border-t ${borderColor} max-w-2xl`}>
             <p className={`font-editorial text-xl md:text-2xl italic ${textSecondary} leading-relaxed`}>
-              "Same projects, same skills — presented through a completely different visual language."
+              {t('exploreBrutalist.description')}
             </p>
             <p className={`font-mono text-xs uppercase tracking-wider ${textMuted} mt-4`}>
               Because great developers adapt to any aesthetic
@@ -49,7 +51,7 @@ export function ExploreDesignsBrutalist({ isDark }: ExploreDesignsBrutalistProps
           to="/"
           transitionColor="#FAF8F5"
           transitionAccent="#C9A962"
-          transitionLabel="Luxury Minimal"
+          transitionLabel={t('menuPage.designNames.luxuryMinimal')}
           onMouseEnter={() => setHoveredCard('luxury')}
           onMouseLeave={() => setHoveredCard(null)}
           className={`group block border-b-2 ${borderColor}`}
@@ -65,7 +67,7 @@ export function ExploreDesignsBrutalist({ isDark }: ExploreDesignsBrutalistProps
             {/* Content */}
             <div className="col-span-10 md:col-span-7 lg:col-span-8 p-4 md:p-6">
               <h3 className={`font-editorial text-2xl sm:text-3xl md:text-4xl italic ${textPrimary} group-hover:text-[#C9A962] transition-colors`}>
-                Luxury Minimal
+                {t('menuPage.designNames.luxuryMinimal')}
               </h3>
               <p className={`font-mono text-xs uppercase tracking-wider ${textMuted} mt-2`}>
                 Elegant • Refined • Gold Accents
@@ -105,7 +107,7 @@ export function ExploreDesignsBrutalist({ isDark }: ExploreDesignsBrutalistProps
           to="/menu"
           transitionColor={isDark ? '#171717' : '#fafafa'}
           transitionAccent={isDark ? '#ffffff' : '#171717'}
-          transitionLabel="Design Menu"
+          transitionLabel={t('logoSelector.designMenu')}
           onMouseEnter={() => setHoveredCard('menu')}
           onMouseLeave={() => setHoveredCard(null)}
           className={`group block border-b-2 ${borderColor}`}
@@ -121,7 +123,7 @@ export function ExploreDesignsBrutalist({ isDark }: ExploreDesignsBrutalistProps
             {/* Content */}
             <div className="col-span-10 md:col-span-7 lg:col-span-8 p-4 md:p-6">
               <h3 className={`font-editorial text-2xl sm:text-3xl md:text-4xl italic ${textPrimary} group-hover:text-red-600 transition-colors`}>
-                Design Menu
+                {t('logoSelector.designMenu')}
               </h3>
               <p className={`font-mono text-xs uppercase tracking-wider ${textMuted} mt-2`}>
                 Compare • Select • Explore
@@ -161,7 +163,7 @@ export function ExploreDesignsBrutalist({ isDark }: ExploreDesignsBrutalistProps
       <div className={`py-6 px-4 md:px-6`}>
         <div className="max-w-[1800px] mx-auto flex items-center justify-between">
           <p className={`font-mono text-xs ${textMuted} uppercase tracking-wider`}>
-            Viewing: <span className="text-red-600">Brutalist</span>
+            {t('exploreBrutalist.viewing')} <span className="text-red-600">{t('exploreBrutalist.viewingBrutalist')}</span>
           </p>
           <p className={`font-mono text-xs ${textMuted}`}>
             2 styles

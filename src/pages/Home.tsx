@@ -1,8 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { ThemeProvider, useTheme } from '../context/ThemeContext'
-import { ThemeToggle, LuxuryPreview, BrutalistPreview, TransitionLink, SEOHead } from '../components'
-import { useDynamicFavicon } from '../hooks'
+import { LanguageSelectorMenu, ThemeToggle, LuxuryPreview, BrutalistPreview, TransitionLink, SEOHead } from '../components'
+import { useDynamicFavicon, useI18n } from '../hooks'
 import { personalInfo } from '../data/portfolio-extended'
 
 const visionStyles = [
@@ -35,6 +35,7 @@ const designs = [
 
 function HomeContent() {
   const { isDark } = useTheme()
+  const { t } = useI18n()
   const [hoveredDesign, setHoveredDesign] = useState<number | null>(null)
   const [autoIndex, setAutoIndex] = useState(0)
 
@@ -64,8 +65,8 @@ function HomeContent() {
     <>
       {/* SEO */}
       <SEOHead 
-        title="Maximiliano Bustamante | Portfolio Design Selector"
-        description="Choose your preferred portfolio experience. Frontend Developer specialized in React, Next.js, TypeScript, and e-commerce development."
+        title={t('menuPage.seoTitle')}
+        description={t('menuPage.seoDescription')}
       />
       
       <div className={`min-h-screen ${bg} ${text} font-body transition-colors duration-300`} role="document">
@@ -76,13 +77,14 @@ function HomeContent() {
             to="/" 
             transitionColor="#FAF8F5"
             transitionAccent="#C9A962"
-            transitionLabel="Luxury Minimal"
-            className={`text-xs uppercase tracking-[0.2em] ${textMuted} hover:${text} transition-colors`}
+            transitionLabel={t('menuPage.designNames.luxuryMinimal')}
+            className={`inline-flex items-center h-10 text-xs uppercase tracking-[0.2em] leading-none ${textMuted} hover:${text} transition-colors`}
           >
-            ← Main Portfolio
+            {t('menuPage.mainPortfolio')}
           </TransitionLink>
           <div className="flex items-center gap-4">
-            <span className={`hidden sm:block text-xs ${textMuted}`}>{personalInfo.name}</span>
+            <span className={`hidden sm:block text-xs leading-none ${textMuted}`}>{personalInfo.name}</span>
+            <LanguageSelectorMenu />
             <ThemeToggle />
           </div>
         </div>
@@ -102,7 +104,7 @@ function HomeContent() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
             </svg>
             <span className={`text-[10px] sm:text-xs tracking-[0.3em] uppercase ${textMuted}`}>
-              Design Selector
+              {t('menuPage.designSelector')}
             </span>
           </motion.div>
           
@@ -113,7 +115,7 @@ function HomeContent() {
             className="mb-6 sm:mb-8"
           >
             <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-medium tracking-tight leading-[1]">
-              One Developer
+              {t('menuPage.oneDeveloper')}
             </span>
             <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-medium tracking-tight leading-[1] mt-1 sm:mt-2 h-[1.15em] flex items-center">
               <AnimatePresence mode="wait">
@@ -125,10 +127,10 @@ function HomeContent() {
                   transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
                   className={visionStyles[activeVisionIndex].className}
                 >
-                  {visionStyles[activeVisionIndex].text}
+                  {activeVisionIndex === 0 ? t('menuPage.visionStyles.elegant') : t('menuPage.visionStyles.bold')}
                 </motion.span>
               </AnimatePresence>
-              <span className="ml-2 sm:ml-3">Vision</span>
+              <span className="ml-2 sm:ml-3">{t('menuPage.vision')}</span>
             </span>
           </motion.h1>
           
@@ -138,7 +140,7 @@ function HomeContent() {
             transition={{ delay: 0.2 }}
             className={`text-sm sm:text-base ${textSecondary} max-w-lg leading-relaxed`}
           >
-            Choose your preferred aesthetic. Same content, different design language.
+            {t('menuPage.subtitle')}
             Hover to preview, click to enter.
           </motion.p>
         </section>
@@ -160,10 +162,10 @@ function HomeContent() {
             className="flex items-center justify-between gap-4 mb-6 sm:mb-8"
           >
             <h2 className={`text-xs uppercase tracking-[0.3em] ${textMuted}`}>
-              Available Designs
+              {t('menuPage.availableDesigns')}
             </h2>
             <span className={`text-xs ${textMuted}`}>
-              {designs.length} options
+              {designs.length} {t('menuPage.options')}
             </span>
           </motion.div>
 
@@ -171,6 +173,10 @@ function HomeContent() {
             {designs.map((design, index) => {
               const isHovered = hoveredDesign === design.id
               const PreviewComponent = design.Preview
+              const designName =
+                design.id === 1 ? t('menuPage.designNames.luxuryMinimal') : t('menuPage.designNames.brutalistEditorial')
+              const designSubtitle =
+                design.id === 1 ? t('menuPage.designSubtitles.luxuryMinimal') : t('menuPage.designSubtitles.brutalistEditorial')
               
               return (
                 <motion.div
@@ -183,7 +189,7 @@ function HomeContent() {
                     to={design.route}
                     transitionColor={design.transitionColor}
                     transitionAccent={design.accentColor}
-                    transitionLabel={design.name}
+                    transitionLabel={designName}
                     onMouseEnter={() => setHoveredDesign(design.id)}
                     onMouseLeave={() => setHoveredDesign(null)}
                     className={`group block ${cardBg} border ${border} overflow-hidden transition-all duration-300 ${
@@ -200,7 +206,7 @@ function HomeContent() {
                           className="absolute top-3 right-3 px-2 py-1 text-[9px] font-medium text-white"
                           style={{ backgroundColor: design.accentColor }}
                         >
-                          Default
+                          {t('menuPage.default')}
                         </div>
                       )}
                     </div>
@@ -212,7 +218,7 @@ function HomeContent() {
                           className="text-lg sm:text-xl font-display font-medium transition-colors duration-300"
                           style={{ color: isHovered ? design.accentColor : undefined }}
                         >
-                          {design.name}
+                          {designName}
                         </h3>
                         <motion.svg 
                           animate={{ x: isHovered ? 0 : -6, opacity: isHovered ? 1 : 0 }}
@@ -227,7 +233,7 @@ function HomeContent() {
                       </div>
                       
                       <p className={`text-xs sm:text-sm ${textMuted}`}>
-                        {design.subtitle}
+                        {designSubtitle}
                       </p>
                     </div>
                   </TransitionLink>
@@ -246,19 +252,17 @@ function HomeContent() {
         >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
             <div className="max-w-sm">
-              <p className={`text-xs uppercase tracking-[0.2em] ${textMuted} mb-2`}>Why two versions?</p>
-              <p className={`text-sm ${textSecondary}`}>
-                Different aesthetics for different contexts. Same skills, proven versatility.
-              </p>
+              <p className={`text-xs uppercase tracking-[0.2em] ${textMuted} mb-2`}>{t('menuPage.whyTwoVersions')}</p>
+              <p className={`text-sm ${textSecondary}`}>{t('menuPage.whyTwoVersionsDesc')}</p>
             </div>
             <TransitionLink 
               to="/"
               transitionColor="#FAF8F5"
               transitionAccent="#C9A962"
-              transitionLabel="Luxury Minimal"
+              transitionLabel={t('menuPage.designNames.luxuryMinimal')}
               className={`inline-flex items-center gap-2 text-sm ${textSecondary} hover:${text} transition-colors group`}
             >
-              <span>Start with default</span>
+              <span>{t('menuPage.startWithDefault')}</span>
               <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>

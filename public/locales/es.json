@@ -1,0 +1,151 @@
+{
+  "language": {
+    "selector": {
+      "ariaLabel": "Seleccionar idioma",
+      "title": "Idioma"
+    }
+  },
+  "common": {
+    "quickEmail": "Correo Rápido",
+    "quickMessage": "Mensaje Rápido",
+    "downloadCV": "Descargar CV",
+    "cancel": "Cancelar",
+    "sending": "Enviando...",
+    "sendMessage": "Enviar Mensaje",
+    "messageSent": "¡Mensaje Enviado!",
+    "respondSoon": "Te responderé pronto.",
+    "orEmailDirectly": "O envíame un correo directamente:",
+    "name": "Tu nombre",
+    "email": "Tu correo",
+    "subjectOptional": "Asunto (opcional)",
+    "subject": "Asunto",
+    "yourMessage": "Tu mensaje...",
+    "yourMessageLabel": "Tu mensaje",
+    "send": "Enviar"
+  },
+  "nav": {
+    "home": "Inicio",
+    "experience": "Experiencia",
+    "skills": "Habilidades",
+    "contact": "Contacto",
+    "explore": "Explorar",
+    "work": "Trabajo",
+    "freelance": "Freelance",
+    "companies": "Empresas",
+    "otherStyles": "Otros estilos"
+  },
+  "hero": {
+    "greeting": "Hola, soy",
+    "description": "Soy un estudiante apasionado de Ingeniería de Software en la Universidad EAFIT, con amplia experiencia en el desarrollo web moderno. Me especializo en React, Next.js y en crear experiencias de usuario hermosas y funcionales que generan resultados para el negocio.",
+    "currentFocus": {
+      "title": "Enfoque Actual",
+      "item1": "Frontend Developer líder en Ellamau SAS",
+      "item2": "Construyendo soluciones de e-commerce escalables con Shopify Liquid",
+      "item3": "Proyectos de desarrollo web freelance"
+    },
+    "buttons": {
+      "getInTouch": "Contactar",
+      "downloadCV": "Descargar CV"
+    }
+  },
+  "personal": {
+    "title": "Ingeniero de Software"
+  },
+  "sections": {
+    "experience": "Experiencia",
+    "skills": "Habilidades",
+    "contact": "Contacto",
+    "exploreOtherDesigns": "Explorar otros diseños",
+    "alternativeViews": "Vistas Alternativas",
+    "experienceTabWork": "Trabajo",
+    "experienceTabFreelance": "Freelance",
+    "section02": "Sección 02",
+    "professionalExperience": "Profesional",
+    "magazineProfile": "Perfil",
+    "aboutSkills": "Habilidades",
+    "companies": "Empresas"
+  },
+  "skills": {
+    "about": "Acerca de",
+    "languages": "Lenguajes",
+    "frameworks": "Frameworks",
+    "databases": "Bases de datos",
+    "platforms": "Plataformas"
+  },
+  "mobileMenu": {
+    "navigation": "Navegación",
+    "menu": "Menú"
+  },
+  "contactPage": {
+    "getInTouch": "Pongámonos en contacto",
+    "email": "Correo",
+    "phone": "Teléfono",
+    "location": "Ubicación"
+  },
+  "exploreLuxury": {
+    "tagline": "Vistas Alternativas",
+    "headlinePrefix": "Explora",
+    "headlineRest": "Otras Estéticas",
+    "description": "El mismo recorrido profesional, expresado a través de diferentes lenguajes de diseño.",
+    "cardBrutalistTitle": "Editorial Brutalista",
+    "cardBrutalistSubtitle": "Audaz e Impactante",
+    "cardMenuTitle": "Menú de Diseño",
+    "cardMenuSubtitle": "Compara Opciones",
+    "currently": "Actualmente:",
+    "viewingLuxury": "Luxury Minimal"
+  },
+  "exploreBrutalist": {
+    "styles": "Estilos",
+    "description": "Los mismos proyectos, las mismas habilidades — presentados con un lenguaje visual completamente distinto.",
+    "viewing": "Viendo:",
+    "viewingBrutalist": "Brutalista"
+  },
+  "menuPage": {
+    "seoTitle": "Maximiliano Bustamante | Selector de Diseño de Portafolio",
+    "seoDescription": "Elige tu experiencia de portafolio preferida. Soy Frontend Developer especializado en React, Next.js, TypeScript y desarrollo de e-commerce.",
+    "mainPortfolio": "← Portafolio Principal",
+    "designSelector": "Selector de Diseño",
+    "oneDeveloper": "Un solo desarrollador",
+    "vision": "Visión",
+    "subtitle": "Elige la estética que prefieras. Mismo contenido, lenguaje de diseño diferente.",
+    "availableDesigns": "Diseños Disponibles",
+    "options": "opciones",
+    "default": "Por defecto",
+    "viewAll": "Ver todos los diseños",
+    "whyTwoVersions": "¿Por qué dos versiones?",
+    "whyTwoVersionsDesc": "Estéticas distintas para contextos diferentes. Las mismas habilidades, probada versatilidad.",
+    "startWithDefault": "Empieza con el por defecto",
+    "visionStyles": {
+      "elegant": "Elegante",
+      "bold": "Audaz"
+    },
+    "designNames": {
+      "luxuryMinimal": "Luxury Minimal",
+      "brutalistEditorial": "Editorial Brutalista"
+    },
+    "designSubtitles": {
+      "luxuryMinimal": "Elegante y refinado",
+      "brutalistEditorial": "Audaz y crudo"
+    }
+  },
+  "contactModal": {
+    "title": "Mensaje Rápido",
+    "description": "Envíame un mensaje y te responderé pronto.",
+    "sentTitle": "¡Mensaje Enviado!",
+    "sentSubtitle": "Responderé lo antes posible.",
+    "successSent": "Enviado!"
+  },
+  "logoSelector": {
+    "selectExperience": "Seleccionar experiencia",
+    "portfolioExperience": "Experiencia del portafolio",
+    "selectYourStyle": "Selecciona tu estilo",
+    "currentlyViewing": "Actualmente en vista",
+    "switchExperience": "Cambiar de experiencia",
+    "otherExperiences": "Otras experiencias",
+    "designMenu": "Menú de diseño",
+    "allDesigns": "Todos los diseños",
+    "luxuryMinimal": "Luxury Minimal",
+    "brutalistEditorial": "Editorial Brutalista"
+  }
+}
+

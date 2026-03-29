@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { BrutalistPreview, MenuPreview } from '../previews'
 import { TransitionLink } from '../common'
 import { useState } from 'react'
+import { useI18n } from '../../hooks'
 
 interface ExploreDesignsLuxuryProps {
   isDark: boolean
@@ -9,6 +10,7 @@ interface ExploreDesignsLuxuryProps {
 
 export function ExploreDesignsLuxury({ isDark }: ExploreDesignsLuxuryProps) {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
+  const { t } = useI18n()
   
   const accent = isDark ? 'text-deco-gold' : 'text-luxury-gold'
   const textPrimary = isDark ? 'text-deco-cream' : 'text-luxury-black'
@@ -32,7 +34,7 @@ export function ExploreDesignsLuxury({ isDark }: ExploreDesignsLuxuryProps) {
               transition={{ duration: 0.8 }}
             />
             <span className={`text-[10px] tracking-[0.5em] uppercase ${accent}`}>
-              Alternative Views
+              {t('exploreLuxury.tagline')}
             </span>
             <motion.div 
               className={`h-px flex-1 max-w-[80px] ${isDark ? 'bg-deco-gold/30' : 'bg-luxury-gold/40'}`}
@@ -44,10 +46,10 @@ export function ExploreDesignsLuxury({ isDark }: ExploreDesignsLuxuryProps) {
           </div>
           
           <h2 className={`font-display text-2xl sm:text-3xl md:text-4xl mb-4 ${textPrimary}`}>
-            <span className="italic">Explore</span> Other Aesthetics
+            <span className="italic">{t('exploreLuxury.headlinePrefix')}</span> {t('exploreLuxury.headlineRest')}
           </h2>
           <p className={`${textSecondary} text-sm max-w-md mx-auto`}>
-            The same professional journey, expressed through different design languages.
+            {t('exploreLuxury.description')}
           </p>
         </div>
 
@@ -64,7 +66,7 @@ export function ExploreDesignsLuxury({ isDark }: ExploreDesignsLuxuryProps) {
               to="/brutalist"
               transitionColor="#1c1917"
               transitionAccent="#dc2626"
-              transitionLabel="Brutalist Editorial"
+              transitionLabel={t('exploreLuxury.cardBrutalistTitle')}
               onMouseEnter={() => setHoveredCard('brutalist')}
               onMouseLeave={() => setHoveredCard(null)}
               className={`group block border ${borderColor} ${cardBg} backdrop-blur-sm overflow-hidden transition-all duration-500 hover:border-red-600/30`}
@@ -77,9 +79,9 @@ export function ExploreDesignsLuxury({ isDark }: ExploreDesignsLuxuryProps) {
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className={`font-display text-lg ${textPrimary} group-hover:text-red-600 transition-colors duration-300`}>
-                      Brutalist Editorial
+                      {t('exploreLuxury.cardBrutalistTitle')}
                     </h3>
-                    <p className={`text-xs ${textMuted} mt-1`}>Bold & Impactful</p>
+                    <p className={`text-xs ${textMuted} mt-1`}>{t('exploreLuxury.cardBrutalistSubtitle')}</p>
                   </div>
                   <motion.div
                     animate={{ x: hoveredCard === 'brutalist' ? 0 : -8, opacity: hoveredCard === 'brutalist' ? 1 : 0 }}
@@ -105,7 +107,7 @@ export function ExploreDesignsLuxury({ isDark }: ExploreDesignsLuxuryProps) {
               to="/menu"
               transitionColor={isDark ? '#171717' : '#fafafa'}
               transitionAccent={isDark ? '#ffffff' : '#171717'}
-              transitionLabel="Design Menu"
+              transitionLabel={t('exploreLuxury.cardMenuTitle')}
               onMouseEnter={() => setHoveredCard('menu')}
               onMouseLeave={() => setHoveredCard(null)}
               className={`group block border ${borderColor} ${cardBg} backdrop-blur-sm overflow-hidden transition-all duration-500 hover:${isDark ? 'border-deco-gold/40' : 'border-luxury-gold/40'}`}
@@ -118,9 +120,9 @@ export function ExploreDesignsLuxury({ isDark }: ExploreDesignsLuxuryProps) {
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className={`font-display text-lg ${textPrimary} group-hover:${accent} transition-colors duration-300`}>
-                      Design Menu
+                      {t('exploreLuxury.cardMenuTitle')}
                     </h3>
-                    <p className={`text-xs ${textMuted} mt-1`}>Compare Options</p>
+                    <p className={`text-xs ${textMuted} mt-1`}>{t('exploreLuxury.cardMenuSubtitle')}</p>
                   </div>
                   <motion.div
                     animate={{ x: hoveredCard === 'menu' ? 0 : -8, opacity: hoveredCard === 'menu' ? 1 : 0 }}
@@ -141,7 +143,7 @@ export function ExploreDesignsLuxury({ isDark }: ExploreDesignsLuxuryProps) {
           <div className="flex items-center justify-center gap-4">
             <div className={`w-8 h-px ${isDark ? 'bg-deco-gold/20' : 'bg-luxury-black/10'}`} />
             <p className={`text-[11px] tracking-wider ${textMuted}`}>
-              Currently: <span className={`${accent} italic`}>Luxury Minimal</span>
+              {t('exploreLuxury.currently')} <span className={`${accent} italic`}>{t('exploreLuxury.viewingLuxury')}</span>
             </p>
             <div className={`w-8 h-px ${isDark ? 'bg-deco-gold/20' : 'bg-luxury-black/10'}`} />
           </div>

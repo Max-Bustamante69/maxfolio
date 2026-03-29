@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { TransitionLink } from "./TransitionLink";
 
 interface LogoSelectorBrutalistProps {
@@ -9,6 +9,7 @@ interface LogoSelectorBrutalistProps {
 export function LogoSelectorBrutalist({ isDark }: LogoSelectorBrutalistProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Show hint after a delay
   useEffect(() => {
@@ -16,13 +17,40 @@ export function LogoSelectorBrutalist({ isDark }: LogoSelectorBrutalistProps) {
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+
+    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node | null;
+      if (containerRef.current && target && !containerRef.current.contains(target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+    };
+  }, [isOpen]);
+
   const menuBg = isDark ? "bg-stone-950" : "bg-stone-100";
   const textPrimary = isDark ? "text-stone-100" : "text-stone-900";
   const textMuted = isDark ? "text-stone-500" : "text-stone-500";
   const borderColor = isDark ? "border-stone-800" : "border-stone-300";
 
   return (
-    <div className="relative flex items-center gap-1">
+    <div ref={containerRef} className="relative flex items-center gap-1">
       {/* Logo Button with hover effects */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}

@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { TransitionLink } from './TransitionLink'
+import { useI18n } from '../../hooks'
 
 interface NavItem {
   label: string
@@ -16,6 +17,7 @@ interface MobileMenuBrutalistProps {
 
 export function MobileMenuBrutalist({ navItems, isDark, onContactClick }: MobileMenuBrutalistProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const { t } = useI18n()
 
   // Prevent body scroll when menu is open
   useEffect(() => {
@@ -88,7 +90,7 @@ export function MobileMenuBrutalist({ navItems, isDark, onContactClick }: Mobile
               className="mb-8"
             >
               <span className="font-mono text-[10px] uppercase tracking-[0.5em] text-red-600">
-                Menu
+                {t('mobileMenu.menu')}
               </span>
             </motion.div>
 
@@ -124,7 +126,7 @@ export function MobileMenuBrutalist({ navItems, isDark, onContactClick }: Mobile
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                Quick Message
+                {t('common.quickMessage')}
               </motion.button>
             )}
 
@@ -144,26 +146,26 @@ export function MobileMenuBrutalist({ navItems, isDark, onContactClick }: Mobile
               className="text-center"
             >
               <p className={`font-mono text-[10px] uppercase tracking-[0.3em] ${textMuted} mb-4`}>
-                Switch Style
+                {t('logoSelector.switchExperience')}
               </p>
               <div className="flex gap-6">
                 <TransitionLink
                   to="/menu"
                   transitionColor={isDark ? '#171717' : '#fafafa'}
                   transitionAccent={isDark ? '#ffffff' : '#171717'}
-                  transitionLabel="Design Menu"
+                  transitionLabel={t('logoSelector.designMenu')}
                   className={`font-mono text-xs uppercase tracking-wider ${textMuted} hover:text-red-600 transition-colors`}
                 >
-                  All
+                  {t('logoSelector.allDesigns')}
                 </TransitionLink>
                 <TransitionLink
                   to="/"
                   transitionColor="#FAF8F5"
                   transitionAccent="#C9A962"
-                  transitionLabel="Luxury Minimal"
+                  transitionLabel={t('menuPage.designNames.luxuryMinimal')}
                   className={`font-mono text-xs uppercase tracking-wider ${textMuted} hover:text-red-600 transition-colors`}
                 >
-                  Luxury →
+                  {t('menuPage.designNames.luxuryMinimal')} →
                 </TransitionLink>
               </div>
             </motion.div>
