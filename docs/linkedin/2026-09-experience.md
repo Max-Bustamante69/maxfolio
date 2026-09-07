@@ -2,7 +2,7 @@
 
 Source of truth: `src/data/registry.ts` + `src/content/en.ts` (same titles, dates and figures as the
 portfolio). Every entry follows one anatomy: **summary line → 3–5 bullets with a figure each →
-Stack line**. Applied only after Max's explicit approval, entry by entry.
+Stack line**. Applied to the profile on 2026-09-07 after Max's approval: headline, About, 7 entries (4 edited, 3 created), 13 media on the CTO entry, Saint Theory on the 2023-24 entry. LinkedIn had auto-set the headline to the last created position (iBox) — overwritten with the headline below.
 
 ## Headline (220 chars max)
 
