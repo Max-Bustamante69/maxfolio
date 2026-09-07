@@ -13,6 +13,22 @@ const fmt = (ym) => { const [y, m] = ym.split('-'); return `${MONTHS[Number(m) -
 const gallery = (slug) => resolve('public/gallery', slug, 'linkedin.webp')
 const projects = []
 
+// LinkedIn skills must come from its taxonomy; map the stack chips onto standard names.
+const SKILL_MAP = [
+  [/shopify/i, 'Shopify'], [/liquid/i, 'Liquid'], [/react/i, 'React.js'], [/remix/i, 'Remix'], [/tailwind/i, 'Tailwind CSS'],
+  [/next/i, 'Next.js'], [/django/i, 'Django'], [/postgres|neon/i, 'PostgreSQL'], [/typescript/i, 'TypeScript'], [/wordpress/i, 'WordPress'],
+  [/astro/i, 'Astro'], [/a\/b/i, 'A/B Testing'], [/klaviyo/i, 'Klaviyo'], [/vite/i, 'Vite'], [/three/i, 'Three.js'], [/framer/i, 'Framer'],
+  [/woocommerce/i, 'WooCommerce'], [/prisma/i, 'Prisma'], [/functions|wasm/i, 'WebAssembly'], [/pixel|track|events/i, 'Web Analytics'],
+  [/quiz|offers|bundle|reviews|pricing|sync/i, 'E-commerce'], [/ocr/i, 'OCR'], [/extension/i, 'Browser Extensions'], [/ai sdk/i, 'Generative AI'],
+]
+const skillsFor = (stack, base = []) => {
+  const out = [...base]
+  for (const chip of stack) for (const [re, name] of SKILL_MAP) if (re.test(chip) && !out.includes(name)) { out.push(name); break }
+  return out.slice(0, 3)
+}
+// The CTO position starts Jun 2024; anything earlier belongs to the 2023-24 Shopify developer role.
+const roleFor = (start) => (start >= '2024-06' ? 'cto' : 'fe2023')
+
 for (const st of stores) {
   const c = en.stores[st.slug] ?? {}
   const facts = st.facts.map((f) => `• ${c.factLabels?.[f.id] ?? f.id}: ${f.value}`)
@@ -32,8 +48,8 @@ for (const st of stores) {
     description: lines.join('\n').trim(),
     start: st.timeline.start,
     end: st.status === 'live' ? st.timeline.end : null, // dev builds: "currently working on"
-    associated: st.legacy ? 'fe2023' : 'cto',
-    skills: ['Shopify', ...st.stack].filter((v, i, a) => a.indexOf(v) === i).slice(0, 5),
+    associated: roleFor(st.timeline.start),
+    skills: skillsFor(st.stack, ['Shopify', 'Liquid']),
     media: st.gallery ? gallery(st.slug) : null,
     url: st.url || null,
   })
@@ -49,7 +65,7 @@ for (const p of products) {
     start: `${p.year}`,
     end: null,
     associated: 'cto',
-    skills: p.stack.slice(0, 5),
+    skills: skillsFor(p.stack),
     media: p.gallery ? gallery(p.id) : null,
     url: p.url || null,
   })
@@ -65,7 +81,7 @@ for (const p of personalProjects) {
     start: `${p.year}`,
     end: null,
     associated: 'none',
-    skills: p.stack.slice(0, 5),
+    skills: skillsFor(p.stack),
     media: null,
     url: p.url || p.repo || null,
   })
