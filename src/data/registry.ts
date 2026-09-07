@@ -1,0 +1,252 @@
+// Untranslated facts. Everything a visitor reads in words lives in src/content/<locale>.ts,
+// keyed by the ids declared here. Dates are YYYY-MM and get formatted per locale by useContent().
+
+export type ExperienceId =
+  | 'digitdeck-cto'
+  | 'ellamau'
+  | 'abidata'
+  | 'rh'
+  | 'digitdeck-fe'
+  | 'orthofix'
+  | 'ibox'
+
+export interface ExperienceEntry {
+  id: ExperienceId
+  company: string
+  location: string
+  start: string // YYYY-MM
+  end: string | null // null = present
+  employment: 'full-time' | 'part-time' | 'contract'
+  website?: string
+  logo?: string
+  technologies: string[]
+  metrics: { id: string; value: string }[] // labels live in content
+}
+
+const DIGITDECK_LOGO = 'https://framerusercontent.com/images/UJJ3kd6f5grrgPCmw1YV1u0Np80.png'
+
+export const experience: ExperienceEntry[] = [
+  {
+    id: 'digitdeck-cto',
+    company: 'Digitdeck',
+    location: 'Remote · Medellín, CO',
+    start: '2024-06',
+    end: null,
+    employment: 'full-time',
+    website: 'https://digitdeck.co/',
+    logo: DIGITDECK_LOGO,
+    technologies: ['Shopify', 'Liquid', 'React', 'Remix', 'Vite', 'Tailwind CSS', 'Prisma', 'PostgreSQL', 'BullMQ', 'Playwright', 'GitHub Actions', 'Claude Code'],
+    metrics: [
+      { id: 'storefronts', value: '18+' },
+      { id: 'modules', value: '5' },
+      { id: 'tests', value: '800+' },
+    ],
+  },
+  {
+    id: 'ellamau',
+    company: 'Ellamau',
+    location: 'Remote',
+    start: '2025-11',
+    end: '2026-01',
+    employment: 'contract',
+    website: 'https://www.ellamauusa.com/',
+    logo: 'https://www.ellamauusa.com/cdn/shop/files/logo_ellamau.png?width=400',
+    technologies: ['Shopify', 'Liquid', 'JavaScript', 'CSS'],
+    metrics: [
+      { id: 'templates', value: '15+' },
+      { id: 'lighthouse', value: '90+' },
+    ],
+  },
+  {
+    id: 'abidata',
+    company: 'ABI Data',
+    location: 'Medellín, CO',
+    start: '2025-02',
+    end: '2025-10',
+    employment: 'full-time',
+    website: 'https://abidata.co/en/',
+    logo: 'https://abidata.co/en/wp-content/uploads/2025/05/logo-abi.webp',
+    technologies: ['Django', 'Next.js', 'React Email', 'PostgreSQL', 'REST'],
+    metrics: [
+      { id: 'contacts', value: '10,000+' },
+      { id: 'campaignTime', value: '-40%' },
+      { id: 'users', value: '30+' },
+    ],
+  },
+  {
+    id: 'rh',
+    company: 'RH',
+    location: 'Remote',
+    start: '2024-02',
+    end: '2025-01',
+    employment: 'full-time',
+    website: 'https://rh.com/',
+    logo: 'https://companieslogo.com/img/orig/RH-b5862da2.png',
+    technologies: ['React', 'TypeScript', 'Contentful', 'Adobe AEM', 'Material UI', 'Radix UI'],
+    metrics: [
+      { id: 'components', value: '25+' },
+      { id: 'lighthouse', value: '70→95+' },
+      { id: 'savings', value: '$45k/yr' },
+    ],
+  },
+  {
+    id: 'digitdeck-fe',
+    company: 'Digitdeck',
+    location: 'Remote',
+    start: '2023-02',
+    end: '2024-01',
+    employment: 'full-time',
+    website: 'https://digitdeck.co/',
+    logo: DIGITDECK_LOGO,
+    technologies: ['Shopify', 'Liquid', 'JavaScript', 'CSS', 'SEO'],
+    metrics: [
+      { id: 'conversion', value: '+10–20%' },
+      { id: 'loadTime', value: '-30–40%' },
+      { id: 'organic', value: '+20%' },
+    ],
+  },
+  {
+    id: 'orthofix',
+    company: 'Orthofix',
+    location: 'Remote',
+    start: '2022-09',
+    end: '2022-12',
+    employment: 'full-time',
+    website: 'https://orthofix.com/',
+    logo: 'https://companieslogo.com/img/orig/OFIX-c56c9c90.png',
+    technologies: ['Salesforce', 'Lightning Web Components', 'Apex', 'SOQL'],
+    metrics: [
+      { id: 'users', value: '50+' },
+      { id: 'dataEntry', value: '-20%' },
+    ],
+  },
+  {
+    id: 'ibox',
+    company: 'iBox SA',
+    location: 'Medellín, CO',
+    start: '2022-01',
+    end: '2022-07',
+    employment: 'full-time',
+    website: 'https://www.iboxsm.com/',
+    technologies: ['React', 'JavaScript', 'CSS'],
+    metrics: [
+      { id: 'components', value: '20+' },
+      { id: 'pages', value: '10+' },
+      { id: 'lighthouse', value: '90+' },
+    ],
+  },
+]
+
+export type StoreStatus = 'live' | 'dev'
+export type StoreRole = 'built' | 'maintained' | 'migrated'
+
+export interface StoreEntry {
+  slug: string
+  name: string
+  url: string // '' when there is no public URL to link
+  status: StoreStatus
+  role: StoreRole
+  year: number
+  stack: string[]
+  gallery: boolean // images exist under /gallery/<slug>/
+  legacy?: boolean // 2023-25 era, before the current fleet
+}
+
+export const stores: StoreEntry[] = [
+  { slug: 'the-gummy-box', name: 'The Gummy Box', url: 'https://thegummyboxwellness.com', status: 'live', role: 'built', year: 2026, stack: ['Liquid', 'React islands', 'Bundles app', 'Subscriptions'], gallery: true },
+  { slug: 'nos-cafe', name: 'NOS Café', url: 'https://cafesnos.com', status: 'live', role: 'built', year: 2026, stack: ['Framer → Liquid', 'React islands', 'Bundle builder', 'Klaviyo'], gallery: true },
+  { slug: 'millennio', name: 'Perfumería Millennio', url: 'https://perfumeriamillennio.com', status: 'live', role: 'built', year: 2026, stack: ['Framer → Liquid', 'React islands', 'Digitdeck Track'], gallery: true },
+  { slug: 'mindfuel', name: 'Mindfuel', url: 'https://joinmindfuel.com', status: 'live', role: 'built', year: 2026, stack: ['React port', 'Liquid', 'Tailwind'], gallery: true },
+  { slug: 'nalua', name: 'Nalua Skincare', url: 'https://naluaskincare.co', status: 'live', role: 'built', year: 2026, stack: ['Liquid', 'Purchase offers', 'Releasit'], gallery: true },
+  { slug: 'sebum', name: 'Sebum', url: 'https://www.sebumcremas.com', status: 'live', role: 'built', year: 2026, stack: ['Liquid', 'Review wall', 'React islands'], gallery: true },
+  { slug: 'valdo-cafe', name: 'Valdo Café', url: 'https://valdocafe.co', status: 'live', role: 'migrated', year: 2026, stack: ['Liquid', 'Store transfer'], gallery: true },
+  { slug: 'factores-2x2', name: 'Factores 2x2', url: 'https://factoresdetransferenciaacc.com.co', status: 'live', role: 'built', year: 2026, stack: ['Framer → Liquid', 'Web quality 95+'], gallery: true },
+  { slug: 'pixxiesx', name: 'Pixxiesx', url: 'https://www.pixxiesx.co', status: 'live', role: 'built', year: 2026, stack: ['Liquid', 'Product quiz', 'Metaobjects'], gallery: true },
+  { slug: 'luxe-shine', name: 'Luxe Shine', url: 'https://luxeshiine.com', status: 'live', role: 'built', year: 2026, stack: ['Liquid', 'Scroll video', 'Digitdeck Track'], gallery: true },
+  { slug: 'atmosfera', name: 'Atmósfera Tecnológica', url: 'https://atmosferatecnologica.com', status: 'live', role: 'built', year: 2026, stack: ['Liquid', 'Catalog sync', 'Dual pricing'], gallery: true },
+  { slug: 'saint-theory', name: 'Saint Theory', url: 'https://www.saint-theory.com', status: 'live', role: 'built', year: 2023, stack: ['Liquid', 'Custom theme'], gallery: true, legacy: true },
+  { slug: 'peluna', name: 'Peluna Pets', url: 'https://pelunapets.com', status: 'dev', role: 'built', year: 2026, stack: ['Liquid', 'A/B testing', 'Metaobjects'], gallery: true },
+  { slug: 'en-amor-a-dos', name: 'En Amor a Dos', url: 'https://enamoradosaccesorios.com', status: 'dev', role: 'built', year: 2026, stack: ['Liquid', 'React islands'], gallery: true },
+  { slug: 'unik', name: 'Unik Jeans', url: 'https://www.unikjeans.com', status: 'dev', role: 'built', year: 2026, stack: ['Liquid', 'Bilingual', 'Dual currency'], gallery: true },
+  { slug: 'origen-vital', name: 'Origen Vital', url: 'https://www.origenvital.com.co', status: 'dev', role: 'built', year: 2026, stack: ['Framer → Liquid', 'Quiz', 'Promo landings'], gallery: true },
+  { slug: 'para-machos', name: 'Para Machos', url: 'https://www.paramachos.us', status: 'dev', role: 'built', year: 2026, stack: ['Liquid', 'React islands'], gallery: true },
+  { slug: 'tierramont', name: 'TierraMont', url: 'https://tierramont.com', status: 'dev', role: 'built', year: 2026, stack: ['Liquid', 'React islands'], gallery: true },
+  { slug: 'alma-de-aviador', name: 'Alma de Aviador', url: 'https://almadeaviador.com', status: 'dev', role: 'migrated', year: 2026, stack: ['WooCommerce → Shopify', 'Framer port'], gallery: true },
+  { slug: 'joystaz', name: 'Joystaz Jeans', url: 'https://joystazjeans.com', status: 'live', role: 'built', year: 2025, stack: ['Liquid', 'Tailwind', 'Reviews backend'], gallery: false, legacy: true },
+  { slug: 'new-urban', name: 'New Urban', url: 'https://newurbanisa.com', status: 'live', role: 'built', year: 2023, stack: ['Liquid'], gallery: false, legacy: true },
+  { slug: 'gummind', name: 'Gummind', url: '', status: 'live', role: 'built', year: 2025, stack: ['Liquid', 'Tailwind'], gallery: false, legacy: true },
+  { slug: 'rimo', name: 'Rimo', url: '', status: 'live', role: 'built', year: 2023, stack: ['Liquid'], gallery: false, legacy: true },
+]
+
+export interface ProductEntry {
+  id: string
+  name: string
+  url?: string
+  year: number
+  stack: string[]
+  gallery: boolean
+}
+
+export const products: ProductEntry[] = [
+  { id: 'digitdeck-apps', name: 'Digitdeck Apps', year: 2026, stack: ['Remix', 'Shopify Functions (WASM)', 'Web Pixel', 'Theme App Extension', 'Billing API', 'Prisma', 'BullMQ'], gallery: true },
+  { id: 'digitdeck-platform', name: 'Digitdeck Platform', url: 'https://app.digitdeck.co', year: 2026, stack: ['Remix', 'Prisma', 'PostgreSQL + pgvector', 'BullMQ', 'Vercel AI SDK', 'Tailwind v4'], gallery: true },
+  { id: 'audit-dashboard', name: 'Audit Dashboard', year: 2026, stack: ['React', 'Vite', 'Three.js', 'Self-contained HTML'], gallery: true },
+  { id: 'feedback-portal', name: 'Client Feedback Portal', year: 2026, stack: ['Next.js', 'GitHub Issues API'], gallery: false },
+  { id: 'track', name: 'Digitdeck Track', year: 2026, stack: ['TypeScript', 'data-dd-* contract', 'First-party events'], gallery: false },
+]
+
+export interface PersonalProject {
+  id: string
+  name: string
+  url?: string
+  repo?: string
+  year: number
+  stack: string[]
+}
+
+export const personalProjects: PersonalProject[] = [
+  { id: 'kotodama', name: 'Kotodama 言霊', url: 'https://kotodama-six.vercel.app', repo: 'https://github.com/Max-Bustamante69/kotodama', year: 2026, stack: ['Next.js 16', 'Drizzle', 'Neon', 'Vercel AI SDK', 'ts-fsrs'] },
+  { id: 'peptidos', name: 'Peptidos', repo: 'https://github.com/Max-Bustamante69/Peptidos', year: 2026, stack: ['Headless commerce', 'React', 'Tailwind'] },
+  { id: 'will-you', name: 'will-you', repo: 'https://github.com/Max-Bustamante69/will-you', year: 2026, stack: ['React', 'Vite'] },
+  { id: 'fast-resoluciones', name: 'Fast Resoluciones', repo: 'https://github.com/Max-Bustamante69/fast-resoluciones', year: 2026, stack: ['React', 'PDF parsing', 'Excel'] },
+  { id: 'autofill-plugin', name: 'Autofill Plugin', repo: 'https://github.com/Max-Bustamante69/autofill-plugin', year: 2026, stack: ['Browser extension', 'TypeScript'] },
+  { id: 'pagui', name: 'Pagui.co', url: 'https://pagui-kyc.vercel.app/', year: 2025, stack: ['Django', 'Next.js', 'OCR', 'PostgreSQL'] },
+  { id: 'scorrea', name: 'Sebastian Correa portfolio', url: 'https://www.scorrea.dev/', year: 2024, stack: ['Astro', 'TypeScript', 'Tailwind'] },
+  { id: 'dr-hugo', name: 'Dr. Hugo Diazgranados', url: 'https://drhugodiazgranados.com/', year: 2023, stack: ['WordPress', 'Custom theme'] },
+  { id: 'maxfolio', name: 'Maxfolio', url: 'https://www.maxfolio.dev/', repo: 'https://github.com/Max-Bustamante69/maxfolio', year: 2026, stack: ['React 19', 'Vite', 'Tailwind', 'framer-motion'] },
+]
+
+export type StatId = 'storefronts' | 'modules' | 'functions' | 'standards' | 'tests' | 'brands'
+
+export const stats: { id: StatId; value: string }[] = [
+  { id: 'storefronts', value: '18+' },
+  { id: 'modules', value: '5' },
+  { id: 'functions', value: '2' },
+  { id: 'standards', value: '91' },
+  { id: 'tests', value: '800+' },
+  { id: 'brands', value: '14' },
+]
+
+export const skillGroups = {
+  shopify: ['Liquid', 'Online Store 2.0', 'Theme Blocks', 'Metaobjects & metafields', 'Admin & Storefront GraphQL', 'Shopify CLI', 'Embedded apps (Remix)', 'Shopify Functions → WASM', 'Web Pixels', 'Theme App Extensions', 'App Proxy', 'Billing API', 'Store migrations'],
+  frontend: ['React', 'Remix', 'Next.js', 'Vite', 'Tailwind CSS', 'GSAP', 'Framer Motion', 'Accessibility'],
+  backend: ['Node.js', 'TypeScript', 'Prisma', 'PostgreSQL', 'Redis', 'BullMQ', 'REST & GraphQL', 'Multi-tenant architecture'],
+  quality: ['Playwright', 'Vitest', 'GitHub Actions', 'Lighthouse / Core Web Vitals'],
+  cro: ['A/B testing (Bayesian, SRM)', 'First-party event instrumentation', 'AOV & funnel optimization'],
+  ai: ['Claude Code', 'Codex', 'MCP', 'Multi-agent orchestration', 'Evaluation suites'],
+} as const
+
+export type SkillGroupId = keyof typeof skillGroups
+
+export const personal = {
+  name: 'Maximiliano Bustamante',
+  firstName: 'Maximiliano',
+  lastName: 'Bustamante',
+  email: 'maxbustamanteg@gmail.com',
+  phone: '+57 319 594 0522',
+  phoneHref: 'tel:+573195940522',
+  linkedin: 'https://www.linkedin.com/in/maximiliano-bustamante-998b77173/',
+  github: 'https://github.com/Max-Bustamante69',
+  site: 'https://www.maxfolio.dev/',
+  cv: '/Maximiliano-Bustamante-CV.pdf',
+} as const

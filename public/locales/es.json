@@ -32,7 +32,10 @@
     "work": "Trabajo",
     "freelance": "Freelance",
     "companies": "Empresas",
-    "otherStyles": "Otros estilos"
+    "otherStyles": "Otros estilos",
+    "shopify": "Shopify",
+    "gallery": "Galería",
+    "projects": "Proyectos"
   },
   "hero": {
     "greeting": "Hola, soy",
@@ -117,16 +120,21 @@
     "startWithDefault": "Empieza con el por defecto",
     "visionStyles": {
       "elegant": "Elegante",
-      "bold": "Audaz"
+      "bold": "Audaz",
+      "clean": "Limpio"
     },
     "designNames": {
       "luxuryMinimal": "Luxury Minimal",
-      "brutalistEditorial": "Editorial Brutalista"
+      "brutalistEditorial": "Editorial Brutalista",
+      "apple": "Apple Clean"
     },
     "designSubtitles": {
       "luxuryMinimal": "Elegante y refinado",
-      "brutalistEditorial": "Audaz y crudo"
-    }
+      "brutalistEditorial": "Audaz y crudo",
+      "apple": "Silencioso y preciso"
+    },
+    "whyVersions": "¿Por qué cuatro versiones?",
+    "whyVersionsDesc": "Distintas estéticas para distintos contextos. Las mismas habilidades, versatilidad probada."
   },
   "contactModal": {
     "title": "Mensaje Rápido",
@@ -145,7 +153,7 @@
     "designMenu": "Menú de diseño",
     "allDesigns": "Todos los diseños",
     "luxuryMinimal": "Luxury Minimal",
-    "brutalistEditorial": "Editorial Brutalista"
+    "brutalistEditorial": "Editorial Brutalista",
+    "apple": "Apple Clean"
   }
 }
-

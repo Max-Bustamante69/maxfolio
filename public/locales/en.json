@@ -32,7 +32,10 @@
     "work": "Work",
     "freelance": "Freelance",
     "companies": "Companies",
-    "otherStyles": "Other Styles"
+    "otherStyles": "Other Styles",
+    "shopify": "Shopify",
+    "gallery": "Gallery",
+    "projects": "Projects"
   },
   "hero": {
     "greeting": "Hi, I'm",
@@ -117,16 +120,21 @@
     "startWithDefault": "Start with default",
     "visionStyles": {
       "elegant": "Elegant",
-      "bold": "Bold"
+      "bold": "Bold",
+      "clean": "Clean"
     },
     "designNames": {
       "luxuryMinimal": "Luxury Minimal",
-      "brutalistEditorial": "Brutalist Editorial"
+      "brutalistEditorial": "Brutalist Editorial",
+      "apple": "Apple Clean"
     },
     "designSubtitles": {
       "luxuryMinimal": "Elegant & Refined",
-      "brutalistEditorial": "Bold & Raw"
-    }
+      "brutalistEditorial": "Bold & Raw",
+      "apple": "Quiet & Precise"
+    },
+    "whyVersions": "Why four versions?",
+    "whyVersionsDesc": "Different aesthetics for different contexts. Same skills, proven versatility."
   },
   "contactModal": {
     "title": "Quick Message",
@@ -145,7 +153,7 @@
     "designMenu": "Design Menu",
     "allDesigns": "All Designs",
     "luxuryMinimal": "Luxury Minimal",
-    "brutalistEditorial": "Brutalist Editorial"
+    "brutalistEditorial": "Brutalist Editorial",
+    "apple": "Apple Clean"
   }
 }
-

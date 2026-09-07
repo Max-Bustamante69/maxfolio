@@ -32,7 +32,10 @@
     "work": "仕事",
     "freelance": "フリーランス",
     "companies": "企業",
-    "otherStyles": "他のスタイル"
+    "otherStyles": "他のスタイル",
+    "shopify": "Shopify",
+    "gallery": "ギャラリー",
+    "projects": "プロジェクト"
   },
   "hero": {
     "greeting": "こんにちは、私は",
@@ -117,16 +120,21 @@
     "startWithDefault": "デフォルトから始める",
     "visionStyles": {
       "elegant": "エレガント",
-      "bold": "大胆"
+      "bold": "大胆",
+      "clean": "クリーン"
     },
     "designNames": {
       "luxuryMinimal": "ラグジュアリー・ミニマル",
-      "brutalistEditorial": "ブルータリスト・エディトリアル"
+      "brutalistEditorial": "ブルータリスト・エディトリアル",
+      "apple": "Apple Clean"
     },
     "designSubtitles": {
       "luxuryMinimal": "エレガント＆洗練",
-      "brutalistEditorial": "大胆で生っぽい"
-    }
+      "brutalistEditorial": "大胆で生っぽい",
+      "apple": "静かで正確"
+    },
+    "whyVersions": "なぜ4つのデザイン？",
+    "whyVersionsDesc": "文脈に合わせた異なる美学。同じスキルで、確かな対応力を。"
   },
   "contactModal": {
     "title": "クイックメッセージ",
@@ -145,7 +153,7 @@
     "designMenu": "デザインメニュー",
     "allDesigns": "すべてのデザイン",
     "luxuryMinimal": "ラグジュアリー・ミニマル",
-    "brutalistEditorial": "ブルータリスト・エディトリアル"
+    "brutalistEditorial": "ブルータリスト・エディトリアル",
+    "apple": "Apple Clean"
   }
 }
-
