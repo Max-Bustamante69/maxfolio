@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { TransitionLink } from './TransitionLink'
 import { useI18n } from '../../hooks'
+import { otherDesigns, MENU } from '../../data/designs'
 
 interface NavItem {
   label: string
@@ -158,26 +159,30 @@ export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMen
               <p className={`text-[10px] uppercase tracking-[0.3em] ${textMuted} mb-4`}>
                 {t('logoSelector.otherExperiences')}
               </p>
-              <div className="flex gap-4">
+              <div className="flex flex-wrap justify-center gap-x-4 gap-y-2">
                 <TransitionLink
-                  to="/menu"
+                  to={MENU.route}
                   transitionColor={isDark ? '#171717' : '#fafafa'}
                   transitionAccent={isDark ? '#ffffff' : '#171717'}
-                  transitionLabel={t('logoSelector.designMenu')}
+                  transitionLabel={t(MENU.labelKey)}
                   className={`text-xs ${textMuted} hover:${accent} transition-colors`}
                 >
-                  {t('logoSelector.allDesigns')}
+                  {t(MENU.subtitleKey)}
                 </TransitionLink>
-                <span className={textMuted}>·</span>
-                <TransitionLink
-                  to="/brutalist"
-                  transitionColor="#1c1917"
-                  transitionAccent="#dc2626"
-                  transitionLabel={t('logoSelector.brutalistEditorial')}
-                  className={`text-xs ${textMuted} hover:${accent} transition-colors`}
-                >
-                  {t('logoSelector.brutalistEditorial')}
-                </TransitionLink>
+                {otherDesigns('luxury').map((d) => (
+                  <span key={d.id} className="flex gap-4">
+                    <span className={textMuted}>·</span>
+                    <TransitionLink
+                      to={d.route}
+                      transitionColor={d.transitionColor}
+                      transitionAccent={d.transitionAccent}
+                      transitionLabel={t(d.nameKey)}
+                      className={`text-xs ${textMuted} hover:${accent} transition-colors`}
+                    >
+                      {t(d.nameKey)}
+                    </TransitionLink>
+                  </span>
+                ))}
               </div>
             </motion.div>
           </div>

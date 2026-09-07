@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { TransitionLink } from './TransitionLink'
 import { useI18n } from '../../hooks'
+import { otherDesigns, MENU } from '../../data/designs'
 
 interface NavItem {
   label: string
@@ -148,25 +149,28 @@ export function MobileMenuBrutalist({ navItems, isDark, onContactClick }: Mobile
               <p className={`font-mono text-[10px] uppercase tracking-[0.3em] ${textMuted} mb-4`}>
                 {t('logoSelector.switchExperience')}
               </p>
-              <div className="flex gap-6">
+              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
                 <TransitionLink
-                  to="/menu"
+                  to={MENU.route}
                   transitionColor={isDark ? '#171717' : '#fafafa'}
                   transitionAccent={isDark ? '#ffffff' : '#171717'}
-                  transitionLabel={t('logoSelector.designMenu')}
+                  transitionLabel={t(MENU.labelKey)}
                   className={`font-mono text-xs uppercase tracking-wider ${textMuted} hover:text-red-600 transition-colors`}
                 >
-                  {t('logoSelector.allDesigns')}
+                  {t(MENU.subtitleKey)}
                 </TransitionLink>
-                <TransitionLink
-                  to="/"
-                  transitionColor="#FAF8F5"
-                  transitionAccent="#C9A962"
-                  transitionLabel={t('menuPage.designNames.luxuryMinimal')}
-                  className={`font-mono text-xs uppercase tracking-wider ${textMuted} hover:text-red-600 transition-colors`}
-                >
-                  {t('menuPage.designNames.luxuryMinimal')} →
-                </TransitionLink>
+                {otherDesigns('brutalist').map((d) => (
+                  <TransitionLink
+                    key={d.id}
+                    to={d.route}
+                    transitionColor={d.transitionColor}
+                    transitionAccent={d.transitionAccent}
+                    transitionLabel={t(d.nameKey)}
+                    className={`font-mono text-xs uppercase tracking-wider ${textMuted} hover:text-red-600 transition-colors`}
+                  >
+                    {t(d.nameKey)} →
+                  </TransitionLink>
+                ))}
               </div>
             </motion.div>
           </div>

@@ -2,13 +2,13 @@
 export { ThemeToggle, FadeInUp, CompanyLogo, TransitionLink, MobileMenuLuxury, MobileMenuBrutalist, LogoSelectorLuxury, LogoSelectorBrutalist, SkipLink, SEOHead, LanguageSelectorLuxury, LanguageSelectorBrutalist, LanguageSelectorMenu } from './common'
 
 // Preview components
-export { LuxuryPreview, BrutalistPreview, MenuPreview } from './previews'
+export { LuxuryPreview, BrutalistPreview, MenuPreview, ApplePreview } from './previews'
 
 // Modal components
 export { ContactFormModal } from './modals'
 
 // Section components
-export { ExploreDesigns, ExploreDesignsLuxury, ExploreDesignsBrutalist } from './sections'
+export { ExploreDesignsLuxury, ExploreDesignsBrutalist, ShopifyWork, Gallery } from './sections'
 
 // Transitions
 export { PageTransitionProvider, usePageTransition } from './transitions'

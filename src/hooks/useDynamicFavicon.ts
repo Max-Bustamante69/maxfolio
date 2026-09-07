@@ -1,15 +1,16 @@
 import { useEffect } from 'react'
+import { designs, MENU, type DesignId } from '../data/designs'
 
-type FaviconType = 'luxury' | 'brutalist' | 'menu' | 'default'
+type FaviconType = DesignId | 'menu' | 'default'
 
 const favicons: Record<FaviconType, string> = {
-  luxury: '/favicon-luxury.svg',
-  brutalist: '/favicon-brutalist.svg',
-  menu: '/favicon-menu.svg',
+  ...(Object.fromEntries(designs.map((d) => [d.id, d.favicon])) as Record<DesignId, string>),
+  menu: MENU.favicon,
   default: '/favicon.svg',
 }
 
 const titles: Record<FaviconType, string> = {
+  apple: 'MB | Portfolio',
   luxury: 'MB | Luxury Portfolio',
   brutalist: 'MB | Brutalist Portfolio',
   menu: 'MB | Design Menu',
