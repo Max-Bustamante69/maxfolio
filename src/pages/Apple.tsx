@@ -107,7 +107,7 @@ function AppleContent() {
             <LogoSelectorApple isDark={isDark} />
             <div className="hidden md:flex items-center gap-6 text-xs">
               {nav.map(([href, label]) => (
-                <a key={href} href={href} className={`${muted} hover:${blue} transition-colors duration-150`}>
+                <a key={href} href={href} className={`inline-flex items-center h-11 ${muted} hover:${blue} transition-colors duration-150`}>
                   {label}
                 </a>
               ))}
@@ -256,7 +256,7 @@ function AppleContent() {
                       <h3 className="text-xl font-semibold tracking-tight leading-snug">{c.experience[job.id].title}</h3>
                       <p className={`${muted} text-sm mt-0.5`}>
                         {job.company} · {job.location} · {formatPeriod(job.start, job.end)}
-                        {job.end === null && <span className={`ml-2 font-medium ${blue}`}>{c.badges.current}</span>}
+                        {job.end === null && <span className={`ml-2 font-medium ${blue}`}> · {c.badges.current}</span>}
                       </p>
                     </div>
                   </div>

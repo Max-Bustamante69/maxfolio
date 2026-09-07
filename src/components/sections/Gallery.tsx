@@ -56,7 +56,7 @@ export function Gallery({ skin, heading }: GalleryProps) {
             role="tab"
             aria-selected={filter === f}
             onClick={() => setFilter(f)}
-            className={`${skin.chip} compact-touch transition-colors ${filter === f ? skin.chipActive : ''}`}
+            className={`${filter === f ? skin.chipOn : skin.chip} compact-touch transition-colors`}
           >
             {f === 'all' ? g.filterAll : f === 'live' ? g.filterLive : g.filterDev}
           </button>

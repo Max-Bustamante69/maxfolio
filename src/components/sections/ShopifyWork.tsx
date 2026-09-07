@@ -107,7 +107,7 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
             role="tab"
             aria-selected={tab === k}
             onClick={() => setTab(k)}
-            className={`${skin.chip} compact-touch transition-colors ${tab === k ? skin.chipActive : ''}`}
+            className={`${tab === k ? skin.chipOn : skin.chip} compact-touch transition-colors`}
           >
             {k === 'stores' ? s.tabStores : s.tabProducts}
           </button>

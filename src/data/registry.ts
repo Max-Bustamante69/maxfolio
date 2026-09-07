@@ -188,9 +188,9 @@ export interface ProductEntry {
 }
 
 export const products: ProductEntry[] = [
-  { id: 'digitdeck-apps', name: 'Digitdeck Apps', year: 2026, stack: ['Remix', 'Shopify Functions (WASM)', 'Web Pixel', 'Theme App Extension', 'Billing API', 'Prisma', 'BullMQ'], gallery: true },
-  { id: 'digitdeck-platform', name: 'Digitdeck Platform', url: 'https://app.digitdeck.co', year: 2026, stack: ['Remix', 'Prisma', 'PostgreSQL + pgvector', 'BullMQ', 'Vercel AI SDK', 'Tailwind v4'], gallery: true },
-  { id: 'audit-dashboard', name: 'Audit Dashboard', year: 2026, stack: ['React', 'Vite', 'Three.js', 'Self-contained HTML'], gallery: true },
+  { id: 'digitdeck-apps', name: 'Digitdeck Apps', year: 2026, stack: ['Remix', 'Shopify Functions (WASM)', 'Web Pixel', 'Theme App Extension', 'Billing API', 'Prisma', 'BullMQ'], gallery: false },
+  { id: 'digitdeck-platform', name: 'Digitdeck Platform', url: 'https://app.digitdeck.co', year: 2026, stack: ['Remix', 'Prisma', 'PostgreSQL + pgvector', 'BullMQ', 'Vercel AI SDK', 'Tailwind v4'], gallery: false },
+  { id: 'audit-dashboard', name: 'Audit Dashboard', year: 2026, stack: ['React', 'Vite', 'Three.js', 'Self-contained HTML'], gallery: false },
   { id: 'feedback-portal', name: 'Client Feedback Portal', year: 2026, stack: ['Next.js', 'GitHub Issues API'], gallery: false },
   { id: 'track', name: 'Digitdeck Track', year: 2026, stack: ['TypeScript', 'data-dd-* contract', 'First-party events'], gallery: false },
 ]

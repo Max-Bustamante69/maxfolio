@@ -9,8 +9,8 @@ export interface Skin {
   body: string // regular text
   muted: string
   accent: string
-  chip: string
-  chipActive: string
+  chip: string // idle chip: shape + colors
+  chipOn: string // active chip: shape + colors (never combined with `chip`)
   badgeLive: string
   badgeDev: string
 }
@@ -24,7 +24,7 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     muted: d ? 'text-[#a1a1a6]' : 'text-[#86868b]',
     accent: d ? 'text-[#2997ff]' : 'text-[#0071e3]',
     chip: `rounded-full px-2.5 py-1 text-[11px] ${d ? 'bg-white/10 text-[#d2d2d7]' : 'bg-[#f5f5f7] text-[#1d1d1f]'}`,
-    chipActive: d ? 'bg-white text-black' : 'bg-[#1d1d1f] text-white',
+    chipOn: `rounded-full px-2.5 py-1 text-[11px] font-medium ${d ? 'bg-white text-black' : 'bg-[#1d1d1f] text-white'}`,
     badgeLive: 'bg-[#34c759] text-white',
     badgeDev: 'bg-[#ff9f0a] text-white',
   }),
@@ -36,7 +36,7 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     muted: d ? 'text-deco-cream/50' : 'text-luxury-black/50',
     accent: d ? 'text-deco-gold' : 'text-luxury-gold',
     chip: `border px-2 py-0.5 text-[10px] tracking-[0.15em] uppercase ${d ? 'border-deco-gold/20 text-deco-cream/60' : 'border-luxury-black/10 text-luxury-black/60'}`,
-    chipActive: d ? 'bg-deco-gold text-deco-navy border-deco-gold' : 'bg-luxury-black text-luxury-cream border-luxury-black',
+    chipOn: `border px-2 py-0.5 text-[10px] tracking-[0.15em] uppercase ${d ? 'bg-deco-gold text-deco-navy border-deco-gold' : 'bg-luxury-black text-luxury-cream border-luxury-black'}`,
     badgeLive: d ? 'bg-deco-gold text-deco-navy' : 'bg-luxury-black text-luxury-cream',
     badgeDev: `border ${d ? 'border-deco-gold text-deco-gold' : 'border-luxury-gold text-luxury-gold'}`,
   }),
@@ -48,7 +48,7 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     muted: 'text-stone-500',
     accent: 'text-red-600',
     chip: `font-mono text-[10px] px-2 py-1 ${d ? 'bg-stone-800 text-stone-400' : 'bg-stone-200 text-stone-600'}`,
-    chipActive: 'bg-red-600 text-white',
+    chipOn: 'font-mono text-[10px] px-2 py-1 bg-red-600 text-white',
     badgeLive: 'bg-red-600 text-white font-mono uppercase',
     badgeDev: 'border-2 border-red-600 text-red-600 font-mono uppercase',
   }),
