@@ -237,3 +237,19 @@
   95% { clip: rect(42px, 9999px, 25px, 0); }
   100% { clip: rect(38px, 9999px, 91px, 0); }
 }
+
+/* Apple Clean experience — press feedback and hover gating */
+.press {
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1), background-color 160ms ease, color 160ms ease, opacity 160ms ease;
+}
+.press:active {
+  transform: scale(0.97);
+}
+@media (hover: hover) and (pointer: fine) {
+  .lift:hover {
+    transform: translateY(-2px);
+  }
+}
+.lift {
+  transition: transform 200ms cubic-bezier(0.23, 1, 0.32, 1), box-shadow 200ms ease;
+}

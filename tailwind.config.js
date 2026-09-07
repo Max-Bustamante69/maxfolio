@@ -13,8 +13,30 @@ export default {
         'editorial': ['Instrument Serif', 'serif'],
         'grotesk': ['Clash Display', 'sans-serif'],
         'accent': ['Space Mono', 'monospace'],
+        'sf': ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"SF Pro Text"', 'Inter', 'system-ui', 'sans-serif'],
+      },
+      boxShadow: {
+        'tile': '0 4px 24px rgba(0,0,0,0.06)',
+        'tile-dark': '0 4px 24px rgba(0,0,0,0.5)',
+      },
+      transitionTimingFunction: {
+        'out-strong': 'cubic-bezier(0.23, 1, 0.32, 1)',
+        'drawer': 'cubic-bezier(0.32, 0.72, 0, 1)',
       },
       colors: {
+        'apple': {
+          'bg': '#fbfbfd',
+          'surface': '#f5f5f7',
+          'text': '#1d1d1f',
+          'muted': '#86868b',
+          'blue': '#0071e3',
+          'blueHover': '#0077ed',
+          'blueDark': '#2997ff',
+          'dark': '#000000',
+          'darkSurface': '#1d1d1f',
+          'darkText': '#f5f5f7',
+          'darkMuted': '#a1a1a6',
+        },
         'cyber': {
           'neon': '#00ff88',
           'pink': '#ff0080',

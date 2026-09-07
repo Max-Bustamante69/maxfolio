@@ -1,13 +1,13 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, FormEvent } from 'react'
 import { config } from '../../config'
-import { personalInfo } from '../../data/portfolio-extended'
+import { personal as personalInfo } from '../../data/registry'
 import { useI18n } from '../../hooks'
 
 interface ContactFormModalProps {
   isOpen: boolean
   onClose: () => void
-  variant?: 'luxury' | 'brutalist'
+  variant?: 'luxury' | 'brutalist' | 'apple'
   isDark?: boolean
 }
 
@@ -103,7 +103,24 @@ export function ContactFormModal({
       : 'border-stone-300 text-stone-700 hover:bg-stone-200',
   }
 
-  const styles = variant === 'luxury' ? luxuryStyles : brutalistStyles
+  // Apple variant styles
+  const appleStyles = {
+    bgModal: isDark ? 'bg-[#1d1d1f] rounded-[22px]' : 'bg-white rounded-[22px]',
+    bgInput: isDark
+      ? 'bg-white/10 border-transparent text-[#f5f5f7] placeholder:text-[#a1a1a6] focus:border-[#2997ff] rounded-[12px]'
+      : 'bg-[#f5f5f7] border-transparent text-[#1d1d1f] placeholder:text-[#86868b] focus:border-[#0071e3] rounded-[12px]',
+    textPrimary: isDark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]',
+    textSecondary: isDark ? 'text-[#d2d2d7]' : 'text-[#424245]',
+    textMuted: isDark ? 'text-[#a1a1a6]' : 'text-[#86868b]',
+    accent: isDark ? 'text-[#2997ff]' : 'text-[#0071e3]',
+    btnPrimary: 'bg-[#0071e3] text-white hover:bg-[#0077ed] rounded-full press',
+    btnSecondary: isDark
+      ? 'border-white/15 text-[#f5f5f7] hover:bg-white/10 rounded-full press'
+      : 'border-black/10 text-[#1d1d1f] hover:bg-black/5 rounded-full press',
+  }
+
+  const styles = variant === 'apple' ? appleStyles : variant === 'luxury' ? luxuryStyles : brutalistStyles
+  const successCircle = variant === 'apple' ? 'bg-[#0071e3]/15' : variant === 'luxury' ? 'bg-deco-gold/20' : 'bg-red-600/20'
 
   return (
     <AnimatePresence>
@@ -158,7 +175,7 @@ export function ContactFormModal({
                     animate={{ opacity: 1, scale: 1 }}
                     className="py-12 text-center"
                   >
-                    <div className={`w-16 h-16 mx-auto mb-4 rounded-full ${variant === 'luxury' ? 'bg-deco-gold/20' : 'bg-red-600/20'} flex items-center justify-center`}>
+                    <div className={`w-16 h-16 mx-auto mb-4 rounded-full ${successCircle} flex items-center justify-center`}>
                       <svg className={`w-8 h-8 ${styles.accent}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
@@ -293,7 +310,7 @@ export function ContactFormModal({
                   animate={{ opacity: 1, scale: 1 }}
                   className="py-8 text-center"
                 >
-                  <div className={`w-14 h-14 mx-auto mb-3 rounded-full ${variant === 'luxury' ? 'bg-deco-gold/20' : 'bg-red-600/20'} flex items-center justify-center`}>
+                  <div className={`w-14 h-14 mx-auto mb-3 rounded-full ${successCircle} flex items-center justify-center`}>
                     <svg className={`w-7 h-7 ${styles.accent}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>

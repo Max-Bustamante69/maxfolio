@@ -1,0 +1,21 @@
+[
+  { "slug": "the-gummy-box", "url": "https://thegummyboxwellness.com", "status": "live" },
+  { "slug": "nos-cafe", "url": "https://cafesnos.com", "status": "live" },
+  { "slug": "millennio", "url": "https://perfumeriamillennio.com", "status": "live" },
+  { "slug": "mindfuel", "url": "https://joinmindfuel.com", "status": "live" },
+  { "slug": "nalua", "url": "https://naluaskincare.co", "status": "live" },
+  { "slug": "sebum", "url": "https://www.sebumcremas.com", "status": "live" },
+  { "slug": "valdo-cafe", "url": "https://valdocafe.co", "status": "live" },
+  { "slug": "factores-2x2", "url": "https://factoresdetransferenciaacc.com.co", "status": "live" },
+  { "slug": "pixxiesx", "url": "https://www.pixxiesx.co", "status": "live" },
+  { "slug": "luxe-shine", "url": "https://luxeshiine.com", "status": "live" },
+  { "slug": "atmosfera", "url": "https://atmosferatecnologica.com", "status": "live" },
+  { "slug": "saint-theory", "url": "https://www.saint-theory.com", "status": "live" },
+  { "slug": "peluna", "url": "https://pelunapets.com", "status": "dev" },
+  { "slug": "en-amor-a-dos", "url": "https://enamoradosaccesorios.com", "status": "dev", "previewThemeId": "163940401371" },
+  { "slug": "unik", "url": "https://www.unikjeans.com", "status": "dev", "previewThemeId": "142761787463" },
+  { "slug": "origen-vital", "url": "https://www.origenvital.com.co", "status": "dev", "previewThemeId": "190230987040" },
+  { "slug": "para-machos", "url": "https://www.paramachos.us", "status": "dev", "previewThemeId": "160311017621" },
+  { "slug": "tierramont", "url": "https://tierramont.com", "status": "dev", "previewThemeId": "165861556464" },
+  { "slug": "alma-de-aviador", "url": "https://jgnqhc-f1.myshopify.com", "status": "dev" }
+]
