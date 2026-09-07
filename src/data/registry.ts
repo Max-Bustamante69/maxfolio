@@ -150,32 +150,37 @@ export interface StoreEntry {
   stack: string[]
   gallery: boolean // images exist under /gallery/<slug>/
   legacy?: boolean // 2023-25 era, before the current fleet
+  timeline: { start: string; end: string } // YYYY-MM, first → last commit (or the year for legacy work)
+  commits?: number // git history of the store repo
+  sections?: number // custom Liquid sections in the repo
+  facts: { id: string; value: string }[] // verifiable facts; labels in content.stores[slug].factLabels
+  results: { id: string; value: string }[] // measured outcomes only (empty until a real number exists)
 }
 
 export const stores: StoreEntry[] = [
-  { slug: 'the-gummy-box', name: 'The Gummy Box', url: 'https://thegummyboxwellness.com', status: 'live', role: 'built', year: 2026, stack: ['Liquid', 'React islands', 'Bundles app', 'Subscriptions'], gallery: true },
-  { slug: 'nos-cafe', name: 'NOS Café', url: 'https://cafesnos.com', status: 'live', role: 'built', year: 2026, stack: ['Framer → Liquid', 'React islands', 'Bundle builder', 'Klaviyo'], gallery: true },
-  { slug: 'millennio', name: 'Perfumería Millennio', url: 'https://perfumeriamillennio.com', status: 'live', role: 'built', year: 2026, stack: ['Framer → Liquid', 'React islands', 'Digitdeck Track'], gallery: true },
-  { slug: 'mindfuel', name: 'Mindfuel', url: 'https://joinmindfuel.com', status: 'live', role: 'built', year: 2026, stack: ['React port', 'Liquid', 'Tailwind'], gallery: true },
-  { slug: 'nalua', name: 'Nalua Skincare', url: 'https://naluaskincare.co', status: 'live', role: 'built', year: 2026, stack: ['Liquid', 'Purchase offers', 'Releasit'], gallery: true },
-  { slug: 'sebum', name: 'Sebum', url: 'https://www.sebumcremas.com', status: 'live', role: 'built', year: 2026, stack: ['Liquid', 'Review wall', 'React islands'], gallery: true },
-  { slug: 'valdo-cafe', name: 'Valdo Café', url: 'https://valdocafe.co', status: 'live', role: 'migrated', year: 2026, stack: ['Liquid', 'Store transfer'], gallery: true },
-  { slug: 'factores-2x2', name: 'Factores 2x2', url: 'https://factoresdetransferenciaacc.com.co', status: 'live', role: 'built', year: 2026, stack: ['Framer → Liquid', 'Web quality 95+'], gallery: true },
-  { slug: 'pixxiesx', name: 'Pixxiesx', url: 'https://www.pixxiesx.co', status: 'live', role: 'built', year: 2026, stack: ['Liquid', 'Product quiz', 'Metaobjects'], gallery: true },
-  { slug: 'luxe-shine', name: 'Luxe Shine', url: 'https://luxeshiine.com', status: 'live', role: 'built', year: 2026, stack: ['Liquid', 'Scroll video', 'Digitdeck Track'], gallery: true },
-  { slug: 'atmosfera', name: 'Atmósfera Tecnológica', url: 'https://atmosferatecnologica.com', status: 'live', role: 'built', year: 2026, stack: ['Liquid', 'Catalog sync', 'Dual pricing'], gallery: true },
-  { slug: 'saint-theory', name: 'Saint Theory', url: 'https://www.saint-theory.com', status: 'live', role: 'built', year: 2023, stack: ['Liquid', 'Custom theme'], gallery: true, legacy: true },
-  { slug: 'peluna', name: 'Peluna Pets', url: 'https://pelunapets.com', status: 'dev', role: 'built', year: 2026, stack: ['Liquid', 'A/B testing', 'Metaobjects'], gallery: true },
-  { slug: 'en-amor-a-dos', name: 'En Amor a Dos', url: 'https://enamoradosaccesorios.com', status: 'dev', role: 'built', year: 2026, stack: ['Liquid', 'React islands'], gallery: true },
-  { slug: 'unik', name: 'Unik Jeans', url: 'https://www.unikjeans.com', status: 'dev', role: 'built', year: 2026, stack: ['Liquid', 'Bilingual', 'Dual currency'], gallery: true },
-  { slug: 'origen-vital', name: 'Origen Vital', url: 'https://www.origenvital.com.co', status: 'dev', role: 'built', year: 2026, stack: ['Framer → Liquid', 'Quiz', 'Promo landings'], gallery: true },
-  { slug: 'para-machos', name: 'Para Machos', url: 'https://www.paramachos.us', status: 'dev', role: 'built', year: 2026, stack: ['Liquid', 'React islands'], gallery: true },
-  { slug: 'tierramont', name: 'TierraMont', url: 'https://tierramont.com', status: 'dev', role: 'built', year: 2026, stack: ['Liquid', 'React islands'], gallery: true },
-  { slug: 'alma-de-aviador', name: 'Alma de Aviador', url: 'https://almadeaviador.com', status: 'dev', role: 'migrated', year: 2026, stack: ['WooCommerce → Shopify', 'Framer port'], gallery: true },
-  { slug: 'joystaz', name: 'Joystaz Jeans', url: 'https://joystazjeans.com', status: 'live', role: 'built', year: 2025, stack: ['Liquid', 'Tailwind', 'Reviews backend'], gallery: false, legacy: true },
-  { slug: 'new-urban', name: 'New Urban', url: 'https://newurbanisa.com', status: 'live', role: 'built', year: 2023, stack: ['Liquid'], gallery: false, legacy: true },
-  { slug: 'gummind', name: 'Gummind', url: '', status: 'live', role: 'built', year: 2025, stack: ['Liquid', 'Tailwind'], gallery: false, legacy: true },
-  { slug: 'rimo', name: 'Rimo', url: '', status: 'live', role: 'built', year: 2023, stack: ['Liquid'], gallery: false, legacy: true },
+  { slug: 'the-gummy-box', name: 'The Gummy Box', url: 'https://thegummyboxwellness.com', status: 'live', role: 'built', year: 2026, stack: ['Liquid', 'React islands', 'Bundles app', 'Subscriptions'], gallery: true, timeline: { start: '2026-06', end: '2026-09' }, commits: 696, sections: 72, facts: [{ id: 'ladder', value: '10% → 20%' }, { id: 'modules', value: 'Bundles · Track' }], results: [] },
+  { slug: 'nos-cafe', name: 'NOS Café', url: 'https://cafesnos.com', status: 'live', role: 'built', year: 2026, stack: ['Framer → Liquid', 'React islands', 'Bundle builder', 'Klaviyo'], gallery: true, timeline: { start: '2026-07', end: '2026-09' }, commits: 391, sections: 59, facts: [{ id: 'ladder', value: '10% → 20%' }, { id: 'bags', value: '5' }], results: [] },
+  { slug: 'millennio', name: 'Perfumería Millennio', url: 'https://perfumeriamillennio.com', status: 'live', role: 'built', year: 2026, stack: ['Framer → Liquid', 'React islands', 'Digitdeck Track'], gallery: true, timeline: { start: '2026-07', end: '2026-09' }, commits: 292, sections: 104, facts: [{ id: 'tracked', value: '260+' }], results: [] },
+  { slug: 'mindfuel', name: 'Mindfuel', url: 'https://joinmindfuel.com', status: 'live', role: 'built', year: 2026, stack: ['React port', 'Liquid', 'Tailwind'], gallery: true, timeline: { start: '2026-08', end: '2026-09' }, commits: 115, sections: 34, facts: [{ id: 'live', value: 'Aug 20, 2026' }], results: [] },
+  { slug: 'nalua', name: 'Nalua Skincare', url: 'https://naluaskincare.co', status: 'live', role: 'built', year: 2026, stack: ['Liquid', 'Purchase offers', 'Releasit'], gallery: true, timeline: { start: '2026-06', end: '2026-09' }, commits: 567, sections: 47, facts: [{ id: 'offers', value: '19/19' }], results: [] },
+  { slug: 'sebum', name: 'Sebum', url: 'https://www.sebumcremas.com', status: 'live', role: 'built', year: 2026, stack: ['Liquid', 'Review wall', 'React islands'], gallery: true, timeline: { start: '2026-07', end: '2026-09' }, commits: 203, sections: 38, facts: [{ id: 'parity', value: '100%' }], results: [] },
+  { slug: 'valdo-cafe', name: 'Valdo Café', url: 'https://valdocafe.co', status: 'live', role: 'migrated', year: 2026, stack: ['Liquid', 'Store transfer'], gallery: true, timeline: { start: '2026-06', end: '2026-09' }, commits: 50, sections: 27, facts: [{ id: 'transfer', value: 'Jul 9–10, 2026' }], results: [] },
+  { slug: 'factores-2x2', name: 'Factores 2x2', url: 'https://factoresdetransferenciaacc.com.co', status: 'live', role: 'built', year: 2026, stack: ['Framer → Liquid', 'Web quality 95+'], gallery: true, timeline: { start: '2026-07', end: '2026-09' }, commits: 182, sections: 49, facts: [{ id: 'quality', value: '95+' }], results: [] },
+  { slug: 'pixxiesx', name: 'Pixxiesx', url: 'https://www.pixxiesx.co', status: 'live', role: 'built', year: 2026, stack: ['Liquid', 'Product quiz', 'Metaobjects'], gallery: true, timeline: { start: '2026-06', end: '2026-08' }, commits: 100, sections: 97, facts: [{ id: 'metaobjects', value: '6' }], results: [] },
+  { slug: 'luxe-shine', name: 'Luxe Shine', url: 'https://luxeshiine.com', status: 'live', role: 'built', year: 2026, stack: ['Liquid', 'Scroll video', 'Digitdeck Track'], gallery: true, timeline: { start: '2026-06', end: '2026-08' }, commits: 193, sections: 41, facts: [{ id: 'hero', value: 'Scroll video' }], results: [] },
+  { slug: 'atmosfera', name: 'Atmósfera Tecnológica', url: 'https://atmosferatecnologica.com', status: 'live', role: 'built', year: 2026, stack: ['Liquid', 'Catalog sync', 'Dual pricing'], gallery: true, timeline: { start: '2026-06', end: '2026-08' }, commits: 134, sections: 35, facts: [{ id: 'pricing', value: 'Dual (IVA)' }, { id: 'sync', value: '12 h' }], results: [] },
+  { slug: 'saint-theory', name: 'Saint Theory', url: 'https://www.saint-theory.com', status: 'live', role: 'built', year: 2023, stack: ['Liquid', 'Custom theme'], gallery: true, legacy: true, timeline: { start: '2023-01', end: '2023-12' }, facts: [], results: [] },
+  { slug: 'peluna', name: 'Peluna Pets', url: 'https://pelunapets.com', status: 'dev', role: 'built', year: 2026, stack: ['Liquid', 'A/B testing', 'Metaobjects'], gallery: true, timeline: { start: '2026-06', end: '2026-09' }, commits: 154, facts: [{ id: 'ab', value: 'A/B' }], results: [] },
+  { slug: 'en-amor-a-dos', name: 'En Amor a Dos', url: 'https://enamoradosaccesorios.com', status: 'dev', role: 'built', year: 2026, stack: ['Liquid', 'React islands'], gallery: true, timeline: { start: '2026-08', end: '2026-09' }, commits: 166, sections: 85, facts: [{ id: 'custom', value: '57' }], results: [] },
+  { slug: 'unik', name: 'Unik Jeans', url: 'https://www.unikjeans.com', status: 'dev', role: 'built', year: 2026, stack: ['Liquid', 'Bilingual', 'Dual currency'], gallery: true, timeline: { start: '2026-06', end: '2026-09' }, commits: 107, sections: 44, facts: [{ id: 'langs', value: '2 · 2' }, { id: 'ahead', value: '389' }], results: [] },
+  { slug: 'origen-vital', name: 'Origen Vital', url: 'https://www.origenvital.com.co', status: 'dev', role: 'built', year: 2026, stack: ['Framer → Liquid', 'Quiz', 'Promo landings'], gallery: true, timeline: { start: '2026-07', end: '2026-09' }, commits: 493, sections: 102, facts: [{ id: 'reviews', value: '302' }, { id: 'ads', value: '192' }, { id: 'collections', value: '5' }], results: [] },
+  { slug: 'para-machos', name: 'Para Machos', url: 'https://www.paramachos.us', status: 'dev', role: 'built', year: 2026, stack: ['Liquid', 'React islands'], gallery: true, timeline: { start: '2026-08', end: '2026-09' }, commits: 138, sections: 62, facts: [], results: [] },
+  { slug: 'tierramont', name: 'TierraMont', url: 'https://tierramont.com', status: 'dev', role: 'built', year: 2026, stack: ['Liquid', 'React islands'], gallery: true, timeline: { start: '2026-07', end: '2026-09' }, commits: 304, sections: 45, facts: [{ id: 'issues', value: '81' }], results: [] },
+  { slug: 'alma-de-aviador', name: 'Alma de Aviador', url: 'https://almadeaviador.com', status: 'dev', role: 'migrated', year: 2026, stack: ['WooCommerce → Shopify', 'Framer port'], gallery: true, timeline: { start: '2026-08', end: '2026-09' }, commits: 170, sections: 51, facts: [{ id: 'framer', value: '35' }, { id: 'migration', value: 'Woo → Shopify' }], results: [] },
+  { slug: 'joystaz', name: 'Joystaz Jeans', url: 'https://joystazjeans.com', status: 'live', role: 'built', year: 2025, stack: ['Liquid', 'Tailwind', 'Reviews backend'], gallery: false, legacy: true, timeline: { start: '2025-08', end: '2025-10' }, commits: 249, sections: 43, facts: [{ id: 'reviews', value: 'Custom' }], results: [] },
+  { slug: 'new-urban', name: 'New Urban', url: 'https://newurbanisa.com', status: 'live', role: 'built', year: 2023, stack: ['Liquid'], gallery: false, legacy: true, timeline: { start: '2023-01', end: '2023-12' }, facts: [], results: [] },
+  { slug: 'gummind', name: 'Gummind', url: '', status: 'live', role: 'built', year: 2025, stack: ['Liquid', 'Tailwind'], gallery: false, legacy: true, timeline: { start: '2025-05', end: '2025-08' }, facts: [], results: [] },
+  { slug: 'rimo', name: 'Rimo', url: '', status: 'live', role: 'built', year: 2023, stack: ['Liquid'], gallery: false, legacy: true, timeline: { start: '2023-01', end: '2023-12' }, facts: [], results: [] },
 ]
 
 export interface ProductEntry {
@@ -206,9 +211,6 @@ export interface PersonalProject {
 
 export const personalProjects: PersonalProject[] = [
   { id: 'kotodama', name: 'Kotodama 言霊', url: 'https://kotodama-six.vercel.app', repo: 'https://github.com/Max-Bustamante69/kotodama', year: 2026, stack: ['Next.js 16', 'Drizzle', 'Neon', 'Vercel AI SDK', 'ts-fsrs'] },
-  { id: 'peptidos', name: 'Peptidos', repo: 'https://github.com/Max-Bustamante69/Peptidos', year: 2026, stack: ['Headless commerce', 'React', 'Tailwind'] },
-  { id: 'will-you', name: 'will-you', repo: 'https://github.com/Max-Bustamante69/will-you', year: 2026, stack: ['React', 'Vite'] },
-  { id: 'fast-resoluciones', name: 'Fast Resoluciones', repo: 'https://github.com/Max-Bustamante69/fast-resoluciones', year: 2026, stack: ['React', 'PDF parsing', 'Excel'] },
   { id: 'autofill-plugin', name: 'Autofill Plugin', repo: 'https://github.com/Max-Bustamante69/autofill-plugin', year: 2026, stack: ['Browser extension', 'TypeScript'] },
   { id: 'pagui', name: 'Pagui.co', url: 'https://pagui-kyc.vercel.app/', year: 2025, stack: ['Django', 'Next.js', 'OCR', 'PostgreSQL'] },
   { id: 'scorrea', name: 'Sebastian Correa portfolio', url: 'https://www.scorrea.dev/', year: 2024, stack: ['Astro', 'TypeScript', 'Tailwind'] },

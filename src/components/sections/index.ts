@@ -1,5 +1,5 @@
 export { ExploreDesignsLuxury } from './ExploreDesignsLuxury'
 export { ExploreDesignsBrutalist } from './ExploreDesignsBrutalist'
 export { ShopifyWork } from './ShopifyWork'
-export { Gallery, shotsFor, lightboxItems } from './Gallery'
+export { Gallery, shotsFor, lightboxItems, caseStudyFor } from './Gallery'
 export type { SectionHeading } from './Gallery'

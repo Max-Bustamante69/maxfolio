@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useContent } from '../../hooks'
-import { ProjectFrame, GalleryLightbox, type Skin } from '../gallery'
-import { shotsFor, lightboxItems, type SectionHeading } from './Gallery'
+import { ProjectFrame, ProjectModal, GalleryLightbox, type Skin } from '../gallery'
+import { shotsFor, lightboxItems, caseStudyFor, type SectionHeading } from './Gallery'
 import type { StoreEntry, ProductEntry } from '../../data/registry'
 
 interface ShopifyWorkProps {
@@ -10,76 +10,71 @@ interface ShopifyWorkProps {
   heading: SectionHeading
 }
 
+/**
+ * The index: what each store is, what was built, what it runs on. No screenshots in the rows —
+ * the name opens the case-study sheet (carousel + numbers); the Gallery is the visual wall.
+ */
 export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
-  const { strings, registry } = useContent()
+  const { strings, registry, formatPeriod } = useContent()
   const s = strings.sections.shopify
   const g = strings.sections.gallery
+  const cs = strings.sections.caseStudy
   const [tab, setTab] = useState<'stores' | 'products'>('stores')
-  const [open, setOpen] = useState<{ id: string; name: string; withPdp: boolean } | null>(null)
+  const [openStore, setOpenStore] = useState<StoreEntry | null>(null)
+  const [openProduct, setOpenProduct] = useState<ProductEntry | null>(null)
 
   const fleet = registry.stores.filter((x) => !x.legacy)
   const legacy = registry.stores.filter((x) => x.legacy)
 
-  const StoreCard = ({ st }: { st: StoreEntry }) => (
-    <article className={`${skin.card} p-4 flex flex-col`}>
-      {st.gallery ? (
-        <ProjectFrame
-          name={st.name}
-          url={st.url || undefined}
-          shots={shotsFor(st.slug)}
-          skin={skin}
-          onOpen={() => setOpen({ id: st.slug, name: st.name, withPdp: true })}
-          alt={g.open}
-        />
-      ) : (
-        <div className={`aspect-[16/10] flex items-center justify-center rounded-[12px] border border-dashed border-current/20 ${skin.muted} text-xs`}>
-          {strings.badges.roles[st.role]} · {st.year}
-        </div>
-      )}
-      <div className="mt-3 flex-1 flex flex-col">
-        <div className="flex items-center justify-between gap-2">
-          <h3 className={`${skin.title} text-base`}>{st.name}</h3>
-          <span className={`shrink-0 text-[10px] px-2 py-0.5 rounded-full ${st.status === 'live' ? skin.badgeLive : skin.badgeDev}`}>
+  const StoreRow = ({ st }: { st: StoreEntry }) => (
+    <li className={`grid gap-3 py-5 md:grid-cols-12 md:gap-6 ${skin.rowHover} transition-colors`}>
+      <div className="md:col-span-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <button type="button" onClick={() => setOpenStore(st)} className={`${skin.title} press text-left text-base underline-offset-4 hover:underline`}>
+            {st.name}
+          </button>
+          <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] ${st.status === 'live' ? skin.badgeLive : skin.badgeDev}`}>
             {st.status === 'live' ? strings.badges.live : strings.badges.dev}
           </span>
         </div>
-        <p className={`${skin.muted} text-xs mt-0.5`}>
-          {strings.stores[st.slug]?.industry} · {st.year} · {strings.badges.roles[st.role]}
+        <p className={`${skin.muted} mt-0.5 text-xs`}>
+          {strings.stores[st.slug]?.industry} · {formatPeriod(st.timeline.start, st.timeline.end)} · {strings.badges.roles[st.role]}
         </p>
-        <p className={`${skin.body} text-sm mt-2 leading-relaxed`}>{strings.stores[st.slug]?.tagline}</p>
-        <div className="flex flex-wrap gap-1.5 mt-3">
+      </div>
+      <div className="md:col-span-6">
+        <p className={`${skin.accent} text-sm font-medium`}>{strings.stores[st.slug]?.tagline}</p>
+        <p className={`${skin.body} mt-1 text-sm leading-relaxed`}>{strings.stores[st.slug]?.description}</p>
+      </div>
+      <div className="md:col-span-3">
+        <div className="flex flex-wrap gap-1.5">
           {st.stack.map((t) => (
             <span key={t} className={skin.chip}>
               {t}
             </span>
           ))}
         </div>
-        {st.url && (
-          <a href={st.url} target="_blank" rel="noopener noreferrer" className={`${skin.accent} text-sm mt-auto pt-3 inline-block`}>
-            {s.visit} ›
-          </a>
-        )}
+        <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+          <button type="button" onClick={() => setOpenStore(st)} className={`${skin.accent} press text-sm`}>
+            {cs.facts} ›
+          </button>
+          {st.url && (
+            <a href={st.url} target="_blank" rel="noopener noreferrer" className={`${skin.accent} text-sm`}>
+              {s.visit} ›
+            </a>
+          )}
+        </div>
       </div>
-    </article>
+    </li>
   )
 
   const ProductCard = ({ p }: { p: ProductEntry }) => (
-    <article className={`${skin.card} p-4`}>
-      {p.gallery && (
-        <ProjectFrame
-          name={p.name}
-          url={p.url}
-          shots={shotsFor(p.id, false)}
-          skin={skin}
-          onOpen={() => setOpen({ id: p.id, name: p.name, withPdp: false })}
-          alt={g.open}
-        />
-      )}
-      <div className={p.gallery ? 'mt-3' : ''}>
+    <article className={`${skin.card} p-5`}>
+      {p.gallery && <ProjectFrame name={p.name} shots={shotsFor(p.id, false)} skin={skin} onOpen={() => setOpenProduct(p)} alt={g.open} variant="laptop" />}
+      <div className={p.gallery ? 'mt-5' : ''}>
         <h3 className={`${skin.title} text-lg`}>{p.name}</h3>
         <p className={`${skin.accent} text-sm`}>{strings.products[p.id]?.tagline}</p>
-        <p className={`${skin.body} text-sm mt-2 leading-relaxed`}>{strings.products[p.id]?.description}</p>
-        <div className="flex flex-wrap gap-1.5 mt-3">
+        <p className={`${skin.body} mt-2 text-sm leading-relaxed`}>{strings.products[p.id]?.description}</p>
+        <div className="mt-3 flex flex-wrap gap-1.5">
           {p.stack.map((t) => (
             <span key={t} className={skin.chip}>
               {t}
@@ -87,7 +82,7 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
           ))}
         </div>
         {p.url && (
-          <a href={p.url} target="_blank" rel="noopener noreferrer" className={`${skin.accent} text-sm mt-3 inline-block`}>
+          <a href={p.url} target="_blank" rel="noopener noreferrer" className={`${skin.accent} mt-3 inline-block text-sm`}>
             {s.visit} ›
           </a>
         )}
@@ -99,7 +94,7 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
     <section id="shopify" className="scroll-mt-20">
       {heading(s.eyebrow, s.title, s.titleAccent, s.lead)}
 
-      <div className="flex flex-wrap gap-2 mb-8" role="tablist" aria-label={s.eyebrow}>
+      <div className="mb-6 flex flex-wrap gap-2" role="tablist" aria-label={s.eyebrow}>
         {(['stores', 'products'] as const).map((k) => (
           <button
             key={k}
@@ -109,7 +104,7 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
             onClick={() => setTab(k)}
             className={`${tab === k ? skin.chipOn : skin.chip} compact-touch transition-colors`}
           >
-            {k === 'stores' ? s.tabStores : s.tabProducts}
+            {k === 'stores' ? `${s.tabStores} · ${registry.stores.length}` : `${s.tabProducts} · ${registry.products.length}`}
           </button>
         ))}
       </div>
@@ -117,17 +112,17 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
       <AnimatePresence mode="wait">
         {tab === 'stores' ? (
           <motion.div key="stores" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <ul className={`divide-y border-y ${skin.divider}`}>
               {fleet.map((st) => (
-                <StoreCard key={st.slug} st={st} />
+                <StoreRow key={st.slug} st={st} />
               ))}
-            </div>
-            <p className={`${skin.muted} text-xs tracking-[0.2em] uppercase mt-12 mb-4`}>{s.legacyLabel}</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            </ul>
+            <p className={`${skin.muted} mb-2 mt-10 text-xs uppercase tracking-[0.2em]`}>{s.legacyLabel}</p>
+            <ul className={`divide-y border-y ${skin.divider}`}>
               {legacy.map((st) => (
-                <StoreCard key={st.slug} st={st} />
+                <StoreRow key={st.slug} st={st} />
               ))}
-            </div>
+            </ul>
           </motion.div>
         ) : (
           <motion.div
@@ -135,7 +130,7 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+            className="grid grid-cols-1 gap-6 md:grid-cols-2"
           >
             {registry.products.map((p) => (
               <ProductCard key={p.id} p={p} />
@@ -144,11 +139,18 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
         )}
       </AnimatePresence>
 
+      <ProjectModal
+        open={!!openStore}
+        data={openStore ? caseStudyFor(openStore, strings, skin, formatPeriod) : null}
+        skin={skin}
+        labels={{ close: g.close, prev: cs.prev, next: cs.next, home: g.home, pdp: g.pdp, desktop: g.desktop, mobile: g.mobile, facts: cs.facts, results: cs.results, stack: cs.stack, visit: cs.visit }}
+        onClose={() => setOpenStore(null)}
+      />
       <GalleryLightbox
-        open={!!open}
-        title={open?.name ?? ''}
-        items={open ? lightboxItems(open.id, g, open.withPdp) : []}
-        onClose={() => setOpen(null)}
+        open={!!openProduct}
+        title={openProduct?.name ?? ''}
+        items={openProduct ? lightboxItems(openProduct.id, g, false) : []}
+        onClose={() => setOpenProduct(null)}
         closeLabel={g.close}
       />
     </section>

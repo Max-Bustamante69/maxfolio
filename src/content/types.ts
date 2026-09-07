@@ -25,6 +25,10 @@ export interface PortfolioContent {
       filterAll: string
       filterLive: string
       filterDev: string
+      viewLabel: string
+      viewCarousel: string
+      viewDevices: string
+      viewPhones: string
       open: string
       close: string
       home: string
@@ -44,13 +48,14 @@ export interface PortfolioContent {
       location: string
     }
     explore: { eyebrow: string; title: string; lead: string; viewing: string }
+    caseStudy: { facts: string; results: string; stack: string; visit: string; prev: string; next: string; timeline: string; commits: string; sections: string }
   }
   badges: { live: string; dev: string; current: string; completed: string; roles: Record<StoreRole, string> }
   experience: Record<
     ExperienceId,
     { title: string; summary: string; highlights: string[]; metricLabels: Record<string, string> }
   >
-  stores: Record<string, { industry: string; tagline: string }>
+  stores: Record<string, { industry: string; tagline: string; description: string; factLabels?: Record<string, string> }>
   products: Record<string, { tagline: string; description: string }>
   projects: Record<string, { tagline: string; description: string }>
   footer: { tagline: string; services: string[]; servicesTitle: string; quickLinks: string; rights: string }

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Skin } from './skins'
+import { LaptopFrame, PhoneFrame } from './DeviceFrame'
 
 export interface FrameShots {
   homeDesktop: string
@@ -10,94 +11,72 @@ export interface FrameShots {
 
 interface ProjectFrameProps {
   name: string
-  url?: string
   shots: FrameShots
   skin: Skin
   onOpen?: () => void
   alt: string
+  /** 'composite' = laptop with a phone overlapping its corner; 'laptop' = laptop only; 'phone' = phone only */
+  variant?: 'composite' | 'laptop' | 'phone'
 }
 
-const RADIUS: Record<Skin['frame'], { desktop: string; mobile: string }> = {
-  apple: { desktop: 'rounded-[12px]', mobile: 'rounded-[26px]' },
-  luxury: { desktop: 'rounded-none', mobile: 'rounded-[22px]' },
-  brutalist: { desktop: 'rounded-none', mobile: 'rounded-none' },
-}
+const Crossfade = ({ base, over, alt, hover, label }: { base: string; over?: string; alt: string; hover: boolean; label: string }) => (
+  <>
+    <img src={base} alt={`${alt} — ${label}`} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover object-top" />
+    {over && (
+      <img
+        src={over}
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        decoding="async"
+        className={`absolute inset-0 h-full w-full object-cover object-top transition-opacity duration-500 ${hover ? 'opacity-100' : 'opacity-0'}`}
+      />
+    )}
+  </>
+)
 
 /**
- * CSS-only device frames so every project renders at the same size:
- * a browser window (16:10) with the phone (390:844) overlapping its corner.
- * Hovering the desktop frame crossfades home → product page.
+ * Same devices for every project so the gallery reads as one system.
+ * Hovering (or focusing) crossfades home → product page on the desktop screen.
  */
-export function ProjectFrame({ name, url, shots, skin, onOpen, alt }: ProjectFrameProps) {
+export function ProjectFrame({ name, shots, skin, onOpen, alt, variant = 'composite' }: ProjectFrameProps) {
   const [hover, setHover] = useState(false)
-  const r = RADIUS[skin.frame]
-  let host = ''
-  try {
-    host = url ? new URL(url).host.replace(/^www\./, '') : ''
-  } catch {
-    host = ''
+  const bind = {
+    onMouseEnter: () => setHover(true),
+    onMouseLeave: () => setHover(false),
+    onFocus: () => setHover(true),
+    onBlur: () => setHover(false),
+  }
+
+  if (variant === 'phone') {
+    return (
+      <button type="button" onClick={onOpen} {...bind} className="group relative block w-full px-[4%] text-left" aria-label={`${name}: ${alt}`}>
+        <PhoneFrame>
+          <Crossfade base={shots.homeMobile} over={shots.pdpMobile} alt={alt} hover={hover} label="home, mobile" />
+        </PhoneFrame>
+      </button>
+    )
+  }
+
+  if (variant === 'laptop') {
+    return (
+      <button type="button" onClick={onOpen} {...bind} className="group relative block w-full text-left" aria-label={`${name}: ${alt}`}>
+        <LaptopFrame>
+          <Crossfade base={shots.homeDesktop} over={shots.pdpDesktop} alt={alt} hover={hover} label="home, desktop" />
+        </LaptopFrame>
+      </button>
+    )
   }
 
   return (
-    <button
-      type="button"
-      onClick={onOpen}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      onFocus={() => setHover(true)}
-      onBlur={() => setHover(false)}
-      className="group relative block w-full text-left pb-6 pr-2"
-      aria-label={`${name}: ${alt}`}
-    >
-      {/* Desktop browser frame */}
-      <div
-        className={`relative overflow-hidden ${r.desktop} ${
-          skin.frame === 'brutalist' ? 'border-2 border-stone-900' : 'ring-1 ring-black/10'
-        } bg-[#e8e8ed]`}
-      >
-        <div className="flex items-center gap-1.5 px-3 h-7 text-[10px] text-black/60">
-          <span className="w-2 h-2 rounded-full bg-[#ff5f57]" />
-          <span className="w-2 h-2 rounded-full bg-[#febc2e]" />
-          <span className="w-2 h-2 rounded-full bg-[#28c840]" />
-          <span className="ml-2 flex-1 truncate rounded bg-white/70 px-2 py-0.5 text-left">{host}</span>
-        </div>
-        <div className="relative aspect-[16/10] bg-white">
-          <img
-            src={shots.homeDesktop}
-            alt={`${alt} — home, desktop`}
-            loading="lazy"
-            decoding="async"
-            className="absolute inset-0 w-full h-full object-cover object-top"
-          />
-          {shots.pdpDesktop && (
-            <img
-              src={shots.pdpDesktop}
-              alt={`${alt} — product page, desktop`}
-              loading="lazy"
-              decoding="async"
-              className={`absolute inset-0 w-full h-full object-cover object-top transition-opacity duration-500 ${
-                hover ? 'opacity-100' : 'opacity-0'
-              }`}
-            />
-          )}
-        </div>
-      </div>
-
-      {/* Phone frame overlapping the bottom-right corner */}
-      <div
-        className={`absolute bottom-0 right-0 w-[24%] min-w-[74px] overflow-hidden ${r.mobile} border-[3px] border-[#1d1d1f] bg-black shadow-[0_12px_30px_rgba(0,0,0,0.25)] transition-transform duration-500 ${
-          hover ? '-translate-y-1' : ''
-        }`}
-      >
-        <div className="relative aspect-[390/844]">
-          <img
-            src={shots.homeMobile}
-            alt={`${alt} — home, mobile`}
-            loading="lazy"
-            decoding="async"
-            className="absolute inset-0 w-full h-full object-cover object-top"
-          />
-        </div>
+    <button type="button" onClick={onOpen} {...bind} className={`group relative block w-full pb-[9%] pr-[3%] text-left ${skin.frame === 'brutalist' ? '' : ''}`} aria-label={`${name}: ${alt}`}>
+      <LaptopFrame>
+        <Crossfade base={shots.homeDesktop} over={shots.pdpDesktop} alt={alt} hover={hover} label="home, desktop" />
+      </LaptopFrame>
+      <div className={`absolute bottom-0 right-0 w-[24%] min-w-[72px] transition-transform duration-500 ${hover ? '-translate-y-1' : ''}`}>
+        <PhoneFrame>
+          <Crossfade base={shots.homeMobile} over={shots.pdpMobile} alt={alt} hover={hover} label="home, mobile" />
+        </PhoneFrame>
       </div>
     </button>
   )
