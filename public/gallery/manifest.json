@@ -416,5 +416,44 @@
     "finalUrl": "https://jgnqhc-f1.myshopify.com/",
     "linkedin": "/gallery/alma-de-aviador/linkedin.webp",
     "pdp": "/products/combo-heroe-de-pelicula-azul"
+  },
+  "digitdeck-platform": {
+    "slug": "digitdeck-platform",
+    "sourceUrl": "https://app.digitdeck.co",
+    "status": "live",
+    "source": "extra",
+    "capturedAt": "2026-09-07T18:15:26.136Z",
+    "shots": {
+      "home-desktop": "/gallery/digitdeck-platform/home-desktop.webp",
+      "home-mobile": "/gallery/digitdeck-platform/home-mobile.webp"
+    },
+    "pageTitle": "Digitdeck Brain — where ideas get developed",
+    "linkedin": "/gallery/digitdeck-platform/linkedin.webp"
+  },
+  "audit-dashboard": {
+    "slug": "audit-dashboard",
+    "sourceUrl": "file:///C:/Users/Usuario/Desktop/P/Github/Digitdeck-Audits/perfumeriamillennio.com/2026-07-10/dashboard-fallback.html",
+    "status": "live",
+    "source": "extra",
+    "capturedAt": "2026-09-07T18:17:10.042Z",
+    "shots": {
+      "home-desktop": "/gallery/audit-dashboard/home-desktop.webp",
+      "home-mobile": "/gallery/audit-dashboard/home-mobile.webp"
+    },
+    "pageTitle": "",
+    "linkedin": "/gallery/audit-dashboard/linkedin.webp"
+  },
+  "digitdeck-apps": {
+    "slug": "digitdeck-apps",
+    "sourceUrl": "https://cafesnos.com/pages/bundle-builder",
+    "status": "live",
+    "source": "extra",
+    "capturedAt": "2026-09-07T18:16:07.730Z",
+    "shots": {
+      "home-desktop": "/gallery/digitdeck-apps/home-desktop.webp",
+      "home-mobile": "/gallery/digitdeck-apps/home-mobile.webp"
+    },
+    "pageTitle": "Arma tu Caja NOS – NOS - Lumiria Coffee Roasters",
+    "linkedin": "/gallery/digitdeck-apps/linkedin.webp"
   }
 }
