@@ -28,11 +28,13 @@ export const es: PortfolioContent = {
       eyebrow: 'Trabajo en Shopify',
       title: 'Tiendas, apps',
       titleAccent: 'y la plataforma detrás',
-      lead: 'El índice: qué es cada tienda, qué construí y sobre qué corre. Las que están en vivo enlazan a la tienda real; el resto son builds que siguen en el pipeline del cliente. Para verlas, baja a la galería.',
+      lead: 'Qué es cada tienda, qué construí y sobre qué corre. Abre una para ver las cifras; las que están en vivo enlazan a la tienda real.',
       tabStores: 'Tiendas',
       tabProducts: 'Apps y plataforma',
       legacyLabel: 'Trabajo anterior',
       visit: 'Visitar tienda',
+      showAll: 'Ver las {n} tiendas',
+      showLess: 'Ver menos',
     },
     gallery: {
       eyebrow: 'Galería',
@@ -73,7 +75,7 @@ export const es: PortfolioContent = {
       location: 'Ubicación',
     },
     explore: { eyebrow: 'Explorar', title: 'El mismo portafolio, cuatro diseños', lead: 'Elige la estética que prefieras. El contenido es idéntico.', viewing: 'Estás viendo' },
-    caseStudy: { facts: 'En cifras', results: 'Resultados medidos', stack: 'Stack', visit: 'Visitar tienda', prev: 'Anterior', next: 'Siguiente', timeline: 'Línea de tiempo', commits: 'Commits', sections: 'Secciones propias' },
+    caseStudy: { facts: 'En cifras', results: 'Resultados medidos', stack: 'Stack', visit: 'Visitar tienda', prev: 'Anterior', next: 'Siguiente', timeline: 'Ventana de construcción', commits: 'commits', sections: 'secciones propias', open: 'Caso', metrics: 'Lighthouse · móvil', perf: 'Rendimiento', a11y: 'Accesibilidad', bp: 'Buenas prácticas', seo: 'SEO', lcp: 'LCP', measured: 'Medición de laboratorio en la página de inicio, {date}, mediana de {runs} corridas de Lighthouse (móvil, red simulada).' },
   },
   badges: { live: 'En vivo', dev: 'En construcción', current: 'Actual', completed: 'Terminado', roles: { built: 'Construida', maintained: 'Mantenida', migrated: 'Migrada' } },
   experience: {

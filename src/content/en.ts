@@ -28,11 +28,13 @@ export const en: PortfolioContent = {
       eyebrow: 'Shopify work',
       title: 'Storefronts, apps,',
       titleAccent: 'and the platform behind them',
-      lead: 'The index: what each store is, what I built, and what it runs on. Live ones link to the real storefront; the rest are builds still moving through the client\'s pipeline. To see them, scroll to the gallery.',
+      lead: 'What each store is, what I built and what it runs on. Open one for the numbers; the live ones link to the real storefront.',
       tabStores: 'Storefronts',
       tabProducts: 'Apps & platform',
       legacyLabel: 'Earlier work',
       visit: 'Visit store',
+      showAll: 'Show all {n} stores',
+      showLess: 'Show fewer',
     },
     gallery: {
       eyebrow: 'Gallery',
@@ -73,7 +75,7 @@ export const en: PortfolioContent = {
       location: 'Location',
     },
     explore: { eyebrow: 'Explore', title: 'Same portfolio, four designs', lead: 'Pick the aesthetic you prefer. The content is identical.', viewing: 'Currently viewing' },
-    caseStudy: { facts: 'By the numbers', results: 'Measured results', stack: 'Stack', visit: 'Visit store', prev: 'Previous', next: 'Next', timeline: 'Timeline', commits: 'Commits', sections: 'Custom sections' },
+    caseStudy: { facts: 'By the numbers', results: 'Measured results', stack: 'Stack', visit: 'Visit store', prev: 'Previous', next: 'Next', timeline: 'Build window', commits: 'commits', sections: 'custom sections', open: 'Case study', metrics: 'Lighthouse · mobile', perf: 'Performance', a11y: 'Accessibility', bp: 'Best practices', seo: 'SEO', lcp: 'LCP', measured: 'Lab run on the home page, {date}, median of {runs} Lighthouse runs (mobile, simulated throttling).' },
   },
   badges: { live: 'Live', dev: 'In development', current: 'Current', completed: 'Completed', roles: { built: 'Built', maintained: 'Maintained', migrated: 'Migrated' } },
   experience: {

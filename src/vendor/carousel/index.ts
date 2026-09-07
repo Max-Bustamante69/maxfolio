@@ -1,2 +1,6 @@
 export { Carousel, useDragScroll } from './Carousel.jsx'
+export { CarouselDotPagination } from './CarouselDotPagination.jsx'
+export { CarouselArrowButton, CarouselCaretIcon } from './CarouselNav.jsx'
 export type { CarouselProps, CarouselControlsState, Responsive } from './Carousel.d.ts'
+export type { CarouselDotPaginationProps } from './CarouselDotPagination.d.ts'
+export type { CarouselArrowButtonProps } from './CarouselNav.d.ts'

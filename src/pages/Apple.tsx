@@ -97,7 +97,7 @@ function AppleContent() {
       />
       <ContactFormModal isOpen={contactOpen} onClose={() => setContactOpen(false)} variant="apple" isDark={isDark} />
 
-      <div className={`min-h-screen font-sf ${bg} transition-colors duration-300 overflow-x-hidden`} role="document">
+      <div className={`theme-apple min-h-screen font-sf ${bg} transition-colors duration-300 overflow-x-hidden`} role="document">
         {/* Nav — 44px, frosted */}
         <nav
           className={`fixed top-0 inset-x-0 z-40 h-11 ${isDark ? 'bg-black/70' : 'bg-white/70'} backdrop-blur-xl border-b ${isDark ? 'border-white/10' : 'border-black/5'}`}

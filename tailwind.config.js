@@ -22,6 +22,9 @@ export default {
         'lg': '32px',
         'xl': '48px',
       },
+      borderRadius: {
+        'pill': '9999px',
+      },
       boxShadow: {
         'tile': '0 4px 24px rgba(0,0,0,0.06)',
         'tile-dark': '0 4px 24px rgba(0,0,0,0.5)',

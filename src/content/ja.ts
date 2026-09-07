@@ -28,11 +28,13 @@ export const ja: PortfolioContent = {
       eyebrow: 'Shopifyの実績',
       title: 'ストア、アプリ、',
       titleAccent: 'そしてその裏側のプラットフォーム',
-      lead: '一覧です。各ストアが何で、何をつくり、何の上で動いているか。公開中のものは実際のストアへリンクし、残りはクライアント側で進行中のビルドです。見た目はこの下のギャラリーで。',
+      lead: '各ストアが何で、何をつくり、何の上で動いているか。開くと数字が見られます。公開中のものは実際のストアへリンクします。',
       tabStores: 'ストア',
       tabProducts: 'アプリとプラットフォーム',
       legacyLabel: '過去の実績',
       visit: 'ストアを見る',
+      showAll: '{n}店舗すべてを表示',
+      showLess: '表示を減らす',
     },
     gallery: {
       eyebrow: 'ギャラリー',
@@ -73,7 +75,7 @@ export const ja: PortfolioContent = {
       location: '所在地',
     },
     explore: { eyebrow: '探索', title: '同じポートフォリオ、4つのデザイン', lead: 'お好みの美学を選んでください。内容は同じです。', viewing: '表示中' },
-    caseStudy: { facts: '数字で見る', results: '計測した成果', stack: '技術スタック', visit: 'ストアを見る', prev: '前へ', next: '次へ', timeline: '期間', commits: 'コミット', sections: '独自セクション' },
+    caseStudy: { facts: '数字で見る', results: '計測した成果', stack: '技術スタック', visit: 'ストアを見る', prev: '前へ', next: '次へ', timeline: '構築期間', commits: 'コミット', sections: '独自セクション', open: '事例を見る', metrics: 'Lighthouse・モバイル', perf: 'パフォーマンス', a11y: 'アクセシビリティ', bp: 'ベストプラクティス', seo: 'SEO', lcp: 'LCP', measured: 'トップページのラボ計測、{date}、Lighthouse {runs}回の中央値（モバイル、回線シミュレーション）。' },
   },
   badges: { live: '公開中', dev: '開発中', current: '現職', completed: '完了', roles: { built: '構築', maintained: '保守', migrated: '移行' } },
   experience: {

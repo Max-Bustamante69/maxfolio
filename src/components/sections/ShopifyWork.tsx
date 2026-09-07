@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useContent } from '../../hooks'
 import { ProjectFrame, ProjectModal, GalleryLightbox, type Skin } from '../gallery'
-import { shotsFor, lightboxItems, caseStudyFor, type SectionHeading } from './Gallery'
+import { shotsFor, lightboxItems, caseStudyFor, caseStudyLabels, type SectionHeading } from './Gallery'
 import type { StoreEntry, ProductEntry } from '../../data/registry'
 
 interface ShopifyWorkProps {
@@ -10,9 +10,13 @@ interface ShopifyWorkProps {
   heading: SectionHeading
 }
 
+/** Rows shown before "Show all": enough to read the range without scrolling a wall. */
+const VISIBLE = 8
+
 /**
- * The index: what each store is, what was built, what it runs on. No screenshots in the rows —
- * the name opens the case-study sheet (carousel + numbers); the Gallery is the visual wall.
+ * The index: one line per store — name, what it is, when, and the one-sentence tagline. Everything
+ * else (description, Lighthouse, facts, stack, captures) lives in the case-study sheet the name
+ * opens, so the section stays scannable. The Gallery is the visual wall.
  */
 export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
   const { strings, registry, formatPeriod } = useContent()
@@ -20,52 +24,48 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
   const g = strings.sections.gallery
   const cs = strings.sections.caseStudy
   const [tab, setTab] = useState<'stores' | 'products'>('stores')
+  const [showAll, setShowAll] = useState(false)
   const [openStore, setOpenStore] = useState<StoreEntry | null>(null)
   const [openProduct, setOpenProduct] = useState<ProductEntry | null>(null)
 
   const fleet = registry.stores.filter((x) => !x.legacy)
   const legacy = registry.stores.filter((x) => x.legacy)
+  const visibleFleet = showAll ? fleet : fleet.slice(0, VISIBLE)
+  const hidden = registry.stores.length - visibleFleet.length
 
-  const StoreRow = ({ st }: { st: StoreEntry }) => (
-    <li className={`grid gap-3 py-5 md:grid-cols-12 md:gap-6 ${skin.rowHover} transition-colors`}>
-      <div className="md:col-span-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <button type="button" onClick={() => setOpenStore(st)} className={`${skin.title} press text-left text-base underline-offset-4 hover:underline`}>
-            {st.name}
-          </button>
-          <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] ${st.status === 'live' ? skin.badgeLive : skin.badgeDev}`}>
-            {st.status === 'live' ? strings.badges.live : strings.badges.dev}
-          </span>
+  const StoreRow = ({ st }: { st: StoreEntry }) => {
+    const c = strings.stores[st.slug]
+    return (
+      <li className={`${skin.rowHover} transition-colors`}>
+        <div className="grid gap-x-6 gap-y-1.5 py-4 md:grid-cols-12 md:items-center">
+          <div className="md:col-span-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <button type="button" onClick={() => setOpenStore(st)} className={`${skin.title} press text-left text-[15px] underline-offset-4 hover:underline`}>
+                {st.name}
+              </button>
+              <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] ${st.status === 'live' ? skin.badgeLive : skin.badgeDev}`}>
+                {st.status === 'live' ? strings.badges.live : strings.badges.dev}
+              </span>
+            </div>
+            <p className={`${skin.muted} mt-0.5 text-xs`}>
+              {c?.industry} · {formatPeriod(st.timeline.start, st.timeline.end)}
+            </p>
+          </div>
+          <p className={`${skin.body} text-sm leading-snug md:col-span-5 md:line-clamp-2`}>{c?.tagline}</p>
+          <div className="flex items-center gap-x-4 text-sm md:col-span-3 md:justify-end">
+            <button type="button" onClick={() => setOpenStore(st)} className={`${skin.accent} press compact-touch inline-flex items-center whitespace-nowrap`}>
+              {cs.open} ›
+            </button>
+            {st.url && (
+              <a href={st.url} target="_blank" rel="noopener noreferrer" className={`${skin.accent} compact-touch inline-flex items-center whitespace-nowrap`}>
+                {s.visit} ›
+              </a>
+            )}
+          </div>
         </div>
-        <p className={`${skin.muted} mt-0.5 text-xs`}>
-          {strings.stores[st.slug]?.industry} · {formatPeriod(st.timeline.start, st.timeline.end)} · {strings.badges.roles[st.role]}
-        </p>
-      </div>
-      <div className="md:col-span-6">
-        <p className={`${skin.accent} text-sm font-medium`}>{strings.stores[st.slug]?.tagline}</p>
-        <p className={`${skin.body} mt-1 text-sm leading-relaxed`}>{strings.stores[st.slug]?.description}</p>
-      </div>
-      <div className="md:col-span-3">
-        <div className="flex flex-wrap gap-1.5">
-          {st.stack.map((t) => (
-            <span key={t} className={skin.chip}>
-              {t}
-            </span>
-          ))}
-        </div>
-        <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
-          <button type="button" onClick={() => setOpenStore(st)} className={`${skin.accent} press text-sm`}>
-            {cs.facts} ›
-          </button>
-          {st.url && (
-            <a href={st.url} target="_blank" rel="noopener noreferrer" className={`${skin.accent} text-sm`}>
-              {s.visit} ›
-            </a>
-          )}
-        </div>
-      </div>
-    </li>
-  )
+      </li>
+    )
+  }
 
   const ProductCard = ({ p }: { p: ProductEntry }) => (
     <article className={`${skin.card} p-5`}>
@@ -113,16 +113,26 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
         {tab === 'stores' ? (
           <motion.div key="stores" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}>
             <ul className={`divide-y border-y ${skin.divider}`}>
-              {fleet.map((st) => (
+              {visibleFleet.map((st) => (
                 <StoreRow key={st.slug} st={st} />
               ))}
             </ul>
-            <p className={`${skin.muted} mb-2 mt-10 text-xs uppercase tracking-[0.2em]`}>{s.legacyLabel}</p>
-            <ul className={`divide-y border-y ${skin.divider}`}>
-              {legacy.map((st) => (
-                <StoreRow key={st.slug} st={st} />
-              ))}
-            </ul>
+            {showAll && legacy.length > 0 && (
+              <>
+                <p className={`${skin.muted} mb-2 mt-10 text-xs uppercase tracking-[0.2em]`}>{s.legacyLabel}</p>
+                <ul className={`divide-y border-y ${skin.divider}`}>
+                  {legacy.map((st) => (
+                    <StoreRow key={st.slug} st={st} />
+                  ))}
+                </ul>
+              </>
+            )}
+            <div className="mt-6">
+              <button type="button" onClick={() => setShowAll((v) => !v)} aria-expanded={showAll} className={`${showAll ? skin.chip : skin.chipOn} compact-touch press transition-colors`}>
+                {showAll ? s.showLess : s.showAll.replace('{n}', String(registry.stores.length))}
+                {!showAll && hidden > 0 ? ' ›' : ''}
+              </button>
+            </div>
           </motion.div>
         ) : (
           <motion.div
@@ -143,7 +153,7 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
         open={!!openStore}
         data={openStore ? caseStudyFor(openStore, strings, skin, formatPeriod) : null}
         skin={skin}
-        labels={{ close: g.close, prev: cs.prev, next: cs.next, home: g.home, pdp: g.pdp, desktop: g.desktop, mobile: g.mobile, facts: cs.facts, results: cs.results, stack: cs.stack, visit: cs.visit }}
+        labels={caseStudyLabels(strings)}
         onClose={() => setOpenStore(null)}
       />
       <GalleryLightbox

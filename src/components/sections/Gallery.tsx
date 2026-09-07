@@ -1,9 +1,10 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { useContent } from '../../hooks'
-import { ProjectFrame, ProjectModal, carouselTokens, type Skin, type FrameShots, type LightboxItem, type CaseStudyData } from '../gallery'
+import { ProjectFrame, ProjectModal, GlassControls, carouselTokens, type Skin, type FrameShots, type LightboxItem, type CaseStudyData } from '../gallery'
+import type { CaseStudyLabels } from '../gallery/ProjectModal'
 import { Carousel } from '../../vendor/carousel'
-import type { StoreEntry } from '../../data/registry'
+import { metrics, type StoreEntry } from '../../data/registry'
 import type { PortfolioContent } from '../../content/types'
 
 export type SectionHeading = (eyebrow: string, title: string, accent: string, lead?: string) => ReactNode
@@ -31,6 +32,17 @@ export const lightboxItems = (slug: string, labels: GalleryLabels, withPdp = tru
   ...(withPdp ? [{ key: 'pm', label: `${labels.pdp} · ${labels.mobile}`, src: `/gallery/${slug}/pdp-mobile.webp`, kind: 'mobile' as const }] : []),
 ]
 
+/** The sheet's labels, from the gallery + case-study strings of the active locale. */
+export const caseStudyLabels = (strings: PortfolioContent): CaseStudyLabels => {
+  const g = strings.sections.gallery
+  const cs = strings.sections.caseStudy
+  return {
+    close: g.close, prev: cs.prev, next: cs.next, home: g.home, pdp: g.pdp, desktop: g.desktop, mobile: g.mobile,
+    facts: cs.facts, results: cs.results, stack: cs.stack, visit: cs.visit,
+    metrics: cs.metrics, perf: cs.perf, a11y: cs.a11y, bp: cs.bp, seo: cs.seo, lcp: cs.lcp, measured: cs.measured,
+  }
+}
+
 /** Builds the case-study sheet data for a store from the registry + the active locale. */
 export function caseStudyFor(
   st: StoreEntry,
@@ -42,11 +54,10 @@ export function caseStudyFor(
   const cs = strings.sections.caseStudy
   const stats = [
     { label: cs.timeline, value: formatPeriod(st.timeline.start, st.timeline.end) },
-    ...(st.commits ? [{ label: cs.commits, value: st.commits.toLocaleString() }] : []),
-    ...(st.sections ? [{ label: cs.sections, value: String(st.sections) }] : []),
     ...st.facts.map((f) => ({ label: c?.factLabels?.[f.id] ?? f.id, value: f.value })),
   ]
   const results = st.results.map((r) => ({ label: c?.factLabels?.[r.id] ?? r.id, value: r.value }))
+  const build = [st.commits ? `${st.commits.toLocaleString()} ${cs.commits}` : '', st.sections ? `${st.sections} ${cs.sections}` : ''].filter(Boolean).join(' · ')
   return {
     name: st.name,
     url: st.url || undefined,
@@ -54,9 +65,11 @@ export function caseStudyFor(
     badge: { text: st.status === 'live' ? strings.badges.live : strings.badges.dev, className: st.status === 'live' ? skin.badgeLive : skin.badgeDev },
     tagline: c?.tagline ?? '',
     description: c?.description ?? '',
+    metrics: st.status === 'live' ? metrics[st.slug] : undefined,
     stats,
     results,
     stack: st.stack,
+    build: build || undefined,
     shots: shotsFor(st.slug, st.gallery),
   }
 }
@@ -119,16 +132,17 @@ export function Gallery({ skin, heading }: GalleryProps) {
       </div>
 
       {view === 'carousel' && (
-        <div style={carouselTokens(skin.frame, skin.dark)}>
+        <div className="rail-wide" style={carouselTokens(skin.frame, skin.dark)}>
           {/* House carousel: edge bleed to the viewport, centered snap on mobile, left rest on desktop,
-              weighted mouse drag, step-by-one arrows + dots in a reserved control row. */}
+              weighted mouse drag, step-by-one arrows + the five-dot window in glass. The rail breaks
+              out of the text column on wide screens so the composites read at size. */}
           <Carousel
             key={filter}
-            slidesPerView={{ base: 1, md: 2, lg: 3 }}
+            slidesPerView={{ base: 1, md: 2, lg: 2, xl: 3 }}
             gap={24}
-            controls="progress"
             desktopSnap="start"
             ariaLabel={g.eyebrow}
+            renderControls={(state) => <GlassControls state={state} skin={skin} labels={{ prev: cs.prev, next: cs.next }} />}
           >
             {items.map((s) => (
               <figure key={s.slug} className="m-0">
@@ -141,7 +155,7 @@ export function Gallery({ skin, heading }: GalleryProps) {
       )}
 
       {view === 'grid' && (
-        <motion.div layout className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+        <motion.div layout className="rail-wide grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((s, idx) => (
             <motion.figure
               key={s.slug}
@@ -160,7 +174,7 @@ export function Gallery({ skin, heading }: GalleryProps) {
       )}
 
       {view === 'phones' && (
-        <motion.div layout className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
+        <motion.div layout className="rail-wide grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
           {items.map((s, idx) => (
             <motion.figure
               key={s.slug}
@@ -182,7 +196,7 @@ export function Gallery({ skin, heading }: GalleryProps) {
         open={!!open}
         data={open ? caseStudyFor(open, strings, skin, formatPeriod) : null}
         skin={skin}
-        labels={{ close: g.close, prev: cs.prev, next: cs.next, home: g.home, pdp: g.pdp, desktop: g.desktop, mobile: g.mobile, facts: cs.facts, results: cs.results, stack: cs.stack, visit: cs.visit }}
+        labels={caseStudyLabels(strings)}
         onClose={() => setOpenSlug(null)}
       />
     </section>

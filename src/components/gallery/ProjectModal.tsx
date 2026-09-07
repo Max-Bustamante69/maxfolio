@@ -2,9 +2,11 @@ import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { LaptopFrame, PhoneFrame } from './DeviceFrame'
+import { GlassControls } from './CarouselControls'
 import { carouselTokens, type Skin } from './skins'
 import type { FrameShots } from './ProjectFrame'
 import { Carousel } from '../../vendor/carousel'
+import type { StoreMetrics } from '../../data/registry'
 
 export interface CaseStudyStat {
   label: string
@@ -18,13 +20,15 @@ export interface CaseStudyData {
   badge: { text: string; className: string }
   tagline: string
   description: string
-  stats: CaseStudyStat[] // real, verifiable numbers only
-  results: CaseStudyStat[] // measured outcomes; hidden when empty
+  metrics?: StoreMetrics // Lighthouse lab scores, live stores only
+  stats: CaseStudyStat[] // verifiable store facts (build window, ladders, modules…)
+  results: CaseStudyStat[] // measured business outcomes; hidden when empty
   stack: string[]
+  build?: string // muted engineering footnote: "696 commits · 72 custom sections"
   shots: FrameShots
 }
 
-interface Labels {
+export interface CaseStudyLabels {
   close: string
   prev: string
   next: string
@@ -36,21 +40,32 @@ interface Labels {
   results: string
   stack: string
   visit: string
+  metrics: string
+  perf: string
+  a11y: string
+  bp: string
+  seo: string
+  lcp: string
+  measured: string
 }
 
 interface ProjectModalProps {
   open: boolean
   data: CaseStudyData | null
   skin: Skin
-  labels: Labels
+  labels: CaseStudyLabels
   onClose: () => void
 }
 
 const EASE = [0.23, 1, 0.32, 1] as const
 
+/** Lighthouse's own bands: 90+ green, 50–89 orange, below red. */
+const band = (score: number) => (score >= 90 ? '#34c759' : score >= 50 ? '#ff9f0a' : '#ff3b30')
+
 /**
- * Case-study sheet: the house carousel with the four captures on the left, the facts on the right.
- * The carousel is enclosed (no viewport bleed), one slide at a time, controls on every viewport.
+ * Case-study sheet: the house carousel with the four captures on the left, the numbers on the right.
+ * Metrics first (Lighthouse, then any measured outcome), store facts second, the engineering trail
+ * last as a footnote. The carousel is enclosed, one slide at a time, glass controls on every viewport.
  */
 export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModalProps) {
   const slides = data
@@ -79,6 +94,18 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
   const dark = skin.dark
   const panel = skin.frame === 'apple' ? 'rounded-[28px]' : skin.frame === 'luxury' ? 'rounded-none' : 'rounded-none border-2 border-stone-900'
   const panelBg = dark ? 'bg-[#141416] text-[#f5f5f7]' : 'bg-white text-[#1d1d1f]'
+  const radius = skin.frame === 'apple' ? 'rounded-[14px]' : 'rounded-none'
+  const tile = `${radius} p-3 ${dark ? 'bg-white/5' : 'bg-black/[0.04]'}`
+  const label = `text-[11px] font-semibold uppercase tracking-[0.18em] ${skin.muted}`
+
+  const scores = data?.metrics
+    ? [
+        { key: 'perf', label: labels.perf, value: data.metrics.perf },
+        { key: 'a11y', label: labels.a11y, value: data.metrics.a11y },
+        { key: 'bp', label: labels.bp, value: data.metrics.bp },
+        { key: 'seo', label: labels.seo, value: data.metrics.seo },
+      ]
+    : []
 
   const content = (
     <AnimatePresence>
@@ -102,8 +129,18 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
             onClick={(e) => e.stopPropagation()}
           >
             {/* captures — the house carousel, enclosed */}
-            <div className={`flex flex-col justify-center p-5 lg:w-[58%] lg:p-8 ${dark ? 'bg-[#0b0b0c]' : 'bg-[#f5f5f7]'}`} style={carouselTokens(skin.frame, dark)}>
-              <Carousel slidesPerView={1} peek={0} mobilePeek={0} gap={16} edgeBleed={false} controls="progress" controlsOnMobile reveal={false} ariaLabel={data.name}>
+            <div className={`flex flex-col justify-center p-5 lg:w-[56%] lg:p-8 ${dark ? 'bg-[#0b0b0c]' : 'bg-[#f5f5f7]'}`} style={carouselTokens(skin.frame, dark)}>
+              <Carousel
+                slidesPerView={1}
+                peek={0}
+                mobilePeek={0}
+                gap={16}
+                edgeBleed={false}
+                controlsOnMobile
+                reveal={false}
+                ariaLabel={data.name}
+                renderControls={(state) => <GlassControls state={state} skin={skin} labels={{ prev: labels.prev, next: labels.next }} />}
+              >
                 {slides.map((slide) => (
                   <figure key={slide.key} className="m-0 flex h-[36vh] flex-col items-center justify-center sm:h-[44vh] lg:h-[62vh]">
                     {slide.kind === 'desktop' ? (
@@ -125,7 +162,7 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
               </Carousel>
             </div>
 
-            {/* facts */}
+            {/* numbers */}
             <div className="flex-1 overflow-y-auto p-6 lg:p-8">
               <div className="flex items-start justify-between gap-3">
                 <div>
@@ -140,26 +177,33 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
               <p className={`${skin.accent} mt-4 text-sm font-medium`}>{data.tagline}</p>
               <p className="mt-2 text-sm leading-relaxed">{data.description}</p>
 
-              {data.stats.length > 0 && (
+              {data.metrics && (
                 <>
-                  <p className={`mt-6 text-[11px] font-semibold uppercase tracking-[0.18em] ${skin.muted}`}>{labels.facts}</p>
-                  <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
-                    {data.stats.map((s) => (
-                      <div key={s.label} className={`rounded-[14px] p-3 ${dark ? 'bg-white/5' : 'bg-black/[0.04]'}`}>
-                        <p className="text-lg font-semibold leading-tight">{s.value}</p>
-                        <p className={`${skin.muted} mt-0.5 text-[11px] leading-tight`}>{s.label}</p>
+                  <p className={`mt-6 ${label}`}>{labels.metrics}</p>
+                  <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    {scores.map((s) => (
+                      <div key={s.key} className={tile}>
+                        <p className="text-2xl font-semibold leading-none tabular-nums">{s.value}</p>
+                        <p className={`${skin.muted} mt-1.5 text-[11px] leading-tight`}>{s.label}</p>
+                        <div className={`mt-2 h-[3px] w-full overflow-hidden rounded-full ${dark ? 'bg-white/10' : 'bg-black/10'}`} aria-hidden="true">
+                          <div className="h-full rounded-full" style={{ width: `${s.value}%`, backgroundColor: band(s.value) }} />
+                        </div>
                       </div>
                     ))}
                   </div>
+                  <p className={`${skin.muted} mt-2 text-[11px] leading-snug`}>
+                    {data.metrics.lcp ? `${labels.lcp} ${data.metrics.lcp} · ` : ''}
+                    {labels.measured.replace('{date}', data.metrics.measured).replace('{runs}', String(data.metrics.runs))}
+                  </p>
                 </>
               )}
 
               {data.results.length > 0 && (
                 <>
-                  <p className={`mt-6 text-[11px] font-semibold uppercase tracking-[0.18em] ${skin.muted}`}>{labels.results}</p>
+                  <p className={`mt-6 ${label}`}>{labels.results}</p>
                   <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
                     {data.results.map((s) => (
-                      <div key={s.label} className={`rounded-[14px] p-3 ${dark ? 'bg-[#34c759]/15' : 'bg-[#34c759]/10'}`}>
+                      <div key={s.label} className={`${radius} p-3 ${dark ? 'bg-[#34c759]/15' : 'bg-[#34c759]/10'}`}>
                         <p className="text-lg font-semibold leading-tight">{s.value}</p>
                         <p className={`${skin.muted} mt-0.5 text-[11px] leading-tight`}>{s.label}</p>
                       </div>
@@ -168,7 +212,21 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
                 </>
               )}
 
-              <p className={`mt-6 text-[11px] font-semibold uppercase tracking-[0.18em] ${skin.muted}`}>{labels.stack}</p>
+              {data.stats.length > 0 && (
+                <>
+                  <p className={`mt-6 ${label}`}>{labels.facts}</p>
+                  <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    {data.stats.map((s) => (
+                      <div key={s.label} className={tile}>
+                        <p className="text-base font-semibold leading-tight">{s.value}</p>
+                        <p className={`${skin.muted} mt-0.5 text-[11px] leading-tight`}>{s.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              <p className={`mt-6 ${label}`}>{labels.stack}</p>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {data.stack.map((t) => (
                   <span key={t} className={skin.chip}>
@@ -176,6 +234,7 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
                   </span>
                 ))}
               </div>
+              {data.build && <p className={`${skin.muted} mt-2 text-[11px]`}>{data.build}</p>}
 
               {data.url && (
                 <a href={data.url} target="_blank" rel="noopener noreferrer" className={`${skin.accent} mt-6 inline-block text-sm font-medium`}>

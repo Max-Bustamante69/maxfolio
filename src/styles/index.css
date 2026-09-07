@@ -42,8 +42,39 @@
     min-height: 32px;
     min-width: 32px;
   }
+
+  /* The house carousel controls own their geometry (6px dots, 18x6 active pill, 32px arrows);
+     the 44px floor above would turn every dot into a square. */
+  [data-carousel-dot-pagination] button,
+  [data-carousel-controls] button {
+    min-height: 0;
+    min-width: 0;
+  }
+
+  /* Apple experience: focus ring in its own blue, not the luxury gold. */
+  .theme-apple :focus-visible {
+    outline-color: #0071e3;
+  }
   
-  ::selection {
+  /* Gallery rail: breaks out of the 64rem column on wide screens (up to 1400px) so the device
+   composites read at size; below 1024px it is exactly the column. */
+.rail-wide {
+  --rail: clamp(min(100vw - 2rem, 64rem), 100vw - 10rem, 1400px);
+}
+@media (min-width: 1024px) {
+  .rail-wide {
+    width: var(--rail);
+    margin-left: calc(50% - var(--rail) / 2);
+  }
+}
+
+/* iOS-style glass for the carousel controls. */
+.glass {
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(160%);
+}
+
+::selection {
     @apply bg-cyber-neon/30 text-white;
   }
   

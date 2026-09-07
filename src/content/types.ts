@@ -19,7 +19,7 @@ export interface PortfolioContent {
   stats: Record<StatId, string>
   sections: {
     experience: SectionHeading & { achievements: string; technologies: string; visit: string }
-    shopify: SectionHeading & { lead: string; tabStores: string; tabProducts: string; legacyLabel: string; visit: string }
+    shopify: SectionHeading & { lead: string; tabStores: string; tabProducts: string; legacyLabel: string; visit: string; showAll: string; showLess: string }
     gallery: SectionHeading & {
       lead: string
       filterAll: string
@@ -48,7 +48,7 @@ export interface PortfolioContent {
       location: string
     }
     explore: { eyebrow: string; title: string; lead: string; viewing: string }
-    caseStudy: { facts: string; results: string; stack: string; visit: string; prev: string; next: string; timeline: string; commits: string; sections: string }
+    caseStudy: { facts: string; results: string; stack: string; visit: string; prev: string; next: string; timeline: string; commits: string; sections: string; open: string; metrics: string; perf: string; a11y: string; bp: string; seo: string; lcp: string; measured: string }
   }
   badges: { live: string; dev: string; current: string; completed: string; roles: Record<StoreRole, string> }
   experience: Record<
