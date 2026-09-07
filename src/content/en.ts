@@ -40,7 +40,7 @@ export const en: PortfolioContent = {
       eyebrow: 'Gallery',
       title: 'Same frame,',
       titleAccent: 'every store',
-      lead: 'Home and product page, desktop and mobile — captured the same way for every project. Hover a screen to flip to the product page; click to open all four shots.',
+      lead: 'Home and product page, desktop and mobile — captured the same way for every project. Hover a screen to flip to the product page; open any store for its case study: the four captures, Lighthouse scores and what it runs on.',
       filterAll: 'All',
       filterLive: 'Live',
       filterDev: 'In development',

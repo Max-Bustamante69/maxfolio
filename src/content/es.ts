@@ -40,7 +40,7 @@ export const es: PortfolioContent = {
       eyebrow: 'Galería',
       title: 'El mismo marco,',
       titleAccent: 'para cada tienda',
-      lead: 'Home y página de producto, escritorio y móvil — capturadas igual en todos los proyectos. Pasa el cursor por una pantalla para ver la página de producto; haz clic para abrir las cuatro tomas.',
+      lead: 'Home y página de producto, escritorio y móvil — capturadas igual en todos los proyectos. Pasa el cursor por una pantalla para ver la página de producto; abre cualquier tienda para ver su caso: las cuatro tomas, las puntuaciones de Lighthouse y sobre qué corre.',
       filterAll: 'Todas',
       filterLive: 'En vivo',
       filterDev: 'En construcción',

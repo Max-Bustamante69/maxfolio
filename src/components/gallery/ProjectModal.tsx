@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion, useTransform } from 'framer-motion'
 import { LaptopFrame, PhoneFrame } from './DeviceFrame'
 import { GlassControls } from './CarouselControls'
 import { carouselTokens, type Skin } from './skins'
@@ -61,6 +61,54 @@ const EASE = [0.23, 1, 0.32, 1] as const
 
 /** Lighthouse's own bands: 90+ green, 50–89 orange, below red. */
 const band = (score: number) => (score >= 90 ? '#34c759' : score >= 50 ? '#ff9f0a' : '#ff3b30')
+
+const RING_R = 22
+const RING_C = 2 * Math.PI * RING_R
+
+/**
+ * One Lighthouse category as an animated gauge: the arc fills and the number counts up when the
+ * sheet opens (one second, strong ease-out — a data reveal, not a UI transition). Reduced motion
+ * shows the final state at once.
+ */
+function ScoreRing({ value, label, delay, dark, tile }: { value: number; label: string; delay: number; dark: boolean; tile: string }) {
+  const reduced = useReducedMotion()
+  const mv = useMotionValue(reduced ? value : 0)
+  const shown = useTransform(mv, (v) => Math.round(v))
+  const dash = useTransform(mv, (v) => RING_C - (Math.max(0, Math.min(100, v)) / 100) * RING_C)
+  useEffect(() => {
+    if (reduced) {
+      mv.set(value)
+      return
+    }
+    const ctrl = animate(mv, value, { duration: 1, delay, ease: [0.23, 1, 0.32, 1] })
+    return () => ctrl.stop()
+  }, [value, delay, reduced, mv])
+  return (
+    <div className={`${tile} flex items-center gap-3`}>
+      <svg viewBox="0 0 56 56" className="h-14 w-14 shrink-0" aria-hidden="true">
+        <circle cx="28" cy="28" r={RING_R} fill="none" strokeWidth="5" stroke={dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'} />
+        <motion.circle
+          cx="28"
+          cy="28"
+          r={RING_R}
+          fill="none"
+          strokeWidth="5"
+          strokeLinecap="round"
+          stroke={band(value)}
+          strokeDasharray={RING_C}
+          style={{ strokeDashoffset: dash }}
+          transform="rotate(-90 28 28)"
+        />
+      </svg>
+      <div className="min-w-0">
+        <motion.p className="text-2xl font-semibold leading-none tabular-nums" aria-label={`${label}: ${value}`}>
+          {shown}
+        </motion.p>
+        <p className={`mt-1 text-[11px] leading-tight ${dark ? 'text-[#a1a1a6]' : 'text-[#6e6e73]'}`}>{label}</p>
+      </div>
+    </div>
+  )
+}
 
 /**
  * Case-study sheet: the house carousel with the four captures on the left, the numbers on the right.
@@ -180,15 +228,9 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
               {data.metrics && (
                 <>
                   <p className={`mt-6 ${label}`}>{labels.metrics}</p>
-                  <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                    {scores.map((s) => (
-                      <div key={s.key} className={tile}>
-                        <p className="text-2xl font-semibold leading-none tabular-nums">{s.value}</p>
-                        <p className={`${skin.muted} mt-1.5 text-[11px] leading-tight`}>{s.label}</p>
-                        <div className={`mt-2 h-[3px] w-full overflow-hidden rounded-full ${dark ? 'bg-white/10' : 'bg-black/10'}`} aria-hidden="true">
-                          <div className="h-full rounded-full" style={{ width: `${s.value}%`, backgroundColor: band(s.value) }} />
-                        </div>
-                      </div>
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    {scores.map((s, i) => (
+                      <ScoreRing key={`${data.name}-${s.key}`} value={s.value} label={s.label} delay={0.15 + i * 0.08} dark={dark} tile={tile} />
                     ))}
                   </div>
                   <p className={`${skin.muted} mt-2 text-[11px] leading-snug`}>

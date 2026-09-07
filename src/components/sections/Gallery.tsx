@@ -146,7 +146,7 @@ export function Gallery({ skin, heading }: GalleryProps) {
           >
             {items.map((s) => (
               <figure key={s.slug} className="m-0">
-                <ProjectFrame name={s.name} shots={shotsFor(s.slug)} skin={skin} onOpen={() => setOpenSlug(s.slug)} alt={g.open} />
+                <ProjectFrame name={s.name} shots={shotsFor(s.slug)} skin={skin} onOpen={() => setOpenSlug(s.slug)} alt={g.open} cta={cs.open} />
                 <Caption s={s} />
               </figure>
             ))}
@@ -166,7 +166,7 @@ export function Gallery({ skin, heading }: GalleryProps) {
               transition={{ delay: (idx % 3) * 0.05, duration: 0.5 }}
               className="m-0"
             >
-              <ProjectFrame name={s.name} shots={shotsFor(s.slug)} skin={skin} onOpen={() => setOpenSlug(s.slug)} alt={g.open} />
+              <ProjectFrame name={s.name} shots={shotsFor(s.slug)} skin={skin} onOpen={() => setOpenSlug(s.slug)} alt={g.open} cta={cs.open} />
               <Caption s={s} />
             </motion.figure>
           ))}
