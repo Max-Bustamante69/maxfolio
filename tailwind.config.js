@@ -28,7 +28,7 @@ export default {
           'bg': '#fbfbfd',
           'surface': '#f5f5f7',
           'text': '#1d1d1f',
-          'muted': '#86868b',
+          'muted': '#6e6e73',
           'blue': '#0071e3',
           'blueHover': '#0077ed',
           'blueDark': '#2997ff',
