@@ -432,15 +432,15 @@
   },
   "audit-dashboard": {
     "slug": "audit-dashboard",
-    "sourceUrl": "file:///C:/Users/Usuario/Desktop/P/Github/Digitdeck-Audits/perfumeriamillennio.com/2026-07-10/dashboard-fallback.html",
+    "sourceUrl": "file:///C:/Users/Usuario/Desktop/P/Github/Digitdeck-Audits/perfumeriamillennio.com/2026-07-10/dashboard.html",
     "status": "live",
     "source": "extra",
-    "capturedAt": "2026-09-07T18:17:10.042Z",
+    "capturedAt": "2026-09-07T18:19:35.053Z",
     "shots": {
       "home-desktop": "/gallery/audit-dashboard/home-desktop.webp",
       "home-mobile": "/gallery/audit-dashboard/home-mobile.webp"
     },
-    "pageTitle": "",
+    "pageTitle": "Informe de auditoría — Digitdeck",
     "linkedin": "/gallery/audit-dashboard/linkedin.webp"
   },
   "digitdeck-apps": {
