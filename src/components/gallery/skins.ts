@@ -1,9 +1,32 @@
 // Per-theme skins for the shared gallery components. The frame geometry is shared;
 // each experience only decides colors, radii and type.
+import type { CSSProperties } from 'react'
+
 export type FrameStyle = 'apple' | 'luxury' | 'brutalist'
+
+/** Tokens the vendored house Carousel reads (`--color-control-*`, `--duration-base`). Without them the
+ *  controls fall back to currentColor and an invalid transition, so every skin defines the full set. */
+export function carouselTokens(frame: FrameStyle, isDark: boolean): CSSProperties {
+  const t = {
+    apple: { arrow: isDark ? '#f5f5f7' : '#1d1d1f', on: '#0071e3', dot: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.22)', active: isDark ? '#f5f5f7' : '#1d1d1f', brand: '#0071e3', surface: isDark ? '#000000' : '#fbfbfd' },
+    luxury: { arrow: isDark ? '#d4af37' : '#C9A962', on: isDark ? '#f5f0e1' : '#1a1a1a', dot: isDark ? 'rgba(245,240,225,0.3)' : 'rgba(26,26,26,0.2)', active: isDark ? '#d4af37' : '#C9A962', brand: isDark ? '#d4af37' : '#C9A962', surface: isDark ? '#1a1f3c' : '#faf8f5' },
+    brutalist: { arrow: '#dc2626', on: isDark ? '#f5f5f4' : '#1c1917', dot: isDark ? 'rgba(245,245,244,0.3)' : 'rgba(28,25,23,0.25)', active: '#dc2626', brand: '#dc2626', surface: isDark ? '#0c0a09' : '#f5f5f4' },
+  }[frame]
+  return {
+    '--color-control-arrow': t.arrow,
+    '--color-control-arrow-on': t.on,
+    '--color-control-dot': t.dot,
+    '--color-control-dot-active': t.active,
+    '--color-brand-primary': t.brand,
+    '--color-heading': t.arrow,
+    '--color-surface': t.surface,
+    '--duration-base': '200ms',
+  } as CSSProperties
+}
 
 export interface Skin {
   frame: FrameStyle
+  dark: boolean
   card: string // card container classes
   title: string // project name classes
   body: string // regular text
@@ -20,6 +43,7 @@ export interface Skin {
 export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
   apple: (d) => ({
     frame: 'apple',
+    dark: d,
     card: `rounded-[22px] ${d ? 'bg-[#1d1d1f]' : 'bg-white'} shadow-[0_4px_24px_rgba(0,0,0,0.06)]`,
     title: `font-semibold tracking-tight ${d ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'}`,
     body: d ? 'text-[#d2d2d7]' : 'text-[#1d1d1f]',
@@ -34,6 +58,7 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
   }),
   luxury: (d) => ({
     frame: 'luxury',
+    dark: d,
     card: `border ${d ? 'border-deco-gold/20 bg-deco-navy/30' : 'border-luxury-black/10 bg-white/60'}`,
     title: `font-display ${d ? 'text-deco-cream' : 'text-luxury-black'}`,
     body: d ? 'text-deco-cream/80' : 'text-luxury-black/80',
@@ -48,6 +73,7 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
   }),
   brutalist: (d) => ({
     frame: 'brutalist',
+    dark: d,
     card: `border-2 ${d ? 'border-stone-700 bg-stone-900' : 'border-stone-900 bg-stone-100'}`,
     title: `font-editorial italic ${d ? 'text-stone-100' : 'text-stone-900'}`,
     body: d ? 'text-stone-300' : 'text-stone-700',

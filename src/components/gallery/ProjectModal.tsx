@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { LaptopFrame, PhoneFrame } from './DeviceFrame'
-import type { Skin } from './skins'
+import { carouselTokens, type Skin } from './skins'
 import type { FrameShots } from './ProjectFrame'
+import { Carousel } from '../../vendor/carousel'
 
 export interface CaseStudyStat {
   label: string
@@ -48,11 +49,10 @@ interface ProjectModalProps {
 const EASE = [0.23, 1, 0.32, 1] as const
 
 /**
- * Case-study sheet: a carousel of the four captures on the left, the facts on the right.
- * Esc closes, ← → move the carousel.
+ * Case-study sheet: the house carousel with the four captures on the left, the facts on the right.
+ * The carousel is enclosed (no viewport bleed), one slide at a time, controls on every viewport.
  */
 export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModalProps) {
-  const [i, setI] = useState(0)
   const slides = data
     ? [
         { key: 'hd', kind: 'desktop' as const, src: data.shots.homeDesktop, label: `${labels.home} · ${labels.desktop}` },
@@ -61,18 +61,11 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
         ...(data.shots.pdpMobile ? [{ key: 'pm', kind: 'mobile' as const, src: data.shots.pdpMobile, label: `${labels.pdp} · ${labels.mobile}` }] : []),
       ]
     : []
-  const n = slides.length
-
-  useEffect(() => {
-    if (open) setI(0)
-  }, [open, data?.name])
 
   useEffect(() => {
     if (!open) return
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
-      if (e.key === 'ArrowRight') setI((v) => (v + 1) % n)
-      if (e.key === 'ArrowLeft') setI((v) => (v - 1 + n) % n)
     }
     window.addEventListener('keydown', onKey)
     const prev = document.body.style.overflow
@@ -81,16 +74,15 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
       window.removeEventListener('keydown', onKey)
       document.body.style.overflow = prev
     }
-  }, [open, n, onClose])
+  }, [open, onClose])
 
-  const dark = skin.frame === 'brutalist' || skin.card.includes('bg-[#1d1d1f]') || skin.card.includes('deco-navy') || skin.card.includes('stone-900')
+  const dark = skin.dark
   const panel = skin.frame === 'apple' ? 'rounded-[28px]' : skin.frame === 'luxury' ? 'rounded-none' : 'rounded-none border-2 border-stone-900'
   const panelBg = dark ? 'bg-[#141416] text-[#f5f5f7]' : 'bg-white text-[#1d1d1f]'
-  const slide = slides[i]
 
   const content = (
     <AnimatePresence>
-      {open && data && slide && (
+      {open && data && (
         <motion.div
           role="dialog"
           aria-modal="true"
@@ -109,44 +101,28 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
             transition={{ duration: 0.28, ease: EASE }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* carousel */}
-            <div className={`relative flex flex-col ${dark ? 'bg-[#0b0b0c]' : 'bg-[#f5f5f7]'} lg:w-[58%]`}>
-              <div className="flex h-[38vh] items-center justify-center p-5 sm:h-[46vh] lg:h-[70vh] lg:p-8">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={slide.key}
-                    initial={{ opacity: 0, x: 24 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -24, transition: { duration: 0.15 } }}
-                    transition={{ duration: 0.25, ease: EASE }}
-                    className={slide.kind === 'desktop' ? 'w-full max-w-[640px]' : 'h-full'}
-                  >
+            {/* captures — the house carousel, enclosed */}
+            <div className={`flex flex-col justify-center p-5 lg:w-[58%] lg:p-8 ${dark ? 'bg-[#0b0b0c]' : 'bg-[#f5f5f7]'}`} style={carouselTokens(skin.frame, dark)}>
+              <Carousel slidesPerView={1} peek={0} mobilePeek={0} gap={16} edgeBleed={false} controls="progress" controlsOnMobile reveal={false} ariaLabel={data.name}>
+                {slides.map((slide) => (
+                  <figure key={slide.key} className="m-0 flex h-[36vh] flex-col items-center justify-center sm:h-[44vh] lg:h-[62vh]">
                     {slide.kind === 'desktop' ? (
-                      <LaptopFrame>
-                        <img src={slide.src} alt={`${data.name} — ${slide.label}`} className="absolute inset-0 h-full w-full object-cover object-top" />
-                      </LaptopFrame>
+                      <div className="w-full max-w-[640px]">
+                        <LaptopFrame>
+                          <img src={slide.src} alt={`${data.name} — ${slide.label}`} className="absolute inset-0 h-full w-full object-cover object-top" draggable={false} />
+                        </LaptopFrame>
+                      </div>
                     ) : (
-                      <PhoneFrame className="mx-auto h-full" >
-                        <img src={slide.src} alt={`${data.name} — ${slide.label}`} className="absolute inset-0 h-full w-full object-cover object-top" />
-                      </PhoneFrame>
+                      <div className="h-full">
+                        <PhoneFrame className="mx-auto h-full">
+                          <img src={slide.src} alt={`${data.name} — ${slide.label}`} className="absolute inset-0 h-full w-full object-cover object-top" draggable={false} />
+                        </PhoneFrame>
+                      </div>
                     )}
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-              <div className="flex items-center justify-between gap-3 px-5 pb-4 lg:px-8">
-                <button type="button" onClick={() => setI((v) => (v - 1 + n) % n)} className={`press compact-touch h-9 w-9 rounded-full ${dark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`} aria-label={labels.prev}>
-                  ‹
-                </button>
-                <div className="flex items-center gap-2">
-                  {slides.map((s, idx) => (
-                    <button key={s.key} type="button" onClick={() => setI(idx)} aria-label={s.label} aria-current={idx === i} className={`h-1.5 rounded-full transition-all ${idx === i ? `w-6 ${dark ? 'bg-white' : 'bg-black'}` : `w-2 ${dark ? 'bg-white/40' : 'bg-black/30'}`}`} style={{ minHeight: 6, minWidth: 8 }} />
-                  ))}
-                </div>
-                <button type="button" onClick={() => setI((v) => (v + 1) % n)} className={`press compact-touch h-9 w-9 rounded-full ${dark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`} aria-label={labels.next}>
-                  ›
-                </button>
-              </div>
-              <p className={`px-5 pb-4 text-center text-xs ${skin.muted} lg:px-8`}>{slide.label}</p>
+                    <figcaption className={`${skin.muted} mt-3 text-center text-xs`}>{slide.label}</figcaption>
+                  </figure>
+                ))}
+              </Carousel>
             </div>
 
             {/* facts */}

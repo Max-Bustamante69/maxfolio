@@ -1,7 +1,8 @@
-import { useMemo, useRef, useState, type ReactNode } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { useContent } from '../../hooks'
-import { ProjectFrame, ProjectModal, type Skin, type FrameShots, type LightboxItem, type CaseStudyData } from '../gallery'
+import { ProjectFrame, ProjectModal, carouselTokens, type Skin, type FrameShots, type LightboxItem, type CaseStudyData } from '../gallery'
+import { Carousel } from '../../vendor/carousel'
 import type { StoreEntry } from '../../data/registry'
 import type { PortfolioContent } from '../../content/types'
 
@@ -66,8 +67,8 @@ interface GalleryProps {
 }
 
 /**
- * The visual wall. Three views — a carousel of laptop + phone composites (default), a grid of the same,
- * or a wall of phones — and a case-study sheet on click. The facts live in Shopify Work.
+ * The visual wall. Three views — the house carousel of laptop + phone composites (default), a grid of
+ * the same, or a wall of phones — and a case-study sheet on click. The facts live in Shopify Work.
  */
 export function Gallery({ skin, heading }: GalleryProps) {
   const { strings, registry, formatPeriod } = useContent()
@@ -76,7 +77,6 @@ export function Gallery({ skin, heading }: GalleryProps) {
   const [filter, setFilter] = useState<Filter>('all')
   const [view, setView] = useState<View>('carousel')
   const [openSlug, setOpenSlug] = useState<string | null>(null)
-  const rail = useRef<HTMLDivElement>(null)
 
   const items = useMemo(
     () => registry.stores.filter((s) => s.gallery && (filter === 'all' || s.status === filter)),
@@ -84,14 +84,6 @@ export function Gallery({ skin, heading }: GalleryProps) {
   )
   const open = openSlug ? registry.stores.find((s) => s.slug === openSlug) : null
   const chip = (active: boolean) => `${active ? skin.chipOn : skin.chip} compact-touch transition-colors`
-
-  const scrollRail = (dir: 1 | -1) => {
-    const el = rail.current
-    if (!el) return
-    const card = el.querySelector<HTMLElement>('[data-card]')
-    const step = card ? card.offsetWidth + 24 : el.clientWidth * 0.8
-    el.scrollBy({ left: dir * step, behavior: 'smooth' })
-  }
 
   const Caption = ({ s }: { s: StoreEntry }) => (
     <figcaption className="mt-3 flex items-center justify-between gap-3">
@@ -106,46 +98,45 @@ export function Gallery({ skin, heading }: GalleryProps) {
     <section id="gallery" className="scroll-mt-20">
       {heading(g.eyebrow, g.title, g.titleAccent, g.lead)}
 
-      <div className="mb-8 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-          <div className="flex flex-wrap gap-2" role="tablist" aria-label={g.eyebrow}>
-            {(['all', 'live', 'dev'] as Filter[]).map((f) => (
-              <button key={f} type="button" role="tab" aria-selected={filter === f} onClick={() => setFilter(f)} className={chip(filter === f)}>
-                {f === 'all' ? g.filterAll : f === 'live' ? g.filterLive : g.filterDev}
-              </button>
-            ))}
-          </div>
-          <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={g.viewLabel}>
-            {(['carousel', 'grid', 'phones'] as View[]).map((v) => (
-              <button key={v} type="button" role="radio" aria-checked={view === v} onClick={() => setView(v)} className={chip(view === v)}>
-                {v === 'carousel' ? g.viewCarousel : v === 'grid' ? g.viewDevices : g.viewPhones}
-              </button>
-            ))}
-          </div>
+      {/* Two filter groups, visibly separate: status | view */}
+      <div className="mb-8 flex flex-wrap items-center gap-x-5 gap-y-3">
+        <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label={g.eyebrow}>
+          {(['all', 'live', 'dev'] as Filter[]).map((f) => (
+            <button key={f} type="button" role="tab" aria-selected={filter === f} onClick={() => setFilter(f)} className={chip(filter === f)}>
+              {f === 'all' ? g.filterAll : f === 'live' ? g.filterLive : g.filterDev}
+            </button>
+          ))}
         </div>
-        {view === 'carousel' && (
-          <div className="flex gap-2">
-            <button type="button" onClick={() => scrollRail(-1)} className={`${skin.chip} compact-touch h-9 w-9 rounded-full !px-0 text-base`} aria-label={cs.prev}>
-              ‹
+        <span className={`hidden h-6 w-px sm:block ${skin.frame === 'brutalist' ? 'bg-current opacity-60' : 'bg-current opacity-20'}`} aria-hidden="true" />
+        <div className="flex flex-wrap items-center gap-2" role="radiogroup" aria-label={g.viewLabel}>
+          <span className={`${skin.muted} mr-1 text-[11px] uppercase tracking-[0.15em]`}>{g.viewLabel}</span>
+          {(['carousel', 'grid', 'phones'] as View[]).map((v) => (
+            <button key={v} type="button" role="radio" aria-checked={view === v} onClick={() => setView(v)} className={chip(view === v)}>
+              {v === 'carousel' ? g.viewCarousel : v === 'grid' ? g.viewDevices : g.viewPhones}
             </button>
-            <button type="button" onClick={() => scrollRail(1)} className={`${skin.chip} compact-touch h-9 w-9 rounded-full !px-0 text-base`} aria-label={cs.next}>
-              ›
-            </button>
-          </div>
-        )}
+          ))}
+        </div>
       </div>
 
       {view === 'carousel' && (
-        <div
-          ref={rail}
-          className="-mx-4 flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        >
-          {items.map((s) => (
-            <figure key={s.slug} data-card className="m-0 w-[86%] shrink-0 snap-start sm:w-[62%] lg:w-[46%]">
-              <ProjectFrame name={s.name} shots={shotsFor(s.slug)} skin={skin} onOpen={() => setOpenSlug(s.slug)} alt={g.open} />
-              <Caption s={s} />
-            </figure>
-          ))}
+        <div style={carouselTokens(skin.frame, skin.dark)}>
+          {/* House carousel: edge bleed to the viewport, centered snap on mobile, left rest on desktop,
+              weighted mouse drag, step-by-one arrows + dots in a reserved control row. */}
+          <Carousel
+            key={filter}
+            slidesPerView={{ base: 1, md: 2, lg: 3 }}
+            gap={24}
+            controls="progress"
+            desktopSnap="start"
+            ariaLabel={g.eyebrow}
+          >
+            {items.map((s) => (
+              <figure key={s.slug} className="m-0">
+                <ProjectFrame name={s.name} shots={shotsFor(s.slug)} skin={skin} onOpen={() => setOpenSlug(s.slug)} alt={g.open} />
+                <Caption s={s} />
+              </figure>
+            ))}
+          </Carousel>
         </div>
       )}
 

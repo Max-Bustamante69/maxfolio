@@ -15,6 +15,13 @@ export default {
         'accent': ['Space Mono', 'monospace'],
         'sf': ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"SF Pro Text"', 'Inter', 'system-ui', 'sans-serif'],
       },
+      spacing: {
+        'xs': '8px',
+        'sm': '16px',
+        'md': '24px',
+        'lg': '32px',
+        'xl': '48px',
+      },
       boxShadow: {
         'tile': '0 4px 24px rgba(0,0,0,0.06)',
         'tile-dark': '0 4px 24px rgba(0,0,0,0.5)',
