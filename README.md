@@ -1,161 +1,65 @@
-# MaxFolio - Creative Portfolio
+# Maxfolio
 
-A highly creative and professional personal portfolio showcasing two distinct design experiences: **Luxury Minimal** and **Brutalist Editorial**. Built with modern web technologies and optimized for performance, accessibility, and SEO.
+Portfolio of Maximiliano Bustamante — CTO & Shopify Tech Lead at Digitdeck. Four design
+experiences, one content model, three languages (EN / ES / JA).
 
-## Live Demo
+Live: **https://www.maxfolio.dev**
 
-🌐 [maxfolio.co](https://maxfolio.co)
+## Experiences
 
-## Features
+| Route | Experience | Notes |
+|---|---|---|
+| `/` | **Apple Clean** (default) | Light-first, system font stack, frosted nav, bento tiles |
+| `/luxury` | Luxury Minimal | Serif display, gold accents, dark mode |
+| `/brutalist` | Brutalist Editorial | Magazine spread, red accents, mono labels |
+| `/menu` | Design selector | Previews of every experience |
 
-### Dual Design Experience
-- **Luxury Minimal** (`/`) - Elegant, refined aesthetics with sophisticated typography and golden accents
-- **Brutalist Editorial** (`/brutalist`) - Bold, raw design with editorial typography and high-contrast elements
-- **Design Selector** (`/menu`) - Interactive menu to switch between experiences
+Every experience renders the same sections: hero, stats, experience, **Shopify Work**
+(storefronts + apps/platform), **Gallery** (uniform screenshots), projects, skills, contact,
+explore. The list of experiences lives in `src/data/designs.ts`; adding one is one entry there.
 
-### Technical Highlights
-- ⚡ **Fast** - Built with Vite for lightning-fast development and optimized production builds
-- 🎨 **Beautiful Animations** - Smooth page transitions and micro-interactions with Framer Motion
-- 🌙 **Dark/Light Mode** - Theme toggle with system preference detection and persistence
-- 📱 **Fully Responsive** - Mobile-first design with custom mobile menus (bottom sheets)
-- ♿ **Accessible** - WCAG compliant with proper ARIA labels, focus management, and screen reader support
-- 🔍 **SEO Optimized** - Structured data, meta tags, Open Graph, and Twitter Cards
-- 📧 **Contact Form** - Web3Forms integration for backendless email sending
+## Content model
 
-### Design Features
-- Custom logos for each design theme
-- Dynamic favicon that changes per page
-- Smooth page transition animations
-- Interactive design selector in navigation
-- Full-screen mobile menus matching each theme's aesthetic
+- `src/data/registry.ts` — everything that is not translated: experience entries (dates, links,
+  stack, metrics), stores (slug, URL, status, role, stack), products, personal projects, stats,
+  skill groups, personal links.
+- `src/content/{en,es,ja}.ts` — every string a visitor reads, typed with `PortfolioContent`
+  (`src/content/types.ts`) and keyed by the ids in the registry. A missing translation fails
+  `tsc`.
+- `src/hooks/useContent.ts` — merges registry + strings for the active locale and formats periods
+  per locale.
+- `public/locales/*.json` — UI chrome only (nav, buttons, menu page).
 
-## Tech Stack
+## Gallery
 
-- **Framework**: React 18 with TypeScript
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS with custom configuration
-- **Animations**: Framer Motion
-- **Routing**: React Router DOM
-- **Package Manager**: Bun
-- **Form Handling**: Web3Forms API
-
-## Project Structure
-
-```
-src/
-├── components/
-│   ├── common/          # Reusable components (Logo, ThemeToggle, etc.)
-│   ├── modals/          # Modal components (ContactForm)
-│   ├── previews/        # Design preview components
-│   ├── sections/        # Page sections (ExploreDesigns)
-│   └── transitions/     # Page transition system
-├── config/              # App configuration
-├── context/             # React contexts (Theme)
-├── data/                # Portfolio content data
-├── hooks/               # Custom hooks (useDynamicFavicon)
-├── pages/               # Page components
-└── styles/              # Global styles
-```
-
-## Getting Started
-
-### Prerequisites
-
-- [Bun](https://bun.sh/) (recommended) or Node.js 18+
-
-### Installation
+Screenshots are generated, never hand-made, so every project is captured the same way:
 
 ```bash
-# Clone the repository
-git clone https://github.com/Max-Bustamante69/maxfolio.git
-cd maxfolio
+bun run gallery:capture              # every store in src/data/gallery-sources.json
+bun run gallery:capture:one nos-cafe # one store
+node scripts/capture-extra.mjs <slug> <url|file:///…> [waitMs]   # non-Shopify surfaces
+```
 
-# Install dependencies
+Per store: home + product page (auto-discovered via `/products.json`, in-stock first), desktop
+1440×900 @1x and mobile 390×844 @2x, popups dismissed, lazy images triggered, output as WebP
+under `public/gallery/<slug>/` plus a 1200×627 `linkedin.webp` composite and `manifest.json`
+(capture date, source URL, theme id/name read from `Shopify.theme`). Unpublished builds are
+captured through `?preview_theme_id=<id>&pb=0` on the canonical domain.
+
+`src/components/gallery/ProjectFrame.tsx` draws the CSS-only browser + phone frames; each
+experience passes a `skin` (`src/components/gallery/skins.ts`).
+
+## Stack
+
+React 19 · Vite 6 · TypeScript · Tailwind CSS 3 · framer-motion · react-router 7 · Playwright +
+sharp (captures) · Bun · Vercel (with `vercel.json` SPA rewrite).
+
+## Development
+
+```bash
 bun install
-
-# Start development server
-bun dev
+bun dev          # http://localhost:5173
+bun run build    # tsc -b && vite build
 ```
 
-### Environment Variables
-
-Create a `.env` file in the root directory:
-
-```env
-VITE_WEB3FORMS_KEY=your-web3forms-access-key
-```
-
-Get your free access key at [web3forms.com](https://web3forms.com/)
-
-### Build for Production
-
-```bash
-# Build
-bun run build
-
-# Preview production build
-bun run preview
-```
-
-## Customization
-
-### Updating Content
-
-All portfolio content is centralized in `src/data/portfolio-extended.ts`:
-- Personal information
-- Work experience
-- Skills
-- Freelance projects
-- Contact details
-
-### Theme Colors
-
-Custom theme colors are configured in `tailwind.config.js`:
-- `luxury-*` - Luxury Minimal theme colors
-- `deco-*` - Art Deco dark mode colors
-- `stone-*` - Brutalist theme colors
-
-## Accessibility
-
-This portfolio follows WCAG 2.1 guidelines:
-- Semantic HTML structure
-- Proper heading hierarchy
-- ARIA labels and roles
-- Keyboard navigation support
-- Focus visible indicators
-- Reduced motion support
-- Screen reader friendly
-
-## SEO
-
-Optimized for search engines with:
-- Structured data (JSON-LD)
-- Open Graph meta tags
-- Twitter Card meta tags
-- Sitemap.xml
-- Robots.txt
-- Canonical URLs
-- Dynamic page titles
-
-## Performance
-
-- Lazy loading for images
-- Font display swap
-- Preconnect to external resources
-- Optimized bundle size
-- Efficient animations
-
-## License
-
-MIT License - feel free to use this as inspiration for your own portfolio!
-
-## Author
-
-**Maximiliano Bustamante**
-- LinkedIn: [maxbustamanteg](https://www.linkedin.com/in/maximiliano-bustamante-998b77173/)
-- GitHub: [Max-Bustamante69](https://github.com/Max-Bustamante69)
-- Email: maxbustamanteg@gmail.com
-
----
-
-Built with ❤️ using React, TypeScript, and Tailwind CSS
+Contact form uses Web3Forms: set `VITE_WEB3FORMS_KEY` in `.env`.
