@@ -9,10 +9,10 @@ interface SEOHeadProps {
 }
 
 export function SEOHead({
-  title = 'Maximiliano Bustamante | Frontend Developer',
-  description = 'Frontend Developer specialized in React, Next.js, TypeScript, and e-commerce development.',
-  canonical = 'https://maxfolio.co',
-  ogImage = 'https://maxfolio.co/og-image.jpg',
+  title = 'Maximiliano Bustamante | CTO & Shopify Tech Lead',
+  description = 'CTO & Shopify Tech Lead at Digitdeck. 18+ Shopify storefronts, a production app suite, and the delivery system behind them.',
+  canonical = 'https://www.maxfolio.dev',
+  ogImage = 'https://www.maxfolio.dev/og-image.png',
   noindex = false,
 }: SEOHeadProps) {
   useEffect(() => {
