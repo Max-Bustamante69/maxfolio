@@ -55,7 +55,7 @@ export function ProjectFrame({ name, url, shots, skin, onOpen, alt }: ProjectFra
           skin.frame === 'brutalist' ? 'border-2 border-stone-900' : 'ring-1 ring-black/10'
         } bg-[#e8e8ed]`}
       >
-        <div className="flex items-center gap-1.5 px-3 h-7 text-[10px] text-black/40">
+        <div className="flex items-center gap-1.5 px-3 h-7 text-[10px] text-black/60">
           <span className="w-2 h-2 rounded-full bg-[#ff5f57]" />
           <span className="w-2 h-2 rounded-full bg-[#febc2e]" />
           <span className="w-2 h-2 rounded-full bg-[#28c840]" />

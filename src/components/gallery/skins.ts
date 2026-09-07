@@ -25,8 +25,8 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     accent: d ? 'text-[#2997ff]' : 'text-[#0071e3]',
     chip: `rounded-full px-2.5 py-1 text-[11px] ${d ? 'bg-white/10 text-[#d2d2d7]' : 'bg-[#f5f5f7] text-[#1d1d1f]'}`,
     chipOn: `rounded-full px-2.5 py-1 text-[11px] font-medium ${d ? 'bg-white text-black' : 'bg-[#1d1d1f] text-white'}`,
-    badgeLive: 'bg-[#34c759] text-white',
-    badgeDev: 'bg-[#ff9f0a] text-white',
+    badgeLive: d ? 'bg-[#34c759]/20 text-[#5ee082]' : 'bg-[#34c759]/15 text-[#1b7a34]',
+    badgeDev: d ? 'bg-[#ff9f0a]/20 text-[#ffbf4d]' : 'bg-[#ff9f0a]/15 text-[#8a5300]',
   }),
   luxury: (d) => ({
     frame: 'luxury',

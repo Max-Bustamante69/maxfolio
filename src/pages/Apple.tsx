@@ -142,39 +142,16 @@ function AppleContent() {
         <main id="main-content" className="pt-11">
           {/* Hero */}
           <section id="hero" className="px-4 pt-20 md:pt-28 pb-14 md:pb-20 text-center scroll-mt-20" aria-labelledby="hero-heading">
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              className={`text-sm font-semibold ${blue}`}
-            >
-              {c.hero.eyebrow}
-            </motion.p>
-            <motion.h1
+            <p className={`text-sm font-semibold ${blue}`}>{c.hero.eyebrow}</p>
+            {/* The LCP element stays static: an entrance fade would delay the first meaningful paint. */}
+            <h1
               id="hero-heading"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.05, ease: EASE }}
               className="mx-auto mt-4 max-w-4xl text-5xl md:text-7xl lg:text-[84px] font-semibold tracking-[-0.03em] leading-[1.02]"
             >
               {registry.personal.name}
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.15, ease: EASE }}
-              className={`mx-auto mt-5 max-w-2xl text-xl md:text-2xl ${muted} leading-snug tracking-[-0.01em]`}
-            >
-              {c.hero.positioning}
-            </motion.p>
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-              className="mx-auto mt-6 max-w-2xl text-base md:text-lg leading-relaxed"
-            >
-              {c.hero.lead}
-            </motion.p>
+            </h1>
+            <p className={`mx-auto mt-5 max-w-2xl text-xl md:text-2xl ${muted} leading-snug tracking-[-0.01em]`}>{c.hero.positioning}</p>
+            <p className="mx-auto mt-6 max-w-2xl text-base md:text-lg leading-relaxed">{c.hero.lead}</p>
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -446,7 +423,7 @@ function AppleContent() {
                 </TransitionLink>
               </div>
               <p className={`${muted} text-xs mt-8 text-center`}>
-                {c.sections.explore.viewing}: <span className={blue}>{t(defaultDesign.nameKey)}</span>
+                {c.sections.explore.viewing}: <span className="font-medium">{t(defaultDesign.nameKey)}</span>
               </p>
             </div>
           </section>
