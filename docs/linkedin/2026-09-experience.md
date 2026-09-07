@@ -131,3 +131,16 @@ Company website for smart-locker solutions in US and LATAM markets.
 - Lighthouse 90+ and ~35% faster loads.
 
 Stack: React, JavaScript, CSS
+
+## Projects section (applied 2026-09-07, round 3)
+
+34 entries created from `docs/linkedin/2026-09-projects.json` (generator: `scripts/linkedin-projects.mjs`):
+23 storefronts (`<Store> — Shopify storefront`, associated with the CTO position when the build started
+after Jun 2024, otherwise with the 2023-24 Shopify developer role; DEV builds flagged "currently working
+on"), 5 Digitdeck products (`<Product> — Digitdeck`) and 6 personal projects. Each carries the standard
+anatomy (summary → description → bullets → Stack → Live/Dev line), up to 3 taxonomy skills, and the
+1200×627 composite as media where one exists (22). Driver notes: the add form loads only through
+`/in/me/add-edit/PROJECT/?profileFormEntryPoint=PROFILE_SECTION`; the file input rejects webp (JPG copies
+in `scripts/.capture-cache/li/`); LinkedIn's CSP blocks `eval`, so the fill/save routines are inlined per
+call; the media dialog's Save is the lowest visible "Guardar"; "Remix" resolves to the music skill
+"Remixes" in the typeahead (skipped).
