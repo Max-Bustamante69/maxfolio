@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, type MouseEvent } from 'react'
+import { motion, useMotionTemplate, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion'
 import type { Skin } from './skins'
 import { LaptopFrame, PhoneFrame } from './DeviceFrame'
 
@@ -21,22 +22,6 @@ interface ProjectFrameProps {
   cta?: string
 }
 
-const Invite = ({ text, skin }: { text: string; skin: Skin }) => {
-  const d = skin.dark
-  const shape = skin.frame === 'apple' ? 'rounded-full' : 'rounded-none'
-  const surface = d
-    ? 'glass bg-white/[0.12] text-white border border-white/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_8px_24px_rgba(0,0,0,0.4)]'
-    : 'glass bg-white/70 text-[#1d1d1f] border border-white/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_8px_24px_rgba(0,0,0,0.14)]'
-  return (
-    <span
-      aria-hidden="true"
-      className={`pointer-events-none absolute left-1/2 top-[38%] z-10 inline-flex -translate-x-1/2 items-center gap-1 whitespace-nowrap px-3.5 py-1.5 text-xs font-medium transition-[opacity,transform] duration-200 ease-out-strong ${shape} ${surface} opacity-0 translate-y-1 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100`}
-    >
-      {text} <span aria-hidden="true">›</span>
-    </span>
-  )
-}
-
 const Crossfade = ({ base, over, alt, hover, label }: { base: string; over?: string; alt: string; hover: boolean; label: string }) => (
   <>
     <img src={base} alt={`${alt} — ${label}`} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover object-top" />
@@ -53,18 +38,83 @@ const Crossfade = ({ base, over, alt, hover, label }: { base: string; over?: str
   </>
 )
 
+const Invite = ({ text, skin }: { text: string; skin: Skin }) => {
+  const d = skin.dark
+  const shape = skin.frame === 'apple' ? 'rounded-full' : 'rounded-none'
+  const surface = d
+    ? 'glass bg-white/[0.12] text-white border border-white/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_8px_24px_rgba(0,0,0,0.4)]'
+    : 'glass bg-white/70 text-[#1d1d1f] border border-white/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_8px_24px_rgba(0,0,0,0.14)]'
+  return (
+    <span
+      aria-hidden="true"
+      className={`pointer-events-none absolute left-1/2 top-[38%] z-10 inline-flex -translate-x-1/2 items-center gap-1 whitespace-nowrap px-3.5 py-1.5 text-xs font-medium transition-[opacity,transform] duration-200 ease-out-strong ${shape} ${surface} opacity-0 translate-y-1 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100 [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100`}
+      style={{ transform: 'translateZ(60px)' }}
+    >
+      {text} <span aria-hidden="true">›</span>
+    </span>
+  )
+}
+
+/** Spring for the pointer-tracking tilt: quick to follow, no visible bounce. */
+const TILT = { stiffness: 220, damping: 24, mass: 0.5 }
+const SETTLE = { type: 'spring', duration: 0.5, bounce: 0.12 } as const
+
 /**
- * Same devices for every project so the gallery reads as one system.
- * Hovering (or focusing) crossfades home → product page on the desktop screen.
+ * Same devices for every project so the gallery reads as one system. On pointer devices the
+ * composite tilts toward the cursor in real 3D (perspective + preserve-3d), the phone floats on
+ * its own plane, a specular glare crosses the laptop screen and the floor shadow deepens — all
+ * transforms and opacity, spring-interpolated, off for reduced motion. Hovering (or focusing)
+ * also crossfades home → product page.
  */
 export function ProjectFrame({ name, shots, skin, onOpen, alt, variant = 'composite', cta }: ProjectFrameProps) {
   const [hover, setHover] = useState(false)
+  const reduced = useReducedMotion()
+  // pointer position inside the card, 0..1 — springs so the tilt lags the cursor like a physical object
+  const px = useMotionValue(0.5)
+  const py = useMotionValue(0.5)
+  const sx = useSpring(px, TILT)
+  const sy = useSpring(py, TILT)
+  const rotateY = useTransform(sx, [0, 1], [-10, 10])
+  const rotateX = useTransform(sy, [0, 1], [8, -8])
+  const phoneX = useTransform(sx, [0, 1], [18, -18])
+  const phoneY = useTransform(sy, [0, 1], [14, -14])
+  const glareX = useTransform(sx, (v) => `${Math.round(v * 100)}%`)
+  const glareY = useTransform(sy, (v) => `${Math.round(v * 100)}%`)
+  const glare = useMotionTemplate`radial-gradient(circle at ${glareX} ${glareY}, rgba(255,255,255,0.38), rgba(255,255,255,0.08) 32%, rgba(255,255,255,0) 60%)`
+
+  const onMove = (e: MouseEvent<HTMLElement>) => {
+    if (reduced) return
+    const r = e.currentTarget.getBoundingClientRect()
+    px.set(Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)))
+    py.set(Math.min(1, Math.max(0, (e.clientY - r.top) / r.height)))
+  }
+  const rest = () => {
+    px.set(0.5)
+    py.set(0.5)
+  }
   const bind = {
     onMouseEnter: () => setHover(true),
-    onMouseLeave: () => setHover(false),
+    onMouseLeave: () => {
+      setHover(false)
+      rest()
+    },
+    onMouseMove: onMove,
     onFocus: () => setHover(true),
-    onBlur: () => setHover(false),
+    onBlur: () => {
+      setHover(false)
+      rest()
+    },
   }
+  const tilt = reduced ? {} : { rotateX, rotateY }
+  const lift = hover && !reduced
+
+  const Glare = () => (
+    <motion.div
+      aria-hidden="true"
+      className={`pointer-events-none absolute inset-0 mix-blend-screen transition-opacity duration-300 ${lift ? 'opacity-100' : 'opacity-0'}`}
+      style={{ backgroundImage: glare }}
+    />
+  )
 
   if (variant === 'phone') {
     return (
@@ -78,26 +128,48 @@ export function ProjectFrame({ name, shots, skin, onOpen, alt, variant = 'compos
 
   if (variant === 'laptop') {
     return (
-      <button type="button" onClick={onOpen} {...bind} className="group relative block w-full text-left" aria-label={`${name}: ${alt}`}>
-        <LaptopFrame>
-          <Crossfade base={shots.homeDesktop} over={shots.pdpDesktop} alt={alt} hover={hover} label="home, desktop" />
-        </LaptopFrame>
-        {cta && <Invite text={cta} skin={skin} />}
+      <button type="button" onClick={onOpen} {...bind} className="group relative block w-full text-left" aria-label={`${name}: ${alt}`} style={{ perspective: 1200 }}>
+        <motion.div style={{ ...tilt, transformStyle: 'preserve-3d' }} animate={{ scale: lift ? 1.025 : 1 }} transition={SETTLE} className="relative will-change-transform">
+          <LaptopFrame>
+            <Crossfade base={shots.homeDesktop} over={shots.pdpDesktop} alt={alt} hover={hover} label="home, desktop" />
+            <Glare />
+          </LaptopFrame>
+          {cta && <Invite text={cta} skin={skin} />}
+        </motion.div>
+        <Floor lift={lift} />
       </button>
     )
   }
 
   return (
-    <button type="button" onClick={onOpen} {...bind} className={`group relative block w-full pb-[9%] pr-[3%] text-left ${skin.frame === 'brutalist' ? '' : ''}`} aria-label={`${name}: ${alt}`}>
-      <LaptopFrame>
-        <Crossfade base={shots.homeDesktop} over={shots.pdpDesktop} alt={alt} hover={hover} label="home, desktop" />
-      </LaptopFrame>
-      {cta && <Invite text={cta} skin={skin} />}
-      <div className={`absolute bottom-0 right-0 w-[24%] min-w-[72px] transition-transform duration-500 ${hover ? '-translate-y-1' : ''}`}>
-        <PhoneFrame>
-          <Crossfade base={shots.homeMobile} over={shots.pdpMobile} alt={alt} hover={hover} label="home, mobile" />
-        </PhoneFrame>
-      </div>
+    <button type="button" onClick={onOpen} {...bind} className="group relative block w-full pb-[9%] pr-[3%] text-left" aria-label={`${name}: ${alt}`} style={{ perspective: 1200 }}>
+      <motion.div style={{ ...tilt, transformStyle: 'preserve-3d' }} animate={{ scale: lift ? 1.03 : 1 }} transition={SETTLE} className="relative will-change-transform">
+        <LaptopFrame>
+          <Crossfade base={shots.homeDesktop} over={shots.pdpDesktop} alt={alt} hover={hover} label="home, desktop" />
+          <Glare />
+        </LaptopFrame>
+        {cta && <Invite text={cta} skin={skin} />}
+        {/* the phone floats on its own plane, 48px in front of the lid, and drifts against the tilt */}
+        <motion.div
+          className="absolute bottom-0 right-0 w-[24%] min-w-[72px]"
+          style={{ x: reduced ? 0 : phoneX, y: reduced ? 0 : phoneY, z: 64, rotateY: reduced ? 0 : -8 }}
+          animate={{ translateY: lift ? -6 : 0 }}
+          transition={SETTLE}
+        >
+          <PhoneFrame>
+            <Crossfade base={shots.homeMobile} over={shots.pdpMobile} alt={alt} hover={hover} label="home, mobile" />
+          </PhoneFrame>
+        </motion.div>
+      </motion.div>
+      <Floor lift={lift} />
     </button>
   )
 }
+
+/** Soft floor shadow under the devices: reads as depth at rest, deepens and spreads on lift. */
+const Floor = ({ lift }: { lift: boolean }) => (
+  <div
+    aria-hidden="true"
+    className={`pointer-events-none absolute inset-x-[8%] bottom-[2%] -z-10 h-[12%] rounded-[50%] bg-black blur-2xl transition-[opacity,transform] duration-500 ease-out-strong ${lift ? 'scale-110 opacity-30' : 'opacity-20'}`}
+  />
+)

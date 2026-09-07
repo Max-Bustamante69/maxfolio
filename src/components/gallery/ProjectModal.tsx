@@ -170,10 +170,10 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
         >
           <motion.div
             className={`relative flex max-h-[94vh] w-full max-w-6xl flex-col overflow-hidden ${panel} ${panelBg} shadow-[0_30px_80px_rgba(0,0,0,0.45)] lg:flex-row`}
-            initial={{ opacity: 0, y: 24, scale: 0.98 }}
+            initial={{ opacity: 0, y: 32, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 16, scale: 0.98, transition: { duration: 0.15 } }}
-            transition={{ duration: 0.28, ease: EASE }}
+            exit={{ opacity: 0, y: 16, scale: 0.98, transition: { duration: 0.15, ease: EASE } }}
+            transition={{ type: 'spring', duration: 0.55, bounce: 0.14 }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* captures — the house carousel, enclosed */}

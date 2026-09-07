@@ -141,6 +141,7 @@ export function Gallery({ skin, heading }: GalleryProps) {
             slidesPerView={{ base: 1, md: 2, lg: 2, xl: 3 }}
             gap={24}
             desktopSnap="start"
+            trackClassName="py-10 -my-10"
             ariaLabel={g.eyebrow}
             renderControls={(state) => <GlassControls state={state} skin={skin} labels={{ prev: cs.prev, next: cs.next }} />}
           >
