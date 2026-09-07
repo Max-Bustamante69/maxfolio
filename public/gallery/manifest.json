@@ -1,0 +1,420 @@
+{
+  "nos-cafe": {
+    "slug": "nos-cafe",
+    "sourceUrl": "https://cafesnos.com",
+    "status": "live",
+    "previewThemeId": null,
+    "capturedAt": "2026-09-07T17:49:49.985Z",
+    "shots": {
+      "home-desktop": "/gallery/nos-cafe/home-desktop.webp",
+      "pdp-desktop": "/gallery/nos-cafe/pdp-desktop.webp",
+      "home-mobile": "/gallery/nos-cafe/home-mobile.webp",
+      "pdp-mobile": "/gallery/nos-cafe/pdp-mobile.webp"
+    },
+    "theme": {
+      "id": 144315580500,
+      "name": "DEV - Digitdeck NOS",
+      "role": "main"
+    },
+    "pageTitle": "Cafes Nos – NOS - Lumiria Coffee Roasters",
+    "finalUrl": "https://cafesnos.com/",
+    "linkedin": "/gallery/nos-cafe/linkedin.webp",
+    "pdp": "/products/nuevo-cafe-gran-natural"
+  },
+  "the-gummy-box": {
+    "slug": "the-gummy-box",
+    "sourceUrl": "https://thegummyboxwellness.com",
+    "status": "live",
+    "previewThemeId": null,
+    "capturedAt": "2026-09-07T17:47:24.981Z",
+    "shots": {
+      "home-desktop": "/gallery/the-gummy-box/home-desktop.webp",
+      "pdp-desktop": "/gallery/the-gummy-box/pdp-desktop.webp",
+      "home-mobile": "/gallery/the-gummy-box/home-mobile.webp",
+      "pdp-mobile": "/gallery/the-gummy-box/pdp-mobile.webp"
+    },
+    "theme": {
+      "id": 153751814281,
+      "name": "DigitDeck_NewTheme",
+      "role": "main"
+    },
+    "pageTitle": "Gomitas Nutraceuticas y Funcionales SIN AZÚCAR – THE BOX COLOMBIA",
+    "finalUrl": "https://thegummyboxwellness.com/",
+    "linkedin": "/gallery/the-gummy-box/linkedin.webp",
+    "pdp": "/products/creagums"
+  },
+  "millennio": {
+    "slug": "millennio",
+    "sourceUrl": "https://perfumeriamillennio.com",
+    "status": "live",
+    "previewThemeId": null,
+    "capturedAt": "2026-09-07T17:50:31.713Z",
+    "shots": {
+      "home-desktop": "/gallery/millennio/home-desktop.webp",
+      "pdp-desktop": "/gallery/millennio/pdp-desktop.webp",
+      "home-mobile": "/gallery/millennio/home-mobile.webp",
+      "pdp-mobile": "/gallery/millennio/pdp-mobile.webp"
+    },
+    "theme": {
+      "id": 190267916586,
+      "name": "DEV Framer (Digitdeck) — recreado 2026-08-27",
+      "role": "main"
+    },
+    "pageTitle": "Perfumería Millennio - Perfumes Originales en Colombia | Envío Gratis",
+    "finalUrl": "https://perfumeriamillennio.com/",
+    "linkedin": "/gallery/millennio/linkedin.webp",
+    "pdp": "/products/veneno-scarlet-eau-de-parfum-100ml-fragance-world"
+  },
+  "mindfuel": {
+    "slug": "mindfuel",
+    "sourceUrl": "https://joinmindfuel.com",
+    "status": "live",
+    "previewThemeId": null,
+    "capturedAt": "2026-09-07T17:52:04.610Z",
+    "shots": {
+      "home-desktop": "/gallery/mindfuel/home-desktop.webp",
+      "pdp-desktop": "/gallery/mindfuel/pdp-desktop.webp",
+      "home-mobile": "/gallery/mindfuel/home-mobile.webp",
+      "pdp-mobile": "/gallery/mindfuel/pdp-mobile.webp"
+    },
+    "theme": {
+      "id": 155568013504,
+      "name": "Mindfuel V2 - DEV",
+      "role": "main"
+    },
+    "pageTitle": "Mindfuel - Potencia tu enfoque y concentracion",
+    "finalUrl": "https://joinmindfuel.com/",
+    "linkedin": "/gallery/mindfuel/linkedin.webp",
+    "pdp": "/products/mindfuel"
+  },
+  "nalua": {
+    "slug": "nalua",
+    "sourceUrl": "https://naluaskincare.co",
+    "status": "live",
+    "previewThemeId": null,
+    "capturedAt": "2026-09-07T17:53:11.254Z",
+    "shots": {
+      "home-desktop": "/gallery/nalua/home-desktop.webp",
+      "pdp-desktop": "/gallery/nalua/pdp-desktop.webp",
+      "home-mobile": "/gallery/nalua/home-mobile.webp",
+      "pdp-mobile": "/gallery/nalua/pdp-mobile.webp"
+    },
+    "theme": {
+      "id": 159578652926,
+      "name": "NALUA - DIGITDECK THEME",
+      "role": "main"
+    },
+    "pageTitle": "Nalua Skincare",
+    "finalUrl": "https://naluaskincare.co/",
+    "linkedin": "/gallery/nalua/linkedin.webp",
+    "pdp": "/products/aceite-multiproposito-sin-washa"
+  },
+  "sebum": {
+    "slug": "sebum",
+    "sourceUrl": "https://www.sebumcremas.com",
+    "status": "live",
+    "previewThemeId": null,
+    "capturedAt": "2026-09-07T17:53:54.582Z",
+    "shots": {
+      "home-desktop": "/gallery/sebum/home-desktop.webp",
+      "pdp-desktop": "/gallery/sebum/pdp-desktop.webp",
+      "home-mobile": "/gallery/sebum/home-mobile.webp",
+      "pdp-mobile": "/gallery/sebum/pdp-mobile.webp"
+    },
+    "theme": {
+      "id": 192861274483,
+      "name": "Sebum V2 DEV 20260708",
+      "role": "main"
+    },
+    "pageTitle": "Sebum",
+    "finalUrl": "https://www.sebumcremas.com/",
+    "linkedin": "/gallery/sebum/linkedin.webp",
+    "pdp": "/products/combo-balsamo-floreser-balsamo-ritual"
+  },
+  "valdo-cafe": {
+    "slug": "valdo-cafe",
+    "sourceUrl": "https://valdocafe.co",
+    "status": "live",
+    "previewThemeId": null,
+    "capturedAt": "2026-09-07T17:54:34.486Z",
+    "shots": {
+      "home-desktop": "/gallery/valdo-cafe/home-desktop.webp",
+      "pdp-desktop": "/gallery/valdo-cafe/pdp-desktop.webp",
+      "home-mobile": "/gallery/valdo-cafe/home-mobile.webp",
+      "pdp-mobile": "/gallery/valdo-cafe/pdp-mobile.webp"
+    },
+    "theme": {
+      "id": 137915957333,
+      "name": "Valdo DigitDeck DEV",
+      "role": "main"
+    },
+    "pageTitle": "Valdo Café | Café colombiano de origen",
+    "finalUrl": "https://valdocafe.co/",
+    "linkedin": "/gallery/valdo-cafe/linkedin.webp",
+    "pdp": "/products/kit-x-3"
+  },
+  "factores-2x2": {
+    "slug": "factores-2x2",
+    "sourceUrl": "https://factoresdetransferenciaacc.com.co",
+    "status": "live",
+    "previewThemeId": null,
+    "capturedAt": "2026-09-07T17:55:16.249Z",
+    "shots": {
+      "home-desktop": "/gallery/factores-2x2/home-desktop.webp",
+      "pdp-desktop": "/gallery/factores-2x2/pdp-desktop.webp",
+      "home-mobile": "/gallery/factores-2x2/home-mobile.webp",
+      "pdp-mobile": "/gallery/factores-2x2/pdp-mobile.webp"
+    },
+    "theme": {
+      "id": 160168116469,
+      "name": "DEV - Factores 2x2 (Client 468552-6a)",
+      "role": "main"
+    },
+    "pageTitle": "Factores 2X2 Plus | Suplementos para tu Salud y Bienestar – Factores 2x2 Plus",
+    "finalUrl": "https://factoresdetransferenciaacc.com.co/",
+    "linkedin": "/gallery/factores-2x2/linkedin.webp",
+    "pdp": "/products/paga-2-lleva-3-factores-2x2-plus"
+  },
+  "pixxiesx": {
+    "slug": "pixxiesx",
+    "sourceUrl": "https://www.pixxiesx.co",
+    "status": "live",
+    "previewThemeId": null,
+    "capturedAt": "2026-09-07T17:56:43.231Z",
+    "shots": {
+      "home-desktop": "/gallery/pixxiesx/home-desktop.webp",
+      "pdp-desktop": "/gallery/pixxiesx/pdp-desktop.webp",
+      "home-mobile": "/gallery/pixxiesx/home-mobile.webp",
+      "pdp-mobile": "/gallery/pixxiesx/pdp-mobile.webp"
+    },
+    "theme": {
+      "id": 189475979557,
+      "name": "Digitdeck QA - Preventa 2026-07-03",
+      "role": "main"
+    },
+    "pageTitle": "PIXXIESX SUNGLASSES",
+    "finalUrl": "https://www.pixxiesx.co/",
+    "linkedin": "/gallery/pixxiesx/linkedin.webp",
+    "pdp": "/products/pixxiesx-nero-leopard-yellow"
+  },
+  "luxe-shine": {
+    "slug": "luxe-shine",
+    "sourceUrl": "https://luxeshiine.com",
+    "status": "live",
+    "previewThemeId": null,
+    "capturedAt": "2026-09-07T17:59:05.365Z",
+    "shots": {
+      "home-desktop": "/gallery/luxe-shine/home-desktop.webp",
+      "pdp-desktop": "/gallery/luxe-shine/pdp-desktop.webp",
+      "home-mobile": "/gallery/luxe-shine/home-mobile.webp",
+      "pdp-mobile": "/gallery/luxe-shine/pdp-mobile.webp"
+    },
+    "theme": {
+      "id": 186805092641,
+      "name": "Digitdeck-Luxe-Shine/dev",
+      "role": "main"
+    },
+    "pageTitle": "Luxe Shine",
+    "finalUrl": "https://luxeshiine.com/",
+    "linkedin": "/gallery/luxe-shine/linkedin.webp",
+    "pdp": "/products/ascari"
+  },
+  "atmosfera": {
+    "slug": "atmosfera",
+    "sourceUrl": "https://atmosferatecnologica.com",
+    "status": "live",
+    "previewThemeId": null,
+    "capturedAt": "2026-09-07T17:59:46.225Z",
+    "shots": {
+      "home-desktop": "/gallery/atmosfera/home-desktop.webp",
+      "pdp-desktop": "/gallery/atmosfera/pdp-desktop.webp",
+      "home-mobile": "/gallery/atmosfera/home-mobile.webp",
+      "pdp-mobile": "/gallery/atmosfera/pdp-mobile.webp"
+    },
+    "theme": {
+      "id": 193575682180,
+      "name": "Atmosfera cart-capture 2026-07-10",
+      "role": "main"
+    },
+    "pageTitle": "Laptops Gamer y Profesionales en Colombia – ATMOSFERA TECNOLOGICA",
+    "finalUrl": "https://atmosferatecnologica.com/",
+    "linkedin": "/gallery/atmosfera/linkedin.webp",
+    "pdp": "/products/nitro-v16-ai"
+  },
+  "saint-theory": {
+    "slug": "saint-theory",
+    "sourceUrl": "https://www.saint-theory.com",
+    "status": "live",
+    "previewThemeId": null,
+    "capturedAt": "2026-09-07T18:00:24.979Z",
+    "shots": {
+      "home-desktop": "/gallery/saint-theory/home-desktop.webp",
+      "pdp-desktop": "/gallery/saint-theory/pdp-desktop.webp",
+      "home-mobile": "/gallery/saint-theory/home-mobile.webp",
+      "pdp-mobile": "/gallery/saint-theory/pdp-mobile.webp"
+    },
+    "theme": {
+      "id": 188293447958,
+      "name": "Copia de ACTUAL ACTIVO",
+      "role": "main"
+    },
+    "pageTitle": "SAINT THEORY",
+    "finalUrl": "https://www.saint-theory.com/",
+    "linkedin": "/gallery/saint-theory/linkedin.webp",
+    "pdp": "/products/camiseta-hilos-divinos-blue-aero-reflectivo"
+  },
+  "peluna": {
+    "slug": "peluna",
+    "sourceUrl": "https://pelunapets.com",
+    "status": "dev",
+    "previewThemeId": null,
+    "capturedAt": "2026-09-07T18:01:51.966Z",
+    "shots": {
+      "home-desktop": "/gallery/peluna/home-desktop.webp",
+      "pdp-desktop": "/gallery/peluna/pdp-desktop.webp",
+      "home-mobile": "/gallery/peluna/home-mobile.webp",
+      "pdp-mobile": "/gallery/peluna/pdp-mobile.webp"
+    },
+    "theme": {
+      "id": 186891731263,
+      "name": "Digitdeck Peluna DEV 2026-06-25",
+      "role": "main"
+    },
+    "pageTitle": "Peluna Pets Marca",
+    "finalUrl": "https://pelunapets.com/",
+    "linkedin": "/gallery/peluna/linkedin.webp",
+    "pdp": "/products/peluna-fresh-for-dogs-aditivo-oral-para-perros"
+  },
+  "en-amor-a-dos": {
+    "slug": "en-amor-a-dos",
+    "sourceUrl": "https://enamoradosaccesorios.com",
+    "status": "dev",
+    "previewThemeId": "163940401371",
+    "capturedAt": "2026-09-07T18:02:42.793Z",
+    "shots": {
+      "home-desktop": "/gallery/en-amor-a-dos/home-desktop.webp",
+      "pdp-desktop": "/gallery/en-amor-a-dos/pdp-desktop.webp",
+      "home-mobile": "/gallery/en-amor-a-dos/home-mobile.webp",
+      "pdp-mobile": "/gallery/en-amor-a-dos/pdp-mobile.webp"
+    },
+    "theme": {
+      "id": 163940401371,
+      "name": "En Amor a Dos Trade QA",
+      "role": "unpublished"
+    },
+    "pageTitle": "En Amor a Dos | Joyas personalizadas",
+    "finalUrl": "https://enamoradosaccesorios.com/?pb=0",
+    "linkedin": "/gallery/en-amor-a-dos/linkedin.webp",
+    "pdp": "/products/amor-de-dos"
+  },
+  "unik": {
+    "slug": "unik",
+    "sourceUrl": "https://www.unikjeans.com",
+    "status": "dev",
+    "previewThemeId": "142761787463",
+    "capturedAt": "2026-09-07T18:03:29.167Z",
+    "shots": {
+      "home-desktop": "/gallery/unik/home-desktop.webp",
+      "pdp-desktop": "/gallery/unik/pdp-desktop.webp",
+      "home-mobile": "/gallery/unik/home-mobile.webp",
+      "pdp-mobile": "/gallery/unik/pdp-mobile.webp"
+    },
+    "theme": {
+      "id": 142761787463,
+      "name": "Digitdeck DEV - Unik QA Fixes v3 - 2026-06-24",
+      "role": "unpublished"
+    },
+    "pageTitle": "UNIK JEANS - Jeans Para Mujer – Unik Jeans",
+    "finalUrl": "https://www.unikjeans.com/?pb=0",
+    "linkedin": "/gallery/unik/linkedin.webp",
+    "pdp": "/products/ref-dcn1048-pantalon-palazzo-tejido-tipo-lino-tiro-alto-tono-natural"
+  },
+  "origen-vital": {
+    "slug": "origen-vital",
+    "sourceUrl": "https://www.origenvital.com.co",
+    "status": "dev",
+    "previewThemeId": "190230987040",
+    "capturedAt": "2026-09-07T18:04:12.160Z",
+    "shots": {
+      "home-desktop": "/gallery/origen-vital/home-desktop.webp",
+      "pdp-desktop": "/gallery/origen-vital/pdp-desktop.webp",
+      "home-mobile": "/gallery/origen-vital/home-mobile.webp",
+      "pdp-mobile": "/gallery/origen-vital/pdp-mobile.webp"
+    },
+    "theme": {
+      "id": 190230987040,
+      "name": "Origen Vital Colombia - Digitdeck DEV",
+      "role": "unpublished"
+    },
+    "pageTitle": "Origen Vital COLOMBIA",
+    "finalUrl": "https://www.origenvital.com.co/?pb=0",
+    "linkedin": "/gallery/origen-vital/linkedin.webp",
+    "pdp": "/products/este-san-valentin-regalate-2-menpros-1-hots69-y-sorprendela"
+  },
+  "para-machos": {
+    "slug": "para-machos",
+    "sourceUrl": "https://www.paramachos.us",
+    "status": "dev",
+    "previewThemeId": "160311017621",
+    "capturedAt": "2026-09-07T18:05:00.865Z",
+    "shots": {
+      "home-desktop": "/gallery/para-machos/home-desktop.webp",
+      "pdp-desktop": "/gallery/para-machos/pdp-desktop.webp",
+      "home-mobile": "/gallery/para-machos/home-mobile.webp",
+      "pdp-mobile": "/gallery/para-machos/pdp-mobile.webp"
+    },
+    "theme": {
+      "id": 160311017621,
+      "name": "Digitdeck DEV — Para Machos",
+      "role": "unpublished"
+    },
+    "pageTitle": "Para Machos",
+    "finalUrl": "https://www.paramachos.us/?pb=0",
+    "linkedin": "/gallery/para-machos/linkedin.webp",
+    "pdp": "/products/cera-minoxidil-beeswax"
+  },
+  "tierramont": {
+    "slug": "tierramont",
+    "sourceUrl": "https://tierramont.com",
+    "status": "dev",
+    "previewThemeId": "165861556464",
+    "capturedAt": "2026-09-07T18:05:41.275Z",
+    "shots": {
+      "home-desktop": "/gallery/tierramont/home-desktop.webp",
+      "pdp-desktop": "/gallery/tierramont/pdp-desktop.webp",
+      "home-mobile": "/gallery/tierramont/home-mobile.webp",
+      "pdp-mobile": "/gallery/tierramont/pdp-mobile.webp"
+    },
+    "theme": {
+      "id": 165861556464,
+      "name": "Tierramont - Digitdeck DEV 2026-08-09",
+      "role": "unpublished"
+    },
+    "pageTitle": "Tierramont",
+    "finalUrl": "https://tierramont.com/?pb=0",
+    "linkedin": "/gallery/tierramont/linkedin.webp",
+    "pdp": "/products/camiseta-negra-unisex-tierramont"
+  },
+  "alma-de-aviador": {
+    "slug": "alma-de-aviador",
+    "sourceUrl": "https://jgnqhc-f1.myshopify.com",
+    "status": "dev",
+    "previewThemeId": null,
+    "capturedAt": "2026-09-07T18:06:20.108Z",
+    "shots": {
+      "home-desktop": "/gallery/alma-de-aviador/home-desktop.webp",
+      "pdp-desktop": "/gallery/alma-de-aviador/pdp-desktop.webp",
+      "home-mobile": "/gallery/alma-de-aviador/home-mobile.webp",
+      "pdp-mobile": "/gallery/alma-de-aviador/pdp-mobile.webp"
+    },
+    "theme": {
+      "id": 130701787216,
+      "name": "Digitdeck - Alma de Aviador V2 (DEV)",
+      "role": "main"
+    },
+    "pageTitle": "Alma de Aviador",
+    "finalUrl": "https://jgnqhc-f1.myshopify.com/",
+    "linkedin": "/gallery/alma-de-aviador/linkedin.webp",
+    "pdp": "/products/combo-heroe-de-pelicula-azul"
+  }
+}

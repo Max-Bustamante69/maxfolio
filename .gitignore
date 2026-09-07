@@ -38,3 +38,6 @@ skills/
 
 # Bun lock file (optional - can be committed)
 # bun.lock
+
+# gallery capture scratch
+scripts/.capture-cache/
