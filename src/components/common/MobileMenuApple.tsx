@@ -39,7 +39,7 @@ export function MobileMenuApple({ navItems, isDark, onContactClick, contactLabel
   }, [isOpen])
 
   const text = isDark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'
-  const muted = isDark ? 'text-[#a1a1a6]' : 'text-[#86868b]'
+  const muted = isDark ? 'text-[#a1a1a6]' : 'text-[#6e6e73]'
 
   const sheet = (
     <AnimatePresence>

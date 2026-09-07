@@ -21,7 +21,7 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     card: `rounded-[22px] ${d ? 'bg-[#1d1d1f]' : 'bg-white'} shadow-[0_4px_24px_rgba(0,0,0,0.06)]`,
     title: `font-semibold tracking-tight ${d ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'}`,
     body: d ? 'text-[#d2d2d7]' : 'text-[#1d1d1f]',
-    muted: d ? 'text-[#a1a1a6]' : 'text-[#86868b]',
+    muted: d ? 'text-[#a1a1a6]' : 'text-[#6e6e73]',
     accent: d ? 'text-[#2997ff]' : 'text-[#0071e3]',
     chip: `rounded-full px-2.5 py-1 text-[11px] ${d ? 'bg-white/10 text-[#d2d2d7]' : 'bg-[#f5f5f7] text-[#1d1d1f]'}`,
     chipOn: `rounded-full px-2.5 py-1 text-[11px] font-medium ${d ? 'bg-white text-black' : 'bg-[#1d1d1f] text-white'}`,

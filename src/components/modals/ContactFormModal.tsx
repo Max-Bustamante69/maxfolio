@@ -108,10 +108,10 @@ export function ContactFormModal({
     bgModal: isDark ? 'bg-[#1d1d1f] rounded-[22px]' : 'bg-white rounded-[22px]',
     bgInput: isDark
       ? 'bg-white/10 border-transparent text-[#f5f5f7] placeholder:text-[#a1a1a6] focus:border-[#2997ff] rounded-[12px]'
-      : 'bg-[#f5f5f7] border-transparent text-[#1d1d1f] placeholder:text-[#86868b] focus:border-[#0071e3] rounded-[12px]',
+      : 'bg-[#f5f5f7] border-transparent text-[#1d1d1f] placeholder:text-[#6e6e73] focus:border-[#0071e3] rounded-[12px]',
     textPrimary: isDark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]',
     textSecondary: isDark ? 'text-[#d2d2d7]' : 'text-[#424245]',
-    textMuted: isDark ? 'text-[#a1a1a6]' : 'text-[#86868b]',
+    textMuted: isDark ? 'text-[#a1a1a6]' : 'text-[#6e6e73]',
     accent: isDark ? 'text-[#2997ff]' : 'text-[#0071e3]',
     btnPrimary: 'bg-[#0071e3] text-white hover:bg-[#0077ed] rounded-full press',
     btnSecondary: isDark

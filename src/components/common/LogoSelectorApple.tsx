@@ -51,7 +51,7 @@ export function LogoSelectorApple({ isDark }: { isDark: boolean }) {
   }, [open])
 
   const text = isDark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'
-  const muted = isDark ? 'text-[#a1a1a6]' : 'text-[#86868b]'
+  const muted = isDark ? 'text-[#a1a1a6]' : 'text-[#6e6e73]'
   const panel = isDark ? 'bg-[#1d1d1f]/95 border-white/10' : 'bg-white/95 border-black/5'
   const rowHover = isDark ? 'hover:bg-white/5' : 'hover:bg-black/[0.04]'
 

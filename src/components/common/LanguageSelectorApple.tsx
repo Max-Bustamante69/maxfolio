@@ -30,7 +30,7 @@ export function LanguageSelectorApple({ isDark }: { isDark: boolean }) {
                   : 'bg-white text-[#1d1d1f] shadow-sm'
                 : isDark
                   ? 'text-[#a1a1a6] hover:text-white'
-                  : 'text-[#86868b] hover:text-[#1d1d1f]'
+                  : 'text-[#6e6e73] hover:text-[#1d1d1f]'
             }`}
           >
             {LABEL[opt]}
