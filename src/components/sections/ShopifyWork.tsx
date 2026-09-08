@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useContent } from '../../hooks'
-import { ProjectFrame, ProjectModal, GalleryLightbox, type Skin } from '../gallery'
-import { shotsFor, lightboxItems, caseStudyFor, caseStudyLabels, type SectionHeading } from './Gallery'
+import { ProjectFrame, GalleryLightbox, type Skin } from '../gallery'
+import { shotsFor, lightboxItems, caseStudyFor, caseStudyLabels, ProjectModal, type SectionHeading } from './Gallery'
 import type { StoreEntry, ProductEntry } from '../../data/registry'
 
 interface ShopifyWorkProps {
@@ -25,7 +25,12 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
   const cs = strings.sections.caseStudy
   const [tab, setTab] = useState<'stores' | 'products'>('stores')
   const [showAll, setShowAll] = useState(false)
-  const [openStore, setOpenStore] = useState<StoreEntry | null>(null)
+  const [openStore, setOpenStoreState] = useState<StoreEntry | null>(null)
+  const [sheetLoaded, setSheetLoaded] = useState(false)
+  const setOpenStore = (st: StoreEntry | null) => {
+    if (st) setSheetLoaded(true)
+    setOpenStoreState(st)
+  }
   const [openProduct, setOpenProduct] = useState<ProductEntry | null>(null)
 
   const fleet = registry.stores.filter((x) => !x.legacy)
@@ -149,13 +154,17 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
         )}
       </AnimatePresence>
 
-      <ProjectModal
-        open={!!openStore}
-        data={openStore ? caseStudyFor(openStore, strings, skin, formatPeriod) : null}
-        skin={skin}
-        labels={caseStudyLabels(strings)}
-        onClose={() => setOpenStore(null)}
-      />
+      {sheetLoaded && (
+        <Suspense fallback={null}>
+          <ProjectModal
+            open={!!openStore}
+            data={openStore ? caseStudyFor(openStore, strings, skin, formatPeriod) : null}
+            skin={skin}
+            labels={caseStudyLabels(strings)}
+            onClose={() => setOpenStore(null)}
+          />
+        </Suspense>
+      )}
       <GalleryLightbox
         open={!!openProduct}
         title={openProduct?.name ?? ''}

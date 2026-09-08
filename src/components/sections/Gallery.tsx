@@ -1,7 +1,7 @@
-import { useMemo, useState, type ReactNode } from 'react'
+import { lazy, Suspense, useMemo, useState, type ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { useContent } from '../../hooks'
-import { ProjectFrame, ProjectModal, GlassControls, carouselTokens, type Skin, type FrameShots, type LightboxItem, type CaseStudyData } from '../gallery'
+import { ProjectFrame, GlassControls, carouselTokens, type Skin, type FrameShots, type LightboxItem, type CaseStudyData } from '../gallery'
 import type { CaseStudyLabels } from '../gallery/ProjectModal'
 import { Carousel } from '../../vendor/carousel'
 import { metrics, type StoreEntry } from '../../data/registry'
@@ -9,6 +9,9 @@ import { results as storyResults } from '../../data/results'
 import type { PortfolioContent } from '../../content/types'
 
 export type SectionHeading = (eyebrow: string, title: string, accent: string, lead?: string) => ReactNode
+
+/** The case-study sheet (carousel + charts) loads on first open, off the main bundle. */
+export const ProjectModal = lazy(() => import('../gallery/ProjectModal').then((m) => ({ default: m.ProjectModal })))
 
 type Filter = 'all' | 'live' | 'dev'
 type View = 'carousel' | 'grid' | 'phones'
@@ -92,6 +95,11 @@ export function Gallery({ skin, heading }: GalleryProps) {
   const [filter, setFilter] = useState<Filter>('all')
   const [view, setView] = useState<View>('carousel')
   const [openSlug, setOpenSlug] = useState<string | null>(null)
+  const [sheetLoaded, setSheetLoaded] = useState(false)
+  const openSheet = (slug: string) => {
+    setSheetLoaded(true)
+    setOpenSlug(slug)
+  }
 
   const items = useMemo(
     () => registry.stores.filter((s) => s.gallery && (filter === 'all' || s.status === filter)),
@@ -149,7 +157,7 @@ export function Gallery({ skin, heading }: GalleryProps) {
           >
             {items.map((s) => (
               <figure key={s.slug} className="m-0">
-                <ProjectFrame name={s.name} shots={shotsFor(s.slug)} skin={skin} onOpen={() => setOpenSlug(s.slug)} alt={g.open} cta={cs.open} />
+                <ProjectFrame name={s.name} shots={shotsFor(s.slug)} skin={skin} onOpen={() => openSheet(s.slug)} alt={g.open} cta={cs.open} />
                 <Caption s={s} />
               </figure>
             ))}
@@ -169,7 +177,7 @@ export function Gallery({ skin, heading }: GalleryProps) {
               transition={{ delay: (idx % 3) * 0.05, duration: 0.5 }}
               className="m-0"
             >
-              <ProjectFrame name={s.name} shots={shotsFor(s.slug)} skin={skin} onOpen={() => setOpenSlug(s.slug)} alt={g.open} cta={cs.open} />
+              <ProjectFrame name={s.name} shots={shotsFor(s.slug)} skin={skin} onOpen={() => openSheet(s.slug)} alt={g.open} cta={cs.open} />
               <Caption s={s} />
             </motion.figure>
           ))}
@@ -188,20 +196,24 @@ export function Gallery({ skin, heading }: GalleryProps) {
               transition={{ delay: (idx % 5) * 0.04, duration: 0.5 }}
               className="m-0"
             >
-              <ProjectFrame name={s.name} shots={shotsFor(s.slug)} skin={skin} onOpen={() => setOpenSlug(s.slug)} alt={g.open} variant="phone" />
+              <ProjectFrame name={s.name} shots={shotsFor(s.slug)} skin={skin} onOpen={() => openSheet(s.slug)} alt={g.open} variant="phone" />
               <figcaption className={`${skin.muted} mt-2 truncate text-center text-xs`}>{s.name}</figcaption>
             </motion.figure>
           ))}
         </motion.div>
       )}
 
-      <ProjectModal
-        open={!!open}
-        data={open ? caseStudyFor(open, strings, skin, formatPeriod) : null}
-        skin={skin}
-        labels={caseStudyLabels(strings)}
-        onClose={() => setOpenSlug(null)}
-      />
+      {sheetLoaded && (
+        <Suspense fallback={null}>
+          <ProjectModal
+            open={!!open}
+            data={open ? caseStudyFor(open, strings, skin, formatPeriod) : null}
+            skin={skin}
+            labels={caseStudyLabels(strings)}
+            onClose={() => setOpenSlug(null)}
+          />
+        </Suspense>
+      )}
     </section>
   )
 }

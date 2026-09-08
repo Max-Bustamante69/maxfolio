@@ -118,7 +118,7 @@ export function ProjectFrame({ name, shots, skin, onOpen, alt, variant = 'compos
 
   if (variant === 'phone') {
     return (
-      <button type="button" onClick={onOpen} {...bind} className="group relative block w-full px-[4%] text-left" aria-label={`${name}: ${alt}`}>
+      <button type="button" onClick={onOpen} {...bind} className="group relative block w-full px-[4%] text-left" aria-label={cta ? `${cta} · ${name}` : `${name}: ${alt}`}>
         <PhoneFrame>
           <Crossfade base={shots.homeMobile} over={shots.pdpMobile} alt={alt} hover={hover} label="home, mobile" />
         </PhoneFrame>
@@ -128,7 +128,7 @@ export function ProjectFrame({ name, shots, skin, onOpen, alt, variant = 'compos
 
   if (variant === 'laptop') {
     return (
-      <button type="button" onClick={onOpen} {...bind} className="group relative block w-full text-left" aria-label={`${name}: ${alt}`} style={{ perspective: 1200 }}>
+      <button type="button" onClick={onOpen} {...bind} className="group relative block w-full text-left" aria-label={cta ? `${cta} · ${name}` : `${name}: ${alt}`} style={{ perspective: 1200 }}>
         <motion.div style={{ ...tilt, transformStyle: 'preserve-3d' }} animate={{ scale: lift ? 1.025 : 1 }} transition={SETTLE} className="relative will-change-transform">
           <LaptopFrame>
             <Crossfade base={shots.homeDesktop} over={shots.pdpDesktop} alt={alt} hover={hover} label="home, desktop" />
@@ -142,7 +142,7 @@ export function ProjectFrame({ name, shots, skin, onOpen, alt, variant = 'compos
   }
 
   return (
-    <button type="button" onClick={onOpen} {...bind} className="group relative block w-full pb-[9%] pr-[3%] text-left" aria-label={`${name}: ${alt}`} style={{ perspective: 1200 }}>
+    <button type="button" onClick={onOpen} {...bind} className="group relative block w-full pb-[9%] pr-[3%] text-left" aria-label={cta ? `${cta} · ${name}` : `${name}: ${alt}`} style={{ perspective: 1200 }}>
       <motion.div style={{ ...tilt, transformStyle: 'preserve-3d' }} animate={{ scale: lift ? 1.03 : 1 }} transition={SETTLE} className="relative will-change-transform">
         <LaptopFrame>
           <Crossfade base={shots.homeDesktop} over={shots.pdpDesktop} alt={alt} hover={hover} label="home, desktop" />

@@ -113,7 +113,7 @@ export function ScrollRail({ sections, dark, accent = '#0071e3' }: ScrollRailPro
             type="button"
             onClick={() => jumpToId(p.id)}
             aria-label={sections.find((s) => s.id === p.id)?.label}
-            className="group absolute left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 p-1.5 [&]:min-h-0 [&]:min-w-0"
+            className="group absolute left-1/2 z-10 flex h-6 w-6 -translate-x-1/2 -translate-y-1/2 items-center justify-center [&]:min-h-0 [&]:min-w-0"
             style={{ top: `${p.ratio * 100}%` }}
           >
             <span

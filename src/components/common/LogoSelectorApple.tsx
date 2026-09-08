@@ -60,13 +60,14 @@ export function LogoSelectorApple({ isDark }: { isDark: boolean }) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        aria-label="Open design selector"
         aria-expanded={open}
         aria-haspopup="menu"
         className={`press inline-flex items-center gap-2 h-8 pl-1 pr-2.5 rounded-full ${isDark ? 'hover:bg-white/10' : 'hover:bg-black/5'} compact-touch`}
       >
         <Mark id="apple" isDark={isDark} />
         <span className={`text-sm font-semibold ${text}`}>Maxfolio</span>
+        {/* the accessible name keeps the visible text and adds the purpose */}
+        <span className="sr-only">, open design selector</span>
         <svg className={`w-3 h-3 ${muted} transition-transform duration-200 ${open ? 'rotate-180' : ''}`} viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
           <path d="M2.5 4.5 6 8l3.5-3.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>

@@ -43,7 +43,8 @@ function App() {
             <Route path="/2" element={<Design1 />} />
           </Routes>
         </Suspense>
-        <Analytics />
+        {/* The insights script only exists on Vercel; skipping it elsewhere keeps local audits free of a 404. */}
+        {typeof window !== 'undefined' && /(^|\.)maxfolio\.dev$|\.vercel\.app$/.test(window.location.hostname) && <Analytics />}
       </PageTransitionProvider>
     </LanguageProvider>
   )

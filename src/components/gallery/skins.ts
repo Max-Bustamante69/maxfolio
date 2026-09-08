@@ -48,10 +48,11 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     title: `font-semibold tracking-tight ${d ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'}`,
     body: d ? 'text-[#d2d2d7]' : 'text-[#1d1d1f]',
     muted: d ? 'text-[#a1a1a6]' : 'text-[#6e6e73]',
-    accent: d ? 'text-[#2997ff]' : 'text-[#0071e3]',
+    // Light accent is Apple's text-safe blue (#0066cc, 5.1:1 on white); the badge greens clear AA on their tints.
+    accent: d ? 'text-[#2997ff]' : 'text-[#0066cc]',
     chip: `rounded-full px-2.5 py-1 text-[11px] ${d ? 'bg-white/10 text-[#d2d2d7]' : 'bg-[#f5f5f7] text-[#1d1d1f]'}`,
     chipOn: `rounded-full px-2.5 py-1 text-[11px] font-medium ${d ? 'bg-white text-black' : 'bg-[#1d1d1f] text-white'}`,
-    badgeLive: d ? 'bg-[#34c759]/20 text-[#5ee082]' : 'bg-[#34c759]/15 text-[#1b7a34]',
+    badgeLive: d ? 'bg-[#34c759]/20 text-[#5ee082]' : 'bg-[#34c759]/15 text-[#136329]',
     badgeDev: d ? 'bg-[#ff9f0a]/20 text-[#ffbf4d]' : 'bg-[#ff9f0a]/15 text-[#8a5300]',
     rowHover: d ? 'hover:bg-white/[0.03]' : 'hover:bg-black/[0.02]',
     divider: d ? 'divide-white/10 border-white/10' : 'divide-black/10 border-black/10',

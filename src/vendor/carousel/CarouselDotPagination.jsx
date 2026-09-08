@@ -76,16 +76,23 @@ export function CarouselDotPagination({
             aria-selected={active}
             aria-label={`Ir a la página ${dot.index + 1}`}
             onClick={() => onSelect?.(dot.index)}
-            className="shrink-0 rounded-pill transition-all duration-[var(--duration-base)]"
-            style={{
-              width: active ? activeWidth : dotSize,
-              height: active ? activeHeight : dotSize,
-              backgroundColor: active ? activeColor : color,
-              opacity: active ? 1 : dot.opacity,
-              filter: dot.blur ? 'blur(0.35px)' : 'none',
-            }}
+            // Portfolio adaptation: the button keeps a 24px hit box (WCAG target size) and the
+            // visual dot lives in an inner span, so the five-dot window looks exactly the same.
+            className="flex shrink-0 items-center justify-center bg-transparent p-0"
+            style={{ width: Math.max(24, active ? activeWidth : dotSize), height: 24 }}
             data-carousel-dot-index={dot.index}
-          />
+          >
+            <span
+              className="block rounded-pill transition-all duration-[var(--duration-base)]"
+              style={{
+                width: active ? activeWidth : dotSize,
+                height: active ? activeHeight : dotSize,
+                backgroundColor: active ? activeColor : color,
+                opacity: active ? 1 : dot.opacity,
+                filter: dot.blur ? 'blur(0.35px)' : 'none',
+              }}
+            />
+          </button>
         )
       })}
     </div>

@@ -45,7 +45,7 @@ export function LuxuryPreview({ isHovered = false, size = 'md' }: LuxuryPreviewP
           transition={{ duration: 0.3 }}
         />
         <div className="font-display text-[#1a1a1a] text-sm tracking-wide">
-          <span className="italic text-[#C9A962]">Luxury</span>
+          <span className="italic text-[#7a5d14]">Luxury</span>
         </div>
         <motion.div
           className="w-8 h-[1px] bg-[#C9A962] mx-auto mt-2"
