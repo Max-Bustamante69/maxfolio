@@ -7,6 +7,8 @@ import { carouselTokens, type Skin } from './skins'
 import type { FrameShots } from './ProjectFrame'
 import { Carousel } from '../../vendor/carousel'
 import type { StoreMetrics } from '../../data/registry'
+import type { StoreResults } from '../../data/results'
+import { DeltaBars, IndexLine } from './charts'
 
 export interface CaseStudyStat {
   label: string
@@ -21,6 +23,7 @@ export interface CaseStudyData {
   tagline: string
   description: string
   metrics?: StoreMetrics // Lighthouse lab scores, live stores only
+  story?: StoreResults // indexed before/after metrics — sample shapes until measured
   stats: CaseStudyStat[] // verifiable store facts (build window, ladders, modules…)
   results: CaseStudyStat[] // measured business outcomes; hidden when empty
   stack: string[]
@@ -47,6 +50,13 @@ export interface CaseStudyLabels {
   seo: string
   lcp: string
   measured: string
+  story: string
+  sampleBadge: string
+  sampleNote: string
+  measuredFrom: string
+  before: string
+  after: string
+  metric: Record<'cr' | 'aov' | 'revenue' | 'lcp' | 'checkout', string>
 }
 
 interface ProjectModalProps {
@@ -224,6 +234,31 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
               <span className={`mt-3 inline-block rounded-full px-2 py-0.5 text-[10px] ${data.badge.className}`}>{data.badge.text}</span>
               <p className={`${skin.accent} mt-4 text-sm font-medium`}>{data.tagline}</p>
               <p className="mt-2 text-sm leading-relaxed">{data.description}</p>
+
+              {data.story && data.story.metrics.length > 0 && (
+                <>
+                  <div className="mt-6 flex items-center gap-2">
+                    <p className={label}>{labels.story}</p>
+                    {data.story.sample && (
+                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${dark ? 'bg-[#ff9f0a]/20 text-[#ffbf4d]' : 'bg-[#ff9f0a]/15 text-[#8a5300]'}`}>{labels.sampleBadge}</span>
+                    )}
+                  </div>
+                  <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {data.story.metrics.map((m, i) =>
+                      m.unit === 's' ? (
+                        <DeltaBars key={m.id} metric={m} color={skin.frame === 'apple' ? (dark ? '#2997ff' : '#0071e3') : skin.frame === 'luxury' ? '#C9A962' : '#dc2626'} dark={dark} label={labels.metric[m.id]} beforeLabel={labels.before} afterLabel={labels.after} delay={0.2 + i * 0.12} />
+                      ) : (
+                        <IndexLine key={m.id} metric={m} color={skin.frame === 'apple' ? (dark ? '#2997ff' : '#0071e3') : skin.frame === 'luxury' ? '#C9A962' : '#dc2626'} dark={dark} label={labels.metric[m.id]} delay={0.2 + i * 0.12} />
+                      ),
+                    )}
+                  </div>
+                  <p className={`${skin.muted} mt-2 text-[11px] leading-snug`}>
+                    {data.story.sample
+                      ? labels.sampleNote
+                      : labels.measuredFrom.replace('{source}', data.story.metrics[0]?.source ?? '').replace('{period}', data.story.metrics[0]?.period ?? '')}
+                  </p>
+                </>
+              )}
 
               {data.metrics && (
                 <>
