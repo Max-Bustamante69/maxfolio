@@ -12,6 +12,8 @@ import {
   CompanyLogo,
   TransitionLink,
   MenuPreview,
+  SmoothScroll,
+  ScrollRail,
 } from '../components'
 import { skins } from '../components/gallery'
 import { useDynamicFavicon, useI18n, useContent } from '../hooks'
@@ -98,6 +100,7 @@ function AppleContent() {
       <ContactFormModal isOpen={contactOpen} onClose={() => setContactOpen(false)} variant="apple" isDark={isDark} />
 
       <div className={`theme-apple min-h-screen font-sf ${bg} transition-colors duration-300 overflow-x-hidden`} role="document">
+        <ScrollRail sections={nav.map(([href, label]) => ({ id: href.slice(1), label }))} dark={isDark} accent={isDark ? '#2997ff' : '#0071e3'} />
         {/* Nav — 44px, frosted */}
         <nav
           className={`fixed top-0 inset-x-0 z-40 h-11 ${isDark ? 'bg-black/70' : 'bg-white/70'} backdrop-blur-xl border-b ${isDark ? 'border-white/10' : 'border-black/5'}`}
@@ -455,7 +458,9 @@ function AppleContent() {
 export default function Apple() {
   return (
     <ThemeProvider storageKey="apple-theme" defaultTheme="light">
-      <AppleContent />
+      <SmoothScroll offset={56}>
+        <AppleContent />
+      </SmoothScroll>
     </ThemeProvider>
   )
 }

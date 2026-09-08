@@ -132,7 +132,7 @@ export function Gallery({ skin, heading }: GalleryProps) {
       </div>
 
       {view === 'carousel' && (
-        <div className="rail-wide" style={carouselTokens(skin.frame, skin.dark)}>
+        <div className="rail-wide" style={carouselTokens(skin.frame, skin.dark)} data-lenis-prevent-wheel>
           {/* House carousel: edge bleed to the viewport, centered snap on mobile, left rest on desktop,
               weighted mouse drag, step-by-one arrows + the five-dot window in glass. The rail breaks
               out of the text column on wide screens so the composites read at size. */}

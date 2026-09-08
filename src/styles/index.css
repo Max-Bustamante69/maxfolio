@@ -68,6 +68,17 @@
   }
 }
 
+/* The page draws its own scrollbar (ScrollRail) on pointer devices ≥ lg; the native one hides there
+   and only there, so keyboard, wheel and drag-to-scroll behave exactly as before. */
+@media (hover: hover) and (min-width: 1024px) {
+  html.has-rail {
+    scrollbar-width: none;
+  }
+  html.has-rail::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* iOS-style glass for the carousel controls. */
 .glass {
   -webkit-backdrop-filter: blur(20px) saturate(160%);
