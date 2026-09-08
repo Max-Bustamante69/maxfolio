@@ -8,7 +8,7 @@ import type { FrameShots } from './ProjectFrame'
 import { Carousel } from '../../vendor/carousel'
 import type { StoreMetrics } from '../../data/registry'
 import type { ResultMetricId, StoreResults } from '../../data/results'
-import { Gauge, IndexLine, MetricBars, SlopeChart } from './charts'
+import { CompareTable, CountUp, Gauge, IndexLine, MetricBars, SlopeChart } from './charts'
 
 export interface CaseStudyStat {
   label: string
@@ -245,7 +245,20 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
                   </div>
                   {/* One chart per story beat, and a different chart per kind of beat: a line for a trend,
                       a slope for a before/after comparison, gauges for shares, bars for units of time or count. */}
-                  <div className="mt-3 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+                  {/* the headline result, one glance before the detail */}
+                  {(() => {
+                    const lead = data.story.charts.flatMap((ch) => ch.metrics).find((mm) => mm.before > 0)
+                    if (!lead) return null
+                    const d = Math.round(((lead.after - lead.before) / lead.before) * 100)
+                    const good = lead.invert ? d <= 0 : d >= 0
+                    return (
+                      <p className="mt-3 flex items-baseline gap-3">
+                        <CountUp value={Math.abs(d)} prefix={d >= 0 ? '+' : '−'} suffix="%" delay={0.15} className={`text-4xl font-semibold tabular-nums tracking-[-0.03em] ${good ? 'text-[#34c759]' : 'text-[#ff3b30]'}`} />
+                        <span className={`${skin.muted} text-sm`}>{labels.metric[lead.id]}</span>
+                      </p>
+                    )
+                  })()}
+                  <div className="mt-4 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
                     {data.story.charts.map((ch, i) => {
                       const key = `${ch.kind}-${ch.metrics.map((mm) => mm.id).join('-')}`
                       const common = { color: accent, dark, labels: { metric: labels.metric, before: labels.before, after: labels.after }, delay: 0.2 + i * 0.12 }
@@ -264,6 +277,12 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
                           </div>
                         )
                       if (ch.kind === 'bars') return <MetricBars key={key} metrics={ch.metrics} {...common} />
+                      if (ch.kind === 'table' && ch.rows)
+                        return (
+                          <div key={key} className="sm:col-span-2">
+                            <CompareTable rows={ch.rows} dark={dark} labels={common.labels} delay={common.delay} />
+                          </div>
+                        )
                       return <IndexLine key={key} metric={ch.metrics[0]} {...common} />
                     })}
                   </div>

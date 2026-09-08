@@ -17,6 +17,8 @@ import {
   Projects,
   Skills,
   Contact,
+  Faq,
+  Magnetic,
   TransitionLink,
   MenuPreview,
   SmoothScroll,
@@ -97,6 +99,11 @@ function AppleContent() {
   const { strings: c, registry } = useContent()
   const localTime = useLocalTime(locale === 'ja' ? 'ja-JP' : locale === 'es' ? 'es-CO' : 'en-US')
   const [contactOpen, setContactOpen] = useState(false)
+  const [contactPrefill, setContactPrefill] = useState('')
+  const openContact = (prefill?: string) => {
+    setContactPrefill(prefill ?? '')
+    setContactOpen(true)
+  }
   useDynamicFavicon('apple')
 
   const skin = skins.apple(isDark)
@@ -136,7 +143,7 @@ function AppleContent() {
         canonical="https://www.maxfolio.dev"
         ogImage="https://www.maxfolio.dev/og-image.png"
       />
-      <ContactFormModal isOpen={contactOpen} onClose={() => setContactOpen(false)} variant="apple" isDark={isDark} />
+      <ContactFormModal isOpen={contactOpen} onClose={() => setContactOpen(false)} variant="apple" isDark={isDark} initialMessage={contactPrefill} />
 
       <div className={`theme-apple min-h-screen font-sf ${bg} transition-colors duration-300 [overflow-x:clip]`} role="document">
         <ScrollRail sections={nav.map(([href, label]) => ({ id: href.slice(1), label }))} dark={isDark} accent={isDark ? '#2997ff' : '#0071e3'} />
@@ -200,9 +207,11 @@ function AppleContent() {
               transition={{ delay: 0.4, duration: 0.5, ease: EASE }}
               className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6"
             >
-              <button type="button" onClick={() => setContactOpen(true)} className={primaryBtn}>
-                {c.hero.ctaPrimary}
-              </button>
+              <Magnetic>
+                <button type="button" onClick={() => openContact()} className={primaryBtn}>
+                  {c.hero.ctaPrimary}
+                </button>
+              </Magnetic>
               <a href="#shopify" className={`${blue} inline-flex items-center gap-1.5 text-sm font-medium`}>
                 {c.hero.ctaSecondary} {Icon.down}
               </a>
@@ -210,11 +219,14 @@ function AppleContent() {
                 {c.hero.ctaCv} ›
               </a>
             </m.div>
+            <m.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5, duration: 0.5 }} className={`${muted} mt-4 text-xs`}>
+              {c.hero.ctaNote}
+            </m.p>
             <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.55, duration: 0.5 }}
-              className="mt-7 flex flex-wrap items-center justify-center gap-2 text-xs"
+              className="mt-6 flex flex-wrap items-center justify-center gap-2 text-xs"
             >
               <span className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 font-medium ${tile}`}>
                 <span className="w-2 h-2 rounded-full bg-[#34c759]" aria-hidden="true" />
@@ -311,15 +323,22 @@ function AppleContent() {
             </div>
           </section>
 
-          {/* Contact — typographic close */}
-          <section className="px-4 py-24 md:py-32">
+          {/* FAQ — the objections, answered before the ask */}
+          <section className="px-4 py-20 md:py-28">
             <div className="max-w-5xl mx-auto">
-              <Contact skin={skin} ctaClass={`${primaryBtn} px-7 py-3.5`} onContact={() => setContactOpen(true)} />
+              <Faq skin={skin} heading={Heading} />
+            </div>
+          </section>
+
+          {/* Contact — typographic close */}
+          <section className={`px-4 py-24 md:py-32 ${surface}`}>
+            <div className="max-w-5xl mx-auto">
+              <Contact skin={skin} ctaClass={`${primaryBtn} px-7`} onContact={openContact} />
             </div>
           </section>
 
           {/* Explore */}
-          <section id="explore" className={`px-4 py-20 ${surface} scroll-mt-20`}>
+          <section id="explore" className="px-4 py-20 scroll-mt-20">
             <div className="max-w-5xl mx-auto">
               {Heading(c.sections.explore.eyebrow, c.sections.explore.title, '', c.sections.explore.lead)}
               <div className="grid sm:grid-cols-3 gap-3">

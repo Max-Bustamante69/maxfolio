@@ -1,6 +1,6 @@
 import { useEffect, useId } from 'react'
 import { animate, m, useMotionValue, useReducedMotion, useTransform } from 'framer-motion'
-import type { ResultMetric } from '../../data/results'
+import type { ResultMetric, TableRow } from '../../data/results'
 
 const EASE = [0.23, 1, 0.32, 1] as const
 
@@ -220,6 +220,35 @@ export function MetricBars({ metrics, color, dark, labels, delay = 0 }: { metric
           </div>
         )
       })}
+    </figure>
+  )
+}
+
+/** Before / after as a three-column hairline table — for stories told in names and counts, not curves. */
+export function CompareTable({ rows, dark, labels, delay = 0 }: { rows: TableRow[]; labels: ChartLabels; delay?: number; dark: boolean }) {
+  const reduced = useReducedMotion()
+  const line = dark ? 'border-white/10' : 'border-black/10'
+  return (
+    <figure className="m-0">
+      <div className={`grid grid-cols-[1fr_auto_auto] gap-x-4 border-b pb-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] ${line} ${mutedText(dark)}`}>
+        <span />
+        <span>{labels.before}</span>
+        <span className="text-right">{labels.after}</span>
+      </div>
+      {rows.map((r, i) => (
+        <m.div
+          key={r.id}
+          className={`grid grid-cols-[1fr_auto_auto] items-baseline gap-x-4 border-b py-2 text-sm ${line}`}
+          initial={reduced ? false : { opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: delay + i * 0.08, duration: 0.4, ease: EASE }}
+        >
+          <span className={mutedText(dark)}>{labels.metric[r.id] ?? r.id}</span>
+          <span className={`${mutedText(dark)} tabular-nums`}>{r.before}</span>
+          <span className="text-right font-semibold tabular-nums">{r.after}</span>
+        </m.div>
+      ))}
+      <SrTable caption={labels.before + ' / ' + labels.after} rows={rows.map((r) => [labels.metric[r.id] ?? r.id, `${r.before} → ${r.after}`])} />
     </figure>
   )
 }

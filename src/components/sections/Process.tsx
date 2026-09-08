@@ -86,7 +86,16 @@ export function Process({ skin, heading, canvas = '' }: ProcessProps) {
 
   return (
     <section id="process" className="scroll-mt-20">
-      {heading(p.eyebrow, p.title, p.titleAccent, p.lead)}
+      {heading(p.eyebrow, p.title, p.titleAccent)}
+      {/* the narrative spine: the bottleneck, then the fix */}
+      <div className="-mt-2 mb-12 grid max-w-4xl gap-5 md:-mt-4 md:mb-16 md:grid-cols-2 md:gap-10">
+        <p className="text-lg leading-relaxed md:text-xl">
+          <span className={`font-semibold ${skin.accent}`}>{p.problemLabel}</span> <span className={skin.muted}>{p.problem}</span>
+        </p>
+        <p className="text-lg leading-relaxed md:text-xl">
+          <span className={`font-semibold ${skin.title}`}>{p.fixLabel}</span> <span className={skin.muted}>{p.fix}</span>
+        </p>
+      </div>
       <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
         {/* pinned readout (wide screens) */}
         <div className="hidden lg:col-span-5 lg:block">

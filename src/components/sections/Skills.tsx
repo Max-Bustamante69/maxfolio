@@ -62,10 +62,10 @@ export function Skills({ skin, heading }: SkillsProps) {
             <m.p
               key={g}
               className="text-xl leading-[1.75] tracking-[-0.01em] md:text-[26px] md:leading-[1.8]"
-              initial={reduced ? false : { opacity: 0, y: 14 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={reduced ? false : { opacity: 0, y: 14, filter: 'blur(8px)' }}
+              whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
               viewport={{ once: true, margin: '-40px' }}
-              transition={{ duration: 0.55, delay: gi * 0.04, ease: EASE }}
+              transition={{ duration: 0.7, delay: gi * 0.05, ease: EASE }}
             >
               <span className={`${skin.accent} mr-3 align-middle text-[11px] font-semibold uppercase tracking-[0.18em]`}>{sk.groups[g]}</span>
               <Sentence g={g} animate />

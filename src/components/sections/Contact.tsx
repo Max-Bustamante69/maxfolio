@@ -1,27 +1,37 @@
+import { useState, type FormEvent } from 'react'
 import { m, useReducedMotion } from 'framer-motion'
 import { useContent } from '../../hooks'
-import { RevealText } from '../common'
+import { Magnetic, RevealText } from '../common'
 import type { Skin } from '../gallery'
 
 interface ContactProps {
   skin: Skin
   ctaClass: string
-  onContact: () => void
+  /** Opens the contact form, optionally with the message prefilled (the store URL). */
+  onContact: (prefill?: string) => void
 }
 
 const EASE = [0.23, 1, 0.32, 1] as const
 
 /**
- * The close, as a typographic moment: one large second-person line, the offer under it, two ways
- * in (the form, or plain email) with the reassurance beside the button, then "what happens next"
- * as a numbered ladder so the click has no unknowns — and the channels on a hairline row below.
- * No card around any of it.
+ * The close, as a typographic moment: one large second-person line, the offer under it, the
+ * lowest-friction action first (paste a store URL), the form and plain email as the two ways in,
+ * the reassurance beside them, then "what happens next" as a numbered ladder — and the channels
+ * on a hairline row below. No card around any of it.
  */
 export function Contact({ skin, ctaClass, onContact }: ContactProps) {
   const { strings, registry } = useContent()
   const reduced = useReducedMotion()
   const c = strings.sections.contact
+  const [url, setUrl] = useState('')
   const label = `text-[11px] font-semibold uppercase tracking-[0.18em] ${skin.muted}`
+  const field = skin.dark ? 'border-white/15 bg-white/5 placeholder:text-[#6e6e73] focus:border-[#2997ff]' : 'border-black/15 bg-white placeholder:text-[#a1a1a6] focus:border-[#0071e3]'
+
+  const submitUrl = (e: FormEvent) => {
+    e.preventDefault()
+    const v = url.trim()
+    onContact(v ? `${c.urlLabel}: ${v}\n\n` : undefined)
+  }
 
   return (
     <section id="contact" className="scroll-mt-20" aria-labelledby="contact-heading">
@@ -33,15 +43,33 @@ export function Contact({ skin, ctaClass, onContact }: ContactProps) {
           </h2>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed md:text-2xl md:leading-relaxed">{c.lead}</p>
 
-          <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
-            <button type="button" onClick={onContact} className={ctaClass}>
-              {c.cta}
-            </button>
-            <a href={`mailto:${registry.personal.email}`} className={`${skin.accent} text-sm font-medium`}>
+          {/* lowest-friction action: the store URL */}
+          <form onSubmit={submitUrl} className="mt-8 flex max-w-xl flex-col gap-3 sm:flex-row sm:items-stretch">
+            <label htmlFor="store-url" className="sr-only">
+              {c.urlLabel}
+            </label>
+            <input
+              id="store-url"
+              type="text"
+              inputMode="url"
+              autoComplete="url"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder={c.urlPlaceholder}
+              className={`h-12 flex-1 rounded-full border px-5 text-base outline-none transition-colors ${field}`}
+            />
+            <Magnetic>
+              <button type="submit" className={`${ctaClass} h-12 w-full whitespace-nowrap sm:w-auto`}>
+                {c.cta}
+              </button>
+            </Magnetic>
+          </form>
+          <p className={`${skin.muted} mt-3 max-w-xl text-sm leading-relaxed`}>{c.promise}</p>
+          <p className="mt-4 text-sm">
+            <a href={`mailto:${registry.personal.email}`} className={`${skin.accent} font-medium`}>
               {c.ctaSecondary} ›
             </a>
-          </div>
-          <p className={`${skin.muted} mt-4 max-w-xl text-sm leading-relaxed`}>{c.promise}</p>
+          </p>
           <p className="mt-6 text-sm">
             <span className="inline-flex items-center gap-2 font-medium">
               <span className="h-2 w-2 rounded-full bg-[#34c759]" aria-hidden="true" />

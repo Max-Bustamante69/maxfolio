@@ -106,6 +106,10 @@
     transform: translateX(-50%);
   }
 }
+.marquee:hover .marquee-row,
+.marquee:focus-within .marquee-row {
+  animation-play-state: paused;
+}
 @media (prefers-reduced-motion: reduce) {
   .marquee-row {
     animation: none;

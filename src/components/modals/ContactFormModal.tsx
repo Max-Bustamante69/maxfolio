@@ -1,5 +1,5 @@
 import { m, AnimatePresence } from 'framer-motion'
-import { useState, FormEvent } from 'react'
+import { useEffect, useState, FormEvent } from 'react'
 import { config } from '../../config'
 import { personal as personalInfo } from '../../data/registry'
 import { useI18n } from '../../hooks'
@@ -9,13 +9,16 @@ interface ContactFormModalProps {
   onClose: () => void
   variant?: 'luxury' | 'brutalist' | 'apple'
   isDark?: boolean
+  /** Text placed in the message field when the form opens (e.g. the store URL from the contact section). */
+  initialMessage?: string
 }
 
 export function ContactFormModal({ 
   isOpen, 
   onClose, 
   variant = 'luxury',
-  isDark = false 
+  isDark = false,
+  initialMessage,
 }: ContactFormModalProps) {
   const [formData, setFormData] = useState({
     name: '',
@@ -25,6 +28,9 @@ export function ContactFormModal({
   })
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
   const { t } = useI18n()
+  useEffect(() => {
+    if (isOpen && initialMessage) setFormData((prev) => (prev.message ? prev : { ...prev, message: initialMessage }))
+  }, [isOpen, initialMessage])
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()

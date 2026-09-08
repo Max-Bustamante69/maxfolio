@@ -16,6 +16,8 @@ export type ResultMetricId =
   | 'syncLag' // hours between supplier list and storefront (hours, lower is better)
   | 'catalog' // SKUs live (count)
   | 'redirects' // migrated URLs resolving (%)
+  | 'platform' // comparison table: platform
+  | 'design' // comparison table: design source → theme
 
 export interface ResultMetric {
   id: ResultMetricId
@@ -28,11 +30,19 @@ export interface ResultMetric {
   series?: number[]
 }
 
-export type ChartKind = 'line' | 'slope' | 'gauge' | 'bars'
+export type ChartKind = 'line' | 'slope' | 'gauge' | 'bars' | 'table'
+
+/** One row of a before/after comparison table; values are language-neutral (names, counts). */
+export interface TableRow {
+  id: ResultMetricId
+  before: string
+  after: string
+}
 
 export interface ChartSpec {
   kind: ChartKind
   metrics: ResultMetric[]
+  rows?: TableRow[]
 }
 
 export interface StoreResults {
@@ -103,7 +113,7 @@ export const results: Record<string, StoreResults> = {
   'alma-de-aviador': {
     sample: true,
     charts: [
-      { kind: 'gauge', metrics: [{ id: 'redirects', before: 0, after: 100, unit: '%' }] },
+      { kind: 'table', metrics: [], rows: [{ id: 'platform', before: 'WooCommerce', after: 'Shopify' }, { id: 'design', before: 'Framer', after: 'Liquid · 35' }, { id: 'redirects', before: '—', after: '100%' }] },
       { kind: 'bars', metrics: [{ id: 'lcp', before: 7.2, after: 2.8, unit: 's', invert: true }] },
     ],
   },

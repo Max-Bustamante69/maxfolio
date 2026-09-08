@@ -18,6 +18,7 @@ export interface PortfolioContent {
     ctaContact: string
     ctaPrimary: string
     ctaSecondary: string
+    ctaNote: string
     ctaCv: string
   }
   stats: Record<StatId, string>
@@ -42,8 +43,9 @@ export interface PortfolioContent {
     }
     now: { label: string; live: string; dev: string; band: string; local: string }
     statBand: { label: string; asOf: string }
-    process: SectionHeading & { lead: string; stepOf: string; deliverableLabel: string; steps: { title: string; body: string; deliverable: string }[] }
+    process: SectionHeading & { problemLabel: string; problem: string; fixLabel: string; fix: string; stepOf: string; deliverableLabel: string; steps: { title: string; body: string; deliverable: string }[] }
     testimonials: SectionHeading
+    faq: SectionHeading & { items: { q: string; a: string }[] }
     years: SectionHeading & { lead: string; roles: string; shipped: string; products: string; side: string; more: string; count: string }
     projects: SectionHeading & { view: string }
     skills: SectionHeading & { groups: Record<SkillGroupId, string>; narrative: Record<SkillGroupId, string> }
@@ -56,6 +58,8 @@ export interface PortfolioContent {
       ctaSecondary: string
       nextLabel: string
       next: string[]
+      urlLabel: string
+      urlPlaceholder: string
       email: string
       phone: string
       location: string
