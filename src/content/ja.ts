@@ -95,7 +95,7 @@ export const ja: PortfolioContent = {
     testimonials: { eyebrow: 'お客様の声', title: 'クライアントの', titleAccent: '言葉' },
     now: { label: '現在', live: '公開中のストア {n}', dev: '構築中 {n}', band: '納品したストア', local: 'メデジン・現地時間 {time}' },
     statBand: { label: '仕事を数字で', asOf: '2026年9月時点' },
-    years: { eyebrow: '年ごとの歩み', title: '5年間、', titleAccent: 'ひとつの方向へ', lead: '2022年のReactコンポーネントから、Shopifyストア群とその裏側のプラットフォームまで。各行はサイト全体と同じ記録から生成しています。', roles: '役割', shipped: 'ストア', products: 'プロダクト', side: '個人プロジェクト', more: '+{n}件', count: 'ストア {n}', perYear: '構築がその年に及んだストア数', eras: { '2022': 'ReactとSalesforce', '2023': '最初のShopifyストア', '2024': 'エンタープライズのフロント、そしてCTO', '2025': 'CTOと契約案件', '2026': 'ストア群とプラットフォーム' } },
+    years: { eyebrow: '年ごとの歩み', title: '5年間、', titleAccent: 'ひとつの方向へ', lead: '2022年のReactコンポーネントから、Shopifyストア群とその裏側のプラットフォームまで。各行はサイト全体と同じ記録から生成しています。', roles: '役割', shipped: 'ストア', work: 'クライアント案件', products: 'プロダクト', side: '個人プロジェクト', more: '+{n}件', count: 'ストア {n}', perYear: '構築がその年に及んだ納品物の数', eras: { '2022': 'ReactとSalesforce', '2023': '最初のShopifyストア', '2024': 'エンタープライズのフロント、そしてCTO', '2025': 'CTOと契約案件', '2026': 'ストア群とプラットフォーム' } },
     projects: { eyebrow: 'プロジェクト', title: '個人的に', titleAccent: 'つくっているもの', view: 'プロジェクトを見る' },
     skills: {
       eyebrow: 'スキル',
@@ -188,6 +188,13 @@ export const ja: PortfolioContent = {
       highlights: ['再利用可能なReactコンポーネント20以上、レスポンシブページ10以上。', 'Lighthouse 90以上、表示速度は約35%改善。'],
       metricLabels: { components: 'コンポーネント', pages: 'ページ', lighthouse: 'Lighthouse' },
     },
+  },
+  roleWork: {
+    'ibox-site': 'iBox スマートロッカーのWebサイト',
+    'orthofix-apps': 'Orthofix 社内医療アプリ',
+    'rh-migration': 'RH のCMS移行（AEM → Contentful）',
+    'abidata-newsletters': 'ABI Data ニュースレター基盤',
+    'ellamau-storefront': 'Ellamau のShopifyストア',
   },
   stores: {
     'the-gummy-box': { industry: '機能性グミ', tagline: '自社Bundlesモジュールと連携したバンドルビルダー、サブスクリプション、ファーストパーティ計測。', description: 'キットのオファーは、買う人には簡単で、悪用は不可能でなければなりませんでした。Bundlesモジュールがチェックアウト時にShopify Functionでキット価格を計算するため、10%から20%の段階割引は自動で適用され、探すクーポンはありません。サブスクはTreli、全面でファーストパーティ計測。ブランドは各ブロックの働きを把握できます。', factLabels: { ladder: 'キット割引、チェックアウトで自動適用' } },

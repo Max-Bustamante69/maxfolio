@@ -95,7 +95,7 @@ export const es: PortfolioContent = {
     testimonials: { eyebrow: 'En sus palabras', title: 'Lo que dicen', titleAccent: 'los clientes' },
     now: { label: 'Ahora', live: '{n} tiendas en vivo', dev: '{n} en construcción', band: 'Tiendas entregadas', local: 'Medellín · {time} hora local' },
     statBand: { label: 'El trabajo, en números', asOf: 'Septiembre de 2026' },
-    years: { eyebrow: 'Año por año', title: 'Cinco años,', titleAccent: 'una sola dirección', lead: 'De componentes React en 2022 a una flota de tiendas Shopify y la plataforma detrás. Cada línea sale de los mismos registros que el resto del sitio.', roles: 'Roles', shipped: 'Tiendas', products: 'Productos', side: 'En mi tiempo', more: '+{n} más', count: '{n} tiendas', perYear: 'Tiendas cuya construcción tocó el año', eras: { '2022': 'React y Salesforce', '2023': 'Primeras tiendas Shopify', '2024': 'Front enterprise, luego CTO', '2025': 'CTO y builds por contrato', '2026': 'La flota y la plataforma' } },
+    years: { eyebrow: 'Año por año', title: 'Cinco años,', titleAccent: 'una sola dirección', lead: 'De componentes React en 2022 a una flota de tiendas Shopify y la plataforma detrás. Cada línea sale de los mismos registros que el resto del sitio.', roles: 'Roles', shipped: 'Tiendas', work: 'Proyectos con clientes', products: 'Productos', side: 'En mi tiempo', more: '+{n} más', count: '{n} tiendas', perYear: 'Trabajo entregado cuya construcción tocó el año', eras: { '2022': 'React y Salesforce', '2023': 'Primeras tiendas Shopify', '2024': 'Front enterprise, luego CTO', '2025': 'CTO y builds por contrato', '2026': 'La flota y la plataforma' } },
     projects: { eyebrow: 'Proyectos', title: 'Lo que construyo', titleAccent: 'en mi tiempo', view: 'Ver proyecto' },
     skills: {
       eyebrow: 'Habilidades',
@@ -188,6 +188,13 @@ export const es: PortfolioContent = {
       highlights: ['20+ componentes React reutilizables y 10+ páginas responsivas.', 'Lighthouse 90+ y cargas ~35 % más rápidas.'],
       metricLabels: { components: 'Componentes', pages: 'Páginas', lighthouse: 'Lighthouse' },
     },
+  },
+  roleWork: {
+    'ibox-site': 'Sitio web de iBox (smart lockers)',
+    'orthofix-apps': 'Apps internas de salud para Orthofix',
+    'rh-migration': 'Migración del CMS de RH, AEM → Contentful',
+    'abidata-newsletters': 'Plataforma de newsletters de ABI Data',
+    'ellamau-storefront': 'Tienda Shopify de Ellamau',
   },
   stores: {
     'the-gummy-box': { industry: 'Gomitas funcionales', tagline: 'Armador de kits cableado a nuestro módulo de Bundles, suscripciones y tracking propio.', description: 'La oferta del kit tenía que ser simple para el comprador e imposible de trampear: el módulo de Bundles calcula el precio del kit con una Shopify Function en el checkout, así que la escalera de 10% a 20% se aplica sola y no hay cupón que buscar. Las suscripciones corren por Treli y cada superficie reporta eventos propios, así que la marca ve qué hace cada bloque.', factLabels: { ladder: 'Descuento del kit, automático en el checkout' } },

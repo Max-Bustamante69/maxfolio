@@ -95,7 +95,7 @@ export const en: PortfolioContent = {
     testimonials: { eyebrow: 'In their words', title: 'What clients', titleAccent: 'say' },
     now: { label: 'Now', live: '{n} storefronts live', dev: '{n} in development', band: 'Storefronts shipped', local: 'Medellín · {time} local' },
     statBand: { label: 'The work, in numbers', asOf: 'September 2026' },
-    years: { eyebrow: 'Year by year', title: 'Five years,', titleAccent: 'one direction', lead: 'From React components in 2022 to a fleet of Shopify stores and the platform behind them. Every line is derived from the same records as the rest of the site.', roles: 'Roles', shipped: 'Storefronts', products: 'Products', side: 'On my own time', more: '+{n} more', count: '{n} storefronts', perYear: 'Storefronts whose build touched the year', eras: { '2022': 'React and Salesforce', '2023': 'First Shopify storefronts', '2024': 'Enterprise front end, then CTO', '2025': 'CTO and contract builds', '2026': 'The fleet and the platform' } },
+    years: { eyebrow: 'Year by year', title: 'Five years,', titleAccent: 'one direction', lead: 'From React components in 2022 to a fleet of Shopify stores and the platform behind them. Every line is derived from the same records as the rest of the site.', roles: 'Roles', shipped: 'Storefronts', work: 'Client projects', products: 'Products', side: 'On my own time', more: '+{n} more', count: '{n} storefronts', perYear: 'Shipped work whose build touched the year', eras: { '2022': 'React and Salesforce', '2023': 'First Shopify storefronts', '2024': 'Enterprise front end, then CTO', '2025': 'CTO and contract builds', '2026': 'The fleet and the platform' } },
     projects: { eyebrow: 'Projects', title: 'Things I build', titleAccent: 'on my own time', view: 'View project' },
     skills: {
       eyebrow: 'Skills',
@@ -188,6 +188,13 @@ export const en: PortfolioContent = {
       highlights: ['20+ reusable React components and 10+ responsive pages.', 'Lighthouse 90+ and ~35% faster loads.'],
       metricLabels: { components: 'Components', pages: 'Pages', lighthouse: 'Lighthouse' },
     },
+  },
+  roleWork: {
+    'ibox-site': 'iBox smart-locker website',
+    'orthofix-apps': 'Orthofix internal healthcare apps',
+    'rh-migration': 'RH CMS migration, AEM → Contentful',
+    'abidata-newsletters': 'ABI Data newsletter platform',
+    'ellamau-storefront': 'Ellamau Shopify storefront',
   },
   stores: {
     'the-gummy-box': { industry: 'Functional gummies', tagline: 'Bundle builder wired to our Bundles module, subscriptions, first-party tracking.', description: 'The kit offer had to be simple for the shopper and impossible to game: the Bundles module prices the kit through a Shopify Function at checkout, so the 10% to 20% ladder applies by itself and there is no coupon to find. Subscriptions run through Treli and every surface reports first-party events, so the brand sees what each block does.', factLabels: { ladder: 'Bundle discount, automatic at checkout' } },

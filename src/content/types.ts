@@ -1,4 +1,4 @@
-import type { ExperienceId, StatId, SkillGroupId, StoreRole } from '../data/registry'
+import type { ExperienceId, RoleWorkId, StatId, SkillGroupId, StoreRole } from '../data/registry'
 import type { ResultMetricId } from '../data/results'
 
 interface SectionHeading {
@@ -47,7 +47,7 @@ export interface PortfolioContent {
     testimonials: SectionHeading
     faq: SectionHeading & { items: { q: string; a: string }[] }
     manifesto: { label: string; lines: string[] }
-    years: SectionHeading & { lead: string; roles: string; shipped: string; products: string; side: string; more: string; count: string; perYear: string; eras: Record<string, string> }
+    years: SectionHeading & { lead: string; roles: string; shipped: string; work: string; products: string; side: string; more: string; count: string; perYear: string; eras: Record<string, string> }
     projects: SectionHeading & { view: string }
     skills: SectionHeading & { groups: Record<SkillGroupId, string>; narrative: Record<SkillGroupId, string>; usageLabel: string; usageUnit: string; usageNote: string; usageItems: Record<string, string> }
     contact: SectionHeading & {
@@ -74,6 +74,7 @@ export interface PortfolioContent {
     ExperienceId,
     { title: string; summary: string; highlights: string[]; metricLabels: Record<string, string> }
   >
+  roleWork: Record<RoleWorkId, string>
   stores: Record<string, { industry: string; tagline: string; description: string; factLabels?: Record<string, string> }>
   products: Record<string, { tagline: string; description: string }>
   projects: Record<string, { tagline: string; description: string }>

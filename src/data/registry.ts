@@ -216,6 +216,24 @@ export const products: ProductEntry[] = [
   { id: 'track', name: 'Digitdeck Track', year: 2026, stack: ['TypeScript', 'data-dd-* contract', 'First-party events'], gallery: false },
 ]
 
+/** A named deliverable inside a role: the project a year would otherwise hide behind a job title. Labels live in content. */
+export type RoleWorkId = 'ibox-site' | 'orthofix-apps' | 'rh-migration' | 'abidata-newsletters' | 'ellamau-storefront'
+
+export interface RoleWork {
+  id: RoleWorkId
+  role: ExperienceId
+  timeline: { start: string; end: string } // YYYY-MM, the same window rule as storefronts
+  stack: string[]
+}
+
+export const roleWork: RoleWork[] = [
+  { id: 'ibox-site', role: 'ibox', timeline: { start: '2022-01', end: '2022-07' }, stack: ['React', '20+ components', '10+ pages'] },
+  { id: 'orthofix-apps', role: 'orthofix', timeline: { start: '2022-09', end: '2022-12' }, stack: ['Salesforce', 'Lightning Web Components'] },
+  { id: 'rh-migration', role: 'rh', timeline: { start: '2024-02', end: '2025-01' }, stack: ['Adobe AEM → Contentful', 'React', '25+ components'] },
+  { id: 'abidata-newsletters', role: 'abidata', timeline: { start: '2025-02', end: '2025-10' }, stack: ['React', 'REST APIs', 'Email editor'] },
+  { id: 'ellamau-storefront', role: 'ellamau', timeline: { start: '2025-11', end: '2026-01' }, stack: ['Liquid', '15+ templates', 'Lighthouse 90+'] },
+]
+
 export interface PersonalProject {
   id: string
   name: string
