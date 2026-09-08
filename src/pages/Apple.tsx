@@ -197,12 +197,8 @@ function AppleContent() {
             </h1>
             <p className={`mx-auto mt-5 max-w-2xl text-xl md:text-2xl ${muted} leading-snug tracking-[-0.01em]`}>{c.hero.positioning}</p>
             <p className="mx-auto mt-6 max-w-2xl text-base md:text-lg leading-relaxed">{c.hero.lead}</p>
-            <m.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.5, ease: EASE }}
-              className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6"
-            >
+            {/* Static (no entrance): index.html carries the same hero markup before React mounts, so an entrance fade would flash. */}
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
               <Magnetic>
                 <button type="button" onClick={() => openContact()} className={primaryBtn}>
                   {c.hero.ctaPrimary}
@@ -214,16 +210,9 @@ function AppleContent() {
               <a href={registry.personal.cv} download className={`${muted} text-sm font-medium`}>
                 {c.hero.ctaCv} ›
               </a>
-            </m.div>
-            <m.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5, duration: 0.5 }} className={`${muted} mt-4 text-xs`}>
-              {c.hero.ctaNote}
-            </m.p>
-            <m.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.55, duration: 0.5 }}
-              className="mt-6 flex flex-wrap items-center justify-center gap-2 text-xs"
-            >
+            </div>
+            <p className={`${muted} mt-4 text-xs`}>{c.hero.ctaNote}</p>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-2 text-xs">
               <span className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 font-medium ${tile}`}>
                 <span className="w-2 h-2 rounded-full bg-[#34c759]" aria-hidden="true" />
                 {c.hero.availability}
@@ -232,7 +221,7 @@ function AppleContent() {
                 {Icon.globe}
                 {c.hero.location}
               </span>
-            </m.div>
+            </div>
           </section>
 
           {/* Stat band — numerals on hairlines */}

@@ -116,7 +116,58 @@
     <!-- Skip to main content link for accessibility -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <div id="root"></div>
+    <div id="root">
+      <!-- Static hero shell: the same nodes React renders first, so the largest paint does not wait for the bundle.
+           React's first commit replaces it; the inline script below localizes it and applies a saved dark theme. -->
+      <div class="theme-apple min-h-screen font-sf bg-apple-bg text-apple-text [overflow-x:clip]" data-shell>
+        <div class="fixed top-0 inset-x-0 z-40 h-11 bg-white/70 backdrop-blur-xl border-b border-black/5" aria-hidden="true"></div>
+        <main class="pt-11">
+          <section class="px-4 pt-20 md:pt-28 pb-14 md:pb-20 text-center">
+            <p class="text-sm font-semibold text-apple-blue" data-t="eyebrow">CTO &amp; Shopify Tech Lead · Digitdeck</p>
+            <h1 class="mx-auto mt-4 max-w-4xl text-5xl md:text-7xl lg:text-[84px] font-semibold tracking-[-0.03em] leading-[1.02]">Maximiliano Bustamante</h1>
+            <p class="mx-auto mt-5 max-w-2xl text-xl md:text-2xl text-apple-muted leading-snug tracking-[-0.01em]" data-t="positioning">Your Shopify store has traffic. I find where it stops turning into orders.</p>
+            <p class="mx-auto mt-6 max-w-2xl text-base md:text-lg leading-relaxed" data-t="lead">18+ storefronts, a multi-tenant app suite and a QA harness that catches what a launch would have broken. You get Shopify engineering that is measured: what moved, why, and what to do next.</p>
+            <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+              <span class="inline-flex"><a href="#contact" class="press inline-flex items-center justify-center rounded-full bg-apple-blue px-6 py-3 text-sm font-medium text-white" data-t="ctaPrimary">Get a free 20-minute store review</a></span>
+              <a href="#shopify" class="text-apple-blue inline-flex items-center gap-1.5 text-sm font-medium" data-t="ctaSecondary">See the 18+ storefronts ↓</a>
+              <a href="/Maximiliano-Bustamante-CV.pdf" download class="text-apple-muted text-sm font-medium" data-t="ctaCv">Download CV ›</a>
+            </div>
+            <p class="text-apple-muted mt-4 text-xs" data-t="ctaNote">No pitch, no contract. Just where the store leaks and what to fix first.</p>
+            <div class="mt-6 flex flex-wrap items-center justify-center gap-2 text-xs">
+              <span class="inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 font-medium bg-white shadow-tile" data-pill><span class="w-2 h-2 rounded-full bg-[#34c759]"></span><span data-t="availability">Open for Shopify CRO consulting and quotes</span></span>
+              <span class="inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 bg-white shadow-tile text-apple-muted" data-pill><span data-t="location">Based in Medellín, working with US and LATAM brands</span></span>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+    <script>
+      (function () {
+        try {
+          var L = {
+            es: { eyebrow: 'CTO & Shopify Tech Lead · Digitdeck', positioning: 'Tu tienda Shopify tiene tráfico. Yo encuentro dónde deja de convertirse en pedidos.', lead: '18+ tiendas, una suite de apps multi-tenant y un arnés de QA que atrapa lo que un lanzamiento habría roto. Recibes ingeniería Shopify medida: qué se movió, por qué y qué sigue.', ctaPrimary: 'Pide tu revisión gratis de 20 minutos', ctaSecondary: 'Ver las 18+ tiendas ↓', ctaCv: 'Descargar CV ›', ctaNote: 'Sin discurso de venta ni contrato. Solo dónde se fuga la tienda y qué arreglar primero.', availability: 'Disponible para consultoría CRO en Shopify y cotizaciones', location: 'Desde Medellín, para marcas de EE. UU. y Latinoamérica' },
+            ja: { eyebrow: 'CTO & Shopify Tech Lead · Digitdeck', positioning: 'アクセスはあるのに、注文につながらない。その原因を突き止めます。', lead: '18以上のストア、マルチテナントのアプリ群、リリース前に不具合を捕まえるQAハーネス。計測に基づくShopifyエンジニアリング：何が動き、なぜ動き、次に何をするかまで。', ctaPrimary: '無料20分のストア診断を受ける', ctaSecondary: '18店舗以上の実績を見る ↓', ctaCv: 'CVをダウンロード ›', ctaNote: '売り込みも契約も不要。売上が漏れている箇所と、最初に直す点だけをお伝えします。', availability: 'Shopify CROコンサルティング・お見積り受付中', location: 'メデジン拠点、米国・中南米のブランドと協業' }
+          };
+          var saved = localStorage.getItem('lang');
+          var nav = (navigator.language || '').toLowerCase();
+          var lang = saved || (nav.indexOf('es') === 0 ? 'es' : nav.indexOf('ja') === 0 ? 'ja' : 'en');
+          var s = L[lang];
+          if (s) {
+            document.documentElement.lang = lang;
+            var nodes = document.querySelectorAll('#root [data-t]');
+            for (var i = 0; i < nodes.length; i++) { var v = s[nodes[i].getAttribute('data-t')]; if (v) nodes[i].textContent = v; }
+          }
+          if (localStorage.getItem('apple-theme') === 'dark') {
+            var r = document.querySelector('#root [data-shell]');
+            if (r) { r.classList.remove('bg-apple-bg', 'text-apple-text'); r.classList.add('bg-apple-dark', 'text-apple-darkText'); }
+            var bar = document.querySelector('#root [data-shell] > div');
+            if (bar) { bar.classList.remove('bg-white/70', 'border-black/5'); bar.classList.add('bg-black/70', 'border-white/10'); }
+            var pills = document.querySelectorAll('#root [data-pill]');
+            for (var k = 0; k < pills.length; k++) { pills[k].classList.remove('bg-white', 'shadow-tile'); pills[k].classList.add('bg-white/5'); }
+          }
+        } catch (e) {}
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
 
     <!-- Inline critical CSS for skip link -->

@@ -79,7 +79,7 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
       <span className={`${skin.chip} mt-1.5 inline-flex items-center gap-1.5`}>
         <span className={`font-semibold tabular-nums ${good ? goodText(skin.dark) : badText(skin.dark)}`}>{d >= 0 ? '+' : '−'}{Math.abs(d)}%</span>
         <span>{cs.metric[lead.id]}</span>
-        {story.sample && <span className="opacity-60">· {cs.sampleBadge}</span>}
+        {story.sample && <span className={skin.muted}>· {cs.sampleBadge}</span>}
       </span>
     )
   }
