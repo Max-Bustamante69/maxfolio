@@ -94,13 +94,17 @@ export const en: PortfolioContent = {
     testimonials: { eyebrow: 'In their words', title: 'What clients', titleAccent: 'say' },
     now: { label: 'Now', live: '{n} storefronts live', dev: '{n} in development', band: 'Storefronts shipped', local: 'Medellín · {time} local' },
     statBand: { label: 'The work, in numbers', asOf: 'September 2026' },
-    years: { eyebrow: 'Year by year', title: 'Five years,', titleAccent: 'one direction', lead: 'From React components in 2022 to a fleet of Shopify stores and the platform behind them. Every line is derived from the same records as the rest of the site.', roles: 'Roles', shipped: 'Storefronts', products: 'Products', side: 'On my own time', more: '+{n} more', count: '{n} storefronts' },
+    years: { eyebrow: 'Year by year', title: 'Five years,', titleAccent: 'one direction', lead: 'From React components in 2022 to a fleet of Shopify stores and the platform behind them. Every line is derived from the same records as the rest of the site.', roles: 'Roles', shipped: 'Storefronts', products: 'Products', side: 'On my own time', more: '+{n} more', count: '{n} storefronts', perYear: 'Storefronts whose build touched the year', eras: { '2022': 'React and Salesforce', '2023': 'First Shopify storefronts', '2024': 'Enterprise front end, then CTO', '2025': 'CTO and contract builds', '2026': 'The fleet and the platform' } },
     projects: { eyebrow: 'Projects', title: 'Things I build', titleAccent: 'on my own time', view: 'View project' },
     skills: {
       eyebrow: 'Skills',
       title: 'What I',
       titleAccent: 'work with',
       groups: { shopify: 'Shopify', frontend: 'Frontend', backend: 'Backend', quality: 'Testing & CI/CD', cro: 'CRO & analytics', ai: 'AI engineering' },
+      usageLabel: 'Across the fleet',
+      usageUnit: 'stores',
+      usageNote: 'Counted from the {n} storefronts in the index above, not estimated.',
+      usageItems: { liquid: 'Liquid themes', react: 'React islands', framer: 'Framer → Liquid ports', tailwind: 'Tailwind', metaobjects: 'Metaobjects', tracking: 'First-party tracking', bundles: 'Bundles', quiz: 'Product quizzes', reviews: 'Review walls', migration: 'Platform migrations' },
       narrative: {
         shopify: 'Storefronts and apps ship on {skills}.',
         frontend: 'The front end runs on {skills}.',

@@ -46,9 +46,9 @@ export interface PortfolioContent {
     process: SectionHeading & { problemLabel: string; problem: string; fixLabel: string; fix: string; stepOf: string; deliverableLabel: string; steps: { title: string; body: string; deliverable: string }[] }
     testimonials: SectionHeading
     faq: SectionHeading & { items: { q: string; a: string }[] }
-    years: SectionHeading & { lead: string; roles: string; shipped: string; products: string; side: string; more: string; count: string }
+    years: SectionHeading & { lead: string; roles: string; shipped: string; products: string; side: string; more: string; count: string; perYear: string; eras: Record<string, string> }
     projects: SectionHeading & { view: string }
-    skills: SectionHeading & { groups: Record<SkillGroupId, string>; narrative: Record<SkillGroupId, string> }
+    skills: SectionHeading & { groups: Record<SkillGroupId, string>; narrative: Record<SkillGroupId, string>; usageLabel: string; usageUnit: string; usageNote: string; usageItems: Record<string, string> }
     contact: SectionHeading & {
       lead: string
       promise: string

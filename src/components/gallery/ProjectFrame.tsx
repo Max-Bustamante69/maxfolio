@@ -1,5 +1,5 @@
-import { useState, type MouseEvent } from 'react'
-import { m, useMotionTemplate, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion'
+import { useEffect, useRef, useState, type MouseEvent } from 'react'
+import { m, useMotionTemplate, useMotionValue, useReducedMotion, useSpring, useTransform, useInView } from 'framer-motion'
 import type { Skin } from './skins'
 import { LaptopFrame, PhoneFrame } from './DeviceFrame'
 
@@ -69,6 +69,18 @@ const SETTLE = { type: 'spring', duration: 0.5, bounce: 0.12 } as const
 export function ProjectFrame({ name, shots, skin, onOpen, alt, variant = 'composite', cta }: ProjectFrameProps) {
   const [hover, setHover] = useState(false)
   const reduced = useReducedMotion()
+  // Touch has no hover: while the frame is in view, it crossfades home → product page on its own.
+  const [auto, setAuto] = useState(false)
+  const rootRef = useRef<HTMLButtonElement>(null)
+  const inView = useInView(rootRef, { amount: 0.6 })
+  useEffect(() => {
+    if (reduced || !inView || !window.matchMedia('(hover: none)').matches) {
+      setAuto(false)
+      return
+    }
+    const id = window.setInterval(() => setAuto((v) => !v), 3200)
+    return () => window.clearInterval(id)
+  }, [inView, reduced])
   // pointer position inside the card, 0..1 — springs so the tilt lags the cursor like a physical object
   const px = useMotionValue(0.5)
   const py = useMotionValue(0.5)
@@ -118,9 +130,9 @@ export function ProjectFrame({ name, shots, skin, onOpen, alt, variant = 'compos
 
   if (variant === 'phone') {
     return (
-      <button type="button" onClick={onOpen} {...bind} className="group relative block w-full px-[4%] text-left" aria-label={cta ? `${cta} · ${name}` : `${name}: ${alt}`}>
+      <button type="button" ref={rootRef} onClick={onOpen} {...bind} className="group relative block w-full px-[4%] text-left" aria-label={cta ? `${cta} · ${name}` : `${name}: ${alt}`}>
         <PhoneFrame>
-          <Crossfade base={shots.homeMobile} over={shots.pdpMobile} alt={alt} hover={hover} label="home, mobile" />
+          <Crossfade base={shots.homeMobile} over={shots.pdpMobile} alt={alt} hover={hover || auto} label="home, mobile" />
         </PhoneFrame>
       </button>
     )
@@ -128,10 +140,10 @@ export function ProjectFrame({ name, shots, skin, onOpen, alt, variant = 'compos
 
   if (variant === 'laptop') {
     return (
-      <button type="button" onClick={onOpen} {...bind} className="group relative block w-full text-left" aria-label={cta ? `${cta} · ${name}` : `${name}: ${alt}`} style={{ perspective: 1200 }}>
+      <button type="button" ref={rootRef} onClick={onOpen} {...bind} className="group relative block w-full text-left" aria-label={cta ? `${cta} · ${name}` : `${name}: ${alt}`} style={{ perspective: 1200 }}>
         <m.div style={{ ...tilt, transformStyle: 'preserve-3d' }} animate={{ scale: lift ? 1.025 : 1 }} transition={SETTLE} className="relative will-change-transform">
           <LaptopFrame>
-            <Crossfade base={shots.homeDesktop} over={shots.pdpDesktop} alt={alt} hover={hover} label="home, desktop" />
+            <Crossfade base={shots.homeDesktop} over={shots.pdpDesktop} alt={alt} hover={hover || auto} label="home, desktop" />
             <Glare />
           </LaptopFrame>
           {cta && <Invite text={cta} skin={skin} />}
@@ -142,10 +154,10 @@ export function ProjectFrame({ name, shots, skin, onOpen, alt, variant = 'compos
   }
 
   return (
-    <button type="button" onClick={onOpen} {...bind} className="group relative block w-full pb-[9%] pr-[3%] text-left" aria-label={cta ? `${cta} · ${name}` : `${name}: ${alt}`} style={{ perspective: 1200 }}>
+    <button type="button" ref={rootRef} onClick={onOpen} {...bind} className="group relative block w-full pb-[9%] pr-[3%] text-left" aria-label={cta ? `${cta} · ${name}` : `${name}: ${alt}`} style={{ perspective: 1200 }}>
       <m.div style={{ ...tilt, transformStyle: 'preserve-3d' }} animate={{ scale: lift ? 1.03 : 1 }} transition={SETTLE} className="relative will-change-transform">
         <LaptopFrame>
-          <Crossfade base={shots.homeDesktop} over={shots.pdpDesktop} alt={alt} hover={hover} label="home, desktop" />
+          <Crossfade base={shots.homeDesktop} over={shots.pdpDesktop} alt={alt} hover={hover || auto} label="home, desktop" />
           <Glare />
         </LaptopFrame>
         {cta && <Invite text={cta} skin={skin} />}
@@ -157,7 +169,7 @@ export function ProjectFrame({ name, shots, skin, onOpen, alt, variant = 'compos
           transition={SETTLE}
         >
           <PhoneFrame>
-            <Crossfade base={shots.homeMobile} over={shots.pdpMobile} alt={alt} hover={hover} label="home, mobile" />
+            <Crossfade base={shots.homeMobile} over={shots.pdpMobile} alt={alt} hover={hover || auto} label="home, mobile" />
           </PhoneFrame>
         </m.div>
       </m.div>

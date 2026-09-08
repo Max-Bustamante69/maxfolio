@@ -94,13 +94,17 @@ export const es: PortfolioContent = {
     testimonials: { eyebrow: 'En sus palabras', title: 'Lo que dicen', titleAccent: 'los clientes' },
     now: { label: 'Ahora', live: '{n} tiendas en vivo', dev: '{n} en construcción', band: 'Tiendas entregadas', local: 'Medellín · {time} hora local' },
     statBand: { label: 'El trabajo, en números', asOf: 'Septiembre de 2026' },
-    years: { eyebrow: 'Año por año', title: 'Cinco años,', titleAccent: 'una sola dirección', lead: 'De componentes React en 2022 a una flota de tiendas Shopify y la plataforma detrás. Cada línea sale de los mismos registros que el resto del sitio.', roles: 'Roles', shipped: 'Tiendas', products: 'Productos', side: 'En mi tiempo', more: '+{n} más', count: '{n} tiendas' },
+    years: { eyebrow: 'Año por año', title: 'Cinco años,', titleAccent: 'una sola dirección', lead: 'De componentes React en 2022 a una flota de tiendas Shopify y la plataforma detrás. Cada línea sale de los mismos registros que el resto del sitio.', roles: 'Roles', shipped: 'Tiendas', products: 'Productos', side: 'En mi tiempo', more: '+{n} más', count: '{n} tiendas', perYear: 'Tiendas cuya construcción tocó el año', eras: { '2022': 'React y Salesforce', '2023': 'Primeras tiendas Shopify', '2024': 'Front enterprise, luego CTO', '2025': 'CTO y builds por contrato', '2026': 'La flota y la plataforma' } },
     projects: { eyebrow: 'Proyectos', title: 'Lo que construyo', titleAccent: 'en mi tiempo', view: 'Ver proyecto' },
     skills: {
       eyebrow: 'Habilidades',
       title: 'Con qué',
       titleAccent: 'trabajo',
       groups: { shopify: 'Shopify', frontend: 'Frontend', backend: 'Backend', quality: 'Pruebas y CI/CD', cro: 'CRO y analítica', ai: 'Ingeniería con IA' },
+      usageLabel: 'En toda la flota',
+      usageUnit: 'tiendas',
+      usageNote: 'Contado sobre las {n} tiendas del índice de arriba, no estimado.',
+      usageItems: { liquid: 'Temas Liquid', react: 'Islas React', framer: 'Ports Framer → Liquid', tailwind: 'Tailwind', metaobjects: 'Metaobjetos', tracking: 'Tracking propio', bundles: 'Bundles', quiz: 'Quizzes de producto', reviews: 'Muros de reseñas', migration: 'Migraciones de plataforma' },
       narrative: {
         shopify: 'Las tiendas y las apps salen con {skills}.',
         frontend: 'El front corre sobre {skills}.',

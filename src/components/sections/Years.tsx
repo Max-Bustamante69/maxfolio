@@ -14,10 +14,10 @@ interface YearsProps {
 const EASE = [0.23, 1, 0.32, 1] as const
 
 /**
- * The career as an editorial timeline derived from the registry. Desktop: one hairline row per year,
- * the numeral set large on the left, roles / storefronts / products / side projects as sentences on
- * the right. Phones: the same records as a year scrubber (chips) with one panel, so five years cost
- * one screen instead of five.
+ * The career as an editorial timeline derived from the registry, opened by a small real chart
+ * (storefronts whose build touched each year). Desktop: one hairline row per year, the numeral and
+ * its era on the left, roles / storefronts / products / side projects as sentences on the right.
+ * Phones: the same records as a year scrubber with one panel, so five years cost one screen.
  */
 export function Years({ skin, heading }: YearsProps) {
   const { strings, formatPeriod } = useContent()
@@ -28,6 +28,8 @@ export function Years({ skin, heading }: YearsProps) {
   const [picked, setPicked] = useState(years[0].year)
   const dot = (s: YearEntry['stores'][number]) => (s.status === 'live' ? 'bg-[#34c759]' : 'bg-[#ff9f0a]')
   const label = `text-[11px] font-semibold uppercase tracking-[0.18em] ${skin.muted}`
+  const track = skin.dark ? 'bg-white/10' : 'bg-black/[0.06]'
+  const maxStores = Math.max(1, ...timeline.map((e) => e.stores.length))
 
   const Names = ({ items }: { items: { key: string; name: string; dot?: string }[] }) => (
     <p className="text-base leading-relaxed md:text-lg">
@@ -39,6 +41,33 @@ export function Years({ skin, heading }: YearsProps) {
         </span>
       ))}
     </p>
+  )
+
+  /** Storefronts per year as a row of bars — a real count, the same records as the list below. */
+  const PerYear = () => (
+    <figure className="m-0 mb-10 max-w-xl md:mb-14">
+      <div className="flex items-baseline justify-between gap-4">
+        <figcaption className={label}>{y.perYear}</figcaption>
+      </div>
+      <div className="mt-3 grid gap-3" style={{ gridTemplateColumns: `repeat(${timeline.length}, minmax(0, 1fr))` }} role="img" aria-label={timeline.map((e) => `${e.year}: ${e.stores.length}`).join(', ')}>
+        {timeline.map((e, i) => (
+          <div key={e.year} className="flex flex-col justify-end">
+            <p className="mb-1 text-sm font-semibold tabular-nums">{e.stores.length}</p>
+            <div className={`h-16 overflow-hidden rounded-[3px] ${track}`}>
+              <m.div
+                className={`h-full w-full rounded-[3px] ${skin.accentBg}`}
+                initial={reduced ? false : { scaleY: 0 }}
+                whileInView={{ scaleY: 1 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.8, delay: 0.1 + i * 0.08, ease: EASE }}
+                style={{ transformOrigin: 'bottom', height: `${Math.max(3, (e.stores.length / maxStores) * 100)}%`, marginTop: 'auto' }}
+              />
+            </div>
+            <p className={`${skin.muted} mt-1.5 text-xs tabular-nums`}>{e.year}</p>
+          </div>
+        ))}
+      </div>
+    </figure>
   )
 
   const Body = ({ entry }: { entry: YearEntry }) => (
@@ -91,6 +120,7 @@ export function Years({ skin, heading }: YearsProps) {
   return (
     <section id="years" className="scroll-mt-20">
       {heading(y.eyebrow, y.title, y.titleAccent, y.lead)}
+      <PerYear />
 
       {wide ? (
         <ol className={`border-t ${skin.line}`}>
@@ -107,7 +137,7 @@ export function Years({ skin, heading }: YearsProps) {
                 <p className="font-sf text-6xl font-semibold leading-none tracking-[-0.05em] tabular-nums md:text-7xl">
                   <RevealText text={String(entry.year)} />
                 </p>
-                {entry.stores.length > 0 && <p className={`${skin.muted} mt-3 text-sm`}>{y.count.replace('{n}', String(entry.stores.length))}</p>}
+                {y.eras[String(entry.year)] && <p className={`${skin.accent} mt-3 text-sm font-medium`}>{y.eras[String(entry.year)]}</p>}
               </div>
               <div className="md:col-span-9">
                 <Body entry={entry} />
@@ -141,6 +171,7 @@ export function Years({ skin, heading }: YearsProps) {
           </div>
           <AnimatePresence mode="wait" initial={false}>
             <m.div key={picked} role="tabpanel" className="pt-6" initial={reduced ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, transition: { duration: 0.1 } }} transition={{ duration: 0.28, ease: EASE }}>
+              {y.eras[String(picked)] && <p className={`${skin.accent} mb-5 text-sm font-medium`}>{y.eras[String(picked)]}</p>}
               <Body entry={years.find((e) => e.year === picked) ?? years[0]} />
             </m.div>
           </AnimatePresence>

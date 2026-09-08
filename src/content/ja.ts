@@ -94,13 +94,17 @@ export const ja: PortfolioContent = {
     testimonials: { eyebrow: 'お客様の声', title: 'クライアントの', titleAccent: '言葉' },
     now: { label: '現在', live: '公開中のストア {n}', dev: '構築中 {n}', band: '納品したストア', local: 'メデジン・現地時間 {time}' },
     statBand: { label: '仕事を数字で', asOf: '2026年9月時点' },
-    years: { eyebrow: '年ごとの歩み', title: '5年間、', titleAccent: 'ひとつの方向へ', lead: '2022年のReactコンポーネントから、Shopifyストア群とその裏側のプラットフォームまで。各行はサイト全体と同じ記録から生成しています。', roles: '役割', shipped: 'ストア', products: 'プロダクト', side: '個人プロジェクト', more: '+{n}件', count: 'ストア {n}' },
+    years: { eyebrow: '年ごとの歩み', title: '5年間、', titleAccent: 'ひとつの方向へ', lead: '2022年のReactコンポーネントから、Shopifyストア群とその裏側のプラットフォームまで。各行はサイト全体と同じ記録から生成しています。', roles: '役割', shipped: 'ストア', products: 'プロダクト', side: '個人プロジェクト', more: '+{n}件', count: 'ストア {n}', perYear: '構築がその年に及んだストア数', eras: { '2022': 'ReactとSalesforce', '2023': '最初のShopifyストア', '2024': 'エンタープライズのフロント、そしてCTO', '2025': 'CTOと契約案件', '2026': 'ストア群とプラットフォーム' } },
     projects: { eyebrow: 'プロジェクト', title: '個人的に', titleAccent: 'つくっているもの', view: 'プロジェクトを見る' },
     skills: {
       eyebrow: 'スキル',
       title: '使っている',
       titleAccent: '技術',
       groups: { shopify: 'Shopify', frontend: 'フロントエンド', backend: 'バックエンド', quality: 'テストとCI/CD', cro: 'CROと分析', ai: 'AIエンジニアリング' },
+      usageLabel: 'ストア全体での使用',
+      usageUnit: '店舗',
+      usageNote: '上の索引にある{n}店舗から集計した実数です。推定ではありません。',
+      usageItems: { liquid: 'Liquidテーマ', react: 'Reactアイランド', framer: 'Framer → Liquid移植', tailwind: 'Tailwind', metaobjects: 'メタオブジェクト', tracking: 'ファーストパーティ計測', bundles: 'バンドル', quiz: '商品診断クイズ', reviews: 'レビューウォール', migration: 'プラットフォーム移行' },
       narrative: {
         shopify: 'ストアとアプリは {skills} で出荷します。',
         frontend: 'フロントエンドは {skills}。',
