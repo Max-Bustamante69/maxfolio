@@ -41,3 +41,7 @@ skills/
 
 # gallery capture scratch
 scripts/.capture-cache/
+
+# Private job search artifacts (never publish)
+docs/linkedin/2026-09-job-shortlist*
+docs/linkedin/2026-09-warm-contacts*
