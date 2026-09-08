@@ -55,6 +55,7 @@ export const es: PortfolioContent = {
       desktop: 'Escritorio',
       mobile: 'Móvil',
     },
+    years: { eyebrow: 'Año por año', title: 'Cinco años,', titleAccent: 'una sola dirección', lead: 'De componentes React en 2022 a una flota de tiendas Shopify y la plataforma detrás. Cada tarjeta sale de los mismos registros que el resto del sitio.', roles: 'Roles', shipped: 'Tiendas', products: 'Productos', side: 'En mi tiempo', more: '+{n} más' },
     projects: { eyebrow: 'Proyectos', title: 'Lo que construyo', titleAccent: 'en mi tiempo', view: 'Ver proyecto' },
     skills: {
       eyebrow: 'Habilidades',

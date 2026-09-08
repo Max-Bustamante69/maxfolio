@@ -55,6 +55,7 @@ export const ja: PortfolioContent = {
       desktop: 'デスクトップ',
       mobile: 'モバイル',
     },
+    years: { eyebrow: '年ごとの歩み', title: '5年間、', titleAccent: 'ひとつの方向へ', lead: '2022年のReactコンポーネントから、Shopifyストア群とその裏側のプラットフォームまで。各カードはサイト全体と同じ記録から生成しています。', roles: '役割', shipped: 'ストア', products: 'プロダクト', side: '個人プロジェクト', more: '+{n}件' },
     projects: { eyebrow: 'プロジェクト', title: '個人的に', titleAccent: 'つくっているもの', view: 'プロジェクトを見る' },
     skills: {
       eyebrow: 'スキル',

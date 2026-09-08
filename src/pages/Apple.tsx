@@ -9,6 +9,7 @@ import {
   LogoSelectorApple,
   ShopifyWork,
   Gallery,
+  Years,
   CompanyLogo,
   TransitionLink,
   MenuPreview,
@@ -275,8 +276,15 @@ function AppleContent() {
             </div>
           </section>
 
-          {/* Shopify work */}
+          {/* Year by year */}
           <section className="px-4 py-20 md:py-28">
+            <div className="max-w-5xl mx-auto">
+              <Years skin={skin} heading={Heading} />
+            </div>
+          </section>
+
+          {/* Shopify work */}
+          <section className={`px-4 py-20 md:py-28 ${surface}`}>
             <div className="max-w-5xl mx-auto">
               <ShopifyWork skin={skin} heading={Heading} />
             </div>

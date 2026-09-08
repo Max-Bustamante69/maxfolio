@@ -36,6 +36,7 @@ export interface PortfolioContent {
       desktop: string
       mobile: string
     }
+    years: SectionHeading & { lead: string; roles: string; shipped: string; products: string; side: string; more: string }
     projects: SectionHeading & { view: string }
     skills: SectionHeading & { groups: Record<SkillGroupId, string> }
     contact: SectionHeading & {
