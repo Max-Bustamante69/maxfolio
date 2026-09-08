@@ -38,6 +38,8 @@ export interface Skin {
   badgeDev: string
   rowHover: string // list rows in Shopify Work
   divider: string // divide-y color for those rows
+  line: string // hairline border color (editorial rows, stat bands, timelines)
+  accentBg: string // accent as a background (indicators, dots, progress)
 }
 
 export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
@@ -56,6 +58,8 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     badgeDev: d ? 'bg-[#ff9f0a]/20 text-[#ffbf4d]' : 'bg-[#ff9f0a]/15 text-[#8a5300]',
     rowHover: d ? 'hover:bg-white/[0.03]' : 'hover:bg-black/[0.02]',
     divider: d ? 'divide-white/10 border-white/10' : 'divide-black/10 border-black/10',
+    line: d ? 'border-white/10' : 'border-black/10',
+    accentBg: d ? 'bg-[#2997ff]' : 'bg-[#0066cc]',
   }),
   luxury: (d) => ({
     frame: 'luxury',
@@ -71,6 +75,8 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     badgeDev: `border ${d ? 'border-deco-gold text-deco-gold' : 'border-luxury-gold text-luxury-gold'}`,
     rowHover: d ? 'hover:bg-deco-gold/5' : 'hover:bg-luxury-gold/5',
     divider: d ? 'divide-deco-gold/20 border-deco-gold/20' : 'divide-luxury-black/10 border-luxury-black/10',
+    line: d ? 'border-deco-gold/20' : 'border-luxury-black/10',
+    accentBg: d ? 'bg-deco-gold' : 'bg-luxury-gold',
   }),
   brutalist: (d) => ({
     frame: 'brutalist',
@@ -86,5 +92,7 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     badgeDev: 'border-2 border-red-600 text-red-600 font-mono uppercase',
     rowHover: d ? 'hover:bg-stone-800/60' : 'hover:bg-stone-200/60',
     divider: d ? 'divide-stone-700 border-stone-700' : 'divide-stone-900 border-stone-900',
+    line: d ? 'border-stone-700' : 'border-stone-900',
+    accentBg: 'bg-red-600',
   }),
 }

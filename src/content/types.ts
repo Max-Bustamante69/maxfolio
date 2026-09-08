@@ -1,4 +1,5 @@
 import type { ExperienceId, StatId, SkillGroupId, StoreRole } from '../data/registry'
+import type { ResultMetricId } from '../data/results'
 
 interface SectionHeading {
   eyebrow: string
@@ -13,7 +14,10 @@ export interface PortfolioContent {
     positioning: string
     lead: string
     availability: string
+    location: string
     ctaContact: string
+    ctaPrimary: string
+    ctaSecondary: string
     ctaCv: string
   }
   stats: Record<StatId, string>
@@ -36,23 +40,29 @@ export interface PortfolioContent {
       desktop: string
       mobile: string
     }
-    now: { label: string; live: string; dev: string; band: string }
-    process: SectionHeading & { lead: string; steps: { title: string; body: string }[] }
+    now: { label: string; live: string; dev: string; band: string; local: string }
+    statBand: { label: string; asOf: string }
+    process: SectionHeading & { lead: string; stepOf: string; deliverableLabel: string; steps: { title: string; body: string; deliverable: string }[] }
     testimonials: SectionHeading
-    years: SectionHeading & { lead: string; roles: string; shipped: string; products: string; side: string; more: string }
+    years: SectionHeading & { lead: string; roles: string; shipped: string; products: string; side: string; more: string; count: string }
     projects: SectionHeading & { view: string }
-    skills: SectionHeading & { groups: Record<SkillGroupId, string> }
+    skills: SectionHeading & { groups: Record<SkillGroupId, string>; narrative: Record<SkillGroupId, string> }
     contact: SectionHeading & {
       lead: string
+      promise: string
       status: string
       note: string
       cta: string
+      ctaSecondary: string
+      nextLabel: string
+      next: string[]
       email: string
       phone: string
       location: string
+      elsewhere: string
     }
     explore: { eyebrow: string; title: string; lead: string; viewing: string }
-    caseStudy: { facts: string; results: string; stack: string; visit: string; prev: string; next: string; timeline: string; commits: string; sections: string; open: string; metrics: string; perf: string; a11y: string; bp: string; seo: string; lcp: string; measured: string; story: string; sampleBadge: string; sampleNote: string; measuredFrom: string; before: string; after: string; metric: Record<'cr' | 'aov' | 'revenue' | 'lcp' | 'checkout', string> }
+    caseStudy: { facts: string; results: string; stack: string; visit: string; prev: string; next: string; timeline: string; commits: string; sections: string; open: string; metrics: string; perf: string; a11y: string; bp: string; seo: string; lcp: string; measured: string; story: string; sampleBadge: string; sampleNote: string; measuredFrom: string; before: string; after: string; metric: Record<ResultMetricId, string> }
   }
   badges: { live: string; dev: string; current: string; completed: string; roles: Record<StoreRole, string> }
   experience: Record<

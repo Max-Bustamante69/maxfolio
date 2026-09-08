@@ -7,8 +7,8 @@ import { carouselTokens, type Skin } from './skins'
 import type { FrameShots } from './ProjectFrame'
 import { Carousel } from '../../vendor/carousel'
 import type { StoreMetrics } from '../../data/registry'
-import type { StoreResults } from '../../data/results'
-import { DeltaBars, IndexLine } from './charts'
+import type { ResultMetricId, StoreResults } from '../../data/results'
+import { Gauge, IndexLine, MetricBars, SlopeChart } from './charts'
 
 export interface CaseStudyStat {
   label: string
@@ -55,7 +55,7 @@ export interface CaseStudyLabels {
   measuredFrom: string
   before: string
   after: string
-  metric: Record<'cr' | 'aov' | 'revenue' | 'lcp' | 'checkout', string>
+  metric: Record<ResultMetricId, string>
 }
 
 interface ProjectModalProps {
@@ -154,6 +154,7 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
   const radius = skin.frame === 'apple' ? 'rounded-[14px]' : 'rounded-none'
   const tile = `${radius} p-3 ${dark ? 'bg-white/5' : 'bg-black/[0.04]'}`
   const label = `text-[11px] font-semibold uppercase tracking-[0.18em] ${skin.muted}`
+  const accent = skin.frame === 'apple' ? (dark ? '#2997ff' : '#0071e3') : skin.frame === 'luxury' ? '#C9A962' : '#dc2626'
 
   const scores = data?.metrics
     ? [
@@ -234,7 +235,7 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
               <p className={`${skin.accent} mt-4 text-sm font-medium`}>{data.tagline}</p>
               <p className="mt-2 text-sm leading-relaxed">{data.description}</p>
 
-              {data.story && data.story.metrics.length > 0 && (
+              {data.story && data.story.charts.length > 0 && (
                 <>
                   <div className="mt-6 flex items-center gap-2">
                     <p className={label}>{labels.story}</p>
@@ -242,19 +243,32 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
                       <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${dark ? 'bg-[#ff9f0a]/20 text-[#ffbf4d]' : 'bg-[#ff9f0a]/15 text-[#8a5300]'}`}>{labels.sampleBadge}</span>
                     )}
                   </div>
-                  <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    {data.story.metrics.map((m, i) =>
-                      m.unit === 's' ? (
-                        <DeltaBars key={m.id} metric={m} color={skin.frame === 'apple' ? (dark ? '#2997ff' : '#0071e3') : skin.frame === 'luxury' ? '#C9A962' : '#dc2626'} dark={dark} label={labels.metric[m.id]} beforeLabel={labels.before} afterLabel={labels.after} delay={0.2 + i * 0.12} />
-                      ) : (
-                        <IndexLine key={m.id} metric={m} color={skin.frame === 'apple' ? (dark ? '#2997ff' : '#0071e3') : skin.frame === 'luxury' ? '#C9A962' : '#dc2626'} dark={dark} label={labels.metric[m.id]} delay={0.2 + i * 0.12} />
-                      ),
-                    )}
+                  {/* One chart per story beat, and a different chart per kind of beat: a line for a trend,
+                      a slope for a before/after comparison, gauges for shares, bars for units of time or count. */}
+                  <div className="mt-3 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+                    {data.story.charts.map((ch, i) => {
+                      const key = `${ch.kind}-${ch.metrics.map((mm) => mm.id).join('-')}`
+                      const common = { color: accent, dark, labels: { metric: labels.metric, before: labels.before, after: labels.after }, delay: 0.2 + i * 0.12 }
+                      if (ch.kind === 'slope')
+                        return (
+                          <div key={key} className="sm:col-span-2">
+                            <SlopeChart metrics={ch.metrics} {...common} />
+                          </div>
+                        )
+                      if (ch.kind === 'gauge')
+                        return (
+                          <div key={key} className="flex flex-wrap gap-x-8 gap-y-4 sm:col-span-2">
+                            {ch.metrics.map((mm, j) => (
+                              <Gauge key={mm.id} metric={mm} {...common} delay={common.delay + j * 0.1} />
+                            ))}
+                          </div>
+                        )
+                      if (ch.kind === 'bars') return <MetricBars key={key} metrics={ch.metrics} {...common} />
+                      return <IndexLine key={key} metric={ch.metrics[0]} {...common} />
+                    })}
                   </div>
-                  <p className={`${skin.muted} mt-2 text-[11px] leading-snug`}>
-                    {data.story.sample
-                      ? labels.sampleNote
-                      : labels.measuredFrom.replace('{source}', data.story.metrics[0]?.source ?? '').replace('{period}', data.story.metrics[0]?.period ?? '')}
+                  <p className={`${skin.muted} mt-3 text-[11px] leading-snug`}>
+                    {data.story.sample ? labels.sampleNote : labels.measuredFrom.replace('{source}', data.story.source ?? '').replace('{period}', data.story.period ?? '')}
                   </p>
                 </>
               )}

@@ -9,7 +9,7 @@ export { LuxuryPreview, BrutalistPreview, MenuPreview, ApplePreview } from './pr
 export { ContactFormModal } from './modals'
 
 // Section components
-export { ExploreDesignsLuxury, ExploreDesignsBrutalist, ShopifyWork, Gallery, Years, Process, Testimonials } from './sections'
+export { ExploreDesignsLuxury, ExploreDesignsBrutalist, ShopifyWork, Gallery, Years, Process, Testimonials, StatBand, Experience, Projects, Skills, Contact } from './sections'
 
 // Transitions
 export { PageTransitionProvider, usePageTransition } from './transitions'

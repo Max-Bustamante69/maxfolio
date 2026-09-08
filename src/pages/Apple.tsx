@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { m } from 'framer-motion'
 import { ThemeProvider, useTheme } from '../context/ThemeContext'
 import {
@@ -12,7 +12,11 @@ import {
   Years,
   Process,
   Testimonials,
-  CompanyLogo,
+  StatBand,
+  Experience,
+  Projects,
+  Skills,
+  Contact,
   TransitionLink,
   MenuPreview,
   SmoothScroll,
@@ -23,7 +27,19 @@ import {
 import { skins } from '../components/gallery'
 import { useDynamicFavicon, useI18n, useContent } from '../hooks'
 import { defaultDesign, otherDesigns, MENU } from '../data/designs'
-import type { SkillGroupId } from '../data/registry'
+
+/** Wall-clock time in Medellín, refreshed every 30 s — a real vital, not decoration. */
+function useLocalTime(locale: string) {
+  const fmt = () => new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit', timeZone: 'America/Bogota' }).format(new Date())
+  const [time, setTime] = useState(fmt)
+  useEffect(() => {
+    setTime(fmt())
+    const id = window.setInterval(() => setTime(fmt()), 30_000)
+    return () => window.clearInterval(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locale])
+  return time
+}
 
 // Strong ease-out: instant response, soft landing.
 const EASE = [0.23, 1, 0.32, 1] as const
@@ -57,14 +73,30 @@ const Icon = {
       <path strokeLinecap="round" strokeLinejoin="round" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
     </svg>
   ),
+  globe: (
+    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={1.6} viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" />
+      <path strokeLinecap="round" d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
+    </svg>
+  ),
+  down: (
+    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14m0 0-6-6m6 6 6-6" />
+    </svg>
+  ),
 }
 
+/**
+ * Apple Clean. The page runs through distinct layouts on purpose — typographic hero, stat band,
+ * ticker, split tabs, editorial timeline, pinned stepper, index list, media carousel, index list,
+ * narrative chips, typographic close — so no two neighboring bands are "another grid of cards".
+ */
 function AppleContent() {
   const { isDark, toggleTheme } = useTheme()
-  const { t } = useI18n()
-  const { strings: c, registry, formatPeriod } = useContent()
+  const { t, locale } = useI18n()
+  const { strings: c, registry } = useContent()
+  const localTime = useLocalTime(locale === 'ja' ? 'ja-JP' : locale === 'es' ? 'es-CO' : 'en-US')
   const [contactOpen, setContactOpen] = useState(false)
-  const [job, setJob] = useState(registry.experience[0])
   useDynamicFavicon('apple')
 
   const skin = skins.apple(isDark)
@@ -93,6 +125,8 @@ function AppleContent() {
   )
 
   const primaryBtn = 'press inline-flex items-center justify-center rounded-full bg-apple-blue px-6 py-3 text-sm font-medium text-white hover:bg-apple-blueHover'
+  const liveCount = registry.stores.filter((s) => s.status === 'live').length
+  const devCount = registry.stores.filter((s) => s.status === 'dev').length
 
   return (
     <>
@@ -104,7 +138,7 @@ function AppleContent() {
       />
       <ContactFormModal isOpen={contactOpen} onClose={() => setContactOpen(false)} variant="apple" isDark={isDark} />
 
-      <div className={`theme-apple min-h-screen font-sf ${bg} transition-colors duration-300 overflow-x-hidden`} role="document">
+      <div className={`theme-apple min-h-screen font-sf ${bg} transition-colors duration-300 [overflow-x:clip]`} role="document">
         <ScrollRail sections={nav.map(([href, label]) => ({ id: href.slice(1), label }))} dark={isDark} accent={isDark ? '#2997ff' : '#0071e3'} />
         {/* Nav — 44px, frosted */}
         <nav
@@ -148,7 +182,7 @@ function AppleContent() {
         </nav>
 
         <main id="main-content" className="pt-11">
-          {/* Hero */}
+          {/* Hero — typographic */}
           <section id="hero" className="px-4 pt-20 md:pt-28 pb-14 md:pb-20 text-center scroll-mt-20" aria-labelledby="hero-heading">
             <p className={`text-sm font-semibold ${blue}`}>{c.hero.eyebrow}</p>
             {/* The LCP element stays static: an entrance fade would delay the first meaningful paint. */}
@@ -164,35 +198,39 @@ function AppleContent() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.5, ease: EASE }}
-              className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4"
+              className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6"
             >
               <button type="button" onClick={() => setContactOpen(true)} className={primaryBtn}>
-                {c.hero.ctaContact}
+                {c.hero.ctaPrimary}
               </button>
-              <a href={registry.personal.cv} download className={`${blue} text-sm font-medium`}>
+              <a href="#shopify" className={`${blue} inline-flex items-center gap-1.5 text-sm font-medium`}>
+                {c.hero.ctaSecondary} {Icon.down}
+              </a>
+              <a href={registry.personal.cv} download className={`${muted} text-sm font-medium`}>
                 {c.hero.ctaCv} ›
               </a>
             </m.div>
-            <m.p
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.55, duration: 0.5 }}
-              className="mt-6 inline-flex items-center gap-2 text-xs font-medium"
+              className="mt-7 flex flex-wrap items-center justify-center gap-2 text-xs"
             >
-              <span className="w-2 h-2 rounded-full bg-[#34c759]" />
-              {c.hero.availability}
-            </m.p>
+              <span className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 font-medium ${tile}`}>
+                <span className="w-2 h-2 rounded-full bg-[#34c759]" aria-hidden="true" />
+                {c.hero.availability}
+              </span>
+              <span className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 ${tile} ${muted}`}>
+                {Icon.globe}
+                {c.hero.location}
+              </span>
+            </m.div>
           </section>
 
-          {/* Stats bento */}
-          <section className="px-4 pb-20 md:pb-28" aria-label={c.sections.experience.eyebrow}>
-            <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-3 gap-3">
-              {registry.stats.map((s, i) => (
-                <Reveal key={s.id} delay={i * 0.04} className={`${surface} rounded-[22px] p-6 md:p-8`}>
-                  <p className="text-4xl md:text-5xl font-semibold tracking-[-0.03em]">{s.value}</p>
-                  <p className={`${muted} text-sm mt-2`}>{c.stats[s.id]}</p>
-                </Reveal>
-              ))}
+          {/* Stat band — numerals on hairlines */}
+          <section className="px-4 pb-20 md:pb-28">
+            <div className="max-w-5xl mx-auto">
+              <StatBand skin={skin} />
             </div>
           </section>
 
@@ -207,9 +245,9 @@ function AppleContent() {
                   </span>
                   {c.sections.now.label}
                 </span>
-                <span className={muted}>{c.sections.now.live.replace('{n}', String(registry.stores.filter((s) => s.status === 'live').length))}</span>
-                <span className={muted}>{c.sections.now.dev.replace('{n}', String(registry.stores.filter((s) => s.status === 'dev').length))}</span>
-                <span className={muted}>{c.hero.availability}</span>
+                <span className={muted}>{c.sections.now.live.replace('{n}', String(liveCount))}</span>
+                <span className={muted}>{c.sections.now.dev.replace('{n}', String(devCount))}</span>
+                <span className={muted}>{c.sections.now.local.replace('{time}', localTime)}</span>
               </Reveal>
             </div>
             <div className="mt-10">
@@ -221,112 +259,35 @@ function AppleContent() {
             </div>
           </section>
 
-          {/* Experience */}
-          <section id="experience" className={`px-4 py-20 md:py-28 ${surface} scroll-mt-20`}>
+          {/* Experience — split 50/50 */}
+          <section className={`px-4 py-20 md:py-28 ${surface}`}>
             <div className="max-w-5xl mx-auto">
-              {Heading(c.sections.experience.eyebrow, c.sections.experience.title, c.sections.experience.titleAccent)}
-              <div className="grid lg:grid-cols-12 gap-4">
-                <div className="lg:col-span-4 flex lg:flex-col gap-2 overflow-x-auto lg:overflow-visible pb-2 -mx-4 px-4 lg:mx-0 lg:px-0" role="tablist">
-                  {registry.experience.map((e) => {
-                    const active = job.id === e.id
-                    return (
-                      <button
-                        key={e.id}
-                        type="button"
-                        role="tab"
-                        aria-selected={active}
-                        onClick={() => setJob(e)}
-                        className={`press shrink-0 lg:shrink w-[260px] lg:w-auto text-left rounded-[16px] px-4 py-3 transition-colors duration-150 ${
-                          active ? tile : isDark ? 'hover:bg-white/5' : 'hover:bg-black/5'
-                        }`}
-                      >
-                        <p className="text-sm font-semibold leading-snug">{c.experience[e.id].title}</p>
-                        <p className={`${muted} text-xs mt-0.5`}>
-                          {e.company} · {formatPeriod(e.start, e.end)}
-                        </p>
-                      </button>
-                    )
-                  })}
-                </div>
-                <m.div
-                  key={job.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, ease: EASE }}
-                  className={`lg:col-span-8 rounded-[22px] ${tile} p-6 md:p-8`}
-                  role="tabpanel"
-                >
-                  <div className="flex items-start gap-4">
-                    {job.logo && (
-                      <div className="w-12 h-12 rounded-[12px] bg-white p-1.5 shrink-0 shadow-[0_1px_6px_rgba(0,0,0,0.08)]">
-                        <CompanyLogo src={job.logo} alt={job.company} />
-                      </div>
-                    )}
-                    <div className="min-w-0">
-                      <h3 className="text-xl font-semibold tracking-tight leading-snug">{c.experience[job.id].title}</h3>
-                      <p className={`${muted} text-sm mt-0.5`}>
-                        {job.company} · {job.location} · {formatPeriod(job.start, job.end)}
-                        {job.end === null && <span className={`ml-2 font-medium ${blue}`}> · {c.badges.current}</span>}
-                      </p>
-                    </div>
-                  </div>
-                  <p className="mt-5 leading-relaxed">{c.experience[job.id].summary}</p>
-                  <div className="mt-5 grid grid-cols-3 gap-2">
-                    {job.metrics.map((m) => (
-                      <div key={m.id} className={`${surface} rounded-[14px] p-3 text-center`}>
-                        <p className="text-lg md:text-xl font-semibold tracking-tight">{m.value}</p>
-                        <p className={`${muted} text-[11px] leading-tight`}>{c.experience[job.id].metricLabels[m.id]}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <p className={`mt-6 text-xs font-semibold tracking-[0.15em] uppercase ${blue}`}>{c.sections.experience.achievements}</p>
-                  <ul className="mt-2 space-y-2 text-sm">
-                    {c.experience[job.id].highlights.map((h) => (
-                      <li key={h} className="flex gap-2">
-                        <span className={`${blue} mt-[3px]`}>•</span>
-                        <span>{h}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="mt-5 flex flex-wrap gap-1.5">
-                    {job.technologies.map((tech) => (
-                      <span key={tech} className={skin.chip}>
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                  {job.website && (
-                    <a href={job.website} target="_blank" rel="noopener noreferrer" className={`${blue} text-sm mt-5 inline-block`}>
-                      {c.sections.experience.visit} ›
-                    </a>
-                  )}
-                </m.div>
-              </div>
+              <Experience skin={skin} heading={Heading} />
             </div>
           </section>
 
-          {/* Year by year */}
+          {/* Year by year — editorial timeline */}
           <section className="px-4 py-20 md:py-28">
             <div className="max-w-5xl mx-auto">
               <Years skin={skin} heading={Heading} />
             </div>
           </section>
 
-          {/* Process */}
+          {/* Process — pinned stepper */}
           <section className={`px-4 py-20 md:py-28 ${surface}`}>
             <div className="max-w-5xl mx-auto">
-              <Process skin={skin} heading={Heading} />
+              <Process skin={skin} heading={Heading} canvas={surface} />
             </div>
           </section>
 
-          {/* Shopify work */}
+          {/* Shopify work — the index */}
           <section className="px-4 py-20 md:py-28">
             <div className="max-w-5xl mx-auto">
               <ShopifyWork skin={skin} heading={Heading} />
             </div>
           </section>
 
-          {/* Gallery */}
+          {/* Gallery — media carousel */}
           <section className={`px-4 py-20 md:py-28 ${surface}`}>
             <div className="max-w-5xl mx-auto">
               <Gallery skin={skin} heading={Heading} />
@@ -336,101 +297,25 @@ function AppleContent() {
           {/* Testimonials (absent until a real quote exists) */}
           <Testimonials skin={skin} heading={Heading} />
 
-          {/* Projects */}
-          <section id="projects" className="px-4 py-20 md:py-28 scroll-mt-20">
+          {/* Projects — index list */}
+          <section className="px-4 py-20 md:py-28">
             <div className="max-w-5xl mx-auto">
-              {Heading(c.sections.projects.eyebrow, c.sections.projects.title, c.sections.projects.titleAccent)}
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {registry.personalProjects.map((p, i) => (
-                  <Reveal key={p.id} delay={(i % 3) * 0.04} className="h-full">
-                    <a
-                      href={p.url ?? p.repo}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`lift block h-full ${surface} rounded-[22px] p-6`}
-                    >
-                      <p className={`${muted} text-xs`}>{p.year}</p>
-                      <h3 className="mt-1 text-lg font-semibold tracking-tight">{p.name}</h3>
-                      <p className={`${blue} text-sm`}>{c.projects[p.id]?.tagline}</p>
-                      <p className="mt-2 text-sm leading-relaxed">{c.projects[p.id]?.description}</p>
-                      <div className="mt-3 flex flex-wrap gap-1.5">
-                        {p.stack.map((s) => (
-                          <span key={s} className={`${skin.chip} ${isDark ? '' : 'bg-white'}`}>
-                            {s}
-                          </span>
-                        ))}
-                      </div>
-                    </a>
-                  </Reveal>
-                ))}
-              </div>
+              <Projects skin={skin} heading={Heading} />
             </div>
           </section>
 
-          {/* Skills */}
-          <section id="skills" className={`px-4 py-20 md:py-28 ${surface} scroll-mt-20`}>
+          {/* Skills — narrative with inline chips */}
+          <section className={`px-4 py-20 md:py-28 ${surface}`}>
             <div className="max-w-5xl mx-auto">
-              {Heading(c.sections.skills.eyebrow, c.sections.skills.title, c.sections.skills.titleAccent)}
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {(Object.keys(registry.skillGroups) as SkillGroupId[]).map((g, i) => (
-                  <Reveal key={g} delay={i * 0.04} className={`rounded-[22px] ${tile} p-6`}>
-                    <h3 className={`text-xs font-semibold tracking-[0.2em] uppercase ${blue}`}>{c.sections.skills.groups[g]}</h3>
-                    <ul className="mt-3 space-y-1 text-sm">
-                      {registry.skillGroups[g].map((s) => (
-                        <li key={s}>{s}</li>
-                      ))}
-                    </ul>
-                  </Reveal>
-                ))}
-              </div>
+              <Skills skin={skin} heading={Heading} />
             </div>
           </section>
 
-          {/* Contact */}
-          <section id="contact" className="px-4 py-20 md:py-28 scroll-mt-20">
-            <Reveal className={`max-w-4xl mx-auto rounded-[28px] ${surface} p-8 md:p-14 text-center`}>
-              <p className={`text-xs font-semibold tracking-[0.2em] uppercase ${blue}`}>{c.sections.contact.eyebrow}</p>
-              <h2 className="mt-3 text-4xl md:text-6xl font-semibold tracking-[-0.025em] leading-[1.05]">
-                {c.sections.contact.title} <span className={muted}>{c.sections.contact.titleAccent}</span>
-              </h2>
-              <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed">{c.sections.contact.lead}</p>
-              <p className="mt-6 inline-flex items-center gap-2 text-sm font-medium">
-                <span className="w-2 h-2 rounded-full bg-[#34c759]" />
-                {c.sections.contact.status}
-              </p>
-              <p className={`${muted} text-sm mt-1`}>{c.sections.contact.note}</p>
-              <div className="mt-8">
-                <button type="button" onClick={() => setContactOpen(true)} className={`${primaryBtn} px-7 py-3.5`}>
-                  {c.sections.contact.cta}
-                </button>
-              </div>
-              <div className="mt-10 grid sm:grid-cols-3 gap-4 text-sm">
-                <div>
-                  <p className={`${muted} text-xs`}>{c.sections.contact.email}</p>
-                  <a href={`mailto:${registry.personal.email}`} className={blue}>
-                    {registry.personal.email}
-                  </a>
-                </div>
-                <div>
-                  <p className={`${muted} text-xs`}>{c.sections.contact.phone}</p>
-                  <a href={registry.personal.phoneHref} className={blue}>
-                    {registry.personal.phone}
-                  </a>
-                </div>
-                <div>
-                  <p className={`${muted} text-xs`}>{c.sections.contact.location}</p>
-                  <p>{c.location}</p>
-                </div>
-              </div>
-              <div className="mt-8 flex justify-center gap-6 text-sm">
-                <a href={registry.personal.linkedin} target="_blank" rel="noopener noreferrer" className={blue}>
-                  LinkedIn ›
-                </a>
-                <a href={registry.personal.github} target="_blank" rel="noopener noreferrer" className={blue}>
-                  GitHub ›
-                </a>
-              </div>
-            </Reveal>
+          {/* Contact — typographic close */}
+          <section className="px-4 py-24 md:py-32">
+            <div className="max-w-5xl mx-auto">
+              <Contact skin={skin} ctaClass={`${primaryBtn} px-7 py-3.5`} onContact={() => setContactOpen(true)} />
+            </div>
           </section>
 
           {/* Explore */}

@@ -2,6 +2,7 @@ import { Suspense, useState } from 'react'
 import { AnimatePresence, m } from 'framer-motion'
 import { useContent } from '../../hooks'
 import { ProjectFrame, GalleryLightbox, type Skin } from '../gallery'
+import { useHoverPreview } from '../gallery/HoverPreview'
 import { shotsFor, lightboxItems, caseStudyFor, caseStudyLabels, ProjectModal, type SectionHeading } from './Gallery'
 import type { StoreEntry, ProductEntry } from '../../data/registry'
 
@@ -45,6 +46,8 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
     setOpenStoreState(st)
   }
   const [openProduct, setOpenProduct] = useState<ProductEntry | null>(null)
+  // Desktop hover: the store's home capture follows the cursor along the row (touch just opens the sheet).
+  const preview = useHoverPreview()
 
   const active = FEATURES.find((f) => f.id === feature)
   const matches = (st: StoreEntry) => !active || st.stack.some((t) => active.test.test(t))
@@ -57,7 +60,7 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
   const StoreRow = ({ st }: { st: StoreEntry }) => {
     const c = strings.stores[st.slug]
     return (
-      <li className={`${skin.rowHover} transition-colors`}>
+      <li className={`${skin.rowHover} transition-colors`} {...(st.gallery ? preview.bind(`/gallery/${st.slug}/home-desktop.webp`) : {})}>
         <div className="grid gap-x-6 gap-y-1.5 py-4 md:grid-cols-12 md:items-center">
           <div className="md:col-span-4">
             <div className="flex flex-wrap items-center gap-2">
@@ -114,6 +117,7 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
   return (
     <section id="shopify" className="scroll-mt-20">
       {heading(s.eyebrow, s.title, s.titleAccent, s.lead)}
+      {preview.node}
 
       <div className="mb-6 flex flex-wrap gap-2" role="tablist" aria-label={s.eyebrow}>
         {(['stores', 'products'] as const).map((k) => (
