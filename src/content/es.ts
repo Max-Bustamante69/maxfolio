@@ -229,6 +229,6 @@ export const es: PortfolioContent = {
     'dr-hugo': { tagline: 'Sitio de odontólogo estético', description: 'Presencia de servicios y citas para un consultorio dental.' },
     maxfolio: { tagline: 'Este sitio', description: 'Cuatro lenguajes de diseño, un modelo de contenido, tres idiomas.' },
   },
-  footer: { tagline: 'Ingeniería Shopify, medida.', services: ['Tiendas Shopify', 'Apps Shopify', 'CRO y pruebas A/B', 'Migraciones de tienda', 'Rendimiento'], servicesTitle: 'Qué hago', quickLinks: 'Enlaces rápidos', rights: 'Todos los derechos reservados.' },
+  footer: { tagline: 'Ingeniería Shopify, medida.', services: ['Tiendas Shopify', 'Apps Shopify', 'CRO y pruebas A/B', 'Migraciones de tienda', 'Rendimiento'], servicesTitle: 'Qué hago', quickLinks: 'Enlaces rápidos', rights: 'Todos los derechos reservados.', stamp: 'Reconstruido en septiembre de 2026 · React 19 + Vite · Lighthouse 100/100/100/100 en escritorio (medición local)', backToTop: 'Volver arriba' },
   location: 'Medellín, Colombia',
 }

@@ -387,12 +387,16 @@ function AppleContent() {
           </section>
         </main>
 
-        <footer className={`px-4 py-10 text-xs ${muted}`} role="contentinfo" aria-label="Site footer">
-          <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between gap-3">
+        {/* Footer — a deliberate close: rights, an honest build stamp, back to top */}
+        <footer className={`px-4 pb-10 pt-4 text-xs ${muted}`} role="contentinfo" aria-label="Site footer">
+          <div className={`max-w-5xl mx-auto flex flex-col gap-3 border-t pt-8 md:flex-row md:items-baseline md:justify-between ${skin.line}`}>
             <p>
               © 2026 {registry.personal.name}. {c.footer.rights}
             </p>
-            <p>{c.footer.tagline}</p>
+            <p className="md:text-center">{c.footer.stamp}</p>
+            <a href="#hero" className={`${blue} inline-flex items-center gap-1 font-medium`}>
+              {c.footer.backToTop} ↑
+            </a>
           </div>
         </footer>
 

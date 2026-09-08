@@ -77,6 +77,6 @@ export interface PortfolioContent {
   stores: Record<string, { industry: string; tagline: string; description: string; factLabels?: Record<string, string> }>
   products: Record<string, { tagline: string; description: string }>
   projects: Record<string, { tagline: string; description: string }>
-  footer: { tagline: string; services: string[]; servicesTitle: string; quickLinks: string; rights: string }
+  footer: { tagline: string; services: string[]; servicesTitle: string; quickLinks: string; rights: string; stamp: string; backToTop: string }
   location: string
 }

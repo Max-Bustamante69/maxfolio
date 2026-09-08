@@ -229,6 +229,6 @@ export const ja: PortfolioContent = {
     'dr-hugo': { tagline: '審美歯科のサイト', description: '歯科クリニックのサービス紹介と予約導線。' },
     maxfolio: { tagline: 'このサイト', description: '4つのデザイン言語、1つのコンテンツモデル、3つの言語。' },
   },
-  footer: { tagline: '計測に基づくShopifyエンジニアリング。', services: ['Shopifyストア', 'Shopifyアプリ', 'CROとA/Bテスト', 'ストア移行', 'パフォーマンス'], servicesTitle: '提供すること', quickLinks: 'クイックリンク', rights: 'All rights reserved.' },
+  footer: { tagline: '計測に基づくShopifyエンジニアリング。', services: ['Shopifyストア', 'Shopifyアプリ', 'CROとA/Bテスト', 'ストア移行', 'パフォーマンス'], servicesTitle: '提供すること', quickLinks: 'クイックリンク', rights: 'All rights reserved.', stamp: '2026年9月に再構築 · React 19 + Vite · デスクトップでLighthouse 100/100/100/100（ローカル計測）', backToTop: 'トップへ戻る' },
   location: 'コロンビア、メデジン',
 }

@@ -229,6 +229,6 @@ export const en: PortfolioContent = {
     'dr-hugo': { tagline: 'Cosmetic dentist site', description: 'Services and booking presence for a dental practice.' },
     maxfolio: { tagline: 'This site', description: 'Four design languages, one content model, three languages.' },
   },
-  footer: { tagline: 'Shopify engineering, measured.', services: ['Shopify storefronts', 'Shopify apps', 'CRO & A/B testing', 'Store migrations', 'Performance'], servicesTitle: 'What I do', quickLinks: 'Quick links', rights: 'All rights reserved.' },
+  footer: { tagline: 'Shopify engineering, measured.', services: ['Shopify storefronts', 'Shopify apps', 'CRO & A/B testing', 'Store migrations', 'Performance'], servicesTitle: 'What I do', quickLinks: 'Quick links', rights: 'All rights reserved.', stamp: 'Rebuilt September 2026 · React 19 + Vite · Lighthouse 100/100/100/100 on desktop (local lab run)', backToTop: 'Back to top' },
   location: 'Medellín, Colombia',
 }
