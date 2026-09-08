@@ -1,9 +1,10 @@
 import { Suspense, useState } from 'react'
 import { AnimatePresence, m } from 'framer-motion'
 import { useContent } from '../../hooks'
-import { ProjectFrame, GalleryLightbox, type Skin } from '../gallery'
+import { GalleryLightbox, type Skin } from '../gallery'
+import { Products } from './Products'
 import { useHoverPreview } from '../gallery/HoverPreview'
-import { shotsFor, lightboxItems, caseStudyFor, caseStudyLabels, ProjectModal, type SectionHeading } from './Gallery'
+import { lightboxItems, caseStudyFor, caseStudyLabels, ProjectModal, type SectionHeading } from './Gallery'
 import type { StoreEntry, ProductEntry } from '../../data/registry'
 
 interface ShopifyWorkProps {
@@ -91,29 +92,6 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
     )
   }
 
-  const ProductCard = ({ p }: { p: ProductEntry }) => (
-    <article className={`${skin.card} p-5`}>
-      {p.gallery && <ProjectFrame name={p.name} shots={shotsFor(p.id, false)} skin={skin} onOpen={() => setOpenProduct(p)} alt={g.open} variant="laptop" />}
-      <div className={p.gallery ? 'mt-5' : ''}>
-        <h3 className={`${skin.title} text-lg`}>{p.name}</h3>
-        <p className={`${skin.accent} text-sm`}>{strings.products[p.id]?.tagline}</p>
-        <p className={`${skin.body} mt-2 text-sm leading-relaxed`}>{strings.products[p.id]?.description}</p>
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {p.stack.map((t) => (
-            <span key={t} className={skin.chip}>
-              {t}
-            </span>
-          ))}
-        </div>
-        {p.url && (
-          <a href={p.url} target="_blank" rel="noopener noreferrer" className={`${skin.accent} mt-3 inline-block text-sm`}>
-            {s.visit} ›
-          </a>
-        )}
-      </div>
-    </article>
-  )
-
   return (
     <section id="shopify" className="scroll-mt-20">
       {heading(s.eyebrow, s.title, s.titleAccent, s.lead)}
@@ -173,16 +151,8 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
             </div>
           </m.div>
         ) : (
-          <m.div
-            key="products"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            className="grid grid-cols-1 gap-6 md:grid-cols-2"
-          >
-            {registry.products.map((p) => (
-              <ProductCard key={p.id} p={p} />
-            ))}
+          <m.div key="products" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}>
+            <Products skin={skin} onOpen={setOpenProduct} />
           </m.div>
         )}
       </AnimatePresence>

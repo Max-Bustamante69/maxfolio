@@ -157,14 +157,15 @@ export function Process({ skin, heading, canvas = '' }: ProcessProps) {
                     transition={{ duration: 0.3, ease: EASE }}
                   />
                 </button>
-                <m.div animate={{ opacity: on ? 1 : 0.5 }} transition={{ duration: 0.3, ease: EASE }}>
+                {/* Inactive steps recede by color, not opacity, so every state keeps AA contrast. */}
+                <div className="transition-colors duration-300">
                   <p className={`text-[11px] font-semibold uppercase tracking-[0.18em] tabular-nums ${on ? skin.accent : skin.muted}`}>{num(i)}</p>
-                  <h3 className={`${skin.title} mt-1 text-2xl md:text-3xl`}>{step.title}</h3>
-                  <p className="mt-2 max-w-xl text-base leading-relaxed md:text-lg">{step.body}</p>
+                  <h3 className={`mt-1 text-2xl font-semibold tracking-tight transition-colors duration-300 md:text-3xl ${on ? skin.title : skin.muted}`}>{step.title}</h3>
+                  <p className={`mt-2 max-w-xl text-base leading-relaxed transition-colors duration-300 md:text-lg ${on ? '' : skin.muted}`}>{step.body}</p>
                   <p className="mt-3 max-w-xl text-sm leading-relaxed">
-                    <span className={`font-semibold ${skin.accent}`}>{p.deliverableLabel}</span> <span className={skin.muted}>{step.deliverable}</span>
+                    <span className={`font-semibold ${on ? skin.accent : skin.muted}`}>{p.deliverableLabel}</span> <span className={skin.muted}>{step.deliverable}</span>
                   </p>
-                </m.div>
+                </div>
               </li>
             )
           })}
