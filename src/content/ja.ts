@@ -14,7 +14,7 @@ export const ja: PortfolioContent = {
     location: 'メデジン拠点、米国・中南米のブランドと協業',
     ctaContact: 'お問い合わせ',
     ctaPrimary: '無料20分のストア診断を受ける',
-    ctaSecondary: '実績を見る',
+    ctaSecondary: '18店舗以上の実績を見る',
     ctaNote: '売り込みも契約も不要。売上が漏れている箇所と、最初に直す点だけをお伝えします。',
     ctaCv: 'CVをダウンロード',
   },
@@ -135,7 +135,7 @@ export const ja: PortfolioContent = {
       elsewhere: 'その他',
     },
     explore: { eyebrow: '探索', title: '同じポートフォリオ、4つのデザイン', lead: 'お好みの美学を選んでください。内容は同じです。', viewing: '表示中' },
-    caseStudy: { facts: '数字で見る', results: '計測した成果', stack: '技術スタック', visit: 'ストアを見る', prev: '前へ', next: '次へ', timeline: '構築期間', commits: 'コミット', sections: '独自セクション', open: '事例を見る', metrics: 'Lighthouse・モバイル', perf: 'パフォーマンス', a11y: 'アクセシビリティ', bp: 'ベストプラクティス', seo: 'SEO', lcp: 'LCP', measured: 'トップページのラボ計測、{date}、Lighthouse {runs}回の中央値（モバイル、回線シミュレーション）。', story: '何が動いたか', sampleBadge: 'サンプルデータ', sampleNote: '計測値に置き換わるまでの例示です。指数表示：導入前 = 100。', measuredFrom: '{source}・{period}・指数、導入前 = 100', before: '導入前', after: '導入後', metric: { cr: 'コンバージョン率', aov: '平均注文額', revenue: '売上', lcp: 'モバイル表示（LCP）', checkout: 'チェックアウト離脱', bounce: '直帰率', bundleShare: 'バンドル注文の割合', subscribers: '定期購入の割合', reviewCoverage: 'レビュー5件以上の商品', touchpoints: '計測ポイント数', syncLag: 'カタログ同期の遅れ', catalog: '公開SKU数', redirects: '移行URLの解決率', platform: 'プラットフォーム', design: 'デザイン元 → テーマ' } },
+    caseStudy: { facts: '数字で見る', results: '計測した成果', stack: '技術スタック', visit: 'ストアを見る', prev: '前へ', next: '次へ', timeline: '構築期間', commits: 'コミット', sections: '独自セクション', open: '事例を見る', metrics: 'Lighthouse・モバイル', perf: 'パフォーマンス', a11y: 'アクセシビリティ', bp: 'ベストプラクティス', seo: 'SEO', lcp: 'LCP', measured: 'トップページのラボ計測、{date}、Lighthouse {runs}回の中央値（モバイル、回線シミュレーション）。', story: '何が動いたか', sampleBadge: 'サンプルデータ', sampleNote: '計測値に置き換わるまでの例示です。指数表示：導入前 = 100。', measuredFrom: '{source}・{period}・指数、導入前 = 100', copyLink: 'リンクをコピー', copied: 'コピーしました', before: '導入前', after: '導入後', metric: { cr: 'コンバージョン率', aov: '平均注文額', revenue: '売上', lcp: 'モバイル表示（LCP）', checkout: 'チェックアウト離脱', bounce: '直帰率', bundleShare: 'バンドル注文の割合', subscribers: '定期購入の割合', reviewCoverage: 'レビュー5件以上の商品', touchpoints: '計測ポイント数', syncLag: 'カタログ同期の遅れ', catalog: '公開SKU数', redirects: '移行URLの解決率', platform: 'プラットフォーム', design: 'デザイン元 → テーマ' } },
   },
   badges: { live: '公開中', dev: '開発中', current: '現職', completed: '完了', roles: { built: '構築', maintained: '保守', migrated: '移行' } },
   experience: {

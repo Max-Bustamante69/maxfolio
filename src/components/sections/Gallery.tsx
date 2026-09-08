@@ -1,6 +1,6 @@
 import { lazy, Suspense, useMemo, useState, type ReactNode } from 'react'
 import { m } from 'framer-motion'
-import { useContent } from '../../hooks'
+import { useContent, useSheetHistory } from '../../hooks'
 import { ProjectFrame, GlassControls, carouselTokens, type Skin, type FrameShots, type LightboxItem, type CaseStudyData } from '../gallery'
 import type { CaseStudyLabels } from '../gallery/ProjectModal'
 import { Carousel } from '../../vendor/carousel'
@@ -45,6 +45,7 @@ export const caseStudyLabels = (strings: PortfolioContent): CaseStudyLabels => {
     facts: cs.facts, results: cs.results, stack: cs.stack, visit: cs.visit,
     metrics: cs.metrics, perf: cs.perf, a11y: cs.a11y, bp: cs.bp, seo: cs.seo, lcp: cs.lcp, measured: cs.measured,
     story: cs.story, sampleBadge: cs.sampleBadge, sampleNote: cs.sampleNote, measuredFrom: cs.measuredFrom, before: cs.before, after: cs.after, metric: cs.metric,
+    copyLink: cs.copyLink, copied: cs.copied,
   }
 }
 
@@ -100,6 +101,8 @@ export function Gallery({ skin, heading }: GalleryProps) {
     setSheetLoaded(true)
     setOpenSlug(slug)
   }
+
+  useSheetHistory(openSlug, () => setOpenSlug(null), { param: 'store' })
 
   const items = useMemo(
     () => registry.stores.filter((s) => s.gallery && (filter === 'all' || s.status === filter)),

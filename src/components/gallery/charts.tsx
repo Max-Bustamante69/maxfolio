@@ -16,6 +16,9 @@ interface Palette {
 }
 
 const mutedText = (dark: boolean) => (dark ? 'text-[#a1a1a6]' : 'text-[#6e6e73]')
+/** Direction colors that clear AA as text: the accent greens/reds are for fills, not type. */
+export const goodText = (dark: boolean) => (dark ? 'text-[#5ee082]' : 'text-[#136329]')
+export const badText = (dark: boolean) => (dark ? 'text-[#ff8a80]' : 'text-[#b42318]')
 const isGood = (mm: ResultMetric) => (mm.invert ? mm.after <= mm.before : mm.after >= mm.before)
 const deltaPct = (mm: ResultMetric) => (mm.before === 0 ? null : Math.round(((mm.after - mm.before) / mm.before) * 100))
 const fmt = (mm: ResultMetric, v: number) =>
@@ -37,11 +40,11 @@ export function CountUp({ value, decimals = 0, prefix = '', suffix = '', delay =
   return <m.span className={className}>{text}</m.span>
 }
 
-const Delta = ({ metric, delay }: { metric: ResultMetric; delay: number }) => {
+const Delta = ({ metric, delay, dark }: { metric: ResultMetric; delay: number; dark: boolean }) => {
   const d = deltaPct(metric)
   if (d === null) return null
   const up = d >= 0
-  return <CountUp value={Math.abs(d)} prefix={up ? '+' : '−'} suffix="%" delay={delay} className={`text-lg font-semibold tabular-nums ${isGood(metric) ? 'text-[#34c759]' : 'text-[#ff3b30]'}`} />
+  return <CountUp value={Math.abs(d)} prefix={up ? '+' : '−'} suffix="%" delay={delay} className={`text-lg font-semibold tabular-nums ${isGood(metric) ? goodText(dark) : badText(dark)}`} />
 }
 
 const SrTable = ({ caption, rows }: { caption: string; rows: [string, string][] }) => (
@@ -81,7 +84,7 @@ export function IndexLine({ metric, color, dark, labels, delay = 0 }: { metric: 
     <figure className="m-0">
       <div className="flex items-baseline justify-between gap-2">
         <figcaption className={`text-[11px] leading-tight ${mutedText(dark)}`}>{label}</figcaption>
-        <Delta metric={metric} delay={delay} />
+        <Delta metric={metric} delay={delay} dark={dark} />
       </div>
       <svg viewBox={`0 0 ${W} ${H}`} className="mt-1 h-24 w-full" role="img" aria-label={`${label}: ${metric.before} → ${metric.after} (index, base 100)`}>
         <defs>
@@ -145,7 +148,7 @@ export function SlopeChart({ metrics, color, dark, labels, delay = 0 }: { metric
       <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
         {metrics.map((mm, i) => (
           <span key={mm.id} className={`text-[11px] ${mutedText(dark)}`}>
-            {labels.metric[mm.id] ?? mm.id} <Delta metric={mm} delay={delay + i * 0.12} />
+            {labels.metric[mm.id] ?? mm.id} <Delta metric={mm} delay={delay + i * 0.12} dark={dark} />
           </span>
         ))}
       </div>
@@ -203,7 +206,7 @@ export function MetricBars({ metrics, color, dark, labels, delay = 0 }: { metric
           <div key={mm.id}>
             <div className="flex items-baseline justify-between gap-2">
               <figcaption className={`text-[11px] leading-tight ${mutedText(dark)}`}>{label}</figcaption>
-              <Delta metric={mm} delay={delay + i * 0.15} />
+              <Delta metric={mm} delay={delay + i * 0.15} dark={dark} />
             </div>
             <div className="mt-1.5 space-y-1.5" role="img" aria-label={`${label}: ${labels.before} ${fmt(mm, mm.before)}, ${labels.after} ${fmt(mm, mm.after)}`}>
               {rows.map((r, j) => (

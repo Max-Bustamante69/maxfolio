@@ -14,7 +14,7 @@ export const es: PortfolioContent = {
     location: 'Desde Medellín, para marcas de EE. UU. y Latinoamérica',
     ctaContact: 'Escríbeme',
     ctaPrimary: 'Pide tu revisión gratis de 20 minutos',
-    ctaSecondary: 'Ver el trabajo',
+    ctaSecondary: 'Ver las 18+ tiendas',
     ctaNote: 'Sin discurso de venta ni contrato. Solo dónde se fuga la tienda y qué arreglar primero.',
     ctaCv: 'Descargar CV',
   },
@@ -135,7 +135,7 @@ export const es: PortfolioContent = {
       elsewhere: 'También en',
     },
     explore: { eyebrow: 'Explorar', title: 'El mismo portafolio, cuatro diseños', lead: 'Elige la estética que prefieras. El contenido es idéntico.', viewing: 'Estás viendo' },
-    caseStudy: { facts: 'En cifras', results: 'Resultados medidos', stack: 'Stack', visit: 'Visitar tienda', prev: 'Anterior', next: 'Siguiente', timeline: 'Ventana de construcción', commits: 'commits', sections: 'secciones propias', open: 'Caso', metrics: 'Lighthouse · móvil', perf: 'Rendimiento', a11y: 'Accesibilidad', bp: 'Buenas prácticas', seo: 'SEO', lcp: 'LCP', measured: 'Medición de laboratorio en la página de inicio, {date}, mediana de {runs} corridas de Lighthouse (móvil, red simulada).', story: 'Qué se movió', sampleBadge: 'Datos de muestra', sampleNote: 'Formas ilustrativas hasta que los números medidos las reemplacen. Indexado: antes = 100.', measuredFrom: '{source} · {period} · indexado, antes = 100', before: 'Antes', after: 'Después', metric: { cr: 'Tasa de conversión', aov: 'Ticket promedio', revenue: 'Ingresos', lcp: 'Carga en móvil (LCP)', checkout: 'Abandono en checkout', bounce: 'Tasa de rebote', bundleShare: 'Pedidos con bundle', subscribers: 'Pedidos por suscripción', reviewCoverage: 'Productos con 5+ reseñas', touchpoints: 'Puntos de contacto medidos', syncLag: 'Retraso de sincronización del catálogo', catalog: 'SKUs publicados', redirects: 'URLs migradas que resuelven', platform: 'Plataforma', design: 'Diseño de origen → tema' } },
+    caseStudy: { facts: 'En cifras', results: 'Resultados medidos', stack: 'Stack', visit: 'Visitar tienda', prev: 'Anterior', next: 'Siguiente', timeline: 'Ventana de construcción', commits: 'commits', sections: 'secciones propias', open: 'Caso', metrics: 'Lighthouse · móvil', perf: 'Rendimiento', a11y: 'Accesibilidad', bp: 'Buenas prácticas', seo: 'SEO', lcp: 'LCP', measured: 'Medición de laboratorio en la página de inicio, {date}, mediana de {runs} corridas de Lighthouse (móvil, red simulada).', story: 'Qué se movió', sampleBadge: 'Datos de muestra', sampleNote: 'Formas ilustrativas hasta que los números medidos las reemplacen. Indexado: antes = 100.', measuredFrom: '{source} · {period} · indexado, antes = 100', copyLink: 'Copiar enlace', copied: 'Copiado', before: 'Antes', after: 'Después', metric: { cr: 'Tasa de conversión', aov: 'Ticket promedio', revenue: 'Ingresos', lcp: 'Carga en móvil (LCP)', checkout: 'Abandono en checkout', bounce: 'Tasa de rebote', bundleShare: 'Pedidos con bundle', subscribers: 'Pedidos por suscripción', reviewCoverage: 'Productos con 5+ reseñas', touchpoints: 'Puntos de contacto medidos', syncLag: 'Retraso de sincronización del catálogo', catalog: 'SKUs publicados', redirects: 'URLs migradas que resuelven', platform: 'Plataforma', design: 'Diseño de origen → tema' } },
   },
   badges: { live: 'En vivo', dev: 'En construcción', current: 'Actual', completed: 'Terminado', roles: { built: 'Construida', maintained: 'Mantenida', migrated: 'Migrada' } },
   experience: {

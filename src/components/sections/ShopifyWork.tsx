@@ -1,12 +1,13 @@
 import { Suspense, useState } from 'react'
 import { AnimatePresence, m } from 'framer-motion'
-import { useContent } from '../../hooks'
+import { useContent, useSheetHistory } from '../../hooks'
 import { GalleryLightbox, type Skin } from '../gallery'
 import { Products } from './Products'
 import { useHoverPreview } from '../gallery/HoverPreview'
 import { lightboxItems, caseStudyFor, caseStudyLabels, ProjectModal, type SectionHeading } from './Gallery'
 import type { StoreEntry, ProductEntry } from '../../data/registry'
 import { results as storyResults } from '../../data/results'
+import { badText, goodText } from '../gallery/charts'
 
 interface ShopifyWorkProps {
   skin: Skin
@@ -48,6 +49,14 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
     setOpenStoreState(st)
   }
   const [openProduct, setOpenProduct] = useState<ProductEntry | null>(null)
+  // The sheet lives in history: Back closes it, `?store=<slug>` opens it, the link can be copied.
+  useSheetHistory(openStore?.slug ?? null, () => setOpenStoreState(null), {
+    param: 'store',
+    open: (slug) => {
+      const st = registry.stores.find((x) => x.slug === slug)
+      if (st) setOpenStore(st)
+    },
+  })
   // Desktop hover: the store's home capture follows the cursor along the row (touch just opens the sheet).
   const preview = useHoverPreview()
 
@@ -68,7 +77,7 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
     const good = lead.invert ? d <= 0 : d >= 0
     return (
       <span className={`${skin.chip} mt-1.5 inline-flex items-center gap-1.5`}>
-        <span className={`font-semibold tabular-nums ${good ? 'text-[#34c759]' : 'text-[#ff3b30]'}`}>{d >= 0 ? '+' : '−'}{Math.abs(d)}%</span>
+        <span className={`font-semibold tabular-nums ${good ? goodText(skin.dark) : badText(skin.dark)}`}>{d >= 0 ? '+' : '−'}{Math.abs(d)}%</span>
         <span>{cs.metric[lead.id]}</span>
         {story.sample && <span className="opacity-60">· {cs.sampleBadge}</span>}
       </span>

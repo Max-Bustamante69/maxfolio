@@ -1,6 +1,6 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { AnimatePresence, animate, m, useMotionValue, useReducedMotion, useTransform } from 'framer-motion'
+import { AnimatePresence, animate, m, useDragControls, useMotionValue, useReducedMotion, useTransform } from 'framer-motion'
 import { LaptopFrame, PhoneFrame } from './DeviceFrame'
 import { GlassControls } from './CarouselControls'
 import { carouselTokens, type Skin } from './skins'
@@ -8,7 +8,7 @@ import type { FrameShots } from './ProjectFrame'
 import { Carousel } from '../../vendor/carousel'
 import type { StoreMetrics } from '../../data/registry'
 import type { ResultMetricId, StoreResults } from '../../data/results'
-import { CompareTable, CountUp, Gauge, IndexLine, MetricBars, SlopeChart } from './charts'
+import { CompareTable, CountUp, Gauge, IndexLine, MetricBars, SlopeChart, badText, goodText } from './charts'
 
 export interface CaseStudyStat {
   label: string
@@ -56,6 +56,8 @@ export interface CaseStudyLabels {
   before: string
   after: string
   metric: Record<ResultMetricId, string>
+  copyLink: string
+  copied: string
 }
 
 interface ProjectModalProps {
@@ -149,6 +151,21 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
   }, [open, onClose])
 
   const dark = skin.dark
+  // Phones: the sheet is a bottom sheet with a grabber; dragging it down past a threshold dismisses it.
+  const drag = useDragControls()
+  const [copied, setCopied] = useState(false)
+  useEffect(() => {
+    if (!open) setCopied(false)
+  }, [open])
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 1800)
+    } catch {
+      /* clipboard unavailable: the URL bar already carries the link */
+    }
+  }
   const panel = skin.frame === 'apple' ? 'rounded-[28px]' : skin.frame === 'luxury' ? 'rounded-none' : 'rounded-none border-2 border-stone-900'
   const panelBg = dark ? 'bg-[#141416] text-[#f5f5f7]' : 'bg-white text-[#1d1d1f]'
   const radius = skin.frame === 'apple' ? 'rounded-[14px]' : 'rounded-none'
@@ -184,8 +201,20 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 16, scale: 0.98, transition: { duration: 0.15, ease: EASE } }}
             transition={{ type: 'spring', duration: 0.55, bounce: 0.14 }}
+            drag="y"
+            dragControls={drag}
+            dragListener={false}
+            dragConstraints={{ top: 0, bottom: 0 }}
+            dragElastic={{ top: 0, bottom: 0.7 }}
+            onDragEnd={(_, info) => {
+              if (info.offset.y > 120 || info.velocity.y > 600) onClose()
+            }}
             onClick={(e) => e.stopPropagation()}
           >
+            {/* grabber (phones): the only drag surface, so the inner scroll and the carousel keep their gestures */}
+            <div className="flex shrink-0 justify-center py-2 sm:hidden" onPointerDown={(e) => drag.start(e)} style={{ touchAction: 'none' }} aria-hidden="true">
+              <span className={`h-1.5 w-10 rounded-full ${dark ? 'bg-white/25' : 'bg-black/20'}`} />
+            </div>
             {/* captures — the house carousel, enclosed */}
             <div className={`flex flex-col justify-center p-5 lg:w-[56%] lg:p-8 ${dark ? 'bg-[#0b0b0c]' : 'bg-[#f5f5f7]'}`} style={carouselTokens(skin.frame, dark)}>
               <Carousel
@@ -227,9 +256,14 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
                   <h3 className={`${skin.title} text-2xl`}>{data.name}</h3>
                   <p className={`${skin.muted} mt-1 text-xs`}>{data.meta}</p>
                 </div>
-                <button type="button" onClick={onClose} className={`press compact-touch shrink-0 rounded-full px-3 py-1.5 text-xs ${dark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`}>
-                  {labels.close}
-                </button>
+                <div className="flex shrink-0 items-center gap-1.5">
+                  <button type="button" onClick={copyLink} className={`press compact-touch rounded-full px-3 py-1.5 text-xs ${dark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`} aria-live="polite">
+                    {copied ? labels.copied : labels.copyLink}
+                  </button>
+                  <button type="button" onClick={onClose} className={`press compact-touch rounded-full px-3 py-1.5 text-xs ${dark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`}>
+                    {labels.close}
+                  </button>
+                </div>
               </div>
               <span className={`mt-3 inline-block rounded-full px-2 py-0.5 text-[10px] ${data.badge.className}`}>{data.badge.text}</span>
               <p className={`${skin.accent} mt-4 text-sm font-medium`}>{data.tagline}</p>
@@ -253,7 +287,7 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
                     const good = lead.invert ? d <= 0 : d >= 0
                     return (
                       <p className="mt-3 flex items-baseline gap-3">
-                        <CountUp value={Math.abs(d)} prefix={d >= 0 ? '+' : '−'} suffix="%" delay={0.15} className={`text-4xl font-semibold tabular-nums tracking-[-0.03em] ${good ? 'text-[#34c759]' : 'text-[#ff3b30]'}`} />
+                        <CountUp value={Math.abs(d)} prefix={d >= 0 ? '+' : '−'} suffix="%" delay={0.15} className={`text-4xl font-semibold tabular-nums tracking-[-0.03em] ${good ? goodText(dark) : badText(dark)}`} />
                         <span className={`${skin.muted} text-sm`}>{labels.metric[lead.id]}</span>
                       </p>
                     )

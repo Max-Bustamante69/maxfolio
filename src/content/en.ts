@@ -14,7 +14,7 @@ export const en: PortfolioContent = {
     location: 'Based in Medellín, working with US and LATAM brands',
     ctaContact: 'Get in touch',
     ctaPrimary: 'Get a free 20-minute store review',
-    ctaSecondary: 'See the work',
+    ctaSecondary: 'See the 18+ storefronts',
     ctaNote: 'No pitch, no contract. Just where the store leaks and what to fix first.',
     ctaCv: 'Download CV',
   },
@@ -135,7 +135,7 @@ export const en: PortfolioContent = {
       elsewhere: 'Elsewhere',
     },
     explore: { eyebrow: 'Explore', title: 'Same portfolio, four designs', lead: 'Pick the aesthetic you prefer. The content is identical.', viewing: 'Currently viewing' },
-    caseStudy: { facts: 'By the numbers', results: 'Measured results', stack: 'Stack', visit: 'Visit store', prev: 'Previous', next: 'Next', timeline: 'Build window', commits: 'commits', sections: 'custom sections', open: 'Case study', metrics: 'Lighthouse · mobile', perf: 'Performance', a11y: 'Accessibility', bp: 'Best practices', seo: 'SEO', lcp: 'LCP', measured: 'Lab run on the home page, {date}, median of {runs} Lighthouse runs (mobile, simulated throttling).', story: 'What moved', sampleBadge: 'Sample data', sampleNote: 'Illustrative shapes until the measured numbers replace them. Indexed: before = 100.', measuredFrom: '{source} · {period} · indexed, before = 100', before: 'Before', after: 'After', metric: { cr: 'Conversion rate', aov: 'Average order value', revenue: 'Revenue', lcp: 'Mobile load (LCP)', checkout: 'Checkout drop-off', bounce: 'Bounce rate', bundleShare: 'Orders with a bundle', subscribers: 'Subscription share of orders', reviewCoverage: 'Products with 5+ reviews', touchpoints: 'Tracked touchpoints', syncLag: 'Catalog sync lag', catalog: 'SKUs live', redirects: 'Migrated URLs resolving', platform: 'Platform', design: 'Design source → theme' } },
+    caseStudy: { facts: 'By the numbers', results: 'Measured results', stack: 'Stack', visit: 'Visit store', prev: 'Previous', next: 'Next', timeline: 'Build window', commits: 'commits', sections: 'custom sections', open: 'Case study', metrics: 'Lighthouse · mobile', perf: 'Performance', a11y: 'Accessibility', bp: 'Best practices', seo: 'SEO', lcp: 'LCP', measured: 'Lab run on the home page, {date}, median of {runs} Lighthouse runs (mobile, simulated throttling).', story: 'What moved', sampleBadge: 'Sample data', sampleNote: 'Illustrative shapes until the measured numbers replace them. Indexed: before = 100.', measuredFrom: '{source} · {period} · indexed, before = 100', copyLink: 'Copy link', copied: 'Copied', before: 'Before', after: 'After', metric: { cr: 'Conversion rate', aov: 'Average order value', revenue: 'Revenue', lcp: 'Mobile load (LCP)', checkout: 'Checkout drop-off', bounce: 'Bounce rate', bundleShare: 'Orders with a bundle', subscribers: 'Subscription share of orders', reviewCoverage: 'Products with 5+ reviews', touchpoints: 'Tracked touchpoints', syncLag: 'Catalog sync lag', catalog: 'SKUs live', redirects: 'Migrated URLs resolving', platform: 'Platform', design: 'Design source → theme' } },
   },
   badges: { live: 'Live', dev: 'In development', current: 'Current', completed: 'Completed', roles: { built: 'Built', maintained: 'Maintained', migrated: 'Migrated' } },
   experience: {

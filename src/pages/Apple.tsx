@@ -1,35 +1,30 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useState, type ReactNode } from 'react'
 import { m } from 'framer-motion'
 import { ThemeProvider, useTheme } from '../context/ThemeContext'
-import {
-  ContactFormModal,
-  SEOHead,
-  MobileMenuApple,
-  LanguageSelectorApple,
-  LogoSelectorApple,
-  ShopifyWork,
-  Gallery,
-  Years,
-  Process,
-  Testimonials,
-  StatBand,
-  Experience,
-  Projects,
-  Skills,
-  Contact,
-  Faq,
-  Manifesto,
-  Magnetic,
-  TransitionLink,
-  MenuPreview,
-  SmoothScroll,
-  ScrollRail,
-  Marquee,
-  RevealText,
-} from '../components'
-import { skins } from '../components/gallery'
+// Direct imports (not the component barrels) so the main chunk carries only what the first paint needs.
+import { SEOHead, MobileMenuApple, LanguageSelectorApple, LogoSelectorApple, Magnetic, TransitionLink, SmoothScroll, ScrollRail, Marquee, RevealText } from '../components/common'
+import { ContactFormModal } from '../components/modals'
+import { MenuPreview } from '../components/previews'
+import { Testimonials } from '../components/sections/Testimonials'
+import { StatBand } from '../components/sections/StatBand'
+import { Experience } from '../components/sections/Experience'
+import { skins } from '../components/gallery/skins'
 import { useDynamicFavicon, useI18n, useContent } from '../hooks'
 import { defaultDesign, otherDesigns, MENU } from '../data/designs'
+
+// Below the fold, each section arrives as its own chunk so the hero paints off a smaller bundle.
+const Years = lazy(() => import('../components/sections/Years').then((mod) => ({ default: mod.Years })))
+const Process = lazy(() => import('../components/sections/Process').then((mod) => ({ default: mod.Process })))
+const ShopifyWork = lazy(() => import('../components/sections/ShopifyWork').then((mod) => ({ default: mod.ShopifyWork })))
+const Gallery = lazy(() => import('../components/sections/Gallery').then((mod) => ({ default: mod.Gallery })))
+const Manifesto = lazy(() => import('../components/sections/Manifesto').then((mod) => ({ default: mod.Manifesto })))
+const Projects = lazy(() => import('../components/sections/Projects').then((mod) => ({ default: mod.Projects })))
+const Skills = lazy(() => import('../components/sections/Skills').then((mod) => ({ default: mod.Skills })))
+const Faq = lazy(() => import('../components/sections/Faq').then((mod) => ({ default: mod.Faq })))
+const Contact = lazy(() => import('../components/sections/Contact').then((mod) => ({ default: mod.Contact })))
+
+/** Keeps the page height stable while a section's chunk loads. */
+const Pending = ({ h = 'min-h-[60vh]' }: { h?: string }) => <div className={h} aria-hidden="true" />
 
 /** Wall-clock time in Medellín, refreshed every 30 s — a real vital, not decoration. */
 function useLocalTime(locale: string) {
@@ -282,33 +277,43 @@ function AppleContent() {
           {/* Year by year — editorial timeline */}
           <section className="px-4 py-20 md:py-28">
             <div className="max-w-5xl mx-auto">
-              <Years skin={skin} heading={Heading} />
+              <Suspense fallback={<Pending />}>
+                <Years skin={skin} heading={Heading} />
+              </Suspense>
             </div>
           </section>
 
           {/* Process — pinned stepper */}
           <section className={`px-4 py-20 md:py-28 ${surface}`}>
             <div className="max-w-5xl mx-auto">
-              <Process skin={skin} heading={Heading} canvas={surface} />
+              <Suspense fallback={<Pending />}>
+                <Process skin={skin} heading={Heading} canvas={surface} />
+              </Suspense>
             </div>
           </section>
 
           {/* Shopify work — the index */}
           <section className="px-4 py-20 md:py-28">
             <div className="max-w-5xl mx-auto">
-              <ShopifyWork skin={skin} heading={Heading} />
+              <Suspense fallback={<Pending />}>
+                <ShopifyWork skin={skin} heading={Heading} />
+              </Suspense>
             </div>
           </section>
 
           {/* Gallery — media carousel */}
           <section className={`px-4 py-20 md:py-28 ${surface}`}>
             <div className="max-w-5xl mx-auto">
-              <Gallery skin={skin} heading={Heading} />
+              <Suspense fallback={<Pending />}>
+                <Gallery skin={skin} heading={Heading} />
+              </Suspense>
             </div>
           </section>
 
           {/* Manifesto — an inverted typographic band between two media-heavy sections */}
-          <Manifesto skin={skin} />
+          <Suspense fallback={<Pending h="min-h-[40vh]" />}>
+            <Manifesto skin={skin} />
+          </Suspense>
 
           {/* Testimonials (absent until a real quote exists) */}
           <Testimonials skin={skin} heading={Heading} />
@@ -316,28 +321,36 @@ function AppleContent() {
           {/* Projects — index list */}
           <section className="px-4 py-20 md:py-28">
             <div className="max-w-5xl mx-auto">
-              <Projects skin={skin} heading={Heading} />
+              <Suspense fallback={<Pending />}>
+                <Projects skin={skin} heading={Heading} />
+              </Suspense>
             </div>
           </section>
 
           {/* Skills — narrative with inline chips */}
           <section className={`px-4 py-20 md:py-28 ${surface}`}>
             <div className="max-w-5xl mx-auto">
-              <Skills skin={skin} heading={Heading} />
+              <Suspense fallback={<Pending />}>
+                <Skills skin={skin} heading={Heading} />
+              </Suspense>
             </div>
           </section>
 
           {/* FAQ — the objections, answered before the ask */}
           <section className="px-4 py-20 md:py-28">
             <div className="max-w-5xl mx-auto">
-              <Faq skin={skin} heading={Heading} />
+              <Suspense fallback={<Pending h="min-h-[40vh]" />}>
+                <Faq skin={skin} heading={Heading} />
+              </Suspense>
             </div>
           </section>
 
           {/* Contact — typographic close */}
           <section className={`px-4 py-24 md:py-32 ${surface}`}>
             <div className="max-w-5xl mx-auto">
-              <Contact skin={skin} ctaClass={`${primaryBtn} px-7`} onContact={openContact} />
+              <Suspense fallback={<Pending />}>
+                <Contact skin={skin} ctaClass={`${primaryBtn} px-7`} onContact={openContact} />
+              </Suspense>
             </div>
           </section>
 
