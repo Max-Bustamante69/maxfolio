@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 
 interface BrutalistPreviewProps {
   isHovered?: boolean
@@ -11,7 +11,7 @@ export function BrutalistPreview({ isHovered = false, size = 'md' }: BrutalistPr
   return (
     <div className="w-full h-full bg-stone-100 relative overflow-hidden flex items-center justify-center">
       {/* Top red bar */}
-      <motion.div 
+      <m.div 
         className="absolute top-0 left-0 h-1 bg-red-600"
         initial={{ width: '30%' }}
         animate={{ width: isHovered ? '100%' : '30%' }}
@@ -21,7 +21,7 @@ export function BrutalistPreview({ isHovered = false, size = 'md' }: BrutalistPr
       {/* Diagonal lines pattern */}
       <div className="absolute inset-0 overflow-hidden opacity-10">
         {[...Array(8)].map((_, i) => (
-          <motion.div
+          <m.div
             key={i}
             className="absolute h-[200%] w-[1px] bg-stone-900"
             style={{
@@ -39,7 +39,7 @@ export function BrutalistPreview({ isHovered = false, size = 'md' }: BrutalistPr
       
       {/* Center content */}
       <div className="text-center relative z-10" style={{ transform: `scale(${scale})` }}>
-        <motion.div
+        <m.div
           className="font-mono text-stone-900 font-black text-lg tracking-tighter"
           animate={{ 
             letterSpacing: isHovered ? '-0.1em' : '-0.05em',
@@ -47,14 +47,14 @@ export function BrutalistPreview({ isHovered = false, size = 'md' }: BrutalistPr
           transition={{ duration: 0.2 }}
         >
           BOLD
-        </motion.div>
+        </m.div>
         <div className="font-mono text-[8px] uppercase tracking-[0.3em] text-stone-500 mt-1">
           Editorial
         </div>
       </div>
       
       {/* Bottom red square */}
-      <motion.div
+      <m.div
         className="absolute bottom-2 right-2 bg-red-600"
         animate={{ 
           width: isHovered ? 16 : 12,
@@ -64,7 +64,7 @@ export function BrutalistPreview({ isHovered = false, size = 'md' }: BrutalistPr
       />
       
       {/* Grid lines on hover */}
-      <motion.div
+      <m.div
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage: `

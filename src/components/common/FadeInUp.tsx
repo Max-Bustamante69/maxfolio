@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { ReactNode } from 'react'
 
 interface FadeInUpProps {
@@ -15,7 +15,7 @@ export function FadeInUp({
   className = '' 
 }: FadeInUpProps) {
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
@@ -23,6 +23,6 @@ export function FadeInUp({
       className={className}
     >
       {children}
-    </motion.div>
+    </m.div>
   )
 }

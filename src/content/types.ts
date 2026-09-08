@@ -19,7 +19,7 @@ export interface PortfolioContent {
   stats: Record<StatId, string>
   sections: {
     experience: SectionHeading & { achievements: string; technologies: string; visit: string }
-    shopify: SectionHeading & { lead: string; tabStores: string; tabProducts: string; legacyLabel: string; visit: string; showAll: string; showLess: string }
+    shopify: SectionHeading & { lead: string; tabStores: string; tabProducts: string; legacyLabel: string; visit: string; showAll: string; showLess: string; filterAll: string; filters: Record<string, string> }
     gallery: SectionHeading & {
       lead: string
       filterAll: string
@@ -36,6 +36,9 @@ export interface PortfolioContent {
       desktop: string
       mobile: string
     }
+    now: { label: string; live: string; dev: string; band: string }
+    process: SectionHeading & { lead: string; steps: { title: string; body: string }[] }
+    testimonials: SectionHeading
     years: SectionHeading & { lead: string; roles: string; shipped: string; products: string; side: string; more: string }
     projects: SectionHeading & { view: string }
     skills: SectionHeading & { groups: Record<SkillGroupId, string> }

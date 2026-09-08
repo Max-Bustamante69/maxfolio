@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { useState, FormEvent } from 'react'
 import { config } from '../../config'
 import { personal as personalInfo } from '../../data/registry'
@@ -127,7 +127,7 @@ export function ContactFormModal({
       {isOpen && (
         <>
           {/* Backdrop */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -137,7 +137,7 @@ export function ContactFormModal({
           />
           
           {/* Desktop Modal */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
@@ -170,7 +170,7 @@ export function ContactFormModal({
 
                 {/* Success State */}
                 {status === 'success' ? (
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="py-12 text-center"
@@ -182,7 +182,7 @@ export function ContactFormModal({
                     </div>
                     <p className={`font-display text-xl ${styles.textPrimary}`}>{t('contactModal.sentTitle')}</p>
                     <p className={`text-sm ${styles.textSecondary} mt-2`}>{t('contactModal.sentSubtitle')}</p>
-                  </motion.div>
+                  </m.div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-4" aria-label="Contact form">
                     <div className="grid grid-cols-2 gap-4">
@@ -272,10 +272,10 @@ export function ContactFormModal({
                 </div>
               </div>
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Mobile Bottom Sheet */}
-          <motion.div
+          <m.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
@@ -305,7 +305,7 @@ export function ContactFormModal({
               </div>
 
               {status === 'success' ? (
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="py-8 text-center"
@@ -316,7 +316,7 @@ export function ContactFormModal({
                     </svg>
                   </div>
                   <p className={`font-display text-lg ${styles.textPrimary}`}>{t('contactModal.successSent')}</p>
-                </motion.div>
+                </m.div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4" aria-label="Contact form">
                   <label htmlFor="contact-name-mobile" className="sr-only">{t('common.name')}</label>
@@ -379,7 +379,7 @@ export function ContactFormModal({
                 </a>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         </>
       )}
     </AnimatePresence>

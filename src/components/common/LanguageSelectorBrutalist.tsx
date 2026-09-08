@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { useMemo, useState } from 'react'
 import { supportedLocales, useLanguage, Locale } from '../../context/LanguageContext'
 import { useI18n } from '../../hooks/useI18n'
@@ -21,7 +21,7 @@ export function LanguageSelectorBrutalist({ size = 'md' }: { size?: 'sm' | 'md' 
 
   return (
     <div className="relative">
-      <motion.button
+      <m.button
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={`relative ${buttonSize} flex items-center justify-center group`}
@@ -36,12 +36,12 @@ export function LanguageSelectorBrutalist({ size = 'md' }: { size?: 'sm' | 'md' 
         <span className={`relative z-10 font-mono uppercase font-bold ${letterSize} text-white tracking-wider`}>
           {localeLabel(locale)}
         </span>
-      </motion.button>
+      </m.button>
 
       <AnimatePresence>
         {open && (
           <>
-            <motion.div
+            <m.div
               className="fixed inset-0 z-40"
               onClick={() => setOpen(false)}
               initial={{ opacity: 0 }}
@@ -50,7 +50,7 @@ export function LanguageSelectorBrutalist({ size = 'md' }: { size?: 'sm' | 'md' 
               aria-hidden="true"
             />
 
-            <motion.div
+            <m.div
               role="menu"
               aria-orientation="vertical"
               initial={{ opacity: 0, y: -8, scale: 0.98 }}
@@ -69,7 +69,7 @@ export function LanguageSelectorBrutalist({ size = 'md' }: { size?: 'sm' | 'md' 
                 {options.map((opt, idx) => {
                   const isActive = opt === locale
                   return (
-                    <motion.button
+                    <m.button
                       key={opt}
                       type="button"
                       role="menuitem"
@@ -88,13 +88,13 @@ export function LanguageSelectorBrutalist({ size = 'md' }: { size?: 'sm' | 'md' 
                       <span className={`text-[10px] font-mono ${isActive ? 'text-red-300' : 'text-stone-500'}`}>
                         {isActive ? '●' : ' '}
                       </span>
-                    </motion.button>
+                    </m.button>
                   )
                 })}
               </div>
 
               <div className="h-1.5 bg-red-600" aria-hidden="true" />
-            </motion.div>
+            </m.div>
           </>
         )}
       </AnimatePresence>

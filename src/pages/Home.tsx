@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { ThemeProvider, useTheme } from '../context/ThemeContext'
 import { LanguageSelectorMenu, ThemeToggle, TransitionLink, SEOHead } from '../components'
@@ -76,7 +76,7 @@ function HomeContent() {
 
         {/* Hero Section */}
         <section className="mb-12 sm:mb-16 md:mb-20">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className={`inline-flex items-center gap-2 px-3 py-1.5 mb-6 border ${border} ${cardBg}`}
@@ -87,9 +87,9 @@ function HomeContent() {
             <span className={`text-[10px] sm:text-xs tracking-[0.3em] uppercase ${textMuted}`}>
               {t('menuPage.designSelector')}
             </span>
-          </motion.div>
+          </m.div>
 
-          <motion.h1
+          <m.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -100,7 +100,7 @@ function HomeContent() {
             </span>
             <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-display font-medium tracking-tight leading-[1] mt-1 sm:mt-2 h-[1.15em] flex items-center">
               <AnimatePresence mode="wait">
-                <motion.span
+                <m.span
                   key={activeVisionIndex}
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
@@ -109,24 +109,24 @@ function HomeContent() {
                   className={visionStyles[activeVisionIndex].className}
                 >
                   {t(visionStyles[activeVisionIndex].key)}
-                </motion.span>
+                </m.span>
               </AnimatePresence>
               <span className="ml-2 sm:ml-3">{t('menuPage.vision')}</span>
             </span>
-          </motion.h1>
+          </m.h1>
 
-          <motion.p
+          <m.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             className={`text-sm sm:text-base ${textSecondary} max-w-lg leading-relaxed`}
           >
             {t('menuPage.subtitle')}
-          </motion.p>
+          </m.p>
         </section>
 
         {/* Divider */}
-        <motion.div
+        <m.div
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
           transition={{ delay: 0.3, duration: 0.5 }}
@@ -135,7 +135,7 @@ function HomeContent() {
 
         {/* Design Cards */}
         <section>
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
@@ -147,7 +147,7 @@ function HomeContent() {
             <span className={`text-xs ${textMuted}`}>
               {designs.length} {t('menuPage.options')}
             </span>
-          </motion.div>
+          </m.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {designs.map((design, index) => {
@@ -157,7 +157,7 @@ function HomeContent() {
               const designSubtitle = t(design.subtitleKey)
 
               return (
-                <motion.div
+                <m.div
                   key={design.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -198,7 +198,7 @@ function HomeContent() {
                         >
                           {designName}
                         </h3>
-                        <motion.svg
+                        <m.svg
                           animate={{ x: isHovered ? 0 : -6, opacity: isHovered ? 1 : 0 }}
                           className="w-4 h-4"
                           style={{ color: design.accent }}
@@ -207,7 +207,7 @@ function HomeContent() {
                           viewBox="0 0 24 24"
                         >
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                        </motion.svg>
+                        </m.svg>
                       </div>
 
                       <p className={`text-xs sm:text-sm ${textMuted}`}>
@@ -215,14 +215,14 @@ function HomeContent() {
                       </p>
                     </div>
                   </TransitionLink>
-                </motion.div>
+                </m.div>
               )
             })}
           </div>
         </section>
 
         {/* Bottom Note */}
-        <motion.section
+        <m.section
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
@@ -246,7 +246,7 @@ function HomeContent() {
               </svg>
             </TransitionLink>
           </div>
-        </motion.section>
+        </m.section>
       </main>
 
       {/* Footer */}

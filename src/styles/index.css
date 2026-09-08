@@ -79,6 +79,39 @@
   }
 }
 
+/* Fleet ticker: two rows on a transform keyframe (seamless: the set is duplicated), edge-masked,
+   stopped under reduced motion. */
+.marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+.marquee-row {
+  display: flex;
+  width: max-content;
+  animation: marquee 48s linear infinite;
+}
+.marquee-row-reverse {
+  animation-direction: reverse;
+  animation-duration: 56s;
+}
+.marquee-track {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-row {
+    animation: none;
+  }
+}
+
 /* iOS-style glass for the carousel controls. */
 .glass {
   -webkit-backdrop-filter: blur(20px) saturate(160%);

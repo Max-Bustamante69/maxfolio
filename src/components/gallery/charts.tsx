@@ -1,5 +1,5 @@
 import { useEffect, useId } from 'react'
-import { animate, motion, useMotionValue, useReducedMotion, useTransform } from 'framer-motion'
+import { animate, m, useMotionValue, useReducedMotion, useTransform } from 'framer-motion'
 import type { ResultMetric } from '../../data/results'
 
 const EASE = [0.23, 1, 0.32, 1] as const
@@ -17,7 +17,7 @@ export function CountUp({ value, decimals = 0, prefix = '', suffix = '', delay =
     const ctrl = animate(mv, value, { duration: 1, delay, ease: EASE })
     return () => ctrl.stop()
   }, [value, delay, reduced, mv])
-  return <motion.span className={className}>{text}</motion.span>
+  return <m.span className={className}>{text}</m.span>
 }
 
 interface LineProps {
@@ -63,8 +63,8 @@ export function IndexLine({ metric, color, dark, label, delay = 0 }: LineProps) 
           </linearGradient>
         </defs>
         <line x1={pad} x2={W - pad} y1={y(100)} y2={y(100)} stroke={track} strokeWidth="1" strokeDasharray="3 4" />
-        <motion.path d={area} fill={`url(#${id}-fill)`} initial={reduced ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: delay + 0.6, duration: 0.6 }} />
-        <motion.path
+        <m.path d={area} fill={`url(#${id}-fill)`} initial={reduced ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: delay + 0.6, duration: 0.6 }} />
+        <m.path
           d={d}
           fill="none"
           stroke={color}
@@ -75,8 +75,19 @@ export function IndexLine({ metric, color, dark, label, delay = 0 }: LineProps) 
           animate={{ pathLength: 1 }}
           transition={{ delay, duration: 1.1, ease: EASE }}
         />
-        <motion.circle cx={x(series.length - 1)} cy={y(series[series.length - 1])} r="4" fill={color} initial={reduced ? false : { scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: delay + 1, duration: 0.3, ease: EASE }} />
+        <m.circle cx={x(series.length - 1)} cy={y(series[series.length - 1])} r="4" fill={color} initial={reduced ? false : { scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: delay + 1, duration: 0.3, ease: EASE }} />
       </svg>
+      <table className="sr-only">
+        <caption>{label}</caption>
+        <tbody>
+          {series.map((v, i) => (
+            <tr key={i}>
+              <th scope="row">{i + 1}</th>
+              <td>{v}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </figure>
   )
 }
@@ -108,7 +119,7 @@ export function DeltaBars({ metric, color, dark, label, beforeLabel, afterLabel,
           <div key={r.key} className="flex items-center gap-2">
             <span className={`w-12 shrink-0 text-[10px] uppercase tracking-[0.12em] ${dark ? 'text-[#a1a1a6]' : 'text-[#6e6e73]'}`}>{r.key}</span>
             <div className={`h-2.5 flex-1 overflow-hidden rounded-full ${dark ? 'bg-white/10' : 'bg-black/[0.06]'}`}>
-              <motion.div
+              <m.div
                 className="h-full rounded-full"
                 style={{ backgroundColor: r.c }}
                 initial={reduced ? false : { width: 0 }}
@@ -120,6 +131,17 @@ export function DeltaBars({ metric, color, dark, label, beforeLabel, afterLabel,
           </div>
         ))}
       </div>
+      <table className="sr-only">
+        <caption>{label}</caption>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.key}>
+              <th scope="row">{r.key}</th>
+              <td>{fmt(r.v)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </figure>
   )
 }

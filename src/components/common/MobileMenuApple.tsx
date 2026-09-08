@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { TransitionLink } from './TransitionLink'
@@ -44,7 +44,7 @@ export function MobileMenuApple({ navItems, isDark, onContactClick, contactLabel
   const sheet = (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
+        <m.div
           key="sheet"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -54,7 +54,7 @@ export function MobileMenuApple({ navItems, isDark, onContactClick, contactLabel
           style={{ touchAction: 'none' }}
           onClick={() => setIsOpen(false)}
         >
-          <motion.div
+          <m.div
             initial={{ y: -12, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -8, opacity: 0, transition: { duration: 0.16 } }}
@@ -78,7 +78,7 @@ export function MobileMenuApple({ navItems, isDark, onContactClick, contactLabel
 
             <nav className="mt-8 flex-1">
               {navItems.map((item, i) => (
-                <motion.a
+                <m.a
                   key={item.href}
                   href={item.href}
                   onClick={() => setIsOpen(false)}
@@ -88,7 +88,7 @@ export function MobileMenuApple({ navItems, isDark, onContactClick, contactLabel
                   className={`block py-3 text-3xl font-semibold tracking-[-0.02em] ${text}`}
                 >
                   {item.label}
-                </motion.a>
+                </m.a>
               ))}
             </nav>
 
@@ -131,8 +131,8 @@ export function MobileMenuApple({ navItems, isDark, onContactClick, contactLabel
                 </TransitionLink>
               </div>
             </div>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   )

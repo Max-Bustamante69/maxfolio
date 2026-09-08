@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { motion, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion'
+import { m, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion'
 import { useLenis } from './SmoothScroll'
 
 export interface RailSection {
@@ -89,7 +89,7 @@ export function ScrollRail({ sections, dark, accent = '#0071e3' }: ScrollRailPro
   return (
     <>
       {/* progress bar: touch / small screens */}
-      <motion.div
+      <m.div
         aria-hidden="true"
         className="fixed left-0 top-11 z-40 h-[2px] w-full origin-left lg:hidden [@media(hover:hover)_and_(min-width:1024px)]:hidden"
         style={{ scaleX: progress, backgroundColor: accent }}
@@ -123,13 +123,13 @@ export function ScrollRail({ sections, dark, accent = '#0071e3' }: ScrollRailPro
           </button>
         ))}
         {/* thumb */}
-        <motion.div
+        <m.div
           aria-hidden="true"
           className="pointer-events-none absolute left-1/2 z-20 flex -translate-x-1/2 -translate-y-1/2 items-center"
           style={{ top: thumbTop }}
         >
           <div className={`h-9 w-[14px] rounded-full ${glass}`} />
-          <motion.span
+          <m.span
             key={label}
             initial={reduced ? false : { opacity: 0, x: 6 }}
             animate={{ opacity: 1, x: 0 }}
@@ -137,8 +137,8 @@ export function ScrollRail({ sections, dark, accent = '#0071e3' }: ScrollRailPro
             className={`absolute right-full mr-3 whitespace-nowrap rounded-full px-3 py-1 text-[11px] font-medium ${glass} ${ink}`}
           >
             {label}
-          </motion.span>
-        </motion.div>
+          </m.span>
+        </m.div>
       </div>
     </>
   )

@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 
 interface MenuPreviewProps {
   isHovered?: boolean
@@ -17,19 +17,19 @@ export function MenuPreview({ isHovered = false, isDark = false }: MenuPreviewPr
     >
       {/* Simple menu icon lines */}
       <div className="flex flex-col gap-1.5 items-center">
-        <motion.div
+        <m.div
           className="h-[2px] rounded-full"
           style={{ backgroundColor: isHovered ? lineHover : line }}
           animate={{ width: isHovered ? 32 : 28 }}
           transition={{ duration: 0.2 }}
         />
-        <motion.div
+        <m.div
           className="h-[2px] rounded-full"
           style={{ backgroundColor: isHovered ? lineHover : line }}
           animate={{ width: isHovered ? 24 : 20 }}
           transition={{ duration: 0.2, delay: 0.05 }}
         />
-        <motion.div
+        <m.div
           className="h-[2px] rounded-full"
           style={{ backgroundColor: isHovered ? lineHover : line }}
           animate={{ width: isHovered ? 28 : 24 }}
@@ -38,7 +38,7 @@ export function MenuPreview({ isHovered = false, isDark = false }: MenuPreviewPr
       </div>
       
       {/* Subtle dots indicating multiple options */}
-      <motion.div 
+      <m.div 
         className="flex gap-1.5 mt-3"
         animate={{ opacity: isHovered ? 1 : 0.5 }}
         transition={{ duration: 0.2 }}
@@ -51,7 +51,7 @@ export function MenuPreview({ isHovered = false, isDark = false }: MenuPreviewPr
           className="w-1.5 h-1.5 rounded-full"
           style={{ backgroundColor: line }}
         />
-      </motion.div>
+      </m.div>
     </div>
   )
 }

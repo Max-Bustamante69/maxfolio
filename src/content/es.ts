@@ -35,6 +35,8 @@ export const es: PortfolioContent = {
       visit: 'Visitar tienda',
       showAll: 'Ver las {n} tiendas',
       showLess: 'Ver menos',
+      filterAll: 'Todas',
+      filters: { bundles: 'Bundles', quiz: 'Quiz', subscriptions: 'Suscripciones', reviews: 'Reseñas', migration: 'Migraciones', islands: 'Islas React', tracking: 'Tracking', i18n: 'Multimoneda' },
     },
     gallery: {
       eyebrow: 'Galería',
@@ -55,6 +57,21 @@ export const es: PortfolioContent = {
       desktop: 'Escritorio',
       mobile: 'Móvil',
     },
+    process: {
+      eyebrow: 'Cómo se entrega',
+      title: 'Cinco pasos,',
+      titleAccent: 'sin sorpresas',
+      lead: 'Las mismas puertas en cada tienda, para que sepas qué sigue y qué recibes al final.',
+      steps: [
+        { title: 'Diagnóstico', body: 'Tu tienda, tus números, tus cuellos de botella. Leo los datos antes de tocar una línea.' },
+        { title: 'Mapa de patrones', body: 'Cada página tiene plan: qué secciones, qué ofertas, qué prueba, en qué orden.' },
+        { title: 'Construcción', body: 'Liquid + islas React sobre la plantilla Digitdeck, medido desde el primer commit.' },
+        { title: 'QA', body: 'Un arnés de Playwright recorre la tienda completa por comportamiento antes de salir al aire.' },
+        { title: 'Entrega', body: 'Recibes el editor, la documentación y los números; nada depende de mí para seguir andando.' },
+      ],
+    },
+    testimonials: { eyebrow: 'En sus palabras', title: 'Lo que dicen', titleAccent: 'los clientes' },
+    now: { label: 'Ahora', live: '{n} tiendas en vivo', dev: '{n} en construcción', band: 'Tiendas entregadas' },
     years: { eyebrow: 'Año por año', title: 'Cinco años,', titleAccent: 'una sola dirección', lead: 'De componentes React en 2022 a una flota de tiendas Shopify y la plataforma detrás. Cada tarjeta sale de los mismos registros que el resto del sitio.', roles: 'Roles', shipped: 'Tiendas', products: 'Productos', side: 'En mi tiempo', more: '+{n} más' },
     projects: { eyebrow: 'Proyectos', title: 'Lo que construyo', titleAccent: 'en mi tiempo', view: 'Ver proyecto' },
     skills: {

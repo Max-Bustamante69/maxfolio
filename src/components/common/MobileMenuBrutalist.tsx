@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { TransitionLink } from './TransitionLink'
@@ -39,7 +39,7 @@ export function MobileMenuBrutalist({ navItems, isDark, onContactClick }: Mobile
   const menuContent = (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -70,7 +70,7 @@ export function MobileMenuBrutalist({ navItems, isDark, onContactClick }: Mobile
           {/* Content */}
           <div className="h-full flex flex-col items-center justify-center px-8 relative z-10" onClick={(e) => e.stopPropagation()}>
             {/* Close Button */}
-            <motion.button
+            <m.button
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
@@ -81,10 +81,10 @@ export function MobileMenuBrutalist({ navItems, isDark, onContactClick }: Mobile
               <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
-            </motion.button>
+            </m.button>
 
             {/* Section Label */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
@@ -93,12 +93,12 @@ export function MobileMenuBrutalist({ navItems, isDark, onContactClick }: Mobile
               <span className="font-mono text-[10px] uppercase tracking-[0.5em] text-red-600">
                 {t('mobileMenu.menu')}
               </span>
-            </motion.div>
+            </m.div>
 
             {/* Navigation Links */}
             <nav className="text-center mb-10">
               {navItems.map((item, index) => (
-                <motion.a
+                <m.a
                   key={item.href}
                   href={item.href}
                   onClick={() => setIsOpen(false)}
@@ -108,13 +108,13 @@ export function MobileMenuBrutalist({ navItems, isDark, onContactClick }: Mobile
                   className={`block py-3 font-editorial text-4xl italic ${textPrimary} hover:text-red-600 transition-colors`}
                 >
                   {item.label}
-                </motion.a>
+                </m.a>
               ))}
             </nav>
 
             {/* Quick Message Button */}
             {onContactClick && (
-              <motion.button
+              <m.button
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
@@ -128,11 +128,11 @@ export function MobileMenuBrutalist({ navItems, isDark, onContactClick }: Mobile
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
                 {t('common.quickMessage')}
-              </motion.button>
+              </m.button>
             )}
 
             {/* Divider */}
-            <motion.div
+            <m.div
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ delay: 0.55, duration: 0.3 }}
@@ -140,7 +140,7 @@ export function MobileMenuBrutalist({ navItems, isDark, onContactClick }: Mobile
             />
 
             {/* Design Switcher */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
@@ -172,12 +172,12 @@ export function MobileMenuBrutalist({ navItems, isDark, onContactClick }: Mobile
                   </TransitionLink>
                 ))}
               </div>
-            </motion.div>
+            </m.div>
           </div>
 
           {/* Bottom red bar */}
           <div className="absolute bottom-0 left-0 right-0 h-1 bg-red-600" />
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   )

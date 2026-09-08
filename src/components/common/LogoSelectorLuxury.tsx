@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from "react";
 import { TransitionLink } from "./TransitionLink";
 import { useI18n } from "../../hooks/useI18n";
@@ -92,7 +92,7 @@ export function LogoSelectorLuxury({ isDark }: LogoSelectorLuxuryProps) {
   return (
     <div ref={containerRef} className="relative flex items-center gap-1">
       {/* Logo Button with Glow Effect */}
-      <motion.button
+      <m.button
         onClick={() => setIsOpen(!isOpen)}
         className="w-10 h-10 relative flex items-center justify-center group"
         whileHover={{ scale: 1.08 }}
@@ -102,7 +102,7 @@ export function LogoSelectorLuxury({ isDark }: LogoSelectorLuxuryProps) {
         aria-haspopup="true"
       >
         {/* Pulsing glow background on hover */}
-        <motion.div
+        <m.div
           className="absolute inset-0 rounded-full"
           style={{ backgroundColor: glowColor }}
           initial={{ opacity: 0, scale: 0.8 }}
@@ -112,11 +112,11 @@ export function LogoSelectorLuxury({ isDark }: LogoSelectorLuxuryProps) {
 
         {/* Outer frame */}
         <svg viewBox="0 0 40 40" className="absolute inset-0 w-full h-full" fill="none" aria-hidden="true">
-          <motion.path d="M0 8 L0 0 L8 0" stroke={accentHex} strokeWidth="1.5" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.5 }} />
-          <motion.path d="M32 0 L40 0 L40 8" stroke={accentHex} strokeWidth="1.5" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.5, delay: 0.1 }} />
-          <motion.path d="M40 32 L40 40 L32 40" stroke={accentHex} strokeWidth="1.5" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.5, delay: 0.2 }} />
-          <motion.path d="M8 40 L0 40 L0 32" stroke={accentHex} strokeWidth="1.5" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.5, delay: 0.3 }} />
-          <motion.path
+          <m.path d="M0 8 L0 0 L8 0" stroke={accentHex} strokeWidth="1.5" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.5 }} />
+          <m.path d="M32 0 L40 0 L40 8" stroke={accentHex} strokeWidth="1.5" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.5, delay: 0.1 }} />
+          <m.path d="M40 32 L40 40 L32 40" stroke={accentHex} strokeWidth="1.5" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.5, delay: 0.2 }} />
+          <m.path d="M8 40 L0 40 L0 32" stroke={accentHex} strokeWidth="1.5" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.5, delay: 0.3 }} />
+          <m.path
             d="M20 8 L32 20 L20 32 L8 20 Z"
             stroke={accentHex}
             strokeWidth="0.5"
@@ -129,31 +129,31 @@ export function LogoSelectorLuxury({ isDark }: LogoSelectorLuxuryProps) {
         <span className={`font-display text-xs tracking-[0.2em] font-medium ${textPrimary} relative z-10`}>
           MB
         </span>
-      </motion.button>
+      </m.button>
 
       {/* Animated indicator with text hint */}
       <AnimatePresence>
         {showHint && !isOpen && (
-          <motion.div
+          <m.div
             className={`flex items-center gap-1 ${accent}`}
             initial={{ opacity: 0, x: -5 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -5 }}
             transition={{ duration: 0.3 }}
           >
-            <motion.div className="relative w-4 h-4" animate={{ rotate: [0, 180, 360] }} transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}>
+            <m.div className="relative w-4 h-4" animate={{ rotate: [0, 180, 360] }} transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}>
               <svg viewBox="0 0 16 16" className="w-full h-full" fill="none">
-                <motion.path d="M8 1 L15 8 L8 15 L1 8 Z" stroke={accentHex} strokeWidth="1" fill="none" animate={{ scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 2 }} />
+                <m.path d="M8 1 L15 8 L8 15 L1 8 Z" stroke={accentHex} strokeWidth="1" fill="none" animate={{ scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 2 }} />
               </svg>
-            </motion.div>
-            <motion.span
+            </m.div>
+            <m.span
               className="hidden sm:block font-display text-[9px] tracking-[0.15em] uppercase whitespace-nowrap"
               animate={{ opacity: [0.5, 1, 0.5] }}
               transition={{ repeat: Infinity, duration: 2 }}
             >
               Styles
-            </motion.span>
-          </motion.div>
+            </m.span>
+          </m.div>
         )}
       </AnimatePresence>
 
@@ -162,7 +162,7 @@ export function LogoSelectorLuxury({ isDark }: LogoSelectorLuxuryProps) {
         {isOpen && (
           <>
             {/* Backdrop with blur */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -172,7 +172,7 @@ export function LogoSelectorLuxury({ isDark }: LogoSelectorLuxuryProps) {
             />
 
             {/* Elegant Dropdown */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: -15, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -15, scale: 0.9 }}
@@ -201,7 +201,7 @@ export function LogoSelectorLuxury({ isDark }: LogoSelectorLuxuryProps) {
               ))}
 
               {/* Top gold line */}
-              <motion.div
+              <m.div
                 className="h-0.5"
                 style={{ background: `linear-gradient(90deg, transparent, ${accentHex}, transparent)` }}
                 initial={{ scaleX: 0 }}
@@ -211,7 +211,7 @@ export function LogoSelectorLuxury({ isDark }: LogoSelectorLuxuryProps) {
 
               {/* Header */}
               <div className={`px-6 py-5 border-b ${borderColor} relative overflow-hidden`}>
-                <motion.div
+                <m.div
                   className="absolute right-4 top-1/2 -translate-y-1/2 opacity-10"
                   animate={{ rotate: 360 }}
                   transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
@@ -219,7 +219,7 @@ export function LogoSelectorLuxury({ isDark }: LogoSelectorLuxuryProps) {
                   <svg viewBox="0 0 40 40" className="w-10 h-10" fill="none">
                     <path d="M20 0 L40 20 L20 40 L0 20 Z" stroke={accentHex} strokeWidth="1" />
                   </svg>
-                </motion.div>
+                </m.div>
                 <p className={`font-display text-[10px] tracking-[0.4em] uppercase ${textMuted}`}>
                   {t("logoSelector.portfolioExperience")}
                 </p>
@@ -233,7 +233,7 @@ export function LogoSelectorLuxury({ isDark }: LogoSelectorLuxuryProps) {
                 {designs.map((d, index) => {
                   const isCurrent = d.id === "luxury";
                   const inner = (
-                    <motion.div
+                    <m.div
                       className="flex items-start gap-4"
                       role="menuitem"
                       initial={{ x: -10, opacity: 0 }}
@@ -248,21 +248,21 @@ export function LogoSelectorLuxury({ isDark }: LogoSelectorLuxuryProps) {
                         </p>
                         <p className={`text-[11px] ${textMuted} mt-1 leading-relaxed`}>{t(d.subtitleKey)}</p>
                         {isCurrent ? (
-                          <motion.p
+                          <m.p
                             className={`text-[10px] ${accent} mt-3 flex items-center gap-2`}
                             animate={{ opacity: [0.7, 1, 0.7] }}
                             transition={{ repeat: Infinity, duration: 1.5 }}
                           >
                             <span className="w-1.5 h-1.5 rounded-full bg-current" />
                             {t("logoSelector.currentlyViewing")}
-                          </motion.p>
+                          </m.p>
                         ) : (
                           <p className={`text-[10px] ${textMuted} mt-3 flex items-center gap-1 group-hover:${accent} transition-colors`}>
                             {t("logoSelector.switchExperience")} →
                           </p>
                         )}
                       </div>
-                    </motion.div>
+                    </m.div>
                   );
 
                   if (isCurrent) {
@@ -308,7 +308,7 @@ export function LogoSelectorLuxury({ isDark }: LogoSelectorLuxuryProps) {
                   transitionLabel={t(MENU.labelKey)}
                   className={`block mx-3 px-4 py-3 rounded-sm hover:${isDark ? "bg-white/5" : "bg-black/5"} transition-all cursor-pointer group`}
                 >
-                  <motion.div
+                  <m.div
                     className="flex items-center gap-4"
                     role="menuitem"
                     initial={{ x: -10, opacity: 0 }}
@@ -317,30 +317,30 @@ export function LogoSelectorLuxury({ isDark }: LogoSelectorLuxuryProps) {
                     whileHover={{ x: 5 }}
                   >
                     <div className="w-12 h-12 flex items-center justify-center">
-                      <motion.div className="grid grid-cols-2 gap-1.5" whileHover={{ rotate: 90, scale: 1.1 }} transition={{ duration: 0.3 }}>
+                      <m.div className="grid grid-cols-2 gap-1.5" whileHover={{ rotate: 90, scale: 1.1 }} transition={{ duration: 0.3 }}>
                         <div className="w-4 h-4 bg-[#0071e3]" />
                         <div className="w-4 h-4 bg-[#C9A962]" />
                         <div className="w-4 h-4 bg-red-600" />
                         <div className="w-4 h-4 bg-[#C9A962]/50" />
-                      </motion.div>
+                      </m.div>
                     </div>
                     <div>
                       <p className={`font-display text-sm ${textPrimary}`}>{t(MENU.labelKey)}</p>
                       <p className={`text-[10px] ${textMuted}`}>{t(MENU.subtitleKey)}</p>
                     </div>
-                  </motion.div>
+                  </m.div>
                 </TransitionLink>
               </div>
 
               {/* Bottom gold line */}
-              <motion.div
+              <m.div
                 className="h-0.5"
                 style={{ background: `linear-gradient(90deg, transparent, ${accentHex}, transparent)` }}
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
                 transition={{ duration: 0.4, delay: 0.2 }}
               />
-            </motion.div>
+            </m.div>
           </>
         )}
       </AnimatePresence>

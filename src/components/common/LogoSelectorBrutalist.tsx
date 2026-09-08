@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from "react";
 import { TransitionLink } from "./TransitionLink";
 import { useI18n } from "../../hooks/useI18n";
@@ -12,7 +12,7 @@ interface LogoSelectorBrutalistProps {
 function DesignMark({ id }: { id: DesignId }) {
   if (id === "brutalist") {
     return (
-      <motion.div
+      <m.div
         className="w-14 h-14 relative flex-shrink-0 flex items-center justify-center bg-red-600"
         animate={{ boxShadow: ["4px 4px 0 0 rgba(220, 38, 38, 0.3)", "6px 6px 0 0 rgba(220, 38, 38, 0.4)", "4px 4px 0 0 rgba(220, 38, 38, 0.3)"] }}
         transition={{ repeat: Infinity, duration: 1.5 }}
@@ -22,7 +22,7 @@ function DesignMark({ id }: { id: DesignId }) {
           <span className="font-mono text-base font-bold text-white">M</span>
           <span className="font-mono text-base font-bold text-white -mt-1">B</span>
         </div>
-      </motion.div>
+      </m.div>
     );
   }
   if (id === "apple") {
@@ -91,7 +91,7 @@ export function LogoSelectorBrutalist({ isDark }: LogoSelectorBrutalistProps) {
 
   const Stripes = ({ reverse = false }: { reverse?: boolean }) => (
     <div className="h-3 bg-red-600 relative overflow-hidden">
-      <motion.div
+      <m.div
         className="absolute inset-0 flex"
         animate={{ x: reverse ? [-20, 0] : [0, -20] }}
         transition={{ repeat: Infinity, duration: 0.5, ease: "linear" }}
@@ -99,14 +99,14 @@ export function LogoSelectorBrutalist({ isDark }: LogoSelectorBrutalistProps) {
         {[...Array(20)].map((_, i) => (
           <div key={i} className="w-5 h-full bg-red-700 transform -skew-x-12 mx-1" />
         ))}
-      </motion.div>
+      </m.div>
     </div>
   );
 
   return (
     <div ref={containerRef} className="relative flex items-center gap-1">
       {/* Logo Button with hover effects */}
-      <motion.button
+      <m.button
         onClick={() => setIsOpen(!isOpen)}
         className="w-10 h-10 relative flex items-center justify-center group"
         whileHover={{ scale: 1.05, rotate: -2 }}
@@ -115,8 +115,8 @@ export function LogoSelectorBrutalist({ isDark }: LogoSelectorBrutalistProps) {
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
-        <motion.div className="absolute inset-0 bg-red-600" whileHover={{ boxShadow: "0 0 20px 5px rgba(220, 38, 38, 0.4)" }} />
-        <motion.div
+        <m.div className="absolute inset-0 bg-red-600" whileHover={{ boxShadow: "0 0 20px 5px rgba(220, 38, 38, 0.4)" }} />
+        <m.div
           className="absolute -bottom-0.5 -right-0.5 w-full h-full border-2"
           style={{ borderColor: isDark ? "#fafaf9" : "#dc2626" }}
           initial={{ opacity: 0.3 }}
@@ -124,19 +124,19 @@ export function LogoSelectorBrutalist({ isDark }: LogoSelectorBrutalistProps) {
           transition={{ duration: 0.2 }}
         />
         <div className="relative z-10 flex flex-col items-center leading-none">
-          <motion.span className="font-mono text-sm font-bold text-white" animate={{ y: [0, -1, 0] }} transition={{ repeat: Infinity, duration: 2, delay: 0.5 }}>
+          <m.span className="font-mono text-sm font-bold text-white" animate={{ y: [0, -1, 0] }} transition={{ repeat: Infinity, duration: 2, delay: 0.5 }}>
             M
-          </motion.span>
-          <motion.span className="font-mono text-sm font-bold text-white -mt-1" animate={{ y: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 2, delay: 0.5 }}>
+          </m.span>
+          <m.span className="font-mono text-sm font-bold text-white -mt-1" animate={{ y: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 2, delay: 0.5 }}>
             B
-          </motion.span>
+          </m.span>
         </div>
-      </motion.button>
+      </m.button>
 
       {/* Animated indicator - Brutalist style */}
       <AnimatePresence>
         {showHint && !isOpen && (
-          <motion.div
+          <m.div
             className="flex items-center gap-1 text-red-600"
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
@@ -145,7 +145,7 @@ export function LogoSelectorBrutalist({ isDark }: LogoSelectorBrutalistProps) {
           >
             <div className="flex flex-col gap-0.5">
               {["8px", "12px", "8px"].map((w, i) => (
-                <motion.div
+                <m.div
                   key={i}
                   className="h-0.5 bg-red-600"
                   animate={{ width: i === 1 ? ["12px", "8px", "12px"] : [w, "12px", w] }}
@@ -153,14 +153,14 @@ export function LogoSelectorBrutalist({ isDark }: LogoSelectorBrutalistProps) {
                 />
               ))}
             </div>
-            <motion.span
+            <m.span
               className="hidden sm:block font-mono text-[9px] uppercase tracking-wider whitespace-nowrap"
               animate={{ opacity: [0.5, 1, 0.5] }}
               transition={{ repeat: Infinity, duration: 1.5 }}
             >
               Styles
-            </motion.span>
-          </motion.div>
+            </m.span>
+          </m.div>
         )}
       </AnimatePresence>
 
@@ -168,7 +168,7 @@ export function LogoSelectorBrutalist({ isDark }: LogoSelectorBrutalistProps) {
       <AnimatePresence>
         {isOpen && (
           <>
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -177,7 +177,7 @@ export function LogoSelectorBrutalist({ isDark }: LogoSelectorBrutalistProps) {
               aria-hidden="true"
             />
 
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: -10, scaleY: 0.8 }}
               animate={{ opacity: 1, y: 0, scaleY: 1 }}
               exit={{ opacity: 0, y: -10, scaleY: 0.8 }}
@@ -207,7 +207,7 @@ export function LogoSelectorBrutalist({ isDark }: LogoSelectorBrutalistProps) {
                 {designs.map((d, index) => {
                   const isCurrent = d.id === "brutalist";
                   const inner = (
-                    <motion.div
+                    <m.div
                       className="flex items-start gap-4 relative z-10"
                       role="menuitem"
                       initial={{ x: -20, opacity: 0 }}
@@ -227,18 +227,18 @@ export function LogoSelectorBrutalist({ isDark }: LogoSelectorBrutalistProps) {
                           {t(d.subtitleKey)}
                         </p>
                         {isCurrent ? (
-                          <motion.div className="flex items-center gap-2 mt-3" animate={{ opacity: [0.7, 1, 0.7] }} transition={{ repeat: Infinity, duration: 1 }}>
+                          <m.div className="flex items-center gap-2 mt-3" animate={{ opacity: [0.7, 1, 0.7] }} transition={{ repeat: Infinity, duration: 1 }}>
                             <span className="w-2 h-2 bg-red-600" />
                             <span className="font-mono text-[10px] text-red-600 uppercase tracking-wider">{t("logoSelector.currentlyViewing")}</span>
-                          </motion.div>
+                          </m.div>
                         ) : (
                           <p className={`font-mono text-[10px] ${textMuted} mt-3 group-hover:text-red-600 transition-colors flex items-center gap-1`}>
                             <span>{t("logoSelector.switchExperience")}</span>
-                            <motion.span animate={{ x: [0, 4, 0] }} transition={{ repeat: Infinity, duration: 1 }}>→</motion.span>
+                            <m.span animate={{ x: [0, 4, 0] }} transition={{ repeat: Infinity, duration: 1 }}>→</m.span>
                           </p>
                         )}
                       </div>
-                    </motion.div>
+                    </m.div>
                   );
 
                   if (isCurrent) {
@@ -248,7 +248,7 @@ export function LogoSelectorBrutalist({ isDark }: LogoSelectorBrutalistProps) {
                         className={`mx-3 my-2 px-4 py-5 ${isDark ? "bg-red-600/15" : "bg-red-600/10"} border-l-4 border-red-600 relative overflow-hidden`}
                         aria-current="page"
                       >
-                        <motion.div
+                        <m.div
                           className="absolute inset-0 opacity-5"
                           style={{ background: "repeating-linear-gradient(45deg, transparent, transparent 10px, #dc2626 10px, #dc2626 20px)" }}
                           animate={{ x: [0, 20] }}
@@ -286,7 +286,7 @@ export function LogoSelectorBrutalist({ isDark }: LogoSelectorBrutalistProps) {
                   transitionLabel={t(MENU.labelKey)}
                   className="block mx-3 my-2 px-4 py-4 hover:bg-red-600/5 transition-all cursor-pointer group"
                 >
-                  <motion.div
+                  <m.div
                     className="flex items-center gap-4"
                     role="menuitem"
                     initial={{ x: -20, opacity: 0 }}
@@ -294,29 +294,29 @@ export function LogoSelectorBrutalist({ isDark }: LogoSelectorBrutalistProps) {
                     transition={{ delay: 0.3 }}
                     whileHover={{ x: 8 }}
                   >
-                    <motion.div
+                    <m.div
                       className="w-14 h-14 flex items-center justify-center border-2 border-dashed border-stone-500 group-hover:border-red-600 transition-colors"
                       whileHover={{ rotate: 90 }}
                       transition={{ duration: 0.3 }}
                     >
                       <div className="flex flex-col gap-1.5">
                         {[20, 16, 20].map((w, i) => (
-                          <motion.div key={i} className="h-0.5 bg-stone-500 group-hover:bg-red-600 transition-colors" initial={{ width: w }} whileHover={{ width: 24 }} />
+                          <m.div key={i} className="h-0.5 bg-stone-500 group-hover:bg-red-600 transition-colors" initial={{ width: w }} whileHover={{ width: 24 }} />
                         ))}
                       </div>
-                    </motion.div>
+                    </m.div>
                     <div>
                       <p className={`font-mono text-sm uppercase tracking-wider ${textPrimary} group-hover:text-red-600 transition-colors`}>
                         {t(MENU.labelKey)}
                       </p>
                       <p className={`font-mono text-[10px] ${textMuted} uppercase tracking-wide`}>{t(MENU.subtitleKey)}</p>
                     </div>
-                  </motion.div>
+                  </m.div>
                 </TransitionLink>
               </div>
 
               <Stripes reverse />
-            </motion.div>
+            </m.div>
           </>
         )}
       </AnimatePresence>

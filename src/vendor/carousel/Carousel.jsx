@@ -1,5 +1,5 @@
 import { Children, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { animate, motion, useReducedMotion } from 'framer-motion'
+import { animate, m, useReducedMotion } from 'framer-motion'
 import { CarouselArrowButton } from './CarouselNav.jsx'
 import { CarouselDotPagination } from './CarouselDotPagination.jsx'
 
@@ -485,7 +485,7 @@ export function Carousel({
                     : {}),
                 }}
               >
-                <motion.div
+                <m.div
                   className={`flex [&>*]:w-full${fill ? ' h-full' : ''}`}
                   initial={revealSlides ? { opacity: 0, y: 12 } : false}
                   animate={revealSlides ? { opacity: 1, y: 0 } : undefined}
@@ -517,7 +517,7 @@ export function Carousel({
                   }}
                 >
                   {child}
-                </motion.div>
+                </m.div>
               </li>
             )
           })}

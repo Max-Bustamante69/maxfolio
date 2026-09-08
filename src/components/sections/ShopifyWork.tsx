@@ -1,5 +1,5 @@
 import { Suspense, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { useContent } from '../../hooks'
 import { ProjectFrame, GalleryLightbox, type Skin } from '../gallery'
 import { shotsFor, lightboxItems, caseStudyFor, caseStudyLabels, ProjectModal, type SectionHeading } from './Gallery'
@@ -13,6 +13,18 @@ interface ShopifyWorkProps {
 /** Rows shown before "Show all": enough to read the range without scrolling a wall. */
 const VISIBLE = 8
 
+/** Feature chips, derived from each store's stack so the vocabulary stays curated and small. */
+const FEATURES: { id: string; test: RegExp }[] = [
+  { id: 'bundles', test: /bundle/i },
+  { id: 'quiz', test: /quiz/i },
+  { id: 'subscriptions', test: /subscription/i },
+  { id: 'reviews', test: /review/i },
+  { id: 'migration', test: /woocommerce|framer|migrat|port/i },
+  { id: 'islands', test: /react/i },
+  { id: 'tracking', test: /track|pixel|analytics/i },
+  { id: 'i18n', test: /bilingual|currency|dual/i },
+]
+
 /**
  * The index: one line per store — name, what it is, when, and the one-sentence tagline. Everything
  * else (description, Lighthouse, facts, stack, captures) lives in the case-study sheet the name
@@ -25,6 +37,7 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
   const cs = strings.sections.caseStudy
   const [tab, setTab] = useState<'stores' | 'products'>('stores')
   const [showAll, setShowAll] = useState(false)
+  const [feature, setFeature] = useState<string | null>(null)
   const [openStore, setOpenStoreState] = useState<StoreEntry | null>(null)
   const [sheetLoaded, setSheetLoaded] = useState(false)
   const setOpenStore = (st: StoreEntry | null) => {
@@ -33,10 +46,13 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
   }
   const [openProduct, setOpenProduct] = useState<ProductEntry | null>(null)
 
-  const fleet = registry.stores.filter((x) => !x.legacy)
-  const legacy = registry.stores.filter((x) => x.legacy)
-  const visibleFleet = showAll ? fleet : fleet.slice(0, VISIBLE)
+  const active = FEATURES.find((f) => f.id === feature)
+  const matches = (st: StoreEntry) => !active || st.stack.some((t) => active.test.test(t))
+  const fleet = registry.stores.filter((x) => !x.legacy && matches(x))
+  const legacy = registry.stores.filter((x) => x.legacy && matches(x))
+  const visibleFleet = showAll || active ? fleet : fleet.slice(0, VISIBLE)
   const hidden = registry.stores.length - visibleFleet.length
+  const chipFor = (on: boolean) => `${on ? skin.chipOn : skin.chip} compact-touch transition-colors`
 
   const StoreRow = ({ st }: { st: StoreEntry }) => {
     const c = strings.stores[st.slug]
@@ -114,9 +130,22 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
         ))}
       </div>
 
+      {tab === 'stores' && (
+        <div className="mb-6 flex flex-wrap items-center gap-2" role="radiogroup" aria-label={s.tabStores}>
+          <button type="button" role="radio" aria-checked={feature === null} onClick={() => setFeature(null)} className={chipFor(feature === null)}>
+            {s.filterAll}
+          </button>
+          {FEATURES.filter((f) => registry.stores.some((st) => st.stack.some((t) => f.test.test(t)))).map((f) => (
+            <button key={f.id} type="button" role="radio" aria-checked={feature === f.id} onClick={() => setFeature(feature === f.id ? null : f.id)} className={chipFor(feature === f.id)}>
+              {s.filters[f.id]}
+            </button>
+          ))}
+        </div>
+      )}
+
       <AnimatePresence mode="wait">
         {tab === 'stores' ? (
-          <motion.div key="stores" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}>
+          <m.div key="stores" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}>
             <ul className={`divide-y border-y ${skin.divider}`}>
               {visibleFleet.map((st) => (
                 <StoreRow key={st.slug} st={st} />
@@ -132,15 +161,15 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
                 </ul>
               </>
             )}
-            <div className="mt-6">
+            <div className={`mt-6 ${active ? 'hidden' : ''}`}>
               <button type="button" onClick={() => setShowAll((v) => !v)} aria-expanded={showAll} className={`${showAll ? skin.chip : skin.chipOn} compact-touch press transition-colors`}>
                 {showAll ? s.showLess : s.showAll.replace('{n}', String(registry.stores.length))}
                 {!showAll && hidden > 0 ? ' ›' : ''}
               </button>
             </div>
-          </motion.div>
+          </m.div>
         ) : (
-          <motion.div
+          <m.div
             key="products"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -150,7 +179,7 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
             {registry.products.map((p) => (
               <ProductCard key={p.id} p={p} />
             ))}
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 

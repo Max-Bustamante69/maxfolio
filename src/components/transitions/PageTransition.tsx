@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { ReactNode, createContext, useContext, useState, useCallback, useEffect } from 'react'
 
 interface TransitionConfig {
@@ -76,7 +76,7 @@ export function PageTransitionProvider({ children }: PageTransitionProviderProps
       
       <AnimatePresence>
         {isTransitioning && config && (
-          <motion.div
+          <m.div
             className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -84,7 +84,7 @@ export function PageTransitionProvider({ children }: PageTransitionProviderProps
             transition={{ duration: 0.3 }}
           >
             {/* Background that expands */}
-            <motion.div
+            <m.div
               className="absolute inset-0"
               style={{ backgroundColor: config.color }}
               initial={{ scale: 0, borderRadius: '100%' }}
@@ -98,7 +98,7 @@ export function PageTransitionProvider({ children }: PageTransitionProviderProps
             {/* Center content - appears after background */}
             <AnimatePresence>
               {showContent && (
-                <motion.div
+                <m.div
                   className="relative z-10 text-center"
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -106,7 +106,7 @@ export function PageTransitionProvider({ children }: PageTransitionProviderProps
                   transition={{ duration: 0.4, ease: "easeOut" }}
                 >
                   {/* Accent line */}
-                  <motion.div
+                  <m.div
                     className="w-16 h-[2px] mx-auto mb-5"
                     style={{ backgroundColor: config.accentColor }}
                     initial={{ scaleX: 0 }}
@@ -115,7 +115,7 @@ export function PageTransitionProvider({ children }: PageTransitionProviderProps
                   />
                   
                   {/* Label */}
-                  <motion.p
+                  <m.p
                     className="text-sm tracking-[0.4em] uppercase font-medium"
                     style={{ color: config.accentColor }}
                     initial={{ opacity: 0 }}
@@ -123,20 +123,20 @@ export function PageTransitionProvider({ children }: PageTransitionProviderProps
                     transition={{ duration: 0.3, delay: 0.2 }}
                   >
                     {config.label}
-                  </motion.p>
+                  </m.p>
                   
                   {/* Subtle line below */}
-                  <motion.div
+                  <m.div
                     className="w-16 h-[2px] mx-auto mt-5"
                     style={{ backgroundColor: config.accentColor }}
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: 1 }}
                     transition={{ duration: 0.4, delay: 0.3 }}
                   />
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </TransitionContext.Provider>

@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { ThemeProvider, useTheme } from '../context/ThemeContext'
 import {
   ContactFormModal,
@@ -10,11 +10,15 @@ import {
   ShopifyWork,
   Gallery,
   Years,
+  Process,
+  Testimonials,
   CompanyLogo,
   TransitionLink,
   MenuPreview,
   SmoothScroll,
   ScrollRail,
+  Marquee,
+  RevealText,
 } from '../components'
 import { skins } from '../components/gallery'
 import { useDynamicFavicon, useI18n, useContent } from '../hooks'
@@ -25,15 +29,15 @@ import type { SkillGroupId } from '../data/registry'
 const EASE = [0.23, 1, 0.32, 1] as const
 
 const Reveal = ({ children, delay = 0, className = '' }: { children: ReactNode; delay?: number; className?: string }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
+  <m.div
+    initial={{ opacity: 0, y: 20, scale: 0.985 }}
+    whileInView={{ opacity: 1, y: 0, scale: 1 }}
     viewport={{ once: true, margin: '-60px' }}
     transition={{ duration: 0.6, delay, ease: EASE }}
     className={className}
   >
     {children}
-  </motion.div>
+  </m.div>
 )
 
 const Icon = {
@@ -82,7 +86,7 @@ function AppleContent() {
     <Reveal className="mb-10 md:mb-14">
       <p className={`text-xs font-semibold tracking-[0.2em] uppercase ${blue} mb-3`}>{eyebrow}</p>
       <h2 className="font-sf text-4xl md:text-6xl font-semibold tracking-[-0.025em] leading-[1.05]">
-        {title} <span className={muted}>{accent}</span>
+        <RevealText text={title} /> <RevealText text={accent} className={muted} delay={0.1} />
       </h2>
       {lead && <p className={`${muted} text-lg md:text-xl mt-5 max-w-2xl leading-relaxed`}>{lead}</p>}
     </Reveal>
@@ -156,7 +160,7 @@ function AppleContent() {
             </h1>
             <p className={`mx-auto mt-5 max-w-2xl text-xl md:text-2xl ${muted} leading-snug tracking-[-0.01em]`}>{c.hero.positioning}</p>
             <p className="mx-auto mt-6 max-w-2xl text-base md:text-lg leading-relaxed">{c.hero.lead}</p>
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.5, ease: EASE }}
@@ -168,8 +172,8 @@ function AppleContent() {
               <a href={registry.personal.cv} download className={`${blue} text-sm font-medium`}>
                 {c.hero.ctaCv} ›
               </a>
-            </motion.div>
-            <motion.p
+            </m.div>
+            <m.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.55, duration: 0.5 }}
@@ -177,7 +181,7 @@ function AppleContent() {
             >
               <span className="w-2 h-2 rounded-full bg-[#34c759]" />
               {c.hero.availability}
-            </motion.p>
+            </m.p>
           </section>
 
           {/* Stats bento */}
@@ -189,6 +193,31 @@ function AppleContent() {
                   <p className={`${muted} text-sm mt-2`}>{c.stats[s.id]}</p>
                 </Reveal>
               ))}
+            </div>
+          </section>
+
+          {/* Now + the fleet ticker */}
+          <section className="px-4 pb-20 md:pb-28" aria-label={c.sections.now.label}>
+            <div className="max-w-5xl mx-auto">
+              <Reveal className={`inline-flex flex-wrap items-center gap-x-5 gap-y-2 rounded-full px-5 py-2.5 text-sm ${tile}`}>
+                <span className="inline-flex items-center gap-2 font-medium">
+                  <span className="relative flex h-2 w-2" aria-hidden="true">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34c759] opacity-60 motion-reduce:animate-none" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-[#34c759]" />
+                  </span>
+                  {c.sections.now.label}
+                </span>
+                <span className={muted}>{c.sections.now.live.replace('{n}', String(registry.stores.filter((s) => s.status === 'live').length))}</span>
+                <span className={muted}>{c.sections.now.dev.replace('{n}', String(registry.stores.filter((s) => s.status === 'dev').length))}</span>
+                <span className={muted}>{c.hero.availability}</span>
+              </Reveal>
+            </div>
+            <div className="mt-10">
+              <Marquee
+                items={registry.stores.filter((s) => !s.legacy).map((s) => ({ name: s.name, meta: c.stores[s.slug]?.industry, live: s.status === 'live' }))}
+                dark={isDark}
+                label={c.sections.now.band}
+              />
             </div>
           </section>
 
@@ -219,7 +248,7 @@ function AppleContent() {
                     )
                   })}
                 </div>
-                <motion.div
+                <m.div
                   key={job.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -271,7 +300,7 @@ function AppleContent() {
                       {c.sections.experience.visit} ›
                     </a>
                   )}
-                </motion.div>
+                </m.div>
               </div>
             </div>
           </section>
@@ -283,8 +312,15 @@ function AppleContent() {
             </div>
           </section>
 
-          {/* Shopify work */}
+          {/* Process */}
           <section className={`px-4 py-20 md:py-28 ${surface}`}>
+            <div className="max-w-5xl mx-auto">
+              <Process skin={skin} heading={Heading} />
+            </div>
+          </section>
+
+          {/* Shopify work */}
+          <section className="px-4 py-20 md:py-28">
             <div className="max-w-5xl mx-auto">
               <ShopifyWork skin={skin} heading={Heading} />
             </div>
@@ -296,6 +332,9 @@ function AppleContent() {
               <Gallery skin={skin} heading={Heading} />
             </div>
           </section>
+
+          {/* Testimonials (absent until a real quote exists) */}
+          <Testimonials skin={skin} heading={Heading} />
 
           {/* Projects */}
           <section id="projects" className="px-4 py-20 md:py-28 scroll-mt-20">

@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { MenuPreview } from '../previews'
 import { TransitionLink } from '../common'
 import { useState } from 'react'
@@ -104,16 +104,16 @@ export function ExploreDesignsBrutalist({ isDark }: ExploreDesignsBrutalistProps
 
                 {/* Preview - Hidden on mobile */}
                 <div className={`hidden md:block col-span-3 lg:col-span-2 border-l-2 ${borderColor} h-full`}>
-                  <motion.div className="h-full" style={{ backgroundColor: row.previewBg }} animate={{ opacity: hovered ? 1 : 0.7 }}>
+                  <m.div className="h-full" style={{ backgroundColor: row.previewBg }} animate={{ opacity: hovered ? 1 : 0.7 }}>
                     <div className="aspect-square">
                       <row.Preview />
                     </div>
-                  </motion.div>
+                  </m.div>
                 </div>
 
                 {/* Arrow */}
                 <div className={`hidden lg:flex col-span-1 items-center justify-center border-l-2 ${borderColor} h-full p-4`}>
-                  <motion.svg
+                  <m.svg
                     animate={{ x: hovered ? 4 : 0 }}
                     className={`w-6 h-6 ${textMuted} transition-colors`}
                     style={{ color: hovered ? row.accentHex : undefined }}
@@ -122,7 +122,7 @@ export function ExploreDesignsBrutalist({ isDark }: ExploreDesignsBrutalistProps
                     viewBox="0 0 24 24"
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </motion.svg>
+                  </m.svg>
                 </div>
               </div>
             </TransitionLink>

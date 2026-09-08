@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { AnimatePresence, animate, motion, useMotionValue, useReducedMotion, useTransform } from 'framer-motion'
+import { AnimatePresence, animate, m, useMotionValue, useReducedMotion, useTransform } from 'framer-motion'
 import { LaptopFrame, PhoneFrame } from './DeviceFrame'
 import { GlassControls } from './CarouselControls'
 import { carouselTokens, type Skin } from './skins'
@@ -27,7 +27,6 @@ export interface CaseStudyData {
   stats: CaseStudyStat[] // verifiable store facts (build window, ladders, modules…)
   results: CaseStudyStat[] // measured business outcomes; hidden when empty
   stack: string[]
-  build?: string // muted engineering footnote: "696 commits · 72 custom sections"
   shots: FrameShots
 }
 
@@ -97,7 +96,7 @@ function ScoreRing({ value, label, delay, dark, tile }: { value: number; label: 
     <div className={`${tile} flex items-center gap-3`}>
       <svg viewBox="0 0 56 56" className="h-14 w-14 shrink-0" aria-hidden="true">
         <circle cx="28" cy="28" r={RING_R} fill="none" strokeWidth="5" stroke={dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'} />
-        <motion.circle
+        <m.circle
           cx="28"
           cy="28"
           r={RING_R}
@@ -111,9 +110,9 @@ function ScoreRing({ value, label, delay, dark, tile }: { value: number; label: 
         />
       </svg>
       <div className="min-w-0">
-        <motion.p className="text-2xl font-semibold leading-none tabular-nums" aria-label={`${label}: ${value}`}>
+        <m.p className="text-2xl font-semibold leading-none tabular-nums" aria-label={`${label}: ${value}`}>
           {shown}
-        </motion.p>
+        </m.p>
         <p className={`mt-1 text-[11px] leading-tight ${dark ? 'text-[#a1a1a6]' : 'text-[#6e6e73]'}`}>{label}</p>
       </div>
     </div>
@@ -168,7 +167,7 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
   const content = (
     <AnimatePresence>
       {open && data && (
-        <motion.div
+        <m.div
           role="dialog"
           aria-modal="true"
           aria-label={data.name}
@@ -178,7 +177,7 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
           exit={{ opacity: 0 }}
           onClick={onClose}
         >
-          <motion.div
+          <m.div
             className={`relative flex max-h-[94vh] w-full max-w-6xl flex-col overflow-hidden ${panel} ${panelBg} shadow-[0_30px_80px_rgba(0,0,0,0.45)] lg:flex-row`}
             initial={{ opacity: 0, y: 32, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -311,7 +310,6 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
                   </span>
                 ))}
               </div>
-              {data.build && <p className={`${skin.muted} mt-2 text-[11px]`}>{data.build}</p>}
 
               {data.url && (
                 <a href={data.url} target="_blank" rel="noopener noreferrer" className={`${skin.accent} mt-6 inline-block text-sm font-medium`}>
@@ -319,8 +317,8 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
                 </a>
               )}
             </div>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   )

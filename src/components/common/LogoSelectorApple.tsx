@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { useState, useEffect, useRef } from 'react'
 import { TransitionLink } from './TransitionLink'
 import { useI18n } from '../../hooks/useI18n'
@@ -75,7 +75,7 @@ export function LogoSelectorApple({ isDark }: { isDark: boolean }) {
 
       <AnimatePresence>
         {open && (
-          <motion.div
+          <m.div
             role="menu"
             initial={{ opacity: 0, scale: 0.96, y: -4 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -130,7 +130,7 @@ export function LogoSelectorApple({ isDark }: { isDark: boolean }) {
             >
               {t(MENU.subtitleKey)} ›
             </TransitionLink>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

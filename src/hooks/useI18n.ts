@@ -4,16 +4,25 @@ import { useLanguage, Locale } from '../context/LanguageContext'
 type Messages = Record<string, unknown>
 
 const cache: Partial<Record<Locale, Messages>> = {}
+// One fetch per locale even when several hooks mount at once: the in-flight promise is shared.
+const inflight: Partial<Record<Locale, Promise<Messages>>> = {}
 
 function getByPath(obj: unknown, path: string): unknown {
   if (!obj) return undefined
   return path.split('.').reduce((acc: any, part) => (acc ? acc[part] : undefined), obj)
 }
 
-async function loadMessages(locale: Locale): Promise<Messages> {
-  const res = await fetch(`/locales/${locale}.json`, { cache: 'force-cache' })
-  if (!res.ok) throw new Error(`Failed to load locale: ${locale}`)
-  return (await res.json()) as Messages
+function loadMessages(locale: Locale): Promise<Messages> {
+  if (!inflight[locale]) {
+    inflight[locale] = fetch(`/locales/${locale}.json`, { cache: 'force-cache' }).then(async (res) => {
+      if (!res.ok) throw new Error(`Failed to load locale: ${locale}`)
+      return (await res.json()) as Messages
+    })
+    inflight[locale]!.catch(() => {
+      delete inflight[locale]
+    })
+  }
+  return inflight[locale]!
 }
 
 export function useI18n() {

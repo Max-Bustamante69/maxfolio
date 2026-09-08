@@ -1,5 +1,5 @@
 import { lazy, Suspense, useMemo, useState, type ReactNode } from 'react'
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { useContent } from '../../hooks'
 import { ProjectFrame, GlassControls, carouselTokens, type Skin, type FrameShots, type LightboxItem, type CaseStudyData } from '../gallery'
 import type { CaseStudyLabels } from '../gallery/ProjectModal'
@@ -166,11 +166,10 @@ export function Gallery({ skin, heading }: GalleryProps) {
       )}
 
       {view === 'grid' && (
-        <motion.div layout className="rail-wide grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+        <m.div className="rail-wide grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((s, idx) => (
-            <motion.figure
+            <m.figure
               key={s.slug}
-              layout
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-40px' }}
@@ -179,17 +178,16 @@ export function Gallery({ skin, heading }: GalleryProps) {
             >
               <ProjectFrame name={s.name} shots={shotsFor(s.slug)} skin={skin} onOpen={() => openSheet(s.slug)} alt={g.open} cta={cs.open} />
               <Caption s={s} />
-            </motion.figure>
+            </m.figure>
           ))}
-        </motion.div>
+        </m.div>
       )}
 
       {view === 'phones' && (
-        <motion.div layout className="rail-wide grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
+        <m.div className="rail-wide grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
           {items.map((s, idx) => (
-            <motion.figure
+            <m.figure
               key={s.slug}
-              layout
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-40px' }}
@@ -198,9 +196,9 @@ export function Gallery({ skin, heading }: GalleryProps) {
             >
               <ProjectFrame name={s.name} shots={shotsFor(s.slug)} skin={skin} onOpen={() => openSheet(s.slug)} alt={g.open} variant="phone" />
               <figcaption className={`${skin.muted} mt-2 truncate text-center text-xs`}>{s.name}</figcaption>
-            </motion.figure>
+            </m.figure>
           ))}
-        </motion.div>
+        </m.div>
       )}
 
       {sheetLoaded && (

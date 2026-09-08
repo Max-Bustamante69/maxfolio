@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { MenuPreview } from '../previews'
 import { TransitionLink } from '../common'
 import { useState } from 'react'
@@ -48,7 +48,7 @@ export function ExploreDesignsLuxury({ isDark }: ExploreDesignsLuxuryProps) {
         {/* Elegant header with lines */}
         <div className="text-center mb-14">
           <div className="flex items-center justify-center gap-6 mb-6">
-            <motion.div
+            <m.div
               className={`h-px flex-1 max-w-[80px] ${isDark ? 'bg-deco-gold/30' : 'bg-luxury-gold/40'}`}
               initial={{ scaleX: 0 }}
               whileInView={{ scaleX: 1 }}
@@ -58,7 +58,7 @@ export function ExploreDesignsLuxury({ isDark }: ExploreDesignsLuxuryProps) {
             <span className={`text-[10px] tracking-[0.5em] uppercase ${accent}`}>
               {t('exploreLuxury.tagline')}
             </span>
-            <motion.div
+            <m.div
               className={`h-px flex-1 max-w-[80px] ${isDark ? 'bg-deco-gold/30' : 'bg-luxury-gold/40'}`}
               initial={{ scaleX: 0 }}
               whileInView={{ scaleX: 1 }}
@@ -78,7 +78,7 @@ export function ExploreDesignsLuxury({ isDark }: ExploreDesignsLuxuryProps) {
         {/* Elegant cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {cards.map((card, index) => (
-            <motion.div
+            <m.div
               key={card.key}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -110,18 +110,18 @@ export function ExploreDesignsLuxury({ isDark }: ExploreDesignsLuxuryProps) {
                       </h3>
                       <p className={`text-xs ${textMuted} mt-1`}>{card.subtitle}</p>
                     </div>
-                    <motion.div
+                    <m.div
                       animate={{ x: hoveredCard === card.key ? 0 : -8, opacity: hoveredCard === card.key ? 1 : 0 }}
                       style={{ color: card.accentHex }}
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                       </svg>
-                    </motion.div>
+                    </m.div>
                   </div>
                 </div>
               </TransitionLink>
-            </motion.div>
+            </m.div>
           ))}
         </div>
 

@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 import { ThemeProvider, useTheme } from '../context/ThemeContext'
 import {
@@ -25,23 +25,23 @@ const ThemeToggle = ({ size = 'md' }: { size?: 'sm' | 'md' }) => {
   const iconSize = size === 'sm' ? 'w-4 h-4' : 'w-5 h-5'
 
   return (
-    <motion.button
+    <m.button
       onClick={toggleTheme}
       className={`relative ${buttonSize} flex items-center justify-center group`}
       whileTap={{ scale: 0.9 }}
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
     >
-      <motion.div
+      <m.div
         className={`absolute inset-0 border-2 transition-colors duration-200 ${
           isDark ? 'border-red-600 bg-red-600/10' : 'border-stone-900 bg-stone-900/5'
         }`}
       />
-      <motion.div
+      <m.div
         className={`absolute top-0 left-0 w-2 h-2 ${isDark ? 'bg-red-600' : 'bg-stone-900'}`}
         animate={{ scale: isDark ? 1 : 0.5 }}
         transition={{ duration: 0.2 }}
       />
-      <motion.div className="relative z-10" animate={{ scale: [1, 0.8, 1] }} transition={{ duration: 0.3 }} key={isDark ? 'dark' : 'light'}>
+      <m.div className="relative z-10" animate={{ scale: [1, 0.8, 1] }} transition={{ duration: 0.3 }} key={isDark ? 'dark' : 'light'}>
         {isDark ? (
           <svg className={`${iconSize} text-red-500`} fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
             <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
@@ -55,8 +55,8 @@ const ThemeToggle = ({ size = 'md' }: { size?: 'sm' | 'md' }) => {
             />
           </svg>
         )}
-      </motion.div>
-    </motion.button>
+      </m.div>
+    </m.button>
   )
 }
 
@@ -118,7 +118,7 @@ function Design1Content() {
   const nextSection = () => `Section ${String(++sectionNo).padStart(2, '0')}`
 
   const BrutalHeading = (eyebrow: string, title: string, accent: string, lead?: string) => (
-    <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mb-12 md:mb-16">
+    <m.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mb-12 md:mb-16">
       <span className={`font-mono text-xs uppercase tracking-[0.5em] ${textMuted}`}>{eyebrow}</span>
       <h2 className="font-editorial text-[12vw] md:text-[8vw] leading-[0.85] tracking-tight italic mt-4">
         {title}
@@ -126,7 +126,7 @@ function Design1Content() {
         <span className="not-italic text-red-600">{accent}</span>
       </h2>
       {lead && <p className={`${textSecondary} mt-6 max-w-2xl font-editorial text-xl italic leading-relaxed`}>{lead}</p>}
-    </motion.div>
+    </m.div>
   )
 
   const downloadCv = () => {
@@ -190,7 +190,7 @@ function Design1Content() {
           <section className="min-h-screen pt-20 relative" aria-labelledby="hero-heading">
             <div className="max-w-[1800px] mx-auto px-4 md:px-6">
               {/* Masthead */}
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} className={`py-8 md:py-12 border-b-2 ${borderStrong}`}>
+              <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} className={`py-8 md:py-12 border-b-2 ${borderStrong}`}>
                 <div className="flex flex-col md:flex-row justify-between md:items-end gap-4">
                   <div>
                     <p className={`font-mono text-xs uppercase tracking-[0.5em] ${textMuted} mb-2`}>{c.hero.eyebrow}</p>
@@ -203,11 +203,11 @@ function Design1Content() {
                     <p className={`font-mono text-xs uppercase tracking-wider ${textMuted}`}>Est. 2022</p>
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
 
               {/* Main Grid */}
               <div className="grid grid-cols-12 gap-4 md:gap-6 py-8">
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, x: -50 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.8, delay: 0.3 }}
@@ -217,9 +217,9 @@ function Design1Content() {
                     <span className="block">{c.hero.positioning}</span>
                   </h2>
                   <p className={`mt-6 max-w-2xl ${textSecondary} text-base md:text-lg leading-relaxed`}>{c.hero.lead}</p>
-                </motion.div>
+                </m.div>
 
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, delay: 0.5 }}
@@ -233,11 +233,11 @@ function Design1Content() {
                       </div>
                     ))}
                   </div>
-                </motion.div>
+                </m.div>
               </div>
 
               {/* Feature Box */}
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.7 }}
@@ -274,21 +274,21 @@ function Design1Content() {
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
             </div>
           </section>
 
           {/* Work Section */}
           <section id="work" className={`py-16 md:py-24 border-t-4 ${borderStrong}`}>
             <div className="max-w-[1800px] mx-auto px-4 md:px-6">
-              <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mb-12 md:mb-16">
+              <m.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mb-12 md:mb-16">
                 <span className={`font-mono text-xs uppercase tracking-[0.5em] ${textMuted}`}>{nextSection()}</span>
                 <h2 className="font-editorial text-[12vw] md:text-[8vw] leading-[0.85] tracking-tight italic mt-4">
                   {c.sections.experience.title}
                   <br />
                   <span className="not-italic text-red-600">{c.sections.experience.titleAccent}</span>
                 </h2>
-              </motion.div>
+              </m.div>
 
               {/* Tab Navigation */}
               <div className="flex gap-4 mb-8 md:mb-12">
@@ -307,7 +307,7 @@ function Design1Content() {
 
               <AnimatePresence mode="wait">
                 {activeTab === 'work' && (
-                  <motion.div
+                  <m.div
                     key="work"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -315,7 +315,7 @@ function Design1Content() {
                     className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px ${isDark ? 'bg-stone-700' : 'bg-stone-900'}`}
                   >
                     {registry.experience.map((job, index) => (
-                      <motion.article
+                      <m.article
                         key={job.id}
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -363,15 +363,15 @@ function Design1Content() {
                             {c.sections.experience.visit} →
                           </a>
                         )}
-                      </motion.article>
+                      </m.article>
                     ))}
-                  </motion.div>
+                  </m.div>
                 )}
 
                 {activeTab === 'freelance' && (
-                  <motion.div key="freelance" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-6">
+                  <m.div key="freelance" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-6">
                     {registry.personalProjects.map((project, index) => (
-                      <motion.a
+                      <m.a
                         key={project.id}
                         href={project.url ?? project.repo}
                         target="_blank"
@@ -405,9 +405,9 @@ function Design1Content() {
                         <div className="col-span-12 lg:col-span-1 text-right">
                           <span className={`font-mono text-xs ${textMuted}`}>{project.year}</span>
                         </div>
-                      </motion.a>
+                      </m.a>
                     ))}
-                  </motion.div>
+                  </m.div>
                 )}
               </AnimatePresence>
             </div>
@@ -430,18 +430,18 @@ function Design1Content() {
           {/* Skills Section */}
           <section id="about" className={`py-16 md:py-24 border-t-4 ${borderStrong}`}>
             <div className="max-w-[1800px] mx-auto px-4 md:px-6">
-              <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mb-12 md:mb-16">
+              <m.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mb-12 md:mb-16">
                 <span className={`font-mono text-xs uppercase tracking-[0.5em] ${textMuted}`}>{nextSection()}</span>
                 <h2 className="font-editorial text-[12vw] md:text-[8vw] leading-[0.85] tracking-tight italic mt-4">
                   {c.sections.skills.title}
                   <br />
                   <span className="not-italic text-red-600">{c.sections.skills.titleAccent}</span>
                 </h2>
-              </motion.div>
+              </m.div>
 
               <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
                 {(Object.keys(registry.skillGroups) as SkillGroupId[]).map((group, index) => (
-                  <motion.div
+                  <m.div
                     key={group}
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -457,7 +457,7 @@ function Design1Content() {
                         </p>
                       ))}
                     </div>
-                  </motion.div>
+                  </m.div>
                 ))}
               </div>
             </div>
@@ -466,7 +466,7 @@ function Design1Content() {
           {/* Contact Section */}
           <section id="contact" className="py-16 md:py-24 bg-red-600 text-white">
             <div className="max-w-[1800px] mx-auto px-4 md:px-6">
-              <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="text-center">
+              <m.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="text-center">
                 <p className="font-mono text-xs uppercase tracking-[0.5em] text-red-200 mb-6 md:mb-8">{c.sections.contact.eyebrow}</p>
                 <h2 className="font-editorial text-[10vw] md:text-[6vw] leading-[0.85] tracking-tight italic mb-8 md:mb-12">
                   {c.sections.contact.title}
@@ -524,7 +524,7 @@ function Design1Content() {
                     GitHub
                   </a>
                 </div>
-              </motion.div>
+              </m.div>
             </div>
           </section>
         </main>
@@ -545,7 +545,7 @@ function Design1Content() {
         </footer>
 
         {/* Mobile FAB */}
-        <motion.button
+        <m.button
           onClick={() => setIsContactOpen(true)}
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -555,7 +555,7 @@ function Design1Content() {
           aria-label="Open contact form"
         >
           <MailIcon className="w-6 h-6" />
-        </motion.button>
+        </m.button>
       </div>
     </>
   )

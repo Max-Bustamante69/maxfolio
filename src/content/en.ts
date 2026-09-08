@@ -35,6 +35,8 @@ export const en: PortfolioContent = {
       visit: 'Visit store',
       showAll: 'Show all {n} stores',
       showLess: 'Show fewer',
+      filterAll: 'All',
+      filters: { bundles: 'Bundles', quiz: 'Quiz', subscriptions: 'Subscriptions', reviews: 'Reviews', migration: 'Migrations', islands: 'React islands', tracking: 'Tracking', i18n: 'Multi-currency' },
     },
     gallery: {
       eyebrow: 'Gallery',
@@ -55,6 +57,21 @@ export const en: PortfolioContent = {
       desktop: 'Desktop',
       mobile: 'Mobile',
     },
+    process: {
+      eyebrow: 'How it ships',
+      title: 'Five steps,',
+      titleAccent: 'no surprises',
+      lead: 'The same gates on every store, so you know what happens next and what you get at the end.',
+      steps: [
+        { title: 'Discovery', body: 'Your store, your numbers, your bottlenecks. I read the data before touching a line.' },
+        { title: 'Pattern map', body: 'Every page gets a plan: which sections, which offers, which proof, in what order.' },
+        { title: 'Build', body: 'Liquid + React islands on the Digitdeck template, instrumented from the first commit.' },
+        { title: 'QA', body: 'A Playwright harness runs the whole store behaviorally before anything goes live.' },
+        { title: 'Handoff', body: 'You get the editor, the docs and the numbers; nothing depends on me to keep running.' },
+      ],
+    },
+    testimonials: { eyebrow: 'In their words', title: 'What clients', titleAccent: 'say' },
+    now: { label: 'Now', live: '{n} storefronts live', dev: '{n} in development', band: 'Storefronts shipped' },
     years: { eyebrow: 'Year by year', title: 'Five years,', titleAccent: 'one direction', lead: 'From React components in 2022 to a fleet of Shopify stores and the platform behind them. Every card is derived from the same records as the rest of the site.', roles: 'Roles', shipped: 'Storefronts', products: 'Products', side: 'On my own time', more: '+{n} more' },
     projects: { eyebrow: 'Projects', title: 'Things I build', titleAccent: 'on my own time', view: 'View project' },
     skills: {

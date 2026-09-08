@@ -35,6 +35,8 @@ export const ja: PortfolioContent = {
       visit: 'ストアを見る',
       showAll: '{n}店舗すべてを表示',
       showLess: '表示を減らす',
+      filterAll: 'すべて',
+      filters: { bundles: 'バンドル', quiz: '診断クイズ', subscriptions: 'サブスク', reviews: 'レビュー', migration: '移行', islands: 'Reactアイランド', tracking: '計測', i18n: '多通貨' },
     },
     gallery: {
       eyebrow: 'ギャラリー',
@@ -55,6 +57,21 @@ export const ja: PortfolioContent = {
       desktop: 'デスクトップ',
       mobile: 'モバイル',
     },
+    process: {
+      eyebrow: '進め方',
+      title: '5つのステップ、',
+      titleAccent: '想定外なし',
+      lead: 'どのストアも同じゲートを通ります。次に何が起き、最後に何を受け取るかが分かります。',
+      steps: [
+        { title: '診断', body: 'あなたのストア、数字、ボトルネック。1行も触る前にデータを読みます。' },
+        { title: 'パターンマップ', body: '各ページに計画を。どのセクション、どのオファー、どの証拠を、どの順で。' },
+        { title: '構築', body: 'Digitdeckテンプレート上のLiquid + Reactアイランド。最初のコミットから計測。' },
+        { title: 'QA', body: '公開前にPlaywrightのハーネスがストア全体を振る舞いで検証します。' },
+        { title: '引き渡し', body: 'エディタ、ドキュメント、数字を受け取ります。運用に私は不要です。' },
+      ],
+    },
+    testimonials: { eyebrow: 'お客様の声', title: 'クライアントの', titleAccent: '言葉' },
+    now: { label: '現在', live: '公開中のストア {n}', dev: '構築中 {n}', band: '納品したストア' },
     years: { eyebrow: '年ごとの歩み', title: '5年間、', titleAccent: 'ひとつの方向へ', lead: '2022年のReactコンポーネントから、Shopifyストア群とその裏側のプラットフォームまで。各カードはサイト全体と同じ記録から生成しています。', roles: '役割', shipped: 'ストア', products: 'プロダクト', side: '個人プロジェクト', more: '+{n}件' },
     projects: { eyebrow: 'プロジェクト', title: '個人的に', titleAccent: 'つくっているもの', view: 'プロジェクトを見る' },
     skills: {

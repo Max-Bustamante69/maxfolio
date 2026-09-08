@@ -1,5 +1,5 @@
 import { useState, type MouseEvent } from 'react'
-import { motion, useMotionTemplate, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion'
+import { m, useMotionTemplate, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion'
 import type { Skin } from './skins'
 import { LaptopFrame, PhoneFrame } from './DeviceFrame'
 
@@ -109,7 +109,7 @@ export function ProjectFrame({ name, shots, skin, onOpen, alt, variant = 'compos
   const lift = hover && !reduced
 
   const Glare = () => (
-    <motion.div
+    <m.div
       aria-hidden="true"
       className={`pointer-events-none absolute inset-0 mix-blend-screen transition-opacity duration-300 ${lift ? 'opacity-100' : 'opacity-0'}`}
       style={{ backgroundImage: glare }}
@@ -129,13 +129,13 @@ export function ProjectFrame({ name, shots, skin, onOpen, alt, variant = 'compos
   if (variant === 'laptop') {
     return (
       <button type="button" onClick={onOpen} {...bind} className="group relative block w-full text-left" aria-label={cta ? `${cta} · ${name}` : `${name}: ${alt}`} style={{ perspective: 1200 }}>
-        <motion.div style={{ ...tilt, transformStyle: 'preserve-3d' }} animate={{ scale: lift ? 1.025 : 1 }} transition={SETTLE} className="relative will-change-transform">
+        <m.div style={{ ...tilt, transformStyle: 'preserve-3d' }} animate={{ scale: lift ? 1.025 : 1 }} transition={SETTLE} className="relative will-change-transform">
           <LaptopFrame>
             <Crossfade base={shots.homeDesktop} over={shots.pdpDesktop} alt={alt} hover={hover} label="home, desktop" />
             <Glare />
           </LaptopFrame>
           {cta && <Invite text={cta} skin={skin} />}
-        </motion.div>
+        </m.div>
         <Floor lift={lift} />
       </button>
     )
@@ -143,14 +143,14 @@ export function ProjectFrame({ name, shots, skin, onOpen, alt, variant = 'compos
 
   return (
     <button type="button" onClick={onOpen} {...bind} className="group relative block w-full pb-[9%] pr-[3%] text-left" aria-label={cta ? `${cta} · ${name}` : `${name}: ${alt}`} style={{ perspective: 1200 }}>
-      <motion.div style={{ ...tilt, transformStyle: 'preserve-3d' }} animate={{ scale: lift ? 1.03 : 1 }} transition={SETTLE} className="relative will-change-transform">
+      <m.div style={{ ...tilt, transformStyle: 'preserve-3d' }} animate={{ scale: lift ? 1.03 : 1 }} transition={SETTLE} className="relative will-change-transform">
         <LaptopFrame>
           <Crossfade base={shots.homeDesktop} over={shots.pdpDesktop} alt={alt} hover={hover} label="home, desktop" />
           <Glare />
         </LaptopFrame>
         {cta && <Invite text={cta} skin={skin} />}
         {/* the phone floats on its own plane, 48px in front of the lid, and drifts against the tilt */}
-        <motion.div
+        <m.div
           className="absolute bottom-0 right-0 w-[24%] min-w-[72px]"
           style={{ x: reduced ? 0 : phoneX, y: reduced ? 0 : phoneY, z: 64, rotateY: reduced ? 0 : -8 }}
           animate={{ translateY: lift ? -6 : 0 }}
@@ -159,8 +159,8 @@ export function ProjectFrame({ name, shots, skin, onOpen, alt, variant = 'compos
           <PhoneFrame>
             <Crossfade base={shots.homeMobile} over={shots.pdpMobile} alt={alt} hover={hover} label="home, mobile" />
           </PhoneFrame>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
       <Floor lift={lift} />
     </button>
   )

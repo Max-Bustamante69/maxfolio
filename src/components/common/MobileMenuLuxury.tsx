@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion'
+import { m, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { TransitionLink } from './TransitionLink'
@@ -41,7 +41,7 @@ export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMen
   const menuContent = (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -78,7 +78,7 @@ export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMen
           <div className={`absolute bottom-6 right-6 w-12 h-12 border-b border-r ${isDark ? 'border-deco-gold/30' : 'border-luxury-gold/30'}`} />
 
           {/* Close Button */}
-          <motion.button
+          <m.button
             initial={{ opacity: 0, rotate: -90 }}
             animate={{ opacity: 1, rotate: 0 }}
             transition={{ delay: 0.2 }}
@@ -89,12 +89,12 @@ export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMen
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </motion.button>
+          </m.button>
 
           {/* Content */}
           <div className="h-full flex flex-col items-center justify-center px-8 relative z-10" onClick={(e) => e.stopPropagation()}>
             {/* Logo/Title */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
@@ -103,12 +103,12 @@ export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMen
               <span className={`font-display text-sm tracking-[0.3em] uppercase ${accent}`}>
                 {t('mobileMenu.navigation')}
               </span>
-            </motion.div>
+            </m.div>
 
             {/* Navigation Links */}
             <nav className="text-center mb-12">
               {navItems.map((item, index) => (
-                <motion.a
+                <m.a
                   key={item.href}
                   href={item.href}
                   onClick={() => setIsOpen(false)}
@@ -118,13 +118,13 @@ export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMen
                   className={`block py-4 font-display text-3xl ${textPrimary} hover:${accent} transition-colors`}
                 >
                   {item.label}
-                </motion.a>
+                </m.a>
               ))}
             </nav>
 
             {/* Quick Message Button */}
             {onContactClick && (
-              <motion.button
+              <m.button
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
@@ -138,11 +138,11 @@ export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMen
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
                 {t('common.quickMessage')}
-              </motion.button>
+              </m.button>
             )}
 
             {/* Decorative line */}
-            <motion.div
+            <m.div
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ delay: 0.5, duration: 0.5 }}
@@ -150,7 +150,7 @@ export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMen
             />
 
             {/* Design Switcher */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
@@ -184,9 +184,9 @@ export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMen
                   </span>
                 ))}
               </div>
-            </motion.div>
+            </m.div>
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   )

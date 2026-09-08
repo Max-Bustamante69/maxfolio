@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 
 export interface LightboxItem {
   key: string
@@ -45,7 +45,7 @@ export function GalleryLightbox({ open, title, items, onClose, closeLabel }: Gal
   const content = (
     <AnimatePresence>
       {open && current && (
-        <motion.div
+        <m.div
           role="dialog"
           aria-modal="true"
           aria-label={title}
@@ -82,7 +82,7 @@ export function GalleryLightbox({ open, title, items, onClose, closeLabel }: Gal
             </div>
           </div>
           <div className="flex-1 min-h-0 flex items-center justify-center px-4 pb-2" onClick={(e) => e.stopPropagation()}>
-            <motion.img
+            <m.img
               key={current.key}
               src={current.src}
               alt={`${title} — ${current.label}`}
@@ -105,7 +105,7 @@ export function GalleryLightbox({ open, title, items, onClose, closeLabel }: Gal
               />
             ))}
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   )

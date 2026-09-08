@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { useMemo, useState } from 'react'
 import { supportedLocales, useLanguage, Locale } from '../../context/LanguageContext'
 import { useI18n } from '../../hooks/useI18n'
@@ -20,7 +20,7 @@ export function LanguageSelectorMenu({ size = 'md' }: { size?: 'sm' | 'md' }) {
 
   return (
     <div className="relative">
-      <motion.button
+      <m.button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-label={t('language.selector.ariaLabel')}
@@ -30,7 +30,7 @@ export function LanguageSelectorMenu({ size = 'md' }: { size?: 'sm' | 'md' }) {
         whileHover={{ y: -1 }}
         whileTap={{ y: 0, scale: 0.98 }}
       >
-        <motion.div
+        <m.div
           className="absolute inset-0"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -44,12 +44,12 @@ export function LanguageSelectorMenu({ size = 'md' }: { size?: 'sm' | 'md' }) {
         <span className="relative z-10 font-mono font-bold uppercase tracking-wider text-neutral-900 dark:text-neutral-100">
           {localeLabel(locale)}
         </span>
-      </motion.button>
+      </m.button>
 
       <AnimatePresence>
         {open && (
           <>
-            <motion.div
+            <m.div
               className="fixed inset-0 z-40"
               onClick={() => setOpen(false)}
               initial={{ opacity: 0 }}
@@ -58,7 +58,7 @@ export function LanguageSelectorMenu({ size = 'md' }: { size?: 'sm' | 'md' }) {
               aria-hidden="true"
             />
 
-            <motion.div
+            <m.div
               role="menu"
               aria-orientation="vertical"
               initial={{ opacity: 0, y: -8, scale: 0.98 }}
@@ -76,7 +76,7 @@ export function LanguageSelectorMenu({ size = 'md' }: { size?: 'sm' | 'md' }) {
                 {options.map((opt, idx) => {
                   const isActive = opt === locale
                   return (
-                    <motion.button
+                    <m.button
                       key={opt}
                       type="button"
                       role="menuitem"
@@ -97,12 +97,12 @@ export function LanguageSelectorMenu({ size = 'md' }: { size?: 'sm' | 'md' }) {
                       <span className={`text-[12px] ${isActive ? 'text-[#C9A962]' : 'text-neutral-400 dark:text-neutral-600'}`}>
                         {isActive ? '●' : ' '}
                       </span>
-                    </motion.button>
+                    </m.button>
                   )
                 })}
               </div>
               <div className="h-1 bg-gradient-to-r from-[#C9A962] via-neutral-200 to-[#dc2626]" aria-hidden="true" />
-            </motion.div>
+            </m.div>
           </>
         )}
       </AnimatePresence>

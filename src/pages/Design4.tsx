@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { m, AnimatePresence } from 'framer-motion';
 import { useState, ReactNode } from "react";
 import { ThemeProvider, useTheme } from "../context/ThemeContext";
 import {
@@ -26,7 +26,7 @@ const ThemeToggle = ({ size = "md" }: { size?: "sm" | "md" }) => {
   const iconSize = size === "sm" ? "w-3.5 h-3.5" : "w-4 h-4";
 
   return (
-    <motion.button
+    <m.button
       onClick={toggleTheme}
       className={`relative ${buttonSize} flex items-center justify-center group`}
       whileTap={{ scale: 0.9 }}
@@ -34,7 +34,7 @@ const ThemeToggle = ({ size = "md" }: { size?: "sm" | "md" }) => {
     >
       {/* Elegant diamond frame */}
       <svg viewBox="0 0 40 40" className="absolute inset-0 w-full h-full" fill="none" aria-hidden="true">
-        <motion.path
+        <m.path
           d="M20 4 L36 20 L20 36 L4 20 Z"
           stroke={isDark ? "#d4af37" : "#C9A962"}
           strokeWidth="1"
@@ -47,7 +47,7 @@ const ThemeToggle = ({ size = "md" }: { size?: "sm" | "md" }) => {
       </svg>
 
       {/* Icon */}
-      <motion.div initial={false} animate={{ rotate: 0 }} transition={{ duration: 0.5 }}>
+      <m.div initial={false} animate={{ rotate: 0 }} transition={{ duration: 0.5 }}>
         {isDark ? (
           <svg className={`${iconSize} text-deco-gold`} fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
             <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
@@ -61,14 +61,14 @@ const ThemeToggle = ({ size = "md" }: { size?: "sm" | "md" }) => {
             />
           </svg>
         )}
-      </motion.div>
-    </motion.button>
+      </m.div>
+    </m.button>
   );
 };
 
 // Fade in animation wrapper
 const FadeInUp = ({ children, delay = 0, className = "" }: { children: ReactNode; delay?: number; className?: string }) => (
-  <motion.div
+  <m.div
     initial={{ opacity: 0, y: 30 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true, margin: "-50px" }}
@@ -76,7 +76,7 @@ const FadeInUp = ({ children, delay = 0, className = "" }: { children: ReactNode
     className={className}
   >
     {children}
-  </motion.div>
+  </m.div>
 );
 
 const MailIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
@@ -201,7 +201,7 @@ function Design4Content() {
                 ))}
               </div>
               <div className="flex items-center gap-3">
-                <motion.button
+                <m.button
                   onClick={() => setIsContactOpen(true)}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -209,7 +209,7 @@ function Design4Content() {
                 >
                   <MailIcon />
                   <span className="hidden xl:inline">{t("common.quickEmail")}</span>
-                </motion.button>
+                </m.button>
                 <div className="hidden lg:flex items-center gap-2">
                   <LanguageSelectorLuxury isDark={isDark} />
                   <ThemeToggle />
@@ -230,9 +230,9 @@ function Design4Content() {
             <div className="max-w-7xl mx-auto w-full">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-24 items-end">
                 <div className="lg:col-span-8">
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.2 }}>
+                  <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.2 }}>
                     <div className="mb-6 md:mb-8">
-                      <motion.div
+                      <m.div
                         initial={{ width: 0 }}
                         animate={{ width: "60px" }}
                         transition={{ duration: 0.8, delay: 0.5 }}
@@ -243,38 +243,38 @@ function Design4Content() {
                     </div>
 
                     <h1 id="hero-heading" className="font-display text-5xl md:text-7xl lg:text-8xl xl:text-9xl leading-[0.9] tracking-tight mb-6 md:mb-8">
-                      <motion.span initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="block">
+                      <m.span initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="block">
                         {registry.personal.firstName}
-                      </motion.span>
-                      <motion.span
+                      </m.span>
+                      <m.span
                         initial={{ opacity: 0, y: 40 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.4 }}
                         className={`block ${accentCls} italic`}
                       >
                         {registry.personal.lastName}
-                      </motion.span>
+                      </m.span>
                     </h1>
 
-                    <motion.p
+                    <m.p
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ duration: 0.8, delay: 0.7 }}
                       className={`font-display text-xl md:text-2xl ${textPrimary} max-w-xl leading-snug mb-4`}
                     >
                       {c.hero.positioning}
-                    </motion.p>
-                    <motion.p
+                    </m.p>
+                    <m.p
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ duration: 0.8, delay: 0.8 }}
                       className={`text-base md:text-lg ${textSecondary} max-w-xl leading-relaxed font-light mb-6 md:mb-8`}
                     >
                       {c.hero.lead}
-                    </motion.p>
+                    </m.p>
 
                     {/* Availability */}
-                    <motion.div
+                    <m.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ duration: 0.8, delay: 1 }}
@@ -284,16 +284,16 @@ function Design4Content() {
                         <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                         {c.hero.availability}
                       </p>
-                    </motion.div>
+                    </m.div>
 
                     {/* CTA Buttons */}
-                    <motion.div
+                    <m.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ duration: 0.8, delay: 1.2 }}
                       className="flex flex-col sm:flex-row gap-4"
                     >
-                      <motion.button
+                      <m.button
                         onClick={() => setIsContactOpen(true)}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
@@ -301,7 +301,7 @@ function Design4Content() {
                       >
                         <MailIcon />
                         {c.hero.ctaContact}
-                      </motion.button>
+                      </m.button>
                       <button
                         onClick={downloadCv}
                         className={`px-6 md:px-8 py-4 border ${borderColor} hover:${borderAccent} transition-all text-sm tracking-[0.2em] uppercase text-center flex items-center justify-center gap-2`}
@@ -309,13 +309,13 @@ function Design4Content() {
                         <DownloadIcon />
                         {c.hero.ctaCv}
                       </button>
-                    </motion.div>
-                  </motion.div>
+                    </m.div>
+                  </m.div>
                 </div>
 
                 {/* Side Stats */}
                 <div className="lg:col-span-4">
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0, x: 30 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.8, delay: 1 }}
@@ -327,7 +327,7 @@ function Design4Content() {
                         <p className={`text-xs tracking-[0.2em] uppercase ${textMuted} mt-2`}>{c.stats[stat.id]}</p>
                       </div>
                     ))}
-                  </motion.div>
+                  </m.div>
                 </div>
               </div>
             </div>
@@ -371,7 +371,7 @@ function Design4Content() {
 
               <AnimatePresence mode="wait">
                 {activeTab === "work" && (
-                  <motion.div
+                  <m.div
                     key="work"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -381,7 +381,7 @@ function Design4Content() {
                     {/* Job List */}
                     <div className="lg:col-span-4 space-y-3 md:space-y-4 order-2 lg:order-1">
                       {registry.experience.map((job, index) => (
-                        <motion.button
+                        <m.button
                           type="button"
                           key={job.id}
                           initial={{ opacity: 0, x: -20 }}
@@ -402,14 +402,14 @@ function Design4Content() {
                               <p className={`text-xs ${isDark ? "text-deco-cream/40" : "text-white/40"} mt-1`}>{formatPeriod(job.start, job.end)}</p>
                             </div>
                           </div>
-                        </motion.button>
+                        </m.button>
                       ))}
                     </div>
 
                     {/* Job Details */}
                     <div className="lg:col-span-8 order-1 lg:order-2">
                       <AnimatePresence mode="wait">
-                        <motion.div
+                        <m.div
                           key={selectedJob.id}
                           initial={{ opacity: 0, x: 20 }}
                           animate={{ opacity: 1, x: 0 }}
@@ -488,14 +488,14 @@ function Design4Content() {
                               ))}
                             </div>
                           </div>
-                        </motion.div>
+                        </m.div>
                       </AnimatePresence>
                     </div>
-                  </motion.div>
+                  </m.div>
                 )}
 
                 {activeTab === "freelance" && (
-                  <motion.div
+                  <m.div
                     key="freelance"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -503,7 +503,7 @@ function Design4Content() {
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
                   >
                     {registry.personalProjects.map((project, index) => (
-                      <motion.a
+                      <m.a
                         key={project.id}
                         href={project.url ?? project.repo}
                         target="_blank"
@@ -530,9 +530,9 @@ function Design4Content() {
                           ))}
                         </div>
                         <div className={`mt-4 ${accentCls} text-sm opacity-0 group-hover:opacity-100 transition-opacity`}>{c.sections.projects.view} →</div>
-                      </motion.a>
+                      </m.a>
                     ))}
-                  </motion.div>
+                  </m.div>
                 )}
               </AnimatePresence>
             </div>
@@ -610,7 +610,7 @@ function Design4Content() {
                   <div className="mb-8 md:mb-12">
                     <p className={`text-sm ${textMuted} mb-6`}>{c.sections.contact.note}</p>
 
-                    <motion.button
+                    <m.button
                       onClick={() => setIsContactOpen(true)}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
@@ -621,7 +621,7 @@ function Design4Content() {
                       <svg className="w-4 h-4 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                       </svg>
-                    </motion.button>
+                    </m.button>
                   </div>
 
                   <div className="max-w-3xl mx-auto w-full mb-12 md:mb-16">
@@ -734,7 +734,7 @@ function Design4Content() {
         </footer>
 
         {/* Mobile floating contact button */}
-        <motion.button
+        <m.button
           onClick={() => setIsContactOpen(true)}
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -744,7 +744,7 @@ function Design4Content() {
           aria-label="Open contact form"
         >
           <MailIcon className="w-6 h-6" />
-        </motion.button>
+        </m.button>
       </div>
     </>
   );

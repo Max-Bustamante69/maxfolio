@@ -1,6 +1,7 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { lazy, Suspense, useEffect, useRef } from 'react'
 import { Analytics } from '@vercel/analytics/react'
+import { LazyMotion } from 'framer-motion'
 import { PageTransitionProvider, usePageTransition } from './components'
 import { LanguageProvider } from './context/LanguageContext'
 import { designById, MENU } from './data/designs'
@@ -30,6 +31,8 @@ function ScrollToTop() {
 function App() {
   return (
     <LanguageProvider>
+      {/* `m.*` components everywhere; the feature set arrives as an async chunk instead of the eager bundle. */}
+      <LazyMotion features={() => import('./motion-features').then((mod) => mod.default)}>
       <PageTransitionProvider>
         <ScrollToTop />
         <Suspense fallback={null}>
@@ -46,6 +49,7 @@ function App() {
         {/* The insights script only exists on Vercel; skipping it elsewhere keeps local audits free of a 404. */}
         {typeof window !== 'undefined' && /(^|\.)maxfolio\.dev$|\.vercel\.app$/.test(window.location.hostname) && <Analytics />}
       </PageTransitionProvider>
+      </LazyMotion>
     </LanguageProvider>
   )
 }

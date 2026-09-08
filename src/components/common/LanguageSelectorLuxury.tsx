@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { useMemo, useState } from 'react'
 import { supportedLocales, useLanguage, Locale } from '../../context/LanguageContext'
 import { useI18n } from '../../hooks/useI18n'
@@ -35,7 +35,7 @@ export function LanguageSelectorLuxury({
 
   return (
     <div className="relative">
-      <motion.button
+      <m.button
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={`relative ${buttonSize} flex items-center justify-center group`}
@@ -66,7 +66,7 @@ export function LanguageSelectorLuxury({
 
         <AnimatePresence>
           {open && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
@@ -74,16 +74,16 @@ export function LanguageSelectorLuxury({
               aria-hidden="true"
             >
               <div className="w-2 h-2 rotate-45 bg-deco-gold/30 border border-deco-gold/40" />
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
-      </motion.button>
+      </m.button>
 
       <AnimatePresence>
         {open && (
           <>
             {/* Backdrop click-to-close */}
-            <motion.div
+            <m.div
               className="fixed inset-0 z-40"
               onClick={() => setOpen(false)}
               initial={{ opacity: 0 }}
@@ -92,7 +92,7 @@ export function LanguageSelectorLuxury({
               aria-hidden="true"
             />
 
-            <motion.div
+            <m.div
               role="menu"
               aria-orientation="vertical"
               initial={{ opacity: 0, y: -8, scale: 0.98 }}
@@ -110,7 +110,7 @@ export function LanguageSelectorLuxury({
                 {options.map((opt, idx) => {
                   const isActive = opt === locale
                   return (
-                    <motion.button
+                    <m.button
                       key={opt}
                       type="button"
                       role="menuitem"
@@ -129,11 +129,11 @@ export function LanguageSelectorLuxury({
                       <span className={`text-[10px] ${isActive ? accent : textMuted}`}>
                         {isActive ? '●' : ' '}
                       </span>
-                    </motion.button>
+                    </m.button>
                   )
                 })}
               </div>
-            </motion.div>
+            </m.div>
           </>
         )}
       </AnimatePresence>
