@@ -91,6 +91,7 @@ export const ja: PortfolioContent = {
         { q: '構築にはどれくらいかかりますか？', a: '範囲によります。診断の最後に期間を書面でお伝えし、進捗は共有ボードで課題ごとに追えます。' },
       ],
     },
+    manifesto: { label: '仕事の流儀', lines: ['コードより先に、数字を読む。', 'エディタからではなく、gitから出荷する。', '1ページではなく、ストア全体をテストする。', '鍵を渡して終える。'] },
     testimonials: { eyebrow: 'お客様の声', title: 'クライアントの', titleAccent: '言葉' },
     now: { label: '現在', live: '公開中のストア {n}', dev: '構築中 {n}', band: '納品したストア', local: 'メデジン・現地時間 {time}' },
     statBand: { label: '仕事を数字で', asOf: '2026年9月時点' },

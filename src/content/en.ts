@@ -91,6 +91,7 @@ export const en: PortfolioContent = {
         { q: 'How long does a build take?', a: 'It depends on the scope. Discovery ends with a written window, and you follow progress issue by issue on a shared board.' },
       ],
     },
+    manifesto: { label: 'How I work', lines: ['Read the numbers before the code.', 'Ship from git, never from the editor.', 'Test the whole store, not one page.', 'Hand over the keys.'] },
     testimonials: { eyebrow: 'In their words', title: 'What clients', titleAccent: 'say' },
     now: { label: 'Now', live: '{n} storefronts live', dev: '{n} in development', band: 'Storefronts shipped', local: 'Medellín · {time} local' },
     statBand: { label: 'The work, in numbers', asOf: 'September 2026' },

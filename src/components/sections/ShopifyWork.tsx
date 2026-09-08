@@ -6,6 +6,7 @@ import { Products } from './Products'
 import { useHoverPreview } from '../gallery/HoverPreview'
 import { lightboxItems, caseStudyFor, caseStudyLabels, ProjectModal, type SectionHeading } from './Gallery'
 import type { StoreEntry, ProductEntry } from '../../data/registry'
+import { results as storyResults } from '../../data/results'
 
 interface ShopifyWorkProps {
   skin: Skin
@@ -58,6 +59,22 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
   const hidden = registry.stores.length - visibleFleet.length
   const chipFor = (on: boolean) => `${on ? skin.chipOn : skin.chip} compact-touch transition-colors`
 
+  /** The story's headline metric as a small delta chip, so the varied number shows before the sheet opens. */
+  const Headline = ({ slug }: { slug: string }) => {
+    const story = storyResults[slug]
+    const lead = story?.charts.flatMap((ch) => ch.metrics).find((mm) => mm.before > 0)
+    if (!story || !lead) return null
+    const d = Math.round(((lead.after - lead.before) / lead.before) * 100)
+    const good = lead.invert ? d <= 0 : d >= 0
+    return (
+      <span className={`${skin.chip} mt-1.5 inline-flex items-center gap-1.5`}>
+        <span className={`font-semibold tabular-nums ${good ? 'text-[#34c759]' : 'text-[#ff3b30]'}`}>{d >= 0 ? '+' : '−'}{Math.abs(d)}%</span>
+        <span>{cs.metric[lead.id]}</span>
+        {story.sample && <span className="opacity-60">· {cs.sampleBadge}</span>}
+      </span>
+    )
+  }
+
   const StoreRow = ({ st }: { st: StoreEntry }) => {
     const c = strings.stores[st.slug]
     return (
@@ -75,6 +92,7 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
             <p className={`${skin.muted} mt-0.5 text-xs`}>
               {c?.industry} · {formatPeriod(st.timeline.start, st.timeline.end)}
             </p>
+            <Headline slug={st.slug} />
           </div>
           <p className={`${skin.body} text-sm leading-snug md:col-span-5 md:line-clamp-2`}>{c?.tagline}</p>
           <div className="flex items-center gap-x-4 text-sm md:col-span-3 md:justify-end">

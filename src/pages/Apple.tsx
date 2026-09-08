@@ -18,6 +18,7 @@ import {
   Skills,
   Contact,
   Faq,
+  Manifesto,
   Magnetic,
   TransitionLink,
   MenuPreview,
@@ -305,6 +306,9 @@ function AppleContent() {
               <Gallery skin={skin} heading={Heading} />
             </div>
           </section>
+
+          {/* Manifesto — an inverted typographic band between two media-heavy sections */}
+          <Manifesto skin={skin} />
 
           {/* Testimonials (absent until a real quote exists) */}
           <Testimonials skin={skin} heading={Heading} />

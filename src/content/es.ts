@@ -91,6 +91,7 @@ export const es: PortfolioContent = {
         { q: '¿Cuánto tarda una construcción?', a: 'Depende del alcance. El diagnóstico termina con una ventana por escrito, y sigues el avance issue por issue en un tablero compartido.' },
       ],
     },
+    manifesto: { label: 'Cómo trabajo', lines: ['Leer los números antes que el código.', 'Desplegar desde git, nunca desde el editor.', 'Probar la tienda completa, no una página.', 'Entregar las llaves.'] },
     testimonials: { eyebrow: 'En sus palabras', title: 'Lo que dicen', titleAccent: 'los clientes' },
     now: { label: 'Ahora', live: '{n} tiendas en vivo', dev: '{n} en construcción', band: 'Tiendas entregadas', local: 'Medellín · {time} hora local' },
     statBand: { label: 'El trabajo, en números', asOf: 'Septiembre de 2026' },
