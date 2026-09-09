@@ -11,12 +11,17 @@ import {
   LanguageSelectorBrutalist,
   ShopifyWork,
   Gallery,
+  StatBand,
+  Process,
+  Manifesto,
+  Faq,
+  Contact,
+  Skills,
 } from '../components'
 import { skins } from '../components/gallery'
 import { Years } from '../components/sections/Years'
 import { useDynamicFavicon, useI18n, useContent } from '../hooks'
 import { designById } from '../data/designs'
-import type { SkillGroupId } from '../data/registry'
 
 // Theme Toggle - Brutalist Design
 const ThemeToggle = ({ size = 'md' }: { size?: 'sm' | 'md' }) => {
@@ -88,7 +93,12 @@ function Design1Content() {
   const { t } = useI18n()
   const { strings: c, registry, formatPeriod } = useContent()
   const [isContactOpen, setIsContactOpen] = useState(false)
+  const [contactPrefill, setContactPrefill] = useState('')
   const [activeTab, setActiveTab] = useState<'work' | 'freelance'>('work')
+  const openContact = (prefill?: string) => {
+    setContactPrefill(prefill ?? '')
+    setIsContactOpen(true)
+  }
 
   // Dynamic favicon
   useDynamicFavicon('brutalist')
@@ -146,7 +156,7 @@ function Design1Content() {
 
       <div className={`min-h-screen ${bgPrimary} ${textPrimary} font-body overflow-x-hidden transition-colors duration-300`} role="document">
         {/* Contact Modal */}
-        <ContactFormModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} variant="brutalist" isDark={isDark} />
+        <ContactFormModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} variant="brutalist" isDark={isDark} initialMessage={contactPrefill} />
 
         {/* Navigation */}
         <nav
@@ -276,6 +286,13 @@ function Design1Content() {
                   </div>
                 </div>
               </m.div>
+            </div>
+          </section>
+
+          {/* Stat band — the work, in numerals, on a hairline grid */}
+          <section className={`py-16 md:py-24 border-t-4 ${borderStrong}`}>
+            <div className="max-w-[1800px] mx-auto px-4 md:px-6">
+              <StatBand skin={skin} />
             </div>
           </section>
 
@@ -421,6 +438,13 @@ function Design1Content() {
             </div>
           </section>
 
+          {/* Process: how a store ships, as a numbered stepper */}
+          <section className={`py-16 md:py-24 border-t-4 ${borderStrong}`}>
+            <div className="max-w-[1800px] mx-auto px-4 md:px-6">
+              <Process skin={skin} heading={(e, ti, a, l) => BrutalHeading(nextSection() + ' · ' + e, ti, a, l)} canvas={bgPrimary} />
+            </div>
+          </section>
+
           {/* Shopify Work */}
           <section className={`py-16 md:py-24 border-t-4 ${borderStrong}`}>
             <div className="max-w-[1800px] mx-auto px-4 md:px-6">
@@ -435,104 +459,40 @@ function Design1Content() {
             </div>
           </section>
 
-          {/* Skills Section */}
+          {/* Manifesto — inverted typographic band */}
+          <Manifesto skin={skin} />
+
+          {/* Skills Section — the ledger + narrative sentences */}
           <section id="about" className={`py-16 md:py-24 border-t-4 ${borderStrong}`}>
             <div className="max-w-[1800px] mx-auto px-4 md:px-6">
-              <m.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mb-12 md:mb-16">
-                <span className={`font-mono text-xs uppercase tracking-[0.5em] ${textMuted}`}>{nextSection()}</span>
-                <h2 className="font-editorial text-[12vw] md:text-[8vw] leading-[0.85] tracking-tight italic mt-4">
-                  {c.sections.skills.title}
-                  <br />
-                  <span className="not-italic text-red-600">{c.sections.skills.titleAccent}</span>
-                </h2>
-              </m.div>
+              <Skills skin={skin} heading={(e, ti, a, l) => BrutalHeading(nextSection() + ' · ' + e, ti, a, l)} />
+            </div>
+          </section>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
-                {(Object.keys(registry.skillGroups) as SkillGroupId[]).map((group, index) => (
-                  <m.div
-                    key={group}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.08 }}
-                    className={`border-l-4 ${index % 2 === 1 ? 'border-red-600' : borderStrong} pl-4 md:pl-6`}
-                  >
-                    <h3 className={`font-mono text-xs uppercase tracking-wider ${textMuted} mb-4`}>{c.sections.skills.groups[group]}</h3>
-                    <div className="space-y-2">
-                      {registry.skillGroups[group].map((skill) => (
-                        <p key={skill} className="font-editorial text-lg md:text-xl italic">
-                          {skill}
-                        </p>
-                      ))}
-                    </div>
-                  </m.div>
-                ))}
-              </div>
+          {/* FAQ */}
+          <section className={`py-16 md:py-24 border-t-4 ${borderStrong}`}>
+            <div className="max-w-[1800px] mx-auto px-4 md:px-6">
+              <Faq skin={skin} heading={(e, ti, a, l) => BrutalHeading(nextSection() + ' · ' + e, ti, a, l)} />
             </div>
           </section>
 
           {/* Contact Section */}
-          <section id="contact" className="py-16 md:py-24 bg-red-600 text-white">
+          <section id="contact" className={`py-16 md:py-24 border-t-4 ${borderStrong} bg-red-600 text-white`}>
             <div className="max-w-[1800px] mx-auto px-4 md:px-6">
-              <m.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="text-center">
-                <p className="font-mono text-xs uppercase tracking-[0.5em] text-red-200 mb-6 md:mb-8">{c.sections.contact.eyebrow}</p>
-                <h2 className="font-editorial text-[10vw] md:text-[6vw] leading-[0.85] tracking-tight italic mb-8 md:mb-12">
-                  {c.sections.contact.title}
-                  <br />
-                  <span className="not-italic">{c.sections.contact.titleAccent}</span>
-                </h2>
-
-                <p className="text-red-100 max-w-xl mx-auto mb-8 md:mb-12 text-sm md:text-base">{c.sections.contact.lead}</p>
-
-                <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-12 md:mb-16">
-                  <button
-                    onClick={() => setIsContactOpen(true)}
-                    className="inline-flex items-center justify-center gap-2 font-mono text-base md:text-lg uppercase tracking-wider bg-white text-red-600 px-8 py-4 hover:bg-stone-900 hover:text-white transition-colors"
-                  >
-                    <MailIcon className="w-5 h-5" />
-                    {c.sections.contact.cta}
-                  </button>
-                  <button
-                    onClick={downloadCv}
-                    className="inline-flex items-center justify-center gap-2 font-mono text-base md:text-lg uppercase tracking-wider border-4 border-white px-8 py-4 hover:bg-white hover:text-red-600 transition-colors"
-                  >
-                    <DownloadIcon className="w-5 h-5" />
-                    {c.hero.ctaCv}
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto mb-12">
-                  <div>
-                    <p className="font-mono text-xs uppercase tracking-wider text-red-200 mb-2">{c.sections.contact.phone}</p>
-                    <a href={registry.personal.phoneHref} className="hover:text-red-200 transition-colors">
-                      {registry.personal.phone}
-                    </a>
-                  </div>
-                  <div>
-                    <p className="font-mono text-xs uppercase tracking-wider text-red-200 mb-2">{c.sections.contact.location}</p>
-                    <p>{c.location}</p>
-                  </div>
-                  <div>
-                    <p className="font-mono text-xs uppercase tracking-wider text-red-200 mb-2">{c.sections.contact.email}</p>
-                    <a href={`mailto:${registry.personal.email}`} className="hover:text-red-200 transition-colors break-all">
-                      {registry.personal.email}
-                    </a>
-                  </div>
-                </div>
-
-                <p className="font-mono text-xs uppercase tracking-wider text-red-200 mb-6">
-                  {c.sections.contact.status} · {c.sections.contact.note}
-                </p>
-
-                <div className="flex justify-center gap-8 md:gap-12">
-                  <a href={registry.personal.linkedin} target="_blank" rel="noopener noreferrer" className="font-mono text-sm uppercase tracking-wider hover:text-red-900 transition-colors">
-                    LinkedIn
-                  </a>
-                  <a href={registry.personal.github} target="_blank" rel="noopener noreferrer" className="font-mono text-sm uppercase tracking-wider hover:text-red-900 transition-colors">
-                    GitHub
-                  </a>
-                </div>
-              </m.div>
+              <Contact
+                skin={{ ...skin, title: 'text-white', body: 'text-red-50', muted: 'text-red-100', accent: 'text-white underline', line: 'border-red-300/40', accentBg: 'bg-stone-900' }}
+                ctaClass="press inline-flex items-center justify-center font-mono text-sm uppercase tracking-wider bg-white text-red-600 px-8 py-4 hover:bg-stone-900 hover:text-white transition-colors"
+                onContact={openContact}
+              />
+              <div className="mt-10 flex justify-center gap-8 md:gap-12">
+                <button
+                  onClick={downloadCv}
+                  className="inline-flex items-center justify-center gap-2 font-mono text-xs uppercase tracking-wider border-2 border-white px-6 py-3 hover:bg-white hover:text-red-600 transition-colors"
+                >
+                  <DownloadIcon className="w-4 h-4" />
+                  {c.hero.ctaCv}
+                </button>
+              </div>
             </div>
           </section>
         </main>
