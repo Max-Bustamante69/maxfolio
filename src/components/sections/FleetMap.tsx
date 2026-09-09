@@ -86,14 +86,17 @@ export function FleetMap({ skin, heading }: FleetMapProps) {
                   onClick={() => setOpenStore(st)}
                   aria-label={`${st.name} · ${industry} · ${st.status === 'live' ? strings.badges.live : strings.badges.dev} · ${strings.badges.roles[st.role]}`}
                   title={st.name}
-                  className="press compact-touch group relative flex h-9 w-9 items-center justify-center"
+                  className="press compact-touch relative flex h-9 w-9 items-center justify-center transition-transform duration-150 hover:scale-110"
                 >
+                  {/* framer owns this element's transform end to end (scale + the migrated diamond's rotate) — no CSS
+                      transform utility shares it, or the two animation systems fight over the property and the
+                      entrance animation gets stuck mid-scale. Hover growth lives on the button above instead. */}
                   <m.span
                     aria-hidden="true"
-                    className={`block h-3.5 w-3.5 transition-transform group-hover:scale-125 ${st.role === 'migrated' ? 'rotate-45' : 'rounded-full'}`}
+                    className={`block h-3.5 w-3.5 ${st.role === 'migrated' ? '' : 'rounded-full'}`}
                     style={{ backgroundColor: DOT_COLOR[st.status] }}
-                    initial={reduced ? false : { scale: 0 }}
-                    whileInView={{ scale: 1 }}
+                    initial={reduced ? false : { scale: 0, rotate: st.role === 'migrated' ? 45 : 0 }}
+                    whileInView={{ scale: 1, rotate: st.role === 'migrated' ? 45 : 0 }}
                     viewport={{ once: true, margin: '-20px' }}
                     transition={{ duration: 0.3, ease: EASE }}
                   />
