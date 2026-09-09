@@ -1,0 +1,632 @@
+{
+  "the-gummy-box": {
+    "repo": "the-gummy-box",
+    "commits": 696,
+    "first": "2026-06-14",
+    "last": "2026-09-04",
+    "weekOf": "2026-06-08",
+    "weeks": [
+      2,
+      5,
+      0,
+      1,
+      9,
+      0,
+      0,
+      3,
+      19,
+      110,
+      143,
+      137,
+      267
+    ],
+    "files": {
+      "liquid": 101,
+      "ts": 157,
+      "css": 4,
+      "json": 148
+    },
+    "lines": {
+      "liquid": 14189,
+      "islands": 29983,
+      "css": 1030
+    },
+    "sections": 72,
+    "busiestWeek": {
+      "index": 12,
+      "commits": 267,
+      "week": "2026-W36"
+    }
+  },
+  "nos-cafe": {
+    "repo": "nos-cafe",
+    "commits": 411,
+    "first": "2026-07-22",
+    "last": "2026-09-08",
+    "weekOf": "2026-07-20",
+    "weeks": [
+      81,
+      40,
+      32,
+      46,
+      48,
+      27,
+      108,
+      29
+    ],
+    "files": {
+      "liquid": 84,
+      "ts": 69,
+      "css": 2,
+      "json": 83
+    },
+    "lines": {
+      "liquid": 16665,
+      "islands": 14351,
+      "css": 996
+    },
+    "sections": 59,
+    "busiestWeek": {
+      "index": 6,
+      "commits": 108,
+      "week": "2026-W36"
+    }
+  },
+  "millennio": {
+    "repo": "millennio",
+    "commits": 292,
+    "first": "2026-07-28",
+    "last": "2026-09-07",
+    "weekOf": "2026-07-27",
+    "weeks": [
+      25,
+      26,
+      10,
+      0,
+      198,
+      32,
+      1
+    ],
+    "files": {
+      "liquid": 176,
+      "ts": 0,
+      "css": 0,
+      "json": 151
+    },
+    "lines": {
+      "liquid": 78315,
+      "islands": 0,
+      "css": 0
+    },
+    "sections": 104,
+    "busiestWeek": {
+      "index": 4,
+      "commits": 198,
+      "week": "2026-W35"
+    }
+  },
+  "mindfuel": {
+    "repo": "mindfuel-v2",
+    "commits": 126,
+    "first": "2026-08-08",
+    "last": "2026-09-08",
+    "weekOf": "2026-08-03",
+    "weeks": [
+      34,
+      33,
+      6,
+      7,
+      24,
+      22
+    ],
+    "files": {
+      "liquid": 41,
+      "ts": 61,
+      "css": 2,
+      "json": 31
+    },
+    "lines": {
+      "liquid": 13958,
+      "islands": 17086,
+      "css": 616
+    },
+    "sections": 34,
+    "busiestWeek": {
+      "index": 0,
+      "commits": 34,
+      "week": "2026-W32"
+    }
+  },
+  "nalua": {
+    "repo": "nalua",
+    "commits": 567,
+    "first": "2026-06-14",
+    "last": "2026-09-03",
+    "weekOf": "2026-06-08",
+    "weeks": [
+      1,
+      45,
+      50,
+      50,
+      30,
+      96,
+      72,
+      75,
+      91,
+      2,
+      51,
+      0,
+      4
+    ],
+    "files": {
+      "liquid": 65,
+      "ts": 77,
+      "css": 3,
+      "json": 31
+    },
+    "lines": {
+      "liquid": 11592,
+      "islands": 13240,
+      "css": 819
+    },
+    "sections": 47,
+    "busiestWeek": {
+      "index": 5,
+      "commits": 96,
+      "week": "2026-W29"
+    }
+  },
+  "sebum": {
+    "repo": "sebum-v2",
+    "commits": 203,
+    "first": "2026-07-08",
+    "last": "2026-09-03",
+    "weekOf": "2026-07-06",
+    "weeks": [
+      89,
+      43,
+      7,
+      26,
+      16,
+      4,
+      14,
+      0,
+      4
+    ],
+    "files": {
+      "liquid": 50,
+      "ts": 30,
+      "css": 2,
+      "json": 27
+    },
+    "lines": {
+      "liquid": 6271,
+      "islands": 5562,
+      "css": 102
+    },
+    "sections": 38,
+    "busiestWeek": {
+      "index": 0,
+      "commits": 89,
+      "week": "2026-W28"
+    }
+  },
+  "valdo-cafe": {
+    "repo": "valdo-cafe",
+    "commits": 50,
+    "first": "2026-06-21",
+    "last": "2026-09-03",
+    "weekOf": "2026-06-15",
+    "weeks": [
+      10,
+      0,
+      24,
+      11,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      4
+    ],
+    "files": {
+      "liquid": 35,
+      "ts": 45,
+      "css": 2,
+      "json": 20
+    },
+    "lines": {
+      "liquid": 2659,
+      "islands": 5813,
+      "css": 276
+    },
+    "sections": 27,
+    "busiestWeek": {
+      "index": 2,
+      "commits": 24,
+      "week": "2026-W27"
+    }
+  },
+  "factores-2x2": {
+    "repo": "factores-2x2",
+    "commits": 182,
+    "first": "2026-07-06",
+    "last": "2026-09-03",
+    "weekOf": "2026-07-06",
+    "weeks": [
+      7,
+      0,
+      2,
+      55,
+      88,
+      2,
+      20,
+      3,
+      5
+    ],
+    "files": {
+      "liquid": 63,
+      "ts": 58,
+      "css": 3,
+      "json": 99
+    },
+    "lines": {
+      "liquid": 10864,
+      "islands": 14825,
+      "css": 419
+    },
+    "sections": 49,
+    "busiestWeek": {
+      "index": 4,
+      "commits": 88,
+      "week": "2026-W32"
+    }
+  },
+  "pixxiesx": {
+    "repo": "pixxiesx-theme",
+    "commits": 100,
+    "first": "2026-06-17",
+    "last": "2026-08-24",
+    "weekOf": "2026-06-15",
+    "weeks": [
+      9,
+      0,
+      9,
+      16,
+      28,
+      1,
+      25,
+      7,
+      0,
+      0,
+      5
+    ],
+    "files": {
+      "liquid": 224,
+      "ts": 0,
+      "css": 0,
+      "json": 72
+    },
+    "lines": {
+      "liquid": 59557,
+      "islands": 0,
+      "css": 0
+    },
+    "sections": 97,
+    "busiestWeek": {
+      "index": 4,
+      "commits": 28,
+      "week": "2026-W29"
+    }
+  },
+  "luxe-shine": {
+    "repo": "luxe-shine",
+    "commits": 193,
+    "first": "2026-06-15",
+    "last": "2026-08-17",
+    "weekOf": "2026-06-15",
+    "weeks": [
+      15,
+      64,
+      49,
+      13,
+      10,
+      28,
+      12,
+      0,
+      0,
+      2
+    ],
+    "files": {
+      "liquid": 52,
+      "ts": 47,
+      "css": 2,
+      "json": 21
+    },
+    "lines": {
+      "liquid": 11436,
+      "islands": 8495,
+      "css": 125
+    },
+    "sections": 41,
+    "busiestWeek": {
+      "index": 1,
+      "commits": 64,
+      "week": "2026-W26"
+    }
+  },
+  "atmosfera": {
+    "repo": "atmosfera",
+    "commits": 134,
+    "first": "2026-06-16",
+    "last": "2026-08-17",
+    "weekOf": "2026-06-15",
+    "weeks": [
+      62,
+      8,
+      1,
+      31,
+      12,
+      3,
+      8,
+      0,
+      1,
+      8
+    ],
+    "files": {
+      "liquid": 56,
+      "ts": 12,
+      "css": 3,
+      "json": 14
+    },
+    "lines": {
+      "liquid": 7400,
+      "islands": 1351,
+      "css": 971
+    },
+    "sections": 35,
+    "busiestWeek": {
+      "index": 0,
+      "commits": 62,
+      "week": "2026-W25"
+    }
+  },
+  "peluna": {
+    "repo": "peluna",
+    "commits": 158,
+    "first": "2026-06-17",
+    "last": "2026-09-07",
+    "weekOf": "2026-06-15",
+    "weeks": [
+      69,
+      43,
+      18,
+      8,
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      7,
+      12
+    ],
+    "files": {
+      "liquid": 189,
+      "ts": 0,
+      "css": 0,
+      "json": 331
+    },
+    "lines": {
+      "liquid": 64949,
+      "islands": 0,
+      "css": 0
+    },
+    "sections": 90,
+    "busiestWeek": {
+      "index": 0,
+      "commits": 69,
+      "week": "2026-W25"
+    }
+  },
+  "en-amor-a-dos": {
+    "repo": "en-amor-a-dos",
+    "commits": 171,
+    "first": "2026-08-10",
+    "last": "2026-09-08",
+    "weekOf": "2026-08-10",
+    "weeks": [
+      36,
+      10,
+      68,
+      27,
+      30
+    ],
+    "files": {
+      "liquid": 166,
+      "ts": 19,
+      "css": 1,
+      "json": 1145
+    },
+    "lines": {
+      "liquid": 31743,
+      "islands": 2016,
+      "css": 461
+    },
+    "sections": 85,
+    "busiestWeek": {
+      "index": 2,
+      "commits": 68,
+      "week": "2026-W35"
+    }
+  },
+  "unik": {
+    "repo": "unik",
+    "commits": 107,
+    "first": "2026-06-17",
+    "last": "2026-09-03",
+    "weekOf": "2026-06-15",
+    "weeks": [
+      3,
+      6,
+      63,
+      11,
+      17,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      5
+    ],
+    "files": {
+      "liquid": 56,
+      "ts": 47,
+      "css": 2,
+      "json": 25
+    },
+    "lines": {
+      "liquid": 8497,
+      "islands": 24449,
+      "css": 1193
+    },
+    "sections": 44,
+    "busiestWeek": {
+      "index": 2,
+      "commits": 63,
+      "week": "2026-W27"
+    }
+  },
+  "origen-vital": {
+    "repo": "origen-vital-colombia",
+    "commits": 493,
+    "first": "2026-07-20",
+    "last": "2026-09-07",
+    "weekOf": "2026-07-20",
+    "weeks": [
+      219,
+      0,
+      80,
+      32,
+      86,
+      10,
+      62,
+      4
+    ],
+    "files": {
+      "liquid": 272,
+      "ts": 82,
+      "css": 15,
+      "json": 102
+    },
+    "lines": {
+      "liquid": 54829,
+      "islands": 21177,
+      "css": 7587
+    },
+    "sections": 100,
+    "busiestWeek": {
+      "index": 0,
+      "commits": 219,
+      "week": "2026-W30"
+    }
+  },
+  "para-machos": {
+    "repo": "para-machos",
+    "commits": 144,
+    "first": "2026-08-17",
+    "last": "2026-09-08",
+    "weekOf": "2026-08-17",
+    "weeks": [
+      40,
+      46,
+      39,
+      19
+    ],
+    "files": {
+      "liquid": 86,
+      "ts": 88,
+      "css": 2,
+      "json": 61
+    },
+    "lines": {
+      "liquid": 10364,
+      "islands": 14715,
+      "css": 870
+    },
+    "sections": 62,
+    "busiestWeek": {
+      "index": 1,
+      "commits": 46,
+      "week": "2026-W35"
+    }
+  },
+  "tierramont": {
+    "repo": "tierramont-claude",
+    "commits": 323,
+    "first": "2026-07-17",
+    "last": "2026-09-08",
+    "weekOf": "2026-07-13",
+    "weeks": [
+      62,
+      8,
+      12,
+      4,
+      9,
+      61,
+      60,
+      73,
+      34
+    ],
+    "files": {
+      "liquid": 76,
+      "ts": 70,
+      "css": 2,
+      "json": 80
+    },
+    "lines": {
+      "liquid": 16238,
+      "islands": 13627,
+      "css": 554
+    },
+    "sections": 45,
+    "busiestWeek": {
+      "index": 7,
+      "commits": 73,
+      "week": "2026-W36"
+    }
+  },
+  "alma-de-aviador": {
+    "repo": "alma-de-aviador-v2",
+    "commits": 175,
+    "first": "2026-08-26",
+    "last": "2026-09-08",
+    "weekOf": "2026-08-24",
+    "weeks": [
+      59,
+      85,
+      31
+    ],
+    "files": {
+      "liquid": 61,
+      "ts": 65,
+      "css": 2,
+      "json": 61
+    },
+    "lines": {
+      "liquid": 9076,
+      "islands": 17022,
+      "css": 262
+    },
+    "sections": 51,
+    "busiestWeek": {
+      "index": 1,
+      "commits": 85,
+      "week": "2026-W36"
+    }
+  }
+}

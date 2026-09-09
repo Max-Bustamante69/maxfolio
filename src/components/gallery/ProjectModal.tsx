@@ -7,8 +7,8 @@ import { carouselTokens, type Skin } from './skins'
 import type { FrameShots } from './ProjectFrame'
 import { Carousel } from '../../vendor/carousel'
 import type { StoreMetrics } from '../../data/registry'
-import type { ResultMetricId, StoreResults } from '../../data/results'
-import { CompareTable, CountUp, Gauge, IndexLine, MetricBars, SlopeChart, badText, goodText } from './charts'
+import type { StoreTelemetry } from '../../data/telemetry'
+import { CountUp, VolumeBars, WeeklyBars } from './charts'
 
 export interface CaseStudyStat {
   label: string
@@ -23,7 +23,7 @@ export interface CaseStudyData {
   tagline: string
   description: string
   metrics?: StoreMetrics // Lighthouse lab scores, live stores only
-  story?: StoreResults // indexed before/after metrics — sample shapes until measured
+  trail?: { data: StoreTelemetry; range: string } // real build telemetry from the store repo's git history
   stats: CaseStudyStat[] // verifiable store facts (build window, ladders, modules…)
   results: CaseStudyStat[] // measured business outcomes; hidden when empty
   stack: string[]
@@ -49,13 +49,16 @@ export interface CaseStudyLabels {
   seo: string
   lcp: string
   measured: string
-  story: string
-  sampleBadge: string
-  sampleNote: string
-  measuredFrom: string
-  before: string
-  after: string
-  metric: Record<ResultMetricId, string>
+  trail: string
+  trailNote: string
+  perWeek: string
+  peak: string
+  codebase: string
+  liquidLines: string
+  islandLines: string
+  sectionsCount: string
+  commits: string
+  weeks: string
   copyLink: string
   copied: string
 }
@@ -269,60 +272,33 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
               <p className={`${skin.accent} mt-4 text-sm font-medium`}>{data.tagline}</p>
               <p className="mt-2 text-sm leading-relaxed">{data.description}</p>
 
-              {data.story && data.story.charts.length > 0 && (
+              {data.trail && (
                 <>
-                  <div className="mt-6 flex items-center gap-2">
-                    <p className={label}>{labels.story}</p>
-                    {data.story.sample && (
-                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${dark ? 'bg-[#ff9f0a]/20 text-[#ffbf4d]' : 'bg-[#ff9f0a]/15 text-[#8a5300]'}`}>{labels.sampleBadge}</span>
-                    )}
-                  </div>
-                  {/* One chart per story beat, and a different chart per kind of beat: a line for a trend,
-                      a slope for a before/after comparison, gauges for shares, bars for units of time or count. */}
-                  {/* the headline result, one glance before the detail */}
-                  {(() => {
-                    const lead = data.story.charts.flatMap((ch) => ch.metrics).find((mm) => mm.before > 0)
-                    if (!lead) return null
-                    const d = Math.round(((lead.after - lead.before) / lead.before) * 100)
-                    const good = lead.invert ? d <= 0 : d >= 0
-                    return (
-                      <p className="mt-3 flex items-baseline gap-3">
-                        <CountUp value={Math.abs(d)} prefix={d >= 0 ? '+' : '−'} suffix="%" delay={0.15} className={`text-4xl font-semibold tabular-nums tracking-[-0.03em] ${good ? goodText(dark) : badText(dark)}`} />
-                        <span className={`${skin.muted} text-sm`}>{labels.metric[lead.id]}</span>
-                      </p>
-                    )
-                  })()}
-                  <div className="mt-4 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
-                    {data.story.charts.map((ch, i) => {
-                      const key = `${ch.kind}-${ch.metrics.map((mm) => mm.id).join('-')}`
-                      const common = { color: accent, dark, labels: { metric: labels.metric, before: labels.before, after: labels.after }, delay: 0.2 + i * 0.12 }
-                      if (ch.kind === 'slope')
-                        return (
-                          <div key={key} className="sm:col-span-2">
-                            <SlopeChart metrics={ch.metrics} {...common} />
-                          </div>
-                        )
-                      if (ch.kind === 'gauge')
-                        return (
-                          <div key={key} className="flex flex-wrap gap-x-8 gap-y-4 sm:col-span-2">
-                            {ch.metrics.map((mm, j) => (
-                              <Gauge key={mm.id} metric={mm} {...common} delay={common.delay + j * 0.1} />
-                            ))}
-                          </div>
-                        )
-                      if (ch.kind === 'bars') return <MetricBars key={key} metrics={ch.metrics} {...common} />
-                      if (ch.kind === 'table' && ch.rows)
-                        return (
-                          <div key={key} className="sm:col-span-2">
-                            <CompareTable rows={ch.rows} dark={dark} labels={common.labels} delay={common.delay} />
-                          </div>
-                        )
-                      return <IndexLine key={key} metric={ch.metrics[0]} {...common} />
-                    })}
-                  </div>
-                  <p className={`${skin.muted} mt-3 text-[11px] leading-snug`}>
-                    {data.story.sample ? labels.sampleNote : labels.measuredFrom.replace('{source}', data.story.source ?? '').replace('{period}', data.story.period ?? '')}
+                  <p className={`mt-6 ${label}`}>{labels.trail}</p>
+                  {/* the headline is real: commits in the store repo, then the shape of the build week by week */}
+                  <p className="mt-3 flex items-baseline gap-3">
+                    <CountUp value={data.trail.data.commits} delay={0.15} className="text-4xl font-semibold tabular-nums tracking-[-0.03em]" />
+                    <span className={`${skin.muted} text-sm`}>
+                      {labels.commits} · {data.trail.data.weeks.length} {labels.weeks}
+                    </span>
                   </p>
+                  <div className="mt-4">
+                    <WeeklyBars weeks={data.trail.data.weeks} weekOf={data.trail.data.weekOf} caption={labels.perWeek} peakLabel={labels.peak.replace('{n}', String(data.trail.data.busiestWeek.commits))} color={accent} dark={dark} delay={0.25} />
+                  </div>
+                  <p className={`mt-5 ${label}`}>{labels.codebase}</p>
+                  <div className="mt-2">
+                    <VolumeBars
+                      rows={[
+                        { label: labels.sectionsCount, value: data.trail.data.sections },
+                        { label: labels.liquidLines, value: data.trail.data.lines.liquid },
+                        ...(data.trail.data.lines.islands > 0 ? [{ label: labels.islandLines, value: data.trail.data.lines.islands }] : []),
+                      ]}
+                      color={accent}
+                      dark={dark}
+                      delay={0.4}
+                    />
+                  </div>
+                  <p className={`${skin.muted} mt-3 text-[11px] leading-snug`}>{labels.trailNote.replace('{n}', String(data.trail.data.commits)).replace('{range}', data.trail.range)}</p>
                 </>
               )}
 

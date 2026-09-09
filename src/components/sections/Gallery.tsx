@@ -5,7 +5,7 @@ import { ProjectFrame, GlassControls, carouselTokens, type Skin, type FrameShots
 import type { CaseStudyLabels } from '../gallery/ProjectModal'
 import { Carousel } from '../../vendor/carousel'
 import { metrics, type StoreEntry } from '../../data/registry'
-import { results as storyResults } from '../../data/results'
+import { telemetry } from '../../data/telemetry'
 import type { PortfolioContent } from '../../content/types'
 
 export type SectionHeading = (eyebrow: string, title: string, accent: string, lead?: string) => ReactNode
@@ -44,7 +44,7 @@ export const caseStudyLabels = (strings: PortfolioContent): CaseStudyLabels => {
     close: g.close, prev: cs.prev, next: cs.next, home: g.home, pdp: g.pdp, desktop: g.desktop, mobile: g.mobile,
     facts: cs.facts, results: cs.results, stack: cs.stack, visit: cs.visit,
     metrics: cs.metrics, perf: cs.perf, a11y: cs.a11y, bp: cs.bp, seo: cs.seo, lcp: cs.lcp, measured: cs.measured,
-    story: cs.story, sampleBadge: cs.sampleBadge, sampleNote: cs.sampleNote, measuredFrom: cs.measuredFrom, before: cs.before, after: cs.after, metric: cs.metric,
+    trail: cs.trail, trailNote: cs.trailNote, perWeek: cs.perWeek, peak: cs.peak, codebase: cs.codebase, liquidLines: cs.liquidLines, islandLines: cs.islandLines, sectionsCount: cs.sectionsCount, commits: cs.commits, weeks: cs.weeks,
     copyLink: cs.copyLink, copied: cs.copied,
   }
 }
@@ -72,7 +72,7 @@ export function caseStudyFor(
     tagline: c?.tagline ?? '',
     description: c?.description ?? '',
     metrics: st.status === 'live' ? metrics[st.slug] : undefined,
-    story: storyResults[st.slug],
+    trail: telemetry[st.slug] ? { data: telemetry[st.slug], range: formatPeriod(telemetry[st.slug].first.slice(0, 7), telemetry[st.slug].last.slice(0, 7)) } : undefined,
     stats,
     results,
     stack: st.stack,

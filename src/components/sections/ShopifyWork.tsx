@@ -6,8 +6,7 @@ import { Products } from './Products'
 import { useHoverPreview } from '../gallery/HoverPreview'
 import { lightboxItems, caseStudyFor, caseStudyLabels, ProjectModal, type SectionHeading } from './Gallery'
 import type { StoreEntry, ProductEntry } from '../../data/registry'
-import { results as storyResults } from '../../data/results'
-import { badText, goodText } from '../gallery/charts'
+import { telemetry } from '../../data/telemetry'
 
 interface ShopifyWorkProps {
   skin: Skin
@@ -68,18 +67,15 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
   const hidden = registry.stores.length - visibleFleet.length
   const chipFor = (on: boolean) => `${on ? skin.chipOn : skin.chip} compact-touch transition-colors`
 
-  /** The story's headline metric as a small delta chip, so the varied number shows before the sheet opens. */
+  /** The store's real build trail as a small chip (commits and weeks from its git history), before the sheet opens. */
   const Headline = ({ slug }: { slug: string }) => {
-    const story = storyResults[slug]
-    const lead = story?.charts.flatMap((ch) => ch.metrics).find((mm) => mm.before > 0)
-    if (!story || !lead) return null
-    const d = Math.round(((lead.after - lead.before) / lead.before) * 100)
-    const good = lead.invert ? d <= 0 : d >= 0
+    const t = telemetry[slug]
+    if (!t) return null
     return (
       <span className={`${skin.chip} mt-1.5 inline-flex items-center gap-1.5`}>
-        <span className={`font-semibold tabular-nums ${good ? goodText(skin.dark) : badText(skin.dark)}`}>{d >= 0 ? '+' : '−'}{Math.abs(d)}%</span>
-        <span>{cs.metric[lead.id]}</span>
-        {story.sample && <span className={skin.muted}>· {cs.sampleBadge}</span>}
+        <span className="font-semibold tabular-nums">{t.commits}</span>
+        <span>{cs.commits}</span>
+        <span className={skin.muted}>· {t.weeks.length} {cs.weeks}</span>
       </span>
     )
   }

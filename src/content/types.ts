@@ -1,5 +1,4 @@
 import type { ExperienceId, RoleWorkId, StatId, SkillGroupId, StoreRole } from '../data/registry'
-import type { ResultMetricId } from '../data/results'
 
 interface SectionHeading {
   eyebrow: string
@@ -67,7 +66,7 @@ export interface PortfolioContent {
       elsewhere: string
     }
     explore: { eyebrow: string; title: string; lead: string; viewing: string }
-    caseStudy: { facts: string; results: string; stack: string; visit: string; prev: string; next: string; timeline: string; commits: string; sections: string; open: string; metrics: string; perf: string; a11y: string; bp: string; seo: string; lcp: string; measured: string; story: string; sampleBadge: string; sampleNote: string; measuredFrom: string; before: string; after: string; metric: Record<ResultMetricId, string>; copyLink: string; copied: string }
+    caseStudy: { facts: string; results: string; stack: string; visit: string; prev: string; next: string; timeline: string; commits: string; sections: string; open: string; metrics: string; perf: string; a11y: string; bp: string; seo: string; lcp: string; measured: string; trail: string; trailNote: string; perWeek: string; peak: string; codebase: string; liquidLines: string; islandLines: string; sectionsCount: string; weeks: string; copyLink: string; copied: string }
   }
   badges: { live: string; dev: string; current: string; completed: string; roles: Record<StoreRole, string> }
   experience: Record<
