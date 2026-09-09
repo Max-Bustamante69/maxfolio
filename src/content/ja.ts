@@ -95,6 +95,10 @@ export const ja: PortfolioContent = {
     testimonials: { eyebrow: 'お客様の声', title: 'クライアントの', titleAccent: '言葉' },
     now: { label: '現在', live: '公開中のストア {n}', dev: '構築中 {n}', band: '納品したストア', local: 'メデジン・現地時間 {time}' },
     statBand: { label: '仕事を数字で', asOf: '2026年9月時点' },
+    buildHeatmap: { label: 'ビルド活動(週次)', headline: '2026年、全ストアで{n}コミット', legendLow: '少ない', legendHigh: '多い', cellAria: '{date}の週: {n}コミット', half1: '1月–6月', half2: '7月–12月' },
+    stackByYear: { eyebrow: '年別スタック', title: '何を使ったか、', titleAccent: 'その年ごとに', lead: '全ストア・製品・役割で使われた技術を年別にランキング。レジストリから数えた実数で、アンケートではない。', rankAria: '{year}年 第{rank}位: {tag}、{n}回使用', countUnit: '回' },
+    fleetMap: { eyebrow: 'ストア群', title: '18のストアを、', titleAccent: '業種別に', lead: '公開中・開発中の全ストアを、それぞれが属する業種でグループ化。開くとビルド内容が見える。', filterAll: 'すべての役割' },
+    careerSubway: { eyebrow: 'キャリアマップ', title: '役割を、', titleAccent: '一本の路線に', lead: '6年間を路線図として: 雇用主ごとに一本の線、二つの役割が重なった場所に乗り換え。', toggleShow: '地図で見る', toggleHide: '地図を隠す', transferLabel: '重複', rowAria: '{company}: {period}' },
     years: { eyebrow: '年ごとの歩み', title: '5年間、', titleAccent: 'ひとつの方向へ', lead: '2022年のReactコンポーネントから、Shopifyストア群とその裏側のプラットフォームまで。各行はサイト全体と同じ記録から生成しています。', roles: '役割', shipped: 'ストア', work: 'クライアント案件', products: 'プロダクト', side: '個人プロジェクト', more: '+{n}件', count: 'ストア {n}', perYear: '構築がその年に及んだ納品物の数', eras: { '2022': 'ReactとSalesforce', '2023': '最初のShopifyストア', '2024': 'エンタープライズのフロント、そしてCTO', '2025': 'CTOと契約案件', '2026': 'ストア群とプラットフォーム' } },
     projects: { eyebrow: 'プロジェクト', title: '個人的に', titleAccent: 'つくっているもの', view: 'プロジェクトを見る' },
     skills: {
