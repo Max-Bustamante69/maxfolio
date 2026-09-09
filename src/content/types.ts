@@ -1,4 +1,5 @@
 import type { ExperienceId, RoleWorkId, StatId, SkillGroupId, StoreRole } from '../data/registry'
+import type { WorkKind } from '../data/timeline'
 
 interface SectionHeading {
   eyebrow: string
@@ -51,6 +52,36 @@ export interface PortfolioContent {
     faq: SectionHeading & { items: { q: string; a: string }[] }
     manifesto: { label: string; lines: string[] }
     years: SectionHeading & { lead: string; roles: string; shipped: string; work: string; products: string; side: string; more: string; count: string; perYear: string; eras: Record<string, string> }
+    /** Apple's Years replacement: a Gantt ribbon (new BuildTimeline.tsx), not the shared Years.tsx. */
+    buildTimeline: SectionHeading & {
+      lead: string
+      employers: string
+      storefronts: string
+      products: string
+      personal: string
+      current: string
+      roleAria: string // '{title} at {company}, {period}'
+      buildAria: string // '{name}, built {period}'
+      dotAria: string // '{name}, {year}'
+    }
+    /** Luxury's Years intro: the unit chart re-narrated as one composed sentence per year. */
+    fiveLines: {
+      kinds: Record<WorkKind, { one: string; singular: string; plural: string }>
+      numberWords: string[] // spelled 0..20, index-addressed; digits beyond that
+      joiner: string // between a spelled number and its noun phrase ('' for Japanese counters)
+      listJoiner: string // between phrases, all but the last
+      listFinal: string // between the last two phrases
+      empty: string // a year with nothing in the four kinds (defensive — every real year has at least one)
+    }
+    /** Brutalist's Years intro: a 60-cell (2022-01..2026-12) month calendar instead of the unit chart. */
+    yearStrip: {
+      legend: string
+      monthAria: string // '{month} — {state}'
+      activeState: string
+      inactiveState: string
+      currentState: string
+      countUnit: string // 'active months' / 'meses activos' / '稼働月'
+    }
     projects: SectionHeading & { view: string }
     skills: SectionHeading & { groups: Record<SkillGroupId, string>; narrative: Record<SkillGroupId, string>; usageLabel: string; usageUnit: string; usageNote: string; usageItems: Record<string, string> }
     contact: SectionHeading & {

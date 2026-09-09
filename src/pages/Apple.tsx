@@ -13,7 +13,7 @@ import { useDynamicFavicon, useI18n, useContent } from '../hooks'
 import { defaultDesign, otherDesigns, MENU } from '../data/designs'
 
 // Below the fold, each section arrives as its own chunk so the hero paints off a smaller bundle.
-const Years = lazy(() => import('../components/sections/Years').then((mod) => ({ default: mod.Years })))
+const BuildTimeline = lazy(() => import('../components/sections/BuildTimeline').then((mod) => ({ default: mod.BuildTimeline })))
 const Process = lazy(() => import('../components/sections/Process').then((mod) => ({ default: mod.Process })))
 const ShopifyWork = lazy(() => import('../components/sections/ShopifyWork').then((mod) => ({ default: mod.ShopifyWork })))
 const FleetMap = lazy(() => import('../components/sections/FleetMap').then((mod) => ({ default: mod.FleetMap })))
@@ -373,12 +373,13 @@ function AppleContent() {
             </div>
           </section>
 
-          {/* Year by year — editorial timeline. content-visibility:auto was tried and reverted here
-              — see docs/seo.md "content-visibility" for the measured instability. */}
-          <section id="years" className="px-4 py-20 md:py-28 scroll-mt-20">
+          {/* Year by year — a Gantt ribbon (BuildTimeline), not the shared Years.tsx: employer lanes,
+              storefront builds stacked by year, products/side projects as dots. content-visibility:auto
+              was tried and reverted here — see docs/seo.md "content-visibility" for the measured instability. */}
+          <section className="px-4 py-20 md:py-28 scroll-mt-20">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
-                <Years skin={skin} heading={Heading} />
+                <BuildTimeline skin={skin} heading={Heading} />
               </Suspense>
             </div>
           </section>
