@@ -11,7 +11,11 @@
   --neo-shadow-dark: #b8bcc7;
   --neo-shadow-light: #ffffff;
   --neo-ink: #3a3f4b;
-  --neo-ink-muted: #6b7280;
+  /* #6b7280 (the research spec's literal value) reads at 3.98:1 on this surface — under the WCAG AA
+     4.5:1 floor for the small captions/placeholders it's used on. Darkened to the nearest in-family
+     slate that clears it (5.4:1), same fix pattern as the accent below. Kept in sync with
+     tailwind.config.js theme.extend.colors.neo.inkMuted (the static `text-neo-inkMuted` utility). */
+  --neo-ink-muted: #565e6c;
   /* #5b6cff (the research spec's literal value) reads at 3.4:1 on this surface and 4.2:1 under white
      button text — under the WCAG AA 4.5:1 floor the accessibility fix layer (§2.5.1) requires. Darkened
      to the nearest in-family shade that clears both checks (6.0:1 / 4.9:1), measured in the build proof. */

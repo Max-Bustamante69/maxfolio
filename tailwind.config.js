@@ -77,7 +77,10 @@ export default {
           'surface': '#e6e9ef',
           'surfaceRaised': '#eef1f6',
           'ink': '#3a3f4b',
-          'inkMuted': '#6b7280',
+          // The research spec's literal muted ink (#6b7280) measures 3.98:1 on the light surface —
+          // under the WCAG AA 4.5:1 floor for the small captions/labels it's used on. Darkened to the
+          // nearest in-family slate that clears it (5.4:1), same fix pattern as the accent below.
+          'inkMuted': '#565e6c',
           'accent': '#4453d9',
           'dark': '#262a33',
           'darkSurfaceRaised': '#2c303a',

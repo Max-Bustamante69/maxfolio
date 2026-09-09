@@ -156,7 +156,12 @@ function NeoContent() {
         description={c.meta.description}
         canonical="https://www.maxfolio.dev/neo"
       />
-      <ContactFormModal isOpen={contactOpen} onClose={() => setContactOpen(false)} variant="neo" isDark={isDark} initialMessage={contactPrefill} />
+      {/* `theme-neo` wrapper (display:contents so it never affects layout/fixed-positioning) — the modal's
+          neo-* classes read --neo-* custom properties that only exist under .theme-neo, and this modal
+          renders as a sibling of the main .theme-neo container below, not a descendant of it. */}
+      <div className="theme-neo contents" data-theme={isDark ? 'dark' : undefined}>
+        <ContactFormModal isOpen={contactOpen} onClose={() => setContactOpen(false)} variant="neo" isDark={isDark} initialMessage={contactPrefill} />
+      </div>
 
       <div className="theme-neo min-h-screen font-neo transition-colors duration-300 [overflow-x:clip]" data-theme={isDark ? 'dark' : undefined} role="document">
         {/* Nav — a raised bar, the mark a small extruded chip */}
