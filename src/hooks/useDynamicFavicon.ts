@@ -9,17 +9,14 @@ const favicons: Record<FaviconType, string> = {
   default: '/favicon.svg',
 }
 
-const titles: Record<FaviconType, string> = {
-  apple: 'MB | Portfolio',
-  luxury: 'MB | Luxury Portfolio',
-  brutalist: 'MB | Brutalist Portfolio',
-  menu: 'MB | Design Menu',
-  default: 'MB | Portfolio',
-}
-
+// document.title is owned by SEOHead only (locale-, description- and canonical-aware). This hook
+// used to also set a short static title per theme ('MB | Portfolio', etc.) in the same effect
+// tick — on routes where content loads synchronously (the default English locale, since only `en`
+// is bundled eagerly per src/content/index.ts) that write landed AFTER SEOHead's and silently
+// replaced the real <title> with the short label for every crawler and tab. Confirmed via a
+// Playwright title trace (see docs/seo.md "title tag" for the reproduction) before removing it.
 export function useDynamicFavicon(type: FaviconType) {
   useEffect(() => {
-    // Update favicon
     const link = document.querySelector("link[rel~='icon']") as HTMLLinkElement
     if (link) {
       link.href = favicons[type]
@@ -31,16 +28,11 @@ export function useDynamicFavicon(type: FaviconType) {
       document.head.appendChild(newLink)
     }
 
-    // Update page title
-    document.title = titles[type]
-
-    // Cleanup - restore default on unmount
     return () => {
       const link = document.querySelector("link[rel~='icon']") as HTMLLinkElement
       if (link) {
         link.href = favicons.default
       }
-      document.title = titles.default
     }
   }, [type])
 }
