@@ -199,7 +199,7 @@ function Design1Content() {
 
         {/* Hero - Editorial Spread */}
         <main id="main-content">
-          <section className="min-h-screen pt-20 relative" aria-labelledby="hero-heading">
+          <section className="min-h-[70vh] pt-20 relative" aria-labelledby="hero-heading">
             <div className="max-w-[1800px] mx-auto px-4 md:px-6">
               {/* Masthead */}
               <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} className={`py-8 md:py-12 border-b-2 ${borderStrong}`}>
@@ -309,14 +309,14 @@ function Design1Content() {
           </div>
 
           {/* Stat band — the work, in numerals, on a hairline grid */}
-          <section className={`py-16 md:py-24 border-t-4 ${borderStrong}`}>
+          <section className={`py-12 md:py-16 border-t-4 ${borderStrong}`}>
             <div className="max-w-[1800px] mx-auto px-4 md:px-6">
               <StatBand skin={skin} />
             </div>
           </section>
 
           {/* Work Section */}
-          <section id="work" className={`py-16 md:py-24 border-t-4 ${borderStrong}`}>
+          <section id="work" className={`py-12 md:py-16 border-t-4 ${borderStrong}`}>
             <div className="max-w-[1800px] mx-auto px-4 md:px-6">
               <m.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mb-12 md:mb-16">
                 <span className={`font-mono text-xs uppercase tracking-[0.5em] ${textMuted}`}>{nextSection()}</span>
@@ -451,28 +451,28 @@ function Design1Content() {
           </section>
 
           {/* Years: opened by a Year Strip calendar (60 mono cells) instead of the unit chart */}
-          <section className={`py-16 md:py-24 border-t-4 ${borderStrong}`}>
+          <section className={`py-12 md:py-16 border-t-4 ${borderStrong}`}>
             <div className="max-w-[1800px] mx-auto px-4 md:px-6">
               <Years skin={skin} heading={(e, ti, a, l) => BrutalHeading(nextSection() + ' · ' + e, ti, a, l)} variant="strip" />
             </div>
           </section>
 
           {/* Process: how a store ships, as a numbered stepper */}
-          <section className={`py-16 md:py-24 border-t-4 ${borderStrong}`}>
+          <section className={`py-12 md:py-16 border-t-4 ${borderStrong}`}>
             <div className="max-w-[1800px] mx-auto px-4 md:px-6">
               <Process skin={skin} heading={(e, ti, a, l) => BrutalHeading(nextSection() + ' · ' + e, ti, a, l)} canvas={bgPrimary} />
             </div>
           </section>
 
           {/* Shopify Work */}
-          <section className={`py-16 md:py-24 border-t-4 ${borderStrong}`}>
+          <section className={`py-12 md:py-16 border-t-4 ${borderStrong}`}>
             <div className="max-w-[1800px] mx-auto px-4 md:px-6">
               <ShopifyWork skin={skin} heading={(e, ti, a, l) => BrutalHeading(nextSection() + ' · ' + e, ti, a, l)} />
             </div>
           </section>
 
           {/* Gallery */}
-          <section className={`py-16 md:py-24 border-t-4 ${borderStrong} ${bgSecondary}`}>
+          <section className={`py-12 md:py-16 border-t-4 ${borderStrong} ${bgSecondary}`}>
             <div className="max-w-[1800px] mx-auto px-4 md:px-6">
               <Gallery skin={skin} heading={(e, ti, a, l) => BrutalHeading(nextSection() + ' · ' + e, ti, a, l)} />
             </div>
@@ -482,21 +482,21 @@ function Design1Content() {
           <Manifesto skin={skin} />
 
           {/* Skills Section — the ledger + narrative sentences */}
-          <section id="about" className={`py-16 md:py-24 border-t-4 ${borderStrong}`}>
+          <section id="about" className={`py-12 md:py-16 border-t-4 ${borderStrong}`}>
             <div className="max-w-[1800px] mx-auto px-4 md:px-6">
               <Skills skin={skin} heading={(e, ti, a, l) => BrutalHeading(nextSection() + ' · ' + e, ti, a, l)} />
             </div>
           </section>
 
           {/* FAQ */}
-          <section className={`py-16 md:py-24 border-t-4 ${borderStrong}`}>
+          <section className={`py-12 md:py-16 border-t-4 ${borderStrong}`}>
             <div className="max-w-[1800px] mx-auto px-4 md:px-6">
               <Faq skin={skin} heading={(e, ti, a, l) => BrutalHeading(nextSection() + ' · ' + e, ti, a, l)} />
             </div>
           </section>
 
           {/* Contact Section */}
-          <section id="contact" className={`py-16 md:py-24 border-t-4 ${borderStrong} bg-red-600 text-white`}>
+          <section id="contact" className={`py-12 md:py-16 border-t-4 ${borderStrong} bg-red-600 text-white`}>
             <div className="max-w-[1800px] mx-auto px-4 md:px-6">
               <Contact
                 skin={{ ...skin, title: 'text-white', body: 'text-red-50', muted: 'text-red-100', accent: 'text-white underline', line: 'border-red-300/40', accentBg: 'bg-stone-900' }}

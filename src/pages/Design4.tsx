@@ -238,7 +238,7 @@ function Design4Content() {
 
         <main id="main-content">
           {/* Hero Section */}
-          <section id="hero" className="min-h-screen flex items-center py-24 px-6 md:px-16" aria-labelledby="hero-heading">
+          <section id="hero" className="min-h-[70vh] flex items-center py-16 md:py-20 px-6 md:px-16" aria-labelledby="hero-heading">
             <div className="max-w-7xl mx-auto w-full">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-24 items-end">
                 <div className="lg:col-span-8">
@@ -365,13 +365,13 @@ function Design4Content() {
 
           {/* Experience Section */}
           {/* Stat band — the work, in numerals, on a hairline grid */}
-          <section className={`py-20 md:py-32 px-6 md:px-16 ${bgPrimary}`}>
+          <section className={`py-14 md:py-20 px-6 md:px-16 ${bgPrimary}`}>
             <div className="max-w-7xl mx-auto">
               <StatBand skin={skin} />
             </div>
           </section>
 
-          <section id="experience" className={`py-20 md:py-32 px-6 md:px-16 ${bgSecondary} ${isDark ? "text-deco-cream" : "text-luxury-cream"}`}>
+          <section id="experience" className={`py-14 md:py-20 px-6 md:px-16 ${bgSecondary} ${isDark ? "text-deco-cream" : "text-luxury-cream"}`}>
             <div className="max-w-7xl mx-auto">
               <FadeInUp>
                 <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16">
@@ -576,28 +576,28 @@ function Design4Content() {
           </section>
 
           {/* Years: the unit chart stays, each year re-narrated as one composed serif sentence — "five years in five lines" */}
-          <section className={`py-20 md:py-32 px-6 md:px-16 ${bgPrimary}`}>
+          <section className={`py-14 md:py-20 px-6 md:px-16 ${bgPrimary}`}>
             <div className="max-w-7xl mx-auto">
               <Years skin={skin} heading={LuxuryHeading} variant="lines" />
             </div>
           </section>
 
           {/* Process: how a store ships, as a pinned stepper */}
-          <section className={`py-20 md:py-32 px-6 md:px-16 ${isDark ? "bg-slate-950/60" : "bg-luxury-black/[0.03]"}`}>
+          <section className={`py-14 md:py-20 px-6 md:px-16 ${isDark ? "bg-slate-950/60" : "bg-luxury-black/[0.03]"}`}>
             <div className="max-w-7xl mx-auto">
               <Process skin={skin} heading={LuxuryHeading} canvas={isDark ? "bg-slate-950" : "bg-luxury-black/[0.03]"} />
             </div>
           </section>
 
           {/* Shopify Work */}
-          <section className={`py-20 md:py-32 px-6 md:px-16 ${bgPrimary}`}>
+          <section className={`py-14 md:py-20 px-6 md:px-16 ${bgPrimary}`}>
             <div className="max-w-7xl mx-auto">
               <ShopifyWork skin={skin} heading={LuxuryHeading} />
             </div>
           </section>
 
           {/* Gallery */}
-          <section className={`py-20 md:py-32 px-6 md:px-16 ${isDark ? "bg-slate-950/60" : "bg-luxury-black/[0.03]"}`}>
+          <section className={`py-14 md:py-20 px-6 md:px-16 ${isDark ? "bg-slate-950/60" : "bg-luxury-black/[0.03]"}`}>
             <div className="max-w-7xl mx-auto">
               <Gallery skin={skin} heading={LuxuryHeading} />
             </div>
@@ -607,21 +607,21 @@ function Design4Content() {
           <Manifesto skin={skin} />
 
           {/* Skills Section — the ledger + narrative sentences */}
-          <section id="skills" className={`py-20 md:py-32 px-6 md:px-16 ${bgPrimary}`}>
+          <section id="skills" className={`py-14 md:py-20 px-6 md:px-16 ${bgPrimary}`}>
             <div className="max-w-7xl mx-auto">
               <Skills skin={skin} heading={LuxuryHeading} />
             </div>
           </section>
 
           {/* FAQ */}
-          <section className={`py-20 md:py-32 px-6 md:px-16 ${isDark ? "bg-slate-950/60" : "bg-luxury-black/[0.03]"}`}>
+          <section className={`py-14 md:py-20 px-6 md:px-16 ${isDark ? "bg-slate-950/60" : "bg-luxury-black/[0.03]"}`}>
             <div className="max-w-7xl mx-auto">
               <Faq skin={skin} heading={LuxuryHeading} />
             </div>
           </section>
 
           {/* Contact Section */}
-          <section id="contact" className={`py-20 md:py-32 px-6 md:px-16 ${bgPrimary}`}>
+          <section id="contact" className={`py-14 md:py-20 px-6 md:px-16 ${bgPrimary}`}>
             <div className="max-w-5xl mx-auto">
               <Contact skin={skin} ctaClass={`press inline-flex items-center justify-center gap-2 px-8 py-4 text-sm tracking-[0.2em] uppercase ${isDark ? "bg-deco-gold text-deco-navy" : "bg-luxury-black text-luxury-cream"} hover:opacity-90 transition-all`} onContact={openContact} />
             </div>

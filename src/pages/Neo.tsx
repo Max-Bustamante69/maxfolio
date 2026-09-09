@@ -373,14 +373,14 @@ function NeoContent() {
           </section>
 
           {/* Experience — §2.8.4: the rail's active tab already reads as pressed via the accent underline */}
-          <section id="experience" className="px-4 py-16 md:py-24 scroll-mt-24">
+          <section id="experience" className="px-4 py-12 md:py-16 scroll-mt-24">
             <div className="max-w-5xl mx-auto neo-raised neo-lg !rounded-[28px] p-6 md:p-10">
               <Experience skin={skin} heading={Heading} />
             </div>
           </section>
 
           {/* Years — the unit chart's tiles get the depth treatment: shipped raised, empty slots inset */}
-          <section className="px-4 py-16 md:py-24">
+          <section className="px-4 py-12 md:py-16">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Years skin={skin} heading={Heading} depth />
@@ -389,14 +389,14 @@ function NeoContent() {
           </section>
 
           {/* Process — §2.8.6: the numbered badges already ride an inset groove that fills with accent */}
-          <section className="px-4 py-16 md:py-24">
+          <section className="px-4 py-12 md:py-16">
             <div className="max-w-5xl mx-auto neo-inset neo-lg !rounded-[28px] p-6 md:p-10">
               <Process skin={skin} heading={Heading} canvas="neo-canvas" />
             </div>
           </section>
 
           {/* Shopify work — §2.8.7: the index sits on a raised "screen" panel */}
-          <section id="shopify" className="px-4 py-16 md:py-24 scroll-mt-24">
+          <section id="shopify" className="px-4 py-12 md:py-16 scroll-mt-24">
             <div className="max-w-5xl mx-auto neo-raised neo-lg !rounded-[28px] p-6 md:p-10">
               <Suspense fallback={<Pending />}>
                 <ShopifyWork skin={skin} heading={Heading} />
@@ -405,7 +405,7 @@ function NeoContent() {
           </section>
 
           {/* Gallery — §2.8.9: the wall floats inside one extruded shell around the real device frames */}
-          <section id="gallery" className="px-4 py-16 md:py-24 scroll-mt-24">
+          <section id="gallery" className="px-4 py-12 md:py-16 scroll-mt-24">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Gallery skin={skin} heading={Heading} />
@@ -419,7 +419,7 @@ function NeoContent() {
           </Suspense>
 
           {/* Projects — index list */}
-          <section id="projects" className="px-4 py-16 md:py-24 scroll-mt-24">
+          <section id="projects" className="px-4 py-12 md:py-16 scroll-mt-24">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Projects skin={skin} heading={Heading} />
@@ -428,7 +428,7 @@ function NeoContent() {
           </section>
 
           {/* Skills — §2.8.11: the usage ledger's fill bars ride an inset groove */}
-          <section id="skills" className="px-4 py-16 md:py-24 scroll-mt-24">
+          <section id="skills" className="px-4 py-12 md:py-16 scroll-mt-24">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Skills skin={skin} heading={Heading} trackClassName={skillsTrack} />
@@ -437,7 +437,7 @@ function NeoContent() {
           </section>
 
           {/* FAQ */}
-          <section id="faq" className="px-4 py-16 md:py-24">
+          <section id="faq" className="px-4 py-12 md:py-16">
             <div className="max-w-5xl mx-auto neo-inset neo-lg !rounded-[28px] p-6 md:p-10">
               <Suspense fallback={<Pending h="min-h-[40vh]" />}>
                 <Faq skin={skin} heading={Heading} />
@@ -446,7 +446,7 @@ function NeoContent() {
           </section>
 
           {/* Contact — §2.8.12: recessed field, the boldest accent-fill CTA on the page */}
-          <section id="contact" className="px-4 py-20 md:py-28 scroll-mt-24">
+          <section id="contact" className="px-4 py-14 md:py-20 scroll-mt-24">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Contact skin={skin} ctaClass={`${primaryBtn} !px-7`} onContact={openContact} fieldClassName={contactField} />

@@ -259,7 +259,7 @@ function AppleContent() {
 
         <main id="main-content" className="pt-11">
           {/* Hero — typographic */}
-          <section id="hero" className="px-4 pt-20 md:pt-28 pb-14 md:pb-20 text-center scroll-mt-20" aria-labelledby="hero-heading">
+          <section id="hero" className="px-4 pt-16 md:pt-24 pb-10 md:pb-14 text-center scroll-mt-20" aria-labelledby="hero-heading">
             <p className={`text-sm font-semibold ${blue}`}>{c.hero.eyebrow}</p>
             {/* The LCP element stays static: an entrance fade would delay the first meaningful paint. */}
             <h1
@@ -302,7 +302,7 @@ function AppleContent() {
           </section>
 
           {/* Stat band — numerals on hairlines, then the fleet's build activity as a second row */}
-          <section className="px-4 pb-20 md:pb-28">
+          <section className="px-4 pb-14 md:pb-20">
             <div className="max-w-5xl mx-auto">
               <StatBand skin={skin} />
               <Suspense fallback={<Pending h="min-h-[8vh]" />}>
@@ -312,7 +312,7 @@ function AppleContent() {
           </section>
 
           {/* Now + the fleet ticker */}
-          <section className="px-4 pb-20 md:pb-28" aria-label={c.sections.now.label}>
+          <section className="px-4 pb-14 md:pb-20" aria-label={c.sections.now.label}>
             <div className="max-w-5xl mx-auto">
               <Reveal className={`inline-flex flex-wrap items-center gap-x-5 gap-y-2 rounded-full px-5 py-2.5 text-sm ${tile}`}>
                 <span className="inline-flex items-center gap-2 font-medium">
@@ -349,7 +349,7 @@ function AppleContent() {
           </section>
 
           {/* Experience — split 50/50, with an optional subway-map view of the same roles */}
-          <section id="experience" className={`px-4 py-20 md:py-28 scroll-mt-20 ${surface}`}>
+          <section id="experience" className={`px-4 py-14 md:py-20 scroll-mt-20 ${surface}`}>
             <div className="max-w-5xl mx-auto">
               <Experience skin={skin} heading={Heading} />
               <div className="mt-10 md:mt-14">
@@ -376,7 +376,7 @@ function AppleContent() {
           {/* Year by year — a Gantt ribbon (BuildTimeline), not the shared Years.tsx: employer lanes,
               storefront builds stacked by year, products/side projects as dots. content-visibility:auto
               was tried and reverted here — see docs/seo.md "content-visibility" for the measured instability. */}
-          <section className="px-4 py-20 md:py-28 scroll-mt-20">
+          <section className="px-4 py-14 md:py-20 scroll-mt-20">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <BuildTimeline skin={skin} heading={Heading} />
@@ -385,7 +385,7 @@ function AppleContent() {
           </section>
 
           {/* Process — pinned stepper */}
-          <section className={`px-4 py-20 md:py-28 ${surface}`}>
+          <section className={`px-4 py-14 md:py-20 ${surface}`}>
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Process skin={skin} heading={Heading} canvas={surface} />
@@ -394,7 +394,7 @@ function AppleContent() {
           </section>
 
           {/* Shopify work — the index */}
-          <section id="shopify" className="px-4 py-20 md:py-28 scroll-mt-20">
+          <section id="shopify" className="px-4 py-14 md:py-20 scroll-mt-20">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <ShopifyWork skin={skin} heading={Heading} />
@@ -403,7 +403,7 @@ function AppleContent() {
           </section>
 
           {/* Fleet map — the same 18 stores, grouped by industry as a dot matrix */}
-          <section className={`px-4 py-20 md:py-28 ${surface}`}>
+          <section className={`px-4 py-14 md:py-20 ${surface}`}>
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <FleetMap skin={skin} heading={Heading} />
@@ -412,7 +412,7 @@ function AppleContent() {
           </section>
 
           {/* Gallery — media carousel. content-visibility:auto tried and reverted — docs/seo.md. */}
-          <section id="gallery" className={`px-4 py-20 md:py-28 scroll-mt-20 ${surface}`}>
+          <section id="gallery" className={`px-4 py-14 md:py-20 scroll-mt-20 ${surface}`}>
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Gallery skin={skin} heading={Heading} />
@@ -429,7 +429,7 @@ function AppleContent() {
           <Testimonials skin={skin} heading={Heading} />
 
           {/* Projects — index list. content-visibility:auto tried and reverted — docs/seo.md. */}
-          <section id="projects" className="px-4 py-20 md:py-28 scroll-mt-20">
+          <section id="projects" className="px-4 py-14 md:py-20 scroll-mt-20">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Projects skin={skin} heading={Heading} />
@@ -438,7 +438,7 @@ function AppleContent() {
           </section>
 
           {/* Skills — narrative with inline chips. content-visibility:auto tried and reverted — docs/seo.md. */}
-          <section id="skills" className={`px-4 py-20 md:py-28 scroll-mt-20 ${surface}`}>
+          <section id="skills" className={`px-4 py-14 md:py-20 scroll-mt-20 ${surface}`}>
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Skills skin={skin} heading={Heading} />
@@ -447,7 +447,7 @@ function AppleContent() {
           </section>
 
           {/* Stack by year — the same tools, ranked as a bump chart */}
-          <section className="px-4 py-20 md:py-28">
+          <section className="px-4 py-14 md:py-20">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <StackByYear skin={skin} heading={Heading} />
@@ -456,7 +456,7 @@ function AppleContent() {
           </section>
 
           {/* FAQ — the objections, answered before the ask */}
-          <section className="px-4 py-20 md:py-28">
+          <section className="px-4 py-14 md:py-20">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending h="min-h-[40vh]" />}>
                 <Faq skin={skin} heading={Heading} />
