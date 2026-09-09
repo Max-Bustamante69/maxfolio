@@ -213,19 +213,25 @@ export function StackByYear({ skin, heading }: StackByYearProps) {
         </div>
       )}
 
-      <table className="sr-only">
-        <caption>{sy.eyebrow}</caption>
-        <tbody>
-          {tableRows.map((r) => (
-            <tr key={r.year}>
-              <th scope="row">{r.year}</th>
-              {r.ranked.map((x, i) => (
-                <td key={x.tag}>{sy.rankAria.replace('{rank}', String(i + 1)).replace('{year}', String(r.year)).replace('{tag}', x.tag).replace('{n}', String(x.count))}</td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {/* `sr-only` on the wrapper, not the table: a table under table-layout:auto can resist the
+          utility's own 1px width and force its true (very wide, unwrapped) content width instead,
+          which — since this element sits outside any positioned ancestor — escapes the page's
+          overflow-x:clip and shows up as real horizontal scroll. The div's own box stays 1px. */}
+      <div className="sr-only">
+        <table>
+          <caption>{sy.eyebrow}</caption>
+          <tbody>
+            {tableRows.map((r) => (
+              <tr key={r.year}>
+                <th scope="row">{r.year}</th>
+                {r.ranked.map((x, i) => (
+                  <td key={x.tag}>{sy.rankAria.replace('{rank}', String(i + 1)).replace('{year}', String(r.year)).replace('{tag}', x.tag).replace('{n}', String(x.count))}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </section>
   )
 }
