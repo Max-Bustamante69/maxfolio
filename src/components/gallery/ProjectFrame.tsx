@@ -141,7 +141,7 @@ export function ProjectFrame({ name, shots, skin, onOpen, alt, variant = 'compos
   if (variant === 'laptop') {
     return (
       <button type="button" ref={rootRef} onClick={onOpen} {...bind} className="group relative block w-full text-left" aria-label={cta ? `${cta} · ${name}` : `${name}: ${alt}`} style={{ perspective: 1200 }}>
-        <m.div style={{ ...tilt, transformStyle: 'preserve-3d' }} animate={{ scale: lift ? 1.025 : 1 }} transition={SETTLE} className="relative will-change-transform">
+        <m.div style={{ ...tilt, transformStyle: 'preserve-3d' }} animate={{ scale: lift ? 1.025 : 1 }} transition={SETTLE} className={`relative ${hover ? 'will-change-transform' : ''}`}>
           <LaptopFrame>
             <Crossfade base={shots.homeDesktop} over={shots.pdpDesktop} alt={alt} hover={hover || auto} label="home, desktop" />
             <Glare />
@@ -155,7 +155,9 @@ export function ProjectFrame({ name, shots, skin, onOpen, alt, variant = 'compos
 
   return (
     <button type="button" ref={rootRef} onClick={onOpen} {...bind} className="group relative block w-full pb-[9%] pr-[3%] text-left" aria-label={cta ? `${cta} · ${name}` : `${name}: ${alt}`} style={{ perspective: 1200 }}>
-      <m.div style={{ ...tilt, transformStyle: 'preserve-3d' }} animate={{ scale: lift ? 1.03 : 1 }} transition={SETTLE} className="relative will-change-transform">
+      {/* will-change only while a hover/tilt animation is actually running — a static value on up to 18
+          cards is the permanent-will-change GPU-memory antipattern (wf4-seo-perf.md §3.11). */}
+      <m.div style={{ ...tilt, transformStyle: 'preserve-3d' }} animate={{ scale: lift ? 1.03 : 1 }} transition={SETTLE} className={`relative ${hover ? 'will-change-transform' : ''}`}>
         <LaptopFrame>
           <Crossfade base={shots.homeDesktop} over={shots.pdpDesktop} alt={alt} hover={hover || auto} label="home, desktop" />
           <Glare />
