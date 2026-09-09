@@ -14,3 +14,4 @@ headless Chromium, Lighthouse 13.4 defaults: mobile = simulated 4× CPU slowdown
 
 The hero now ships as a static shell inside `index.html` (localized by an inline script from the saved `lang`, dark theme applied from `apple-theme`), so the largest paint no longer waits for the bundle; React's first commit replaces the shell. Remaining mobile gap is the render-blocking stylesheet on simulated slow 4G (FCP ≈ 2.1 s): the next lever would be inlining the hero's critical CSS. Main bundle: 172.7 → 160.7 KB gz after `LazyMotion` (features chunk
 12.7 KB, async); the case-study sheet is its own chunk (4 KB).
+| 2026-09-09 | round 20 merged (Soft UI + Arcade themes, Ticker engine, 4 data sections, Luxury/Brutalist ports, copy + JSON-LD) | 92 / 100 / 100 / 100 (runs 92, 92; LCP 2.8-3.0 s, TBT 130 ms) | 100 / 100 / 100 / 100 (2/2) | idle machine, `scripts/lighthouse-local.mjs --runs 2`; the split serves the control to Lighthouse, so this is the Apple variant |
