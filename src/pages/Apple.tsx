@@ -175,7 +175,8 @@ function AppleContent() {
 
   const Heading = (eyebrow: string, title: string, accent: string, lead?: string) => (
     <Reveal className="mb-10 md:mb-14">
-      <p className={`text-xs font-semibold tracking-[0.2em] uppercase ${blue} mb-3`}>{eyebrow}</p>
+      {/* 12px eyebrow on the gray surface: the brand blue reads 4.31:1 there, the darker shade clears AA (5.1:1). */}
+      <p className={`text-xs font-semibold tracking-[0.2em] uppercase ${isDark ? 'text-apple-blueDark' : 'text-[#0066cc]'} mb-3`}>{eyebrow}</p>
       <h2 className="font-sf text-4xl md:text-6xl font-semibold tracking-[-0.025em] leading-[1.05]">
         <RevealText text={title} /> <RevealText text={accent} className={muted} delay={0.1} />
       </h2>
