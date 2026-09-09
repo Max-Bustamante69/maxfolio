@@ -566,8 +566,8 @@ function SkillsScreen({ chrome, heading, skin }: { chrome: SkinLike; heading: He
   )
 }
 
-function ContactScreen({ chrome, heading, skin, primaryBtn, openContact, self, t }: { chrome: SkinLike; heading: HeadingFn; skin: ReturnType<typeof skins.persona>; primaryBtn: string; openContact: () => void; self: ReturnType<typeof designById>; t: ReturnType<typeof useI18n>['t'] }) {
-  const { strings: c, registry } = useContent()
+function ContactScreen({ chrome, heading, skin, primaryBtn, openContact, t }: { chrome: SkinLike; heading: HeadingFn; skin: ReturnType<typeof skins.persona>; primaryBtn: string; openContact: () => void; self: ReturnType<typeof designById>; t: ReturnType<typeof useI18n>['t'] }) {
+  const { strings: c } = useContent()
   const { surface, line, bg, accentCls, muted } = chrome
 
   return (
@@ -606,27 +606,69 @@ function ContactScreen({ chrome, heading, skin, primaryBtn, openContact, self, t
         </div>
       </section>
 
-      <footer className={`px-4 pb-10 pt-6 text-xs ${muted}`} role="contentinfo" aria-label="Site footer">
-        <div className={`max-w-5xl mx-auto flex flex-col gap-3 border-t pt-8 md:flex-row md:items-baseline md:justify-between font-persona-label uppercase tracking-[0.1em] ${line}`}>
-          <p>
-            © 2026 {registry.personal.name}. {c.footer.rights}
-          </p>
-          <p className="md:text-center">
-            <span className={accentCls}>{t(self.nameKey)}</span> — {t(self.subtitleKey)}
-          </p>
-          <button type="button" onClick={() => { window.location.hash = '#menu' }} className={`${accentCls} inline-flex items-center gap-1 font-semibold`}>
-            {c.footer.backToTop} ↑
-          </button>
-        </div>
-      </footer>
     </Suspense>
   )
 }
 
 // ---------------------------------------------------------------------------
+/** Site footer, on every screen (the contact screen used to be the only one carrying it). */
+function PersonaFooter({ chrome, self, t }: { chrome: SkinLike; self: ReturnType<typeof designById>; t: ReturnType<typeof useI18n>['t'] }) {
+  const { muted, line, accentCls } = chrome
+  const { strings: c, registry } = useContent()
+  return (
+    <footer className={`px-4 pb-24 pt-6 text-xs ${muted}`} role="contentinfo" aria-label="Site footer">
+      <div className={`max-w-5xl mx-auto flex flex-col gap-3 border-t pt-8 md:flex-row md:items-baseline md:justify-between font-persona-label uppercase tracking-[0.1em] ${line}`}>
+        <p>
+          © 2026 {registry.personal.name}. {c.footer.rights}
+        </p>
+        <p className="md:text-center">
+          <span className={accentCls}>{t(self.nameKey)}</span> — {t(self.subtitleKey)}
+        </p>
+        <button type="button" onClick={() => { window.location.hash = '#menu' }} className={`${accentCls} inline-flex items-center gap-1 font-semibold`}>
+          {c.footer.backToTop} ↑
+        </button>
+      </div>
+    </footer>
+  )
+}
+
 // Persistent chrome — top identity bar + bottom game bar (menu, screens, status, utilities). Fixed
 // but never pinned mid-content: it never intercepts or transforms the scrolling column beneath it.
 // ---------------------------------------------------------------------------
+/** Reach every other experience from the Arcade chrome (the owner could not leave the theme before). */
+function ThemeSwitch({ chrome, t }: { chrome: SkinLike; t: ReturnType<typeof useI18n>['t'] }) {
+  const [open, setOpen] = useState(false)
+  const { line, muted, isDark, accentBg, accentCls } = chrome
+  const item = `block px-3 py-2 font-persona-label text-xs font-semibold uppercase tracking-[0.12em] ${isDark ? 'hover:bg-[#f5f2ee]/10' : 'hover:bg-[#0a0f1a]/5'}`
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        data-theme-switcher
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        aria-haspopup="menu"
+        className={`font-persona-label text-[10px] md:text-xs font-semibold uppercase tracking-[0.15em] px-2.5 py-1.5 skew-chip transition-colors ${open ? `${accentBg} ${isDark ? 'text-[#f5f2ee]' : 'text-white'}` : muted}`}
+      >
+        {t(MENU.labelKey)}
+      </button>
+      {open && (
+        <div role="menu" className={`absolute right-0 top-full mt-2 w-60 border ${line} ${isDark ? 'bg-[#111013]' : 'bg-[#eef3f7]'} p-1.5 shadow-2xl`}>
+          {otherDesigns('persona').map((d) => (
+            <TransitionLink key={d.id} to={d.href} transitionColor={d.transitionColor} transitionAccent={d.transitionAccent} transitionLabel={t(d.nameKey)} className={item}>
+              {t(d.nameKey)}
+              <span className={`block text-[10px] normal-case tracking-normal ${muted}`}>{t(d.subtitleKey)}</span>
+            </TransitionLink>
+          ))}
+          <TransitionLink to={MENU.route} transitionColor={isDark ? '#171717' : '#fafafa'} transitionAccent={isDark ? '#ffffff' : '#171717'} transitionLabel={t(MENU.labelKey)} className={`${item} ${accentCls}`}>
+            {t(MENU.subtitleKey)}
+          </TransitionLink>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function TopBar({ chrome, self, t, isDark, toggleTheme, openContact, navigate }: { chrome: SkinLike; self: ReturnType<typeof designById>; t: ReturnType<typeof useI18n>['t']; isDark: boolean; toggleTheme: () => void; openContact: () => void; navigate: (r: Route) => void }) {
   const { line } = chrome
   return (
@@ -640,6 +682,7 @@ function TopBar({ chrome, self, t, isDark, toggleTheme, openContact, navigate }:
           <button type="button" onClick={openContact} aria-label={t('nav.contact')} className={`w-8 h-8 flex items-center justify-center ${chrome.muted}`}>
             {Icon.mail}
           </button>
+          <ThemeSwitch chrome={chrome} t={t} />
           <LanguageSelectorMenu size="sm" />
           <button type="button" onClick={toggleTheme} aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'} className={`w-8 h-8 flex items-center justify-center ${chrome.muted}`}>
             {isDark ? Icon.sun : Icon.moon}
@@ -796,7 +839,7 @@ function PersonaContent() {
           )}
         </AnimatePresence>
 
-        <main id="main-content" className="pt-12 md:pt-14 pb-16">
+        <main id="main-content" className="pt-12 md:pt-14">
           {displayRoute === '' && (
             <section className="relative min-h-[calc(100svh-3rem)] md:min-h-[calc(100svh-3.5rem)] flex flex-col justify-center px-2 sm:px-4 py-10 overflow-clip" aria-label="Arcade menu">
               <div aria-hidden="true" className={`persona-drift ${accentCls}`} />
@@ -817,6 +860,8 @@ function PersonaContent() {
           {displayRoute === 'skills' && <SkillsScreen chrome={chrome} heading={Heading} skin={skin} />}
           {displayRoute === 'contact' && <ContactScreen chrome={chrome} heading={Heading} skin={skin} primaryBtn={primaryBtn} openContact={openContact} self={self} t={t} />}
         </main>
+
+        <PersonaFooter chrome={chrome} self={self} t={t} />
 
         <BottomBar chrome={chrome} route={displayRoute} navigate={navigate} items={items} sfx={sfx} liveCount={liveCount} />
       </div>

@@ -23,11 +23,9 @@ export const AB = {
   /** 90 days: long enough for a returning visitor to land on the same experience. */
   maxAge: 60 * 60 * 24 * 90,
   /** Ordered; the first one is the control and the fallback when a cookie names an unknown variant. */
-  variants: [
-    { id: 'apple', shell: 'index.html' },
-    { id: 'neo', shell: 'neo.html' },
-    { id: 'persona', shell: 'persona.html' },
-  ] as Variant[],
+  // Apple Clean is the default for everyone (owner's call, 2026-09-09). To run the split again, list the other
+  // variants here: { id: 'neo', shell: 'neo.html' }, { id: 'persona', shell: 'persona.html' }.
+  variants: [{ id: 'apple', shell: 'index.html' }] as Variant[],
 }
 
 export const isVariant = (v: unknown): v is VariantId => AB.variants.some((x) => x.id === v)
