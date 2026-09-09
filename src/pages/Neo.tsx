@@ -379,11 +379,11 @@ function NeoContent() {
             </div>
           </section>
 
-          {/* Years — the unit-chart already encodes shipped work by accent-fill strength */}
+          {/* Years — the unit chart's tiles get the depth treatment: shipped raised, empty slots inset */}
           <section className="px-4 py-16 md:py-24">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
-                <Years skin={skin} heading={Heading} />
+                <Years skin={skin} heading={Heading} depth />
               </Suspense>
             </div>
           </section>
