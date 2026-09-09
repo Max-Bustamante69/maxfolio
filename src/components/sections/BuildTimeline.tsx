@@ -138,8 +138,14 @@ export function BuildTimeline({ skin, heading }: BuildTimelineProps) {
   }
   const hideTip = () => setTip(null)
 
-  const barFill = skin.accentBg.replace('bg-', 'fill-')
-  const barStroke = skin.accentBg.replace('bg-', 'stroke-')
+  // SVG paint (stroke/fill) as an inline color, not a Tailwind class built from `skin.accentBg` at
+  // runtime: Tailwind's JIT scanner reads source text, so a class only ever assembled via string
+  // concat (`.replace('bg-','stroke-')`) never gets generated and silently renders `stroke:none`.
+  // `accentBg` is always `bg-[#hex]` for every skin this component ships with (Apple); `currentColor`
+  // is the safe fallback if that ever changes.
+  const accentColor = skin.accentBg.match(/\[(#[0-9a-fA-F]{3,8})\]/)?.[1] ?? 'currentColor'
+  const barFillStyle = { fill: accentColor }
+  const barStrokeStyle = { stroke: accentColor }
 
   // The a11y summary + hidden table mirror the exact records the bars draw — never a separate description.
   const roleAria = (title: string, company: string, period: string) => bt.roleAria.replace('{title}', title).replace('{company}', company).replace('{period}', period)
@@ -215,8 +221,7 @@ export function BuildTimeline({ skin, heading }: BuildTimelineProps) {
                           y2={y2}
                           strokeWidth={barW}
                           strokeLinecap="round"
-                          className={barStroke}
-                          style={{ opacity: seg.current ? 1 : 0.62 }}
+                          style={{ ...barStrokeStyle, opacity: seg.current ? 1 : 0.62 }}
                           initial={reduced ? false : { pathLength: 0 }}
                           whileInView={{ pathLength: 1 }}
                           viewport={{ once: true, margin: '-40px' }}
@@ -257,7 +262,8 @@ export function BuildTimeline({ skin, heading }: BuildTimelineProps) {
                         y2={y2}
                         strokeWidth={YEAR_BAR_H}
                         strokeLinecap="round"
-                        className={`${barStroke} outline-none`}
+                        className="outline-none"
+                        style={barStrokeStyle}
                         opacity={0.65}
                         tabIndex={0}
                         role="img"
@@ -297,7 +303,8 @@ export function BuildTimeline({ skin, heading }: BuildTimelineProps) {
                       cx={x}
                       cy={y}
                       r={row.kind === 'products' ? 4 : 3}
-                      className={`${barFill} outline-none`}
+                      className="outline-none"
+                      style={barFillStyle}
                       opacity={row.kind === 'products' ? 1 : 0.6}
                       tabIndex={0}
                       role="img"
