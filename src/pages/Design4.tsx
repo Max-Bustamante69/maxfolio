@@ -18,6 +18,7 @@ import {
   Faq,
   Contact,
   Skills,
+  Ticker,
 } from "../components";
 import { skins } from "../components/gallery";
 import { Years } from "../components/sections/Years";
@@ -343,6 +344,24 @@ function Design4Content() {
               </div>
             </div>
           </section>
+
+          {/* Fleet ticker — a serif, reverse-hover strip of every store name, the divider between hero and experience */}
+          <div className={`border-y ${borderColor} ${bgSecondary} py-6`} aria-hidden={false}>
+            <Ticker
+              variant="reverse-hover"
+              duration={50}
+              label={c.sections.now.band}
+              items={registry.stores.filter((st) => !st.legacy)}
+              keyOf={(st) => st.slug}
+              itemClassName="flex shrink-0 items-baseline gap-3 whitespace-nowrap px-6"
+              renderItem={(st) => (
+                <>
+                  <span className={`font-display text-2xl italic md:text-4xl ${isDark ? 'text-deco-cream' : 'text-luxury-cream'}`}>{st.name}</span>
+                  <span className={`text-xs uppercase tracking-[0.3em] ${accentCls}`}>{st.status === 'live' ? c.badges.live : c.badges.dev}</span>
+                </>
+              )}
+            />
+          </div>
 
           {/* Experience Section */}
           {/* Stat band — the work, in numerals, on a hairline grid */}

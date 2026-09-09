@@ -79,40 +79,48 @@
   }
 }
 
-/* Fleet ticker: two rows on a transform keyframe (seamless: the set is duplicated), edge-masked,
-   stopped under reduced motion. */
-.marquee {
+/* Ticker (src/components/common/Ticker.tsx): a JS-driven loop (velocity eased toward a per-variant
+   target each frame), so the same mask/track shell serves every variant — only the target differs. */
+.ticker-mask {
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
-  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
 }
-.marquee-row {
-  display: flex;
-  width: max-content;
-  animation: marquee 48s linear infinite;
+.ticker-mask-vertical {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent);
 }
-.marquee-row-reverse {
-  animation-direction: reverse;
-  animation-duration: 56s;
-}
-.marquee-track {
-  display: flex;
+.ticker-track {
   list-style: none;
   margin: 0;
   padding: 0;
 }
-@keyframes marquee {
-  to {
-    transform: translateX(-50%);
-  }
+.ticker-stacked {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
-.marquee:hover .marquee-row,
-.marquee:focus-within .marquee-row {
-  animation-play-state: paused;
+/* Reduced motion: LoopRow's own rAF loop already no-ops, but Ticker short-circuits to this plain list before it mounts. */
+.ticker-static-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 0.5rem 1.25rem;
 }
-@media (prefers-reduced-motion: reduce) {
-  .marquee-row {
-    animation: none;
+/* outline-fill: stroked-outline words that fill solid on hover, pointer devices only so touch never gets stuck mid-fill.
+   Uses -webkit-text-fill-color (not `color`) to hollow out the fill: `color` stays the real inherited ink so the
+   stroke's `currentColor` still resolves to it -- setting `color: transparent` here instead would make the stroke
+   resolve to transparent too (currentColor reads *this* element's own `color`), leaving the word invisible at rest. */
+.ticker-outline-word {
+  -webkit-text-stroke: 1px currentColor;
+  -webkit-text-fill-color: transparent;
+  transition: -webkit-text-fill-color 0.25s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .ticker-outline-word:hover {
+    -webkit-text-fill-color: currentColor;
   }
 }
 

@@ -16,6 +16,15 @@ const Arrow = () => (
   </svg>
 )
 
+/** First letters of up to two words — no invented screenshot exists for these projects, so the hover reveal is typographic, not a fabricated preview. */
+const initials = (name: string) =>
+  name
+    .split(' ')
+    .slice(0, 2)
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase()
+
 /** Side projects as an index: a numbered hairline list, one line each, the whole row a link. */
 export function Projects({ skin, heading }: ProjectsProps) {
   const { strings, registry } = useContent()
@@ -53,7 +62,14 @@ export function Projects({ skin, heading }: ProjectsProps) {
                   {c?.description && <p className={`${skin.muted} mt-1.5 text-sm leading-relaxed md:text-base`}>{c.description}</p>}
                   <p className={`${skin.muted} mt-1.5 text-xs`}>{p.stack.join(' · ')}</p>
                 </div>
-                <span className={`${skin.muted} flex items-center gap-3 text-sm tabular-nums`}>
+                <span className={`${skin.muted} flex items-center gap-4 text-sm tabular-nums`}>
+                  {/* Clip-path reveal on hover: an accent monogram (typographic, not a fabricated screenshot — these projects have no real capture) circles open from its center. */}
+                  <span
+                    aria-hidden="true"
+                    className={`hidden h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-sm font-bold text-white transition-[clip-path] duration-500 ease-out-strong [clip-path:circle(0%_at_50%_50%)] md:flex [@media(hover:hover)]:group-hover:[clip-path:circle(75%_at_50%_50%)] ${skin.accentBg}`}
+                  >
+                    {initials(p.name)}
+                  </span>
                   <span className="hidden sm:inline">{p.year}</span>
                   <span className="transition-transform duration-200 ease-out-strong group-hover:-translate-y-0.5 group-hover:translate-x-0.5">
                     <Arrow />

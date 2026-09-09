@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { m, useInView, useReducedMotion } from 'framer-motion'
 import { useContent } from '../../hooks'
 import { CountUp } from '../gallery/charts'
+import { Ticker } from '../common'
 import type { Skin } from '../gallery'
 
 const EASE = [0.23, 1, 0.32, 1] as const
@@ -36,7 +37,24 @@ export function StatBand({ skin, tileClassName = '' }: StatBandProps) {
         <p className={`text-[11px] font-semibold uppercase tracking-[0.18em] ${skin.muted}`}>{s.label}</p>
         <p className={`text-[11px] ${skin.muted}`}>{s.asOf}</p>
       </div>
-      <dl ref={ref} className={`grid grid-cols-2 border-b md:grid-cols-3 lg:grid-cols-6 ${skin.line}`}>
+      {/* Phones: a mono stock-ticker strip (real registry.stats, no invented deltas) reads faster than a cramped 2-col grid. */}
+      <div className={`rail-wide border-b py-3 md:hidden ${skin.line}`}>
+        <Ticker
+          variant="stock-ticker"
+          duration={30}
+          label={s.label}
+          items={registry.stats}
+          keyOf={(st) => st.id}
+          itemClassName={`flex shrink-0 items-baseline gap-2 whitespace-nowrap px-5 py-1 text-sm ${skin.muted}`}
+          renderItem={(st) => (
+            <>
+              <span className="uppercase tracking-[0.12em]">{strings.stats[st.id]}</span>
+              <span className="text-base font-semibold tabular-nums text-current">{st.value}</span>
+            </>
+          )}
+        />
+      </div>
+      <dl ref={ref} className={`hidden grid-cols-2 border-b md:grid md:grid-cols-3 lg:grid-cols-6 ${skin.line}`}>
         {registry.stats.map((st, i) => {
           const p = parse(st.value)
           const cols = [

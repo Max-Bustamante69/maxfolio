@@ -1,8 +1,8 @@
-import { lazy, Suspense, useEffect, useState, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
 import { m } from 'framer-motion'
 import { ThemeProvider, useTheme } from '../context/ThemeContext'
 // Direct imports (not the component barrels) so the main chunk carries only what the first paint needs.
-import { SEOHead, MobileMenuApple, LanguageSelectorApple, LogoSelectorApple, Magnetic, TransitionLink, SmoothScroll, ScrollRail, Marquee, RevealText } from '../components/common'
+import { SEOHead, MobileMenuApple, LanguageSelectorApple, LogoSelectorApple, Magnetic, TransitionLink, SmoothScroll, ScrollRail, Ticker, RevealText } from '../components/common'
 import { ContactFormModal } from '../components/modals'
 import { MenuPreview } from '../components/previews'
 import { Testimonials } from '../components/sections/Testimonials'
@@ -41,6 +41,57 @@ function useLocalTime(locale: string) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locale])
   return time
+}
+
+/**
+ * Section-aware nav: whichever section's band crosses a line just under the fixed header is
+ * "active" — an IntersectionObserver, not scroll-position math. Several targets (shopify, gallery,
+ * projects, contact) are behind `Suspense`/`lazy()` and may not exist in the DOM yet on mount, so a
+ * `ResizeObserver` on the document (the same trick `ScrollRail` uses for its own positions) re-scans
+ * for and attaches any section that has since mounted.
+ */
+function useActiveSection(ids: string[]) {
+  const [active, setActive] = useState(ids[0] ?? '')
+  const activeRef = useRef(active)
+  activeRef.current = active
+  useEffect(() => {
+    const ratios = new Map<string, number>()
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) ratios.set(entry.target.id, entry.isIntersecting ? entry.intersectionRatio : 0)
+        let best = activeRef.current
+        let bestRatio = 0
+        for (const [id, ratio] of ratios) {
+          if (ratio > bestRatio) {
+            bestRatio = ratio
+            best = id
+          }
+        }
+        if (bestRatio > 0) setActive(best)
+      },
+      { rootMargin: '-44px 0px -55% 0px', threshold: [0, 0.25, 0.5, 0.75, 1] },
+    )
+    const attached = new Set<string>()
+    const attach = () => {
+      for (const id of ids) {
+        if (attached.has(id)) continue
+        const el = document.getElementById(id)
+        if (el) {
+          attached.add(id)
+          observer.observe(el)
+        }
+      }
+    }
+    attach()
+    const ro = new ResizeObserver(attach)
+    ro.observe(document.documentElement)
+    return () => {
+      observer.disconnect()
+      ro.disconnect()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ids.join('|')])
+  return active
 }
 
 // Strong ease-out: instant response, soft landing.
@@ -133,6 +184,7 @@ function AppleContent() {
   )
 
   const primaryBtn = 'press inline-flex items-center justify-center rounded-full bg-apple-blue px-6 py-3 text-sm font-medium text-white hover:bg-apple-blueHover'
+  const activeSection = useActiveSection(nav.map(([href]) => href.slice(1)))
   const liveCount = registry.stores.filter((s) => s.status === 'live').length
   const devCount = registry.stores.filter((s) => s.status === 'dev').length
 
@@ -156,11 +208,26 @@ function AppleContent() {
           <div className="max-w-5xl mx-auto h-full px-4 flex items-center justify-between gap-3">
             <LogoSelectorApple isDark={isDark} />
             <div className="hidden md:flex items-center gap-6 text-xs">
-              {nav.map(([href, label]) => (
-                <a key={href} href={href} className={`inline-flex items-center h-11 ${muted} hover:${blue} transition-colors duration-150`}>
-                  {label}
-                </a>
-              ))}
+              {nav.map(([href, label]) => {
+                const on = activeSection === href.slice(1)
+                return (
+                  <a
+                    key={href}
+                    href={href}
+                    aria-current={on ? 'true' : undefined}
+                    className={`relative inline-flex items-center h-11 transition-colors duration-150 ${on ? blue : `${muted} hover:${blue}`}`}
+                  >
+                    {label}
+                    {on && (
+                      <m.span
+                        layoutId="apple-nav-active"
+                        className={`absolute -bottom-px left-0 right-0 h-[2px] rounded-full ${isDark ? 'bg-apple-blueDark' : 'bg-apple-blue'}`}
+                        transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                      />
+                    )}
+                  </a>
+                )
+              })}
             </div>
             <div className="flex items-center gap-2">
               <LanguageSelectorApple isDark={isDark} />
@@ -201,6 +268,10 @@ function AppleContent() {
               {registry.personal.name}
             </h1>
             <p className={`mx-auto mt-5 max-w-2xl text-xl md:text-2xl ${muted} leading-snug tracking-[-0.01em]`}>{c.hero.positioning}</p>
+            {/* Static (no entrance): index.html carries the same hero markup before React mounts. A `trigger="load"` RevealText
+                here was tried and reverted -- it starts every word at opacity:0, so the lead line (already painted, readable,
+                by the static shell) vanished for ~1-2s on every load before re-animating in word by word, a real flash/regression
+                against the exact static-shell duplication this comment is about. */}
             <p className="mx-auto mt-6 max-w-2xl text-base md:text-lg leading-relaxed">{c.hero.lead}</p>
             {/* Static (no entrance): index.html carries the same hero markup before React mounts, so an entrance fade would flash. */}
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
@@ -255,11 +326,23 @@ function AppleContent() {
                 <span className={muted}>{c.sections.now.local.replace('{time}', localTime)}</span>
               </Reveal>
             </div>
-            <div className="mt-10">
-              <Marquee
-                items={registry.stores.filter((s) => !s.legacy).map((s) => ({ name: s.name, meta: c.stores[s.slug]?.industry, live: s.status === 'live' }))}
-                dark={isDark}
+            <div className="mt-10 rail-wide">
+              {/* Speed-hover (accelerates ×2.5 under the cursor) layered with a skew tied to page-scroll velocity — the two Now-band effects the ticker spec asked for on the same strip. */}
+              <Ticker
+                variant="speed-hover"
+                skew
+                duration={46}
                 label={c.sections.now.band}
+                items={registry.stores.filter((s) => !s.legacy)}
+                keyOf={(s) => s.slug}
+                itemClassName="flex shrink-0 items-center gap-2.5 whitespace-nowrap px-5 py-3"
+                renderItem={(s) => (
+                  <>
+                    <span className={`h-1.5 w-1.5 rounded-full ${s.status !== 'live' ? 'bg-[#ff9f0a]' : 'bg-[#34c759]'}`} aria-hidden="true" />
+                    <span className={`font-sf text-lg font-semibold tracking-[-0.02em] ${isDark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'}`}>{s.name}</span>
+                    {c.stores[s.slug]?.industry && <span className={`text-sm ${muted}`}>{c.stores[s.slug].industry}</span>}
+                  </>
+                )}
               />
             </div>
           </section>
