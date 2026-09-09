@@ -2,7 +2,7 @@
 // each experience only decides colors, radii and type.
 import type { CSSProperties } from 'react'
 
-export type FrameStyle = 'apple' | 'luxury' | 'brutalist'
+export type FrameStyle = 'apple' | 'luxury' | 'brutalist' | 'neo'
 
 /** Tokens the vendored house Carousel reads (`--color-control-*`, `--duration-base`). Without them the
  *  controls fall back to currentColor and an invalid transition, so every skin defines the full set. */
@@ -11,6 +11,7 @@ export function carouselTokens(frame: FrameStyle, isDark: boolean): CSSPropertie
     apple: { arrow: isDark ? '#f5f5f7' : '#1d1d1f', on: '#0071e3', dot: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.22)', active: isDark ? '#f5f5f7' : '#1d1d1f', brand: '#0071e3', surface: isDark ? '#000000' : '#fbfbfd' },
     luxury: { arrow: isDark ? '#d4af37' : '#C9A962', on: isDark ? '#f5f0e1' : '#1a1a1a', dot: isDark ? 'rgba(245,240,225,0.3)' : 'rgba(26,26,26,0.2)', active: isDark ? '#d4af37' : '#C9A962', brand: isDark ? '#d4af37' : '#C9A962', surface: isDark ? '#1a1f3c' : '#faf8f5' },
     brutalist: { arrow: '#dc2626', on: isDark ? '#f5f5f4' : '#1c1917', dot: isDark ? 'rgba(245,245,244,0.3)' : 'rgba(28,25,23,0.25)', active: '#dc2626', brand: '#dc2626', surface: isDark ? '#0c0a09' : '#f5f5f4' },
+    neo: { arrow: isDark ? '#e7e9ee' : '#3a3f4b', on: isDark ? '#8b93ff' : '#4453d9', dot: isDark ? 'rgba(231,233,238,0.3)' : 'rgba(58,63,75,0.22)', active: isDark ? '#8b93ff' : '#4453d9', brand: isDark ? '#8b93ff' : '#4453d9', surface: isDark ? '#262a33' : '#e6e9ef' },
   }[frame]
   return {
     '--color-control-arrow': t.arrow,
@@ -94,5 +95,23 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     divider: d ? 'divide-stone-700 border-stone-700' : 'divide-stone-900 border-stone-900',
     line: d ? 'border-stone-700' : 'border-stone-900',
     accentBg: 'bg-red-600',
+  }),
+  neo: (d) => ({
+    frame: 'neo',
+    dark: d,
+    card: 'neo-raised neo-lg',
+    title: `font-semibold ${d ? 'text-neo-darkInk' : 'text-neo-ink'}`,
+    body: d ? 'text-neo-darkInk' : 'text-neo-ink',
+    muted: d ? 'text-neo-darkInkMuted' : 'text-neo-inkMuted',
+    accent: d ? 'text-neo-darkAccent' : 'text-neo-accent',
+    // Idle = raised chip; active = inset chip with the flat accent fill (§2.5.4 — state never rides on shadow alone).
+    chip: 'neo-chip',
+    chipOn: 'neo-chip-on',
+    badgeLive: d ? 'bg-neo-darkAccent/20 text-neo-darkAccent' : 'bg-neo-accent/15 text-neo-accent',
+    badgeDev: d ? 'text-neo-darkInkMuted bg-white/5' : 'text-neo-inkMuted bg-black/5',
+    rowHover: d ? 'hover:bg-white/[0.03]' : 'hover:bg-black/[0.02]',
+    divider: d ? 'divide-white/10 border-white/10' : 'divide-black/[0.06] border-black/[0.06]',
+    line: d ? 'border-white/10' : 'border-black/[0.08]',
+    accentBg: d ? 'bg-neo-darkAccent' : 'bg-neo-accent',
   }),
 }

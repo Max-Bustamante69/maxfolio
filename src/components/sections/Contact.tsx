@@ -9,6 +9,8 @@ interface ContactProps {
   ctaClass: string
   /** Opens the contact form, optionally with the message prefilled (the store URL). */
   onContact: (prefill?: string) => void
+  /** Overrides the store-URL field's classes, e.g. a recessed Neo field instead of the default bordered one. */
+  fieldClassName?: string
 }
 
 const EASE = [0.23, 1, 0.32, 1] as const
@@ -19,13 +21,13 @@ const EASE = [0.23, 1, 0.32, 1] as const
  * the reassurance beside them, then "what happens next" as a numbered ladder — and the channels
  * on a hairline row below. No card around any of it.
  */
-export function Contact({ skin, ctaClass, onContact }: ContactProps) {
+export function Contact({ skin, ctaClass, onContact, fieldClassName }: ContactProps) {
   const { strings, registry } = useContent()
   const reduced = useReducedMotion()
   const c = strings.sections.contact
   const [url, setUrl] = useState('')
   const label = `text-[11px] font-semibold uppercase tracking-[0.18em] ${skin.muted}`
-  const field = skin.dark ? 'border-white/15 bg-white/5 placeholder:text-[#6e6e73] focus:border-[#2997ff]' : 'border-black/15 bg-white placeholder:text-[#a1a1a6] focus:border-[#0071e3]'
+  const field = fieldClassName ?? (skin.dark ? 'border-white/15 bg-white/5 placeholder:text-[#6e6e73] focus:border-[#2997ff]' : 'border-black/15 bg-white placeholder:text-[#a1a1a6] focus:border-[#0071e3]')
 
   const submitUrl = (e: FormEvent) => {
     e.preventDefault()

@@ -8,6 +8,8 @@ import type { SectionHeading } from './Gallery'
 interface SkillsProps {
   skin: Skin
   heading: SectionHeading
+  /** Overrides the usage ledger's track background, e.g. a recessed Neo groove instead of the flat tint. */
+  trackClassName?: string
 }
 
 const EASE = [0.23, 1, 0.32, 1] as const
@@ -31,7 +33,7 @@ const USAGE: { id: string; test: RegExp }[] = [
  * sized by a real count over the store index), and the tools as sentences with the names set bold
  * inline. On phones the sentences become an accordion so the section costs one screen.
  */
-export function Skills({ skin, heading }: SkillsProps) {
+export function Skills({ skin, heading, trackClassName }: SkillsProps) {
   const { strings, registry } = useContent()
   const reduced = useReducedMotion()
   const wide = useMediaQuery('(min-width: 768px)', true)
@@ -39,7 +41,7 @@ export function Skills({ skin, heading }: SkillsProps) {
   const groups = Object.keys(registry.skillGroups) as SkillGroupId[]
   const [open, setOpen] = useState<SkillGroupId>(groups[0])
   const label = `text-[11px] font-semibold uppercase tracking-[0.18em] ${skin.muted}`
-  const track = skin.dark ? 'bg-white/10' : 'bg-black/[0.06]'
+  const track = trackClassName ?? (skin.dark ? 'bg-white/10' : 'bg-black/[0.06]')
 
   const usage = useMemo(() => {
     const rows = USAGE.map((u) => ({ id: u.id, count: registry.stores.filter((s) => s.stack.some((t) => u.test.test(t))).length }))

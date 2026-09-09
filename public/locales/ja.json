@@ -126,12 +126,14 @@
     "designNames": {
       "luxuryMinimal": "ラグジュアリー・ミニマル",
       "brutalistEditorial": "ブルータリスト・エディトリアル",
-      "apple": "Apple Clean"
+      "apple": "Apple Clean",
+      "neo": "ソフトUI"
     },
     "designSubtitles": {
       "luxuryMinimal": "エレガント＆洗練",
       "brutalistEditorial": "大胆で生っぽい",
-      "apple": "静かで正確"
+      "apple": "静かで正確",
+      "neo": "触感的で立体的"
     },
     "whyVersions": "なぜ4つのデザイン？",
     "whyVersionsDesc": "文脈に合わせた異なる美学。同じスキルで、確かな対応力を。"

@@ -1,7 +1,7 @@
 import { useTheme } from '../../context/ThemeContext'
 
 interface ThemeToggleProps {
-  variant?: 'default' | 'luxury' | 'brutalist'
+  variant?: 'default' | 'luxury' | 'brutalist' | 'neo'
   size?: 'sm' | 'md'
 }
 
@@ -21,6 +21,7 @@ export function ThemeToggle({ variant = 'default', size = 'md' }: ThemeTogglePro
     brutalist: isDark
       ? 'bg-stone-800 hover:bg-stone-700 text-stone-300 border-2 border-stone-600'
       : 'bg-stone-200 hover:bg-stone-300 text-stone-700 border-2 border-stone-400',
+    neo: `neo-raised neo-sm neo-interactive ${isDark ? 'text-neo-darkAccent' : 'text-neo-accent'}`,
   }
   
   return (

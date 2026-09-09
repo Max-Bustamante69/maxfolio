@@ -14,6 +14,7 @@ export default {
         'grotesk': ['Clash Display', 'sans-serif'],
         'accent': ['Space Mono', 'monospace'],
         'sf': ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"SF Pro Text"', 'Inter', 'system-ui', 'sans-serif'],
+        'neo': ['Manrope', 'Inter', 'system-ui', 'sans-serif'],
       },
       spacing: {
         'xs': '8px',
@@ -71,6 +72,21 @@ export default {
           'navy': '#1a1f3c',
           'cream': '#f5f0e1',
           'copper': '#b87333',
+        },
+        'neo': {
+          'surface': '#e6e9ef',
+          'surfaceRaised': '#eef1f6',
+          'ink': '#3a3f4b',
+          // The research spec's literal muted ink (#6b7280) measures 3.98:1 on the light surface —
+          // under the WCAG AA 4.5:1 floor for the small captions/labels it's used on. Darkened to the
+          // nearest in-family slate that clears it (5.4:1), same fix pattern as the accent below.
+          'inkMuted': '#565e6c',
+          'accent': '#4453d9',
+          'dark': '#262a33',
+          'darkSurfaceRaised': '#2c303a',
+          'darkInk': '#e7e9ee',
+          'darkInkMuted': '#9aa0ac',
+          'darkAccent': '#8b93ff',
         },
       },
       animation: {

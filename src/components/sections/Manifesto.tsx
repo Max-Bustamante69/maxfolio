@@ -2,15 +2,23 @@ import { useContent } from '../../hooks'
 import { RevealText } from '../common'
 import type { Skin } from '../gallery'
 
+interface ManifestoProps {
+  skin: Skin
+  /** Overrides the inverted band's background+text classes (defaults to the Apple grays every other theme uses). */
+  bandClassName?: string
+  /** Overrides the eyebrow's accent color. */
+  eyebrowClassName?: string
+}
+
 /**
  * Four declarative lines on an inverted full-bleed band — a typographic moment between two
  * media-heavy sections, and the working rules the Process section already spells out, said short.
  */
-export function Manifesto({ skin }: { skin: Skin }) {
+export function Manifesto({ skin, bandClassName, eyebrowClassName }: ManifestoProps) {
   const { strings } = useContent()
   const mf = strings.sections.manifesto
-  const band = skin.dark ? 'bg-[#f5f5f7] text-[#1d1d1f]' : 'bg-[#1d1d1f] text-[#f5f5f7]'
-  const eyebrow = skin.dark ? 'text-[#0066cc]' : 'text-[#2997ff]'
+  const band = bandClassName ?? (skin.dark ? 'bg-[#f5f5f7] text-[#1d1d1f]' : 'bg-[#1d1d1f] text-[#f5f5f7]')
+  const eyebrow = eyebrowClassName ?? (skin.dark ? 'text-[#0066cc]' : 'text-[#2997ff]')
   return (
     <section aria-label={mf.label} className={`${band} px-4 py-24 md:py-36`}>
       <div className="mx-auto max-w-5xl">

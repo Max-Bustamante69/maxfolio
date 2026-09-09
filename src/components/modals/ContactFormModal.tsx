@@ -8,7 +8,7 @@ import { useI18n } from '../../hooks'
 interface ContactFormModalProps {
   isOpen: boolean
   onClose: () => void
-  variant?: 'luxury' | 'brutalist' | 'apple'
+  variant?: 'luxury' | 'brutalist' | 'apple' | 'neo'
   isDark?: boolean
   /** Text placed in the message field when the form opens (e.g. the store URL from the contact section). */
   initialMessage?: string
@@ -139,8 +139,21 @@ export function ContactFormModal({
       : 'border-black/10 text-[#1d1d1f] hover:bg-black/5 rounded-full press',
   }
 
-  const styles = variant === 'apple' ? appleStyles : variant === 'luxury' ? luxuryStyles : brutalistStyles
-  const successCircle = variant === 'apple' ? 'bg-[#0071e3]/15' : variant === 'luxury' ? 'bg-deco-gold/20' : 'bg-red-600/20'
+  // Neo variant styles: recessed (inset) fields — the shadow IS the border, no visible border color —
+  // and a flat accent-fill primary button, the one deliberate style break (§2.5.2 / Idea 11).
+  const neoStyles = {
+    bgModal: 'neo-raised neo-xl bg-neo-surface',
+    bgInput: 'neo-field neo-md border-transparent text-neo-ink placeholder:text-neo-inkMuted focus:outline-none',
+    textPrimary: 'text-neo-ink',
+    textSecondary: 'text-neo-inkMuted',
+    textMuted: 'text-neo-inkMuted',
+    accent: 'text-neo-accent',
+    btnPrimary: 'neo-btn neo-btn-accent',
+    btnSecondary: 'neo-raised neo-md neo-interactive border-transparent text-neo-ink',
+  }
+
+  const styles = variant === 'apple' ? appleStyles : variant === 'luxury' ? luxuryStyles : variant === 'neo' ? neoStyles : brutalistStyles
+  const successCircle = variant === 'apple' ? 'bg-[#0071e3]/15' : variant === 'luxury' ? 'bg-deco-gold/20' : variant === 'neo' ? 'bg-[#4453d9]/15' : 'bg-red-600/20'
 
   return (
     <AnimatePresence>

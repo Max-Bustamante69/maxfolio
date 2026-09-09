@@ -13,9 +13,12 @@ import type { VariantId } from '../ab.config'
 const Home = lazy(() => import('./pages/Home'))
 const Design1 = lazy(() => import('./pages/Design1'))
 const Design4 = lazy(() => import('./pages/Design4'))
+const Neo = lazy(() => import('./pages/Neo'))
 
 // A/B: the landing at `/` is the visitor's variant. Variants without a page yet fall back to the control.
-const VARIANT_PAGES: Partial<Record<VariantId, ComponentType>> = { apple: Apple }
+// `neo` is registered here so a future split can pick it up, but ab.config.ts still lists only `apple` —
+// there is no split running yet.
+const VARIANT_PAGES: Partial<Record<VariantId, ComponentType>> = { apple: Apple, neo: Neo }
 const variant = currentVariant()
 const Landing = VARIANT_PAGES[variant] ?? Apple
 
@@ -56,6 +59,7 @@ function App() {
             <Route path={designById('apple').route} element={<Landing />} />
             <Route path={designById('luxury').route} element={<Design4 />} />
             <Route path={designById('brutalist').route} element={<Design1 />} />
+            <Route path={designById('neo').route} element={<Neo />} />
             <Route path={MENU.route} element={<Home />} />
             {/* Legacy routes */}
             <Route path="/1" element={<Design4 />} />
