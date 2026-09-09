@@ -12,11 +12,17 @@ const parse = (v: string) => {
   return mt ? { prefix: mt[1], value: Number(mt[2].replace(/,/g, '')), suffix: mt[3] } : null
 }
 
+interface StatBandProps {
+  skin: Skin
+  /** Optional class applied to each stat's wrapper, e.g. a recessed "readout" tile for the Neo theme. */
+  tileClassName?: string
+}
+
 /**
  * The work in numbers as one typographic band: six numerals on hairlines, no tiles. The numbers
  * count up once when the band scrolls into view; reduced motion (or no JS) shows the final values.
  */
-export function StatBand({ skin }: { skin: Skin }) {
+export function StatBand({ skin, tileClassName = '' }: StatBandProps) {
   const { strings, registry } = useContent()
   const ref = useRef<HTMLDListElement>(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
@@ -44,7 +50,7 @@ export function StatBand({ skin }: { skin: Skin }) {
           return (
             <m.div
               key={st.id}
-              className={`flex flex-col-reverse py-7 pr-4 md:py-9 ${cols} ${skin.line}`}
+              className={`flex flex-col-reverse py-7 pr-4 md:py-9 ${cols} ${skin.line} ${tileClassName}`}
               initial={reduced ? false : { opacity: 0, y: 14 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}

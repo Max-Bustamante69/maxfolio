@@ -40,7 +40,7 @@ const Crossfade = ({ base, over, alt, hover, label }: { base: string; over?: str
 
 const Invite = ({ text, skin }: { text: string; skin: Skin }) => {
   const d = skin.dark
-  const shape = skin.frame === 'apple' ? 'rounded-full' : 'rounded-none'
+  const shape = skin.frame === 'apple' || skin.frame === 'neo' ? 'rounded-full' : 'rounded-none'
   const surface = d
     ? 'glass bg-white/[0.12] text-white border border-white/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_8px_24px_rgba(0,0,0,0.4)]'
     : 'glass bg-white/70 text-[#1d1d1f] border border-white/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_8px_24px_rgba(0,0,0,0.14)]'
