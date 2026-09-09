@@ -13,6 +13,7 @@ import {
   Gallery,
 } from '../components'
 import { skins } from '../components/gallery'
+import { Years } from '../components/sections/Years'
 import { useDynamicFavicon, useI18n, useContent } from '../hooks'
 import { designById } from '../data/designs'
 import type { SkillGroupId } from '../data/registry'
@@ -410,6 +411,13 @@ function Design1Content() {
                   </m.div>
                 )}
               </AnimatePresence>
+            </div>
+          </section>
+
+          {/* Years: the career year by year, opened by the unit chart of shipped work */}
+          <section className={`py-16 md:py-24 border-t-4 ${borderStrong}`}>
+            <div className="max-w-[1800px] mx-auto px-4 md:px-6">
+              <Years skin={skin} heading={(e, ti, a, l) => BrutalHeading(nextSection() + ' · ' + e, ti, a, l)} />
             </div>
           </section>
 

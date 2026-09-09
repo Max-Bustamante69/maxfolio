@@ -1,16 +1,23 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
-import { lazy, Suspense, useEffect, useRef } from 'react'
+import { lazy, Suspense, useEffect, useRef, type ComponentType } from 'react'
 import { Analytics } from '@vercel/analytics/react'
 import { LazyMotion } from 'framer-motion'
 import { PageTransitionProvider, usePageTransition } from './components/transitions'
 import { LanguageProvider } from './context/LanguageContext'
 import { designById, MENU } from './data/designs'
 import Apple from './pages/Apple'
+import { attributeUrl, currentVariant, recordAb, splitActive } from './ab'
+import type { VariantId } from '../ab.config'
 
 // The default experience ships in the main bundle; the others load on demand.
 const Home = lazy(() => import('./pages/Home'))
 const Design1 = lazy(() => import('./pages/Design1'))
 const Design4 = lazy(() => import('./pages/Design4'))
+
+// A/B: the landing at `/` is the visitor's variant. Variants without a page yet fall back to the control.
+const VARIANT_PAGES: Partial<Record<VariantId, ComponentType>> = { apple: Apple }
+const variant = currentVariant()
+const Landing = VARIANT_PAGES[variant] ?? Apple
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -28,6 +35,14 @@ function ScrollToTop() {
   return null
 }
 
+/** One exposure beacon per page load, only while a split is running. */
+function AbView() {
+  useEffect(() => {
+    if (splitActive() && window.location.pathname === '/') recordAb('view')
+  }, [])
+  return null
+}
+
 function App() {
   return (
     <LanguageProvider>
@@ -35,9 +50,10 @@ function App() {
       <LazyMotion features={() => import('./motion-features').then((mod) => mod.default)}>
       <PageTransitionProvider>
         <ScrollToTop />
+        <AbView />
         <Suspense fallback={null}>
           <Routes>
-            <Route path={designById('apple').route} element={<Apple />} />
+            <Route path={designById('apple').route} element={<Landing />} />
             <Route path={designById('luxury').route} element={<Design4 />} />
             <Route path={designById('brutalist').route} element={<Design1 />} />
             <Route path={MENU.route} element={<Home />} />
@@ -47,7 +63,7 @@ function App() {
           </Routes>
         </Suspense>
         {/* The insights script only exists on Vercel; skipping it elsewhere keeps local audits free of a 404. */}
-        {typeof window !== 'undefined' && /(^|\.)maxfolio\.dev$|\.vercel\.app$/.test(window.location.hostname) && <Analytics />}
+        {typeof window !== 'undefined' && /(^|\.)maxfolio\.dev$|\.vercel\.app$/.test(window.location.hostname) && <Analytics beforeSend={(e) => ({ ...e, url: attributeUrl(e.url) })} />}
       </PageTransitionProvider>
       </LazyMotion>
     </LanguageProvider>

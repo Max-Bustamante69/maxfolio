@@ -1,6 +1,7 @@
 import { m, AnimatePresence } from 'framer-motion'
 import { useEffect, useState, FormEvent } from 'react'
 import { config } from '../../config'
+import { currentVariant, recordAb } from '../../ab'
 import { personal as personalInfo } from '../../data/registry'
 import { useI18n } from '../../hooks'
 
@@ -52,9 +53,13 @@ export function ContactFormModal({
           access_key: config.web3formsKey,
           name: formData.name,
           email: formData.email,
-          subject: formData.subject || 'Portfolio Contact',
+          subject: `${formData.subject || 'Portfolio Contact'} · via ${variant}/${currentVariant()}`,
           message: formData.message,
           to: personalInfo.email,
+          // attribution: which landing variant and which theme the request came from
+          variant: currentVariant(),
+          theme: variant,
+          page: typeof window !== 'undefined' ? window.location.pathname : '',
         }),
       })
 
@@ -62,6 +67,7 @@ export function ContactFormModal({
       
       if (result.success) {
         setStatus('success')
+        recordAb('contact', { theme: variant })
         setFormData({ name: '', email: '', subject: '', message: '' })
         setTimeout(() => {
           onClose()
