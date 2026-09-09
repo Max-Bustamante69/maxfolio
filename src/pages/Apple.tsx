@@ -263,10 +263,11 @@ function AppleContent() {
               {registry.personal.name}
             </h1>
             <p className={`mx-auto mt-5 max-w-2xl text-xl md:text-2xl ${muted} leading-snug tracking-[-0.01em]`}>{c.hero.positioning}</p>
-            {/* Word-by-word reveal tied to load, not scroll — it's already in view on first paint. */}
-            <p className="mx-auto mt-6 max-w-2xl text-base md:text-lg leading-relaxed">
-              <RevealText text={c.hero.lead} trigger="load" delay={0.15} />
-            </p>
+            {/* Static (no entrance): index.html carries the same hero markup before React mounts. A `trigger="load"` RevealText
+                here was tried and reverted -- it starts every word at opacity:0, so the lead line (already painted, readable,
+                by the static shell) vanished for ~1-2s on every load before re-animating in word by word, a real flash/regression
+                against the exact static-shell duplication this comment is about. */}
+            <p className="mx-auto mt-6 max-w-2xl text-base md:text-lg leading-relaxed">{c.hero.lead}</p>
             {/* Static (no entrance): index.html carries the same hero markup before React mounts, so an entrance fade would flash. */}
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
               <Magnetic>

@@ -218,13 +218,15 @@ export function Ticker<T>({ items, renderItem, keyOf, variant, label, duration =
 
   if (reduced) {
     return (
-      <ul className={`ticker-static-wrap ${className}`} role="region" aria-label={label}>
-        {items.map((item, i) => (
-          <li key={getKey(item, i)} className={itemClassName}>
-            {renderItem(item, i)}
-          </li>
-        ))}
-      </ul>
+      <div role="region" aria-label={label}>
+        <ul className={`ticker-static-wrap ${className}`}>
+          {items.map((item, i) => (
+            <li key={getKey(item, i)} className={itemClassName}>
+              {renderItem(item, i)}
+            </li>
+          ))}
+        </ul>
+      </div>
     )
   }
 

@@ -25,7 +25,6 @@ export function Manifesto({ skin }: { skin: Skin }) {
       whileInView={{ clipPath: 'inset(0% 0% 0% 0%)' }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.8, ease: EASE }}
-      style={{ willChange: reduced ? undefined : 'clip-path' }}
     >
       <div className="mx-auto max-w-5xl">
         <p className={`text-[11px] font-semibold uppercase tracking-[0.2em] ${eyebrow}`}>{mf.label}</p>
