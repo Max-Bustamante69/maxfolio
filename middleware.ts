@@ -1,8 +1,8 @@
-// Vercel Edge Middleware: assigns each new visitor of `/` to one variant (even split), pins it in a
+// Vercel Routing Middleware (the product formerly named Edge Middleware): assigns each new visitor of `/` to one variant (even split), pins it in a
 // cookie, and rewrites the request to that variant's static shell. Crawlers and audit tools always get
 // the control so search engines index one canonical page and Lighthouse measures a stable target.
 // `?v=<id>` forces a variant (and re-pins the cookie) for QA. With one variant configured it is a no-op.
-import { next, rewrite } from '@vercel/edge'
+import { next, rewrite } from '@vercel/functions'
 import { AB, isVariant } from './ab.config'
 
 export const config = { matcher: ['/'] }
