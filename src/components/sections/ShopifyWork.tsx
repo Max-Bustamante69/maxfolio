@@ -1,4 +1,4 @@
-import { Suspense, useState } from 'react'
+import { Suspense, useState, type MouseEvent } from 'react'
 import { AnimatePresence, m } from 'framer-motion'
 import { useContent, useSheetHistory } from '../../hooks'
 import { GalleryLightbox, type Skin } from '../gallery'
@@ -80,11 +80,25 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
     )
   }
 
+  // A cursor spotlight for pointer devices: a radial highlight that tracks the pointer inside the
+  // hovered row via CSS custom properties (no re-render per mousemove) — off on touch by media query.
+  const onRowMove = (e: MouseEvent<HTMLLIElement>) => {
+    const r = e.currentTarget.getBoundingClientRect()
+    e.currentTarget.style.setProperty('--spot-x', `${e.clientX - r.left}px`)
+    e.currentTarget.style.setProperty('--spot-y', `${e.clientY - r.top}px`)
+  }
+  const spotColor = skin.dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)'
+
   const StoreRow = ({ st }: { st: StoreEntry }) => {
     const c = strings.stores[st.slug]
     return (
-      <li className={`${skin.rowHover} transition-colors`} {...(st.gallery ? preview.bind(`/gallery/${st.slug}/home-desktop.webp`) : {})}>
-        <div className="grid gap-x-6 gap-y-1.5 py-4 md:grid-cols-12 md:items-center">
+      <li className={`group relative overflow-hidden ${skin.rowHover} transition-colors`} onMouseMove={onRowMove} {...(st.gallery ? preview.bind(`/gallery/${st.slug}/home-desktop.webp`) : {})}>
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 [@media(hover:hover)_and_(pointer:fine)]:group-hover:opacity-100"
+          style={{ background: `radial-gradient(260px circle at var(--spot-x, 50%) var(--spot-y, 50%), ${spotColor}, transparent 70%)` }}
+        />
+        <div className="relative grid gap-x-6 gap-y-1.5 py-4 md:grid-cols-12 md:items-center">
           <div className="md:col-span-4">
             <div className="flex flex-wrap items-center gap-2">
               <button type="button" onClick={() => setOpenStore(st)} className={`${skin.title} press text-left text-[15px] underline-offset-4 hover:underline`}>
