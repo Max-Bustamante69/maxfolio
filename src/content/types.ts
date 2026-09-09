@@ -42,6 +42,10 @@ export interface PortfolioContent {
     }
     now: { label: string; live: string; dev: string; band: string; local: string }
     statBand: { label: string; asOf: string }
+    buildHeatmap: { label: string; headline: string; legendLow: string; legendHigh: string; cellAria: string; half1: string; half2: string }
+    stackByYear: SectionHeading & { lead: string; rankAria: string; countUnit: string }
+    fleetMap: SectionHeading & { lead: string; filterAll: string }
+    careerSubway: SectionHeading & { lead: string; toggleShow: string; toggleHide: string; transferLabel: string; rowAria: string }
     process: SectionHeading & { problemLabel: string; problem: string; fixLabel: string; fix: string; stepOf: string; deliverableLabel: string; steps: { title: string; body: string; deliverable: string }[] }
     testimonials: SectionHeading
     faq: SectionHeading & { items: { q: string; a: string }[] }

@@ -16,12 +16,16 @@ import { defaultDesign, otherDesigns, MENU } from '../data/designs'
 const Years = lazy(() => import('../components/sections/Years').then((mod) => ({ default: mod.Years })))
 const Process = lazy(() => import('../components/sections/Process').then((mod) => ({ default: mod.Process })))
 const ShopifyWork = lazy(() => import('../components/sections/ShopifyWork').then((mod) => ({ default: mod.ShopifyWork })))
+const FleetMap = lazy(() => import('../components/sections/FleetMap').then((mod) => ({ default: mod.FleetMap })))
 const Gallery = lazy(() => import('../components/sections/Gallery').then((mod) => ({ default: mod.Gallery })))
 const Manifesto = lazy(() => import('../components/sections/Manifesto').then((mod) => ({ default: mod.Manifesto })))
 const Projects = lazy(() => import('../components/sections/Projects').then((mod) => ({ default: mod.Projects })))
 const Skills = lazy(() => import('../components/sections/Skills').then((mod) => ({ default: mod.Skills })))
+const StackByYear = lazy(() => import('../components/sections/StackByYear').then((mod) => ({ default: mod.StackByYear })))
 const Faq = lazy(() => import('../components/sections/Faq').then((mod) => ({ default: mod.Faq })))
 const Contact = lazy(() => import('../components/sections/Contact').then((mod) => ({ default: mod.Contact })))
+const BuildHeatmap = lazy(() => import('../components/sections/BuildHeatmap').then((mod) => ({ default: mod.BuildHeatmap })))
+const CareerSubway = lazy(() => import('../components/sections/CareerSubway').then((mod) => ({ default: mod.CareerSubway })))
 
 /** Keeps the page height stable while a section's chunk loads. */
 const Pending = ({ h = 'min-h-[60vh]' }: { h?: string }) => <div className={h} aria-hidden="true" />
@@ -96,6 +100,7 @@ function AppleContent() {
   const localTime = useLocalTime(locale === 'ja' ? 'ja-JP' : locale === 'es' ? 'es-CO' : 'en-US')
   const [contactOpen, setContactOpen] = useState(false)
   const [contactPrefill, setContactPrefill] = useState('')
+  const [showCareerMap, setShowCareerMap] = useState(false)
   const openContact = (prefill?: string) => {
     setContactPrefill(prefill ?? '')
     setContactOpen(true)
@@ -224,10 +229,13 @@ function AppleContent() {
             </div>
           </section>
 
-          {/* Stat band — numerals on hairlines */}
+          {/* Stat band — numerals on hairlines, then the fleet's build activity as a second row */}
           <section className="px-4 pb-20 md:pb-28">
             <div className="max-w-5xl mx-auto">
               <StatBand skin={skin} />
+              <Suspense fallback={<Pending h="min-h-[8vh]" />}>
+                <BuildHeatmap skin={skin} />
+              </Suspense>
             </div>
           </section>
 
@@ -256,10 +264,28 @@ function AppleContent() {
             </div>
           </section>
 
-          {/* Experience — split 50/50 */}
+          {/* Experience — split 50/50, with an optional subway-map view of the same roles */}
           <section id="experience" className={`px-4 py-20 md:py-28 scroll-mt-20 ${surface}`}>
             <div className="max-w-5xl mx-auto">
               <Experience skin={skin} heading={Heading} />
+              <div className="mt-10 md:mt-14">
+                <button
+                  type="button"
+                  onClick={() => setShowCareerMap((v) => !v)}
+                  aria-expanded={showCareerMap}
+                  aria-controls="career-subway"
+                  className={`${showCareerMap ? skin.chipOn : skin.chip} compact-touch press transition-colors`}
+                >
+                  {showCareerMap ? c.sections.careerSubway.toggleHide : c.sections.careerSubway.toggleShow}
+                </button>
+                {showCareerMap && (
+                  <div className="mt-8">
+                    <Suspense fallback={<Pending h="min-h-[30vh]" />}>
+                      <CareerSubway skin={skin} heading={Heading} />
+                    </Suspense>
+                  </div>
+                )}
+              </div>
             </div>
           </section>
 
@@ -287,6 +313,15 @@ function AppleContent() {
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <ShopifyWork skin={skin} heading={Heading} />
+              </Suspense>
+            </div>
+          </section>
+
+          {/* Fleet map — the same 18 stores, grouped by industry as a dot matrix */}
+          <section className={`px-4 py-20 md:py-28 ${surface}`}>
+            <div className="max-w-5xl mx-auto">
+              <Suspense fallback={<Pending />}>
+                <FleetMap skin={skin} heading={Heading} />
               </Suspense>
             </div>
           </section>
@@ -322,6 +357,15 @@ function AppleContent() {
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Skills skin={skin} heading={Heading} />
+              </Suspense>
+            </div>
+          </section>
+
+          {/* Stack by year — the same tools, ranked as a bump chart */}
+          <section className="px-4 py-20 md:py-28">
+            <div className="max-w-5xl mx-auto">
+              <Suspense fallback={<Pending />}>
+                <StackByYear skin={skin} heading={Heading} />
               </Suspense>
             </div>
           </section>

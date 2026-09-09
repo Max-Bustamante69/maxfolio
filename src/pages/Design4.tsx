@@ -12,12 +12,17 @@ import {
   SEOHead,
   ShopifyWork,
   Gallery,
+  StatBand,
+  Process,
+  Manifesto,
+  Faq,
+  Contact,
+  Skills,
 } from "../components";
 import { skins } from "../components/gallery";
 import { Years } from "../components/sections/Years";
 import { useDynamicFavicon, useI18n, useContent } from "../hooks";
 import { designById, otherDesigns, MENU } from "../data/designs";
-import type { SkillGroupId } from "../data/registry";
 
 // Theme Toggle Button - Luxury Minimal Design
 const ThemeToggle = ({ size = "md" }: { size?: "sm" | "md" }) => {
@@ -107,7 +112,12 @@ function Design4Content() {
   const { t } = useI18n();
   const { strings: c, registry, formatPeriod } = useContent();
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [contactPrefill, setContactPrefill] = useState("");
   const [activeTab, setActiveTab] = useState<"work" | "freelance">("work");
+  const openContact = (prefill?: string) => {
+    setContactPrefill(prefill ?? "");
+    setIsContactOpen(true);
+  };
   const [selectedJob, setSelectedJob] = useState(registry.experience[0]);
 
   // Dynamic favicon
@@ -164,7 +174,7 @@ function Design4Content() {
 
       <div className={`min-h-screen ${bgPrimary} ${textPrimary} font-body overflow-x-hidden transition-colors duration-500`} role="document">
         {/* Contact Modal */}
-        <ContactFormModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} variant="luxury" isDark={isDark} />
+        <ContactFormModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} variant="luxury" isDark={isDark} initialMessage={contactPrefill} />
 
         {/* Decorative pattern - dark mode */}
         {isDark && (
@@ -335,6 +345,13 @@ function Design4Content() {
           </section>
 
           {/* Experience Section */}
+          {/* Stat band — the work, in numerals, on a hairline grid */}
+          <section className={`py-20 md:py-32 px-6 md:px-16 ${bgPrimary}`}>
+            <div className="max-w-7xl mx-auto">
+              <StatBand skin={skin} />
+            </div>
+          </section>
+
           <section id="experience" className={`py-20 md:py-32 px-6 md:px-16 ${bgSecondary} ${isDark ? "text-deco-cream" : "text-luxury-cream"}`}>
             <div className="max-w-7xl mx-auto">
               <FadeInUp>
@@ -546,6 +563,13 @@ function Design4Content() {
             </div>
           </section>
 
+          {/* Process: how a store ships, as a pinned stepper */}
+          <section className={`py-20 md:py-32 px-6 md:px-16 ${isDark ? "bg-slate-950/60" : "bg-luxury-black/[0.03]"}`}>
+            <div className="max-w-7xl mx-auto">
+              <Process skin={skin} heading={LuxuryHeading} canvas={isDark ? "bg-slate-950" : "bg-luxury-black/[0.03]"} />
+            </div>
+          </section>
+
           {/* Shopify Work */}
           <section className={`py-20 md:py-32 px-6 md:px-16 ${bgPrimary}`}>
             <div className="max-w-7xl mx-auto">
@@ -560,117 +584,27 @@ function Design4Content() {
             </div>
           </section>
 
-          {/* Skills Section */}
+          {/* Manifesto — inverted typographic band */}
+          <Manifesto skin={skin} />
+
+          {/* Skills Section — the ledger + narrative sentences */}
           <section id="skills" className={`py-20 md:py-32 px-6 md:px-16 ${bgPrimary}`}>
             <div className="max-w-7xl mx-auto">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-16">
-                <div className="lg:col-span-4">
-                  <FadeInUp>
-                    <p className={`text-xs tracking-[0.5em] uppercase ${accentCls} mb-4`}>{c.sections.skills.eyebrow}</p>
-                    <h2 className="font-display text-3xl md:text-4xl lg:text-5xl leading-tight">
-                      {c.sections.skills.title}
-                      <br />
-                      <span className={`italic ${accentCls}`}>{c.sections.skills.titleAccent}</span>
-                    </h2>
-                  </FadeInUp>
-                </div>
+              <Skills skin={skin} heading={LuxuryHeading} />
+            </div>
+          </section>
 
-                <div className="lg:col-span-8">
-                  <div className={`grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 pt-6 md:pt-8 border-t ${borderColor}`}>
-                    {(Object.keys(registry.skillGroups) as SkillGroupId[]).map((group, index) => (
-                      <FadeInUp key={group} delay={0.1 + index * 0.08}>
-                        <h3 className={`text-xs tracking-[0.2em] uppercase ${accentCls} mb-3 md:mb-4`}>{c.sections.skills.groups[group]}</h3>
-                        <ul className="space-y-1 md:space-y-2">
-                          {registry.skillGroups[group].map((item) => (
-                            <li key={item} className={`text-sm ${textSecondary}`}>
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      </FadeInUp>
-                    ))}
-                  </div>
-                </div>
-              </div>
+          {/* FAQ */}
+          <section className={`py-20 md:py-32 px-6 md:px-16 ${isDark ? "bg-slate-950/60" : "bg-luxury-black/[0.03]"}`}>
+            <div className="max-w-7xl mx-auto">
+              <Faq skin={skin} heading={LuxuryHeading} />
             </div>
           </section>
 
           {/* Contact Section */}
           <section id="contact" className={`py-20 md:py-32 px-6 md:px-16 ${bgPrimary}`}>
             <div className="max-w-5xl mx-auto">
-              <FadeInUp>
-                <div className={`border ${borderColor} p-8 md:p-12 lg:p-20 text-center`}>
-                  <p className={`text-xs tracking-[0.5em] uppercase ${accentCls} mb-6 md:mb-8`}>{c.sections.contact.eyebrow}</p>
-
-                  <h2 className="font-display text-3xl md:text-4xl lg:text-5xl xl:text-6xl mb-6 md:mb-8">
-                    {c.sections.contact.title}
-                    <br />
-                    <span className={`italic ${accentCls}`}>{c.sections.contact.titleAccent}</span>
-                  </h2>
-
-                  <p className={`text-base md:text-lg ${textSecondary} mb-6 md:mb-8 max-w-xl mx-auto font-light`}>{c.sections.contact.lead}</p>
-
-                  <div className={`inline-flex items-center gap-3 px-4 md:px-6 py-3 ${isDark ? "bg-deco-gold/10" : "bg-luxury-gold/10"} rounded-full mb-8 md:mb-12`}>
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                    <span className={`text-sm ${accentCls}`}>{c.sections.contact.status}</span>
-                  </div>
-
-                  <div className="mb-8 md:mb-12">
-                    <p className={`text-sm ${textMuted} mb-6`}>{c.sections.contact.note}</p>
-
-                    <m.button
-                      onClick={() => setIsContactOpen(true)}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className={`inline-flex items-center gap-3 px-8 md:px-10 py-4 md:py-5 ${isDark ? "bg-deco-gold text-deco-navy" : "bg-luxury-black text-luxury-cream"} hover:opacity-90 transition-all group`}
-                    >
-                      <MailIcon className="w-5 h-5" />
-                      <span className="text-sm tracking-[0.2em] uppercase">{c.sections.contact.cta}</span>
-                      <svg className="w-4 h-4 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
-                    </m.button>
-                  </div>
-
-                  <div className="max-w-3xl mx-auto w-full mb-12 md:mb-16">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-start">
-                      <div className="text-center">
-                        <p className={`text-xs tracking-[0.2em] uppercase ${textMuted} mb-2`}>{c.sections.contact.email}</p>
-                        <a href={`mailto:${registry.personal.email}`} className={`${textSecondary} hover:${accentCls} transition-colors text-sm md:text-base`}>
-                          {registry.personal.email}
-                        </a>
-                      </div>
-                      <div className="text-center">
-                        <p className={`text-xs tracking-[0.2em] uppercase ${textMuted} mb-2`}>{c.sections.contact.phone}</p>
-                        <a href={registry.personal.phoneHref} className={`${textSecondary} hover:${accentCls} transition-colors text-sm md:text-base`}>
-                          {registry.personal.phone}
-                        </a>
-                      </div>
-                      <div className="text-center">
-                        <p className={`text-xs tracking-[0.2em] uppercase ${textMuted} mb-2`}>{c.sections.contact.location}</p>
-                        <p className={`${textSecondary} text-sm md:text-base`}>{c.location}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-center gap-6 md:gap-8 max-w-3xl mx-auto">
-                    {[
-                      ["LinkedIn", registry.personal.linkedin],
-                      ["GitHub", registry.personal.github],
-                    ].map(([label, href]) => (
-                      <a
-                        key={label}
-                        href={href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`text-xs tracking-[0.2em] uppercase ${textMuted} hover:${accentCls} transition-colors`}
-                      >
-                        {label}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              </FadeInUp>
+              <Contact skin={skin} ctaClass={`press inline-flex items-center justify-center gap-2 px-8 py-4 text-sm tracking-[0.2em] uppercase ${isDark ? "bg-deco-gold text-deco-navy" : "bg-luxury-black text-luxury-cream"} hover:opacity-90 transition-all`} onContact={openContact} />
             </div>
           </section>
         </main>
