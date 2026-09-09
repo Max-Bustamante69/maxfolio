@@ -134,6 +134,24 @@ export function Years({ skin, heading, variant = 'rows', depth = false }: YearsP
           </li>
         ))}
       </ul>
+      {/* `sr-only` on the wrapper — see StackByYear for why the table itself never gets it directly. */}
+      <div className="sr-only">
+        <table>
+          <caption>{y.perYear}</caption>
+          <tbody>
+            {timeline.map((e) => (
+              <tr key={e.year}>
+                <th scope="row">{e.year}</th>
+                {WORK_KINDS.filter((k) => workCount(e, k) > 0).map((k) => (
+                  <td key={k}>
+                    {kindLabel[k]}: {workCount(e, k)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </figure>
   )
 
