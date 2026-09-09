@@ -52,7 +52,28 @@ export interface PortfolioContent {
     manifesto: { label: string; lines: string[] }
     years: SectionHeading & { lead: string; roles: string; shipped: string; work: string; products: string; side: string; more: string; count: string; perYear: string; eras: Record<string, string> }
     projects: SectionHeading & { view: string }
-    skills: SectionHeading & { groups: Record<SkillGroupId, string>; narrative: Record<SkillGroupId, string>; usageLabel: string; usageUnit: string; usageNote: string; usageItems: Record<string, string> }
+    skills: SectionHeading & {
+      groups: Record<SkillGroupId, string>
+      narrative: Record<SkillGroupId, string>
+      usageLabel: string
+      usageUnit: string
+      usageNote: string
+      usageItems: Record<string, string>
+      sunburst: {
+        caption: string
+        storesUnit: string
+        storesUnitOne: string
+        productsUnit: string
+        productsUnitOne: string
+        roleUnit: string
+        roleUnitOne: string
+        noData: string
+        legendLabel: string
+        triLiquid: string
+        triTs: string
+        triStoresDefault: string
+      }
+    }
     contact: SectionHeading & {
       lead: string
       promise: string
