@@ -126,14 +126,16 @@
     "designNames": {
       "luxuryMinimal": "ラグジュアリー・ミニマル",
       "brutalistEditorial": "ブルータリスト・エディトリアル",
-      "apple": "Apple Clean"
+      "apple": "Apple Clean",
+      "persona": "アーケード"
     },
     "designSubtitles": {
       "luxuryMinimal": "エレガント＆洗練",
       "brutalistEditorial": "大胆で生っぽい",
-      "apple": "静かで正確"
+      "apple": "静かで正確",
+      "persona": "ラウド＆キネティック"
     },
-    "whyVersions": "なぜ4つのデザイン？",
+    "whyVersions": "なぜ5つのデザイン？",
     "whyVersionsDesc": "文脈に合わせた異なる美学。同じスキルで、確かな対応力を。"
   },
   "contactModal": {

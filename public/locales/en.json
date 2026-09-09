@@ -126,14 +126,16 @@
     "designNames": {
       "luxuryMinimal": "Luxury Minimal",
       "brutalistEditorial": "Brutalist Editorial",
-      "apple": "Apple Clean"
+      "apple": "Apple Clean",
+      "persona": "Arcade"
     },
     "designSubtitles": {
       "luxuryMinimal": "Elegant & Refined",
       "brutalistEditorial": "Bold & Raw",
-      "apple": "Quiet & Precise"
+      "apple": "Quiet & Precise",
+      "persona": "Loud & Kinetic"
     },
-    "whyVersions": "Why four versions?",
+    "whyVersions": "Why five versions?",
     "whyVersionsDesc": "Different aesthetics for different contexts. Same skills, proven versatility."
   },
   "contactModal": {
