@@ -100,30 +100,52 @@ export function Process({ skin, heading, canvas = '' }: ProcessProps) {
         {/* pinned readout (wide screens) */}
         <div className="hidden lg:col-span-5 lg:block">
           <div className="sticky top-28">
-            <p className={`text-[11px] font-semibold uppercase tracking-[0.18em] ${skin.muted}`}>{p.stepOf.replace('{n}', String(active + 1)).replace('{total}', String(total))}</p>
+            {/* Crossfades on the same `key={active}` cycle, TIMED TO MATCH the numeral below exactly (was
+                plain, unanimated text) — it used to update the instant `active` changed while the numeral
+                was still mid-exit, so a scroll could land on a frame reading e.g. "Step 5 of 5" next to the
+                still-exiting step 4's numeral and title (reported: "01" shown with "QA"). Matching durations
+                isn't optional here: even a *faster* crossfade (which the title below used too) still settles
+                on the new step before the numeral does, reopening the same window. */}
+            <AnimatePresence mode="wait" initial={false}>
+              <m.p
+                key={`s-${active}`}
+                className={`text-[11px] font-semibold uppercase tracking-[0.18em] ${skin.muted}`}
+                initial={reduced ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={reduced ? { opacity: 1 } : { opacity: 0, transition: { duration: 0.25, ease: EASE } }}
+                transition={reduced ? { duration: 0 } : { duration: 0.45, ease: EASE }}
+              >
+                {p.stepOf.replace('{n}', String(active + 1)).replace('{total}', String(total))}
+              </m.p>
+            </AnimatePresence>
             <div className="relative mt-2 h-[150px] overflow-hidden">
-              <AnimatePresence initial={false}>
+              {/* `mode="wait"` (matching the title's AnimatePresence below) so the outgoing numeral finishes
+                  unmounting before the next one mounts — the default "sync" mode let both coexist mid-crossfade,
+                  which is what let a scroll land mid-transition and read a numeral that didn't match the title
+                  underneath it (reported: "01" shown with "QA"). */}
+              <AnimatePresence initial={false} mode="wait">
                 <m.p
                   key={active}
                   className="absolute inset-x-0 top-0 font-sf text-[150px] font-semibold leading-none tracking-[-0.06em] tabular-nums"
                   initial={reduced ? false : { opacity: 0, y: 40 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -40, transition: { duration: 0.25, ease: EASE } }}
-                  transition={{ duration: 0.45, ease: EASE }}
+                  exit={reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: -40, transition: { duration: 0.25, ease: EASE } }}
+                  transition={reduced ? { duration: 0 } : { duration: 0.45, ease: EASE }}
                   aria-hidden="true"
                 >
                   {num(active)}
                 </m.p>
               </AnimatePresence>
             </div>
+            {/* Timed to match the numeral above exactly — see the stepOf AnimatePresence comment for why. */}
             <AnimatePresence mode="wait" initial={false}>
               <m.p
                 key={`t-${active}`}
                 className={`${skin.title} mt-4 text-2xl`}
                 initial={reduced ? false : { opacity: 0 }}
                 animate={{ opacity: 1 }}
-                exit={{ opacity: 0, transition: { duration: 0.1 } }}
-                transition={{ duration: 0.3 }}
+                exit={reduced ? { opacity: 1 } : { opacity: 0, transition: { duration: 0.25, ease: EASE } }}
+                transition={reduced ? { duration: 0 } : { duration: 0.45, ease: EASE }}
                 aria-hidden="true"
               >
                 {p.steps[active].title}
