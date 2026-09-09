@@ -6,15 +6,19 @@ interface RevealTextProps {
   text: string
   className?: string
   delay?: number
+  /** 'view' (default) reveals as the text scrolls into view; 'load' reveals once, right after mount — for above-the-fold text that is already in view on paint. */
+  trigger?: 'view' | 'load'
 }
 
 /**
- * Heading choreography: each word rises out of its own clip as the heading scrolls into view
- * (transform + opacity only, once). Screen readers get the whole sentence; reduced motion gets it static.
+ * Heading choreography: each word rises out of its own clip (transform + opacity only, once).
+ * Screen readers get the whole sentence; reduced motion gets it static. `trigger="load"` swaps the
+ * scroll-into-view gate for a mount-triggered one, for text that starts in view (the hero lead).
  */
-export function RevealText({ text, className = '', delay = 0 }: RevealTextProps) {
+export function RevealText({ text, className = '', delay = 0, trigger = 'view' }: RevealTextProps) {
   const reduced = useReducedMotion()
   const words = text.split(' ')
+  const byView = trigger === 'view'
   return (
     <span className={className} aria-label={text} role="text">
       {words.map((word, i) => (
@@ -23,8 +27,7 @@ export function RevealText({ text, className = '', delay = 0 }: RevealTextProps)
             aria-hidden="true"
             className="inline-block"
             initial={reduced ? false : { y: '105%', opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            viewport={{ once: true, margin: '-40px' }}
+            {...(byView ? { whileInView: { y: 0, opacity: 1 }, viewport: { once: true, margin: '-40px' } } : { animate: { y: 0, opacity: 1 } })}
             transition={{ duration: 0.7, delay: delay + i * 0.05, ease: EASE }}
           >
             {word}

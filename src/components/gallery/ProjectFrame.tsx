@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type MouseEvent } from 'react'
-import { m, useMotionTemplate, useMotionValue, useReducedMotion, useSpring, useTransform, useInView } from 'framer-motion'
+import { m, useMotionTemplate, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, useInView, type MotionValue } from 'framer-motion'
 import type { Skin } from './skins'
 import { LaptopFrame, PhoneFrame } from './DeviceFrame'
 
@@ -22,8 +22,23 @@ interface ProjectFrameProps {
   cta?: string
 }
 
-const Crossfade = ({ base, over, alt, hover, label }: { base: string; over?: string; alt: string; hover: boolean; label: string }) => (
-  <>
+const Crossfade = ({
+  base,
+  over,
+  alt,
+  hover,
+  label,
+  scale,
+}: {
+  base: string
+  over?: string
+  alt: string
+  hover: boolean
+  label: string
+  /** Subtle scroll-linked zoom (1 → 1.03 → 1) as the card crosses the viewport; the frame clips it. */
+  scale?: MotionValue<number>
+}) => (
+  <m.div className="absolute inset-0" style={scale ? { scale } : undefined}>
     <img src={base} alt={`${alt} — ${label}`} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover object-top" />
     {over && (
       <img
@@ -35,7 +50,7 @@ const Crossfade = ({ base, over, alt, hover, label }: { base: string; over?: str
         className={`absolute inset-0 h-full w-full object-cover object-top transition-opacity duration-500 ${hover ? 'opacity-100' : 'opacity-0'}`}
       />
     )}
-  </>
+  </m.div>
 )
 
 const Invite = ({ text, skin }: { text: string; skin: Skin }) => {
@@ -86,8 +101,11 @@ export function ProjectFrame({ name, shots, skin, onOpen, alt, variant = 'compos
   const py = useMotionValue(0.5)
   const sx = useSpring(px, TILT)
   const sy = useSpring(py, TILT)
-  const rotateY = useTransform(sx, [0, 1], [-10, 10])
-  const rotateX = useTransform(sy, [0, 1], [8, -8])
+  const rotateY = useTransform(sx, [0, 1], [-6, 6])
+  const rotateX = useTransform(sy, [0, 1], [5, -5])
+  // Subtle scale-on-scroll for the captures themselves (1 → 1.03 → 1 as the card crosses the viewport), independent of the pointer-tilt scale above.
+  const { scrollYProgress: frameProgress } = useScroll({ target: rootRef, offset: ['start end', 'end start'] })
+  const imgScale = useTransform(frameProgress, [0, 0.5, 1], [1, 1.03, 1])
   const phoneX = useTransform(sx, [0, 1], [18, -18])
   const phoneY = useTransform(sy, [0, 1], [14, -14])
   const glareX = useTransform(sx, (v) => `${Math.round(v * 100)}%`)
@@ -132,7 +150,7 @@ export function ProjectFrame({ name, shots, skin, onOpen, alt, variant = 'compos
     return (
       <button type="button" ref={rootRef} onClick={onOpen} {...bind} className="group relative block w-full px-[4%] text-left" aria-label={cta ? `${cta} · ${name}` : `${name}: ${alt}`}>
         <PhoneFrame>
-          <Crossfade base={shots.homeMobile} over={shots.pdpMobile} alt={alt} hover={hover || auto} label="home, mobile" />
+          <Crossfade base={shots.homeMobile} over={shots.pdpMobile} alt={alt} hover={hover || auto} label="home, mobile" scale={reduced ? undefined : imgScale} />
         </PhoneFrame>
       </button>
     )
@@ -143,7 +161,7 @@ export function ProjectFrame({ name, shots, skin, onOpen, alt, variant = 'compos
       <button type="button" ref={rootRef} onClick={onOpen} {...bind} className="group relative block w-full text-left" aria-label={cta ? `${cta} · ${name}` : `${name}: ${alt}`} style={{ perspective: 1200 }}>
         <m.div style={{ ...tilt, transformStyle: 'preserve-3d' }} animate={{ scale: lift ? 1.025 : 1 }} transition={SETTLE} className="relative will-change-transform">
           <LaptopFrame>
-            <Crossfade base={shots.homeDesktop} over={shots.pdpDesktop} alt={alt} hover={hover || auto} label="home, desktop" />
+            <Crossfade base={shots.homeDesktop} over={shots.pdpDesktop} alt={alt} hover={hover || auto} label="home, desktop" scale={reduced ? undefined : imgScale} />
             <Glare />
           </LaptopFrame>
           {cta && <Invite text={cta} skin={skin} />}
@@ -157,7 +175,7 @@ export function ProjectFrame({ name, shots, skin, onOpen, alt, variant = 'compos
     <button type="button" ref={rootRef} onClick={onOpen} {...bind} className="group relative block w-full pb-[9%] pr-[3%] text-left" aria-label={cta ? `${cta} · ${name}` : `${name}: ${alt}`} style={{ perspective: 1200 }}>
       <m.div style={{ ...tilt, transformStyle: 'preserve-3d' }} animate={{ scale: lift ? 1.03 : 1 }} transition={SETTLE} className="relative will-change-transform">
         <LaptopFrame>
-          <Crossfade base={shots.homeDesktop} over={shots.pdpDesktop} alt={alt} hover={hover || auto} label="home, desktop" />
+          <Crossfade base={shots.homeDesktop} over={shots.pdpDesktop} alt={alt} hover={hover || auto} label="home, desktop" scale={reduced ? undefined : imgScale} />
           <Glare />
         </LaptopFrame>
         {cta && <Invite text={cta} skin={skin} />}
@@ -169,7 +187,7 @@ export function ProjectFrame({ name, shots, skin, onOpen, alt, variant = 'compos
           transition={SETTLE}
         >
           <PhoneFrame>
-            <Crossfade base={shots.homeMobile} over={shots.pdpMobile} alt={alt} hover={hover || auto} label="home, mobile" />
+            <Crossfade base={shots.homeMobile} over={shots.pdpMobile} alt={alt} hover={hover || auto} label="home, mobile" scale={reduced ? undefined : imgScale} />
           </PhoneFrame>
         </m.div>
       </m.div>

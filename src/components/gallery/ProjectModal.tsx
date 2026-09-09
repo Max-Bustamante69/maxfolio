@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { AnimatePresence, animate, m, useDragControls, useMotionValue, useReducedMotion, useTransform } from 'framer-motion'
+import { AnimatePresence, animate, m, useDragControls, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion'
 import { LaptopFrame, PhoneFrame } from './DeviceFrame'
 import { GlassControls } from './CarouselControls'
 import { carouselTokens, type Skin } from './skins'
@@ -154,6 +154,11 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
   }, [open, onClose])
 
   const dark = skin.dark
+  const reduced = useReducedMotion()
+  // Scroll-progress hairline for the numbers column: its own scroller, not the page.
+  const scrollerRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({ container: scrollerRef })
+  const readProgress = useSpring(scrollYProgress, { stiffness: 300, damping: 40, mass: 0.3 })
   // Phones: the sheet is a bottom sheet with a grabber; dragging it down past a threshold dismisses it.
   const drag = useDragControls()
   const [copied, setCopied] = useState(false)
@@ -253,7 +258,14 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
             </div>
 
             {/* numbers */}
-            <div className="flex-1 overflow-y-auto p-6 lg:p-8">
+            <div ref={scrollerRef} className="relative flex-1 overflow-y-auto p-6 lg:p-8">
+              {!reduced && (
+                <m.div
+                  aria-hidden="true"
+                  className="sticky top-0 z-10 -mx-6 -mt-6 h-[2px] origin-left lg:-mx-8 lg:-mt-8"
+                  style={{ scaleX: readProgress, backgroundColor: accent }}
+                />
+              )}
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h3 className={`${skin.title} text-2xl`}>{data.name}</h3>
