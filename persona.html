@@ -67,25 +67,22 @@
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
     <div id="root">
-      <!-- Static hero shell: the same nodes React's Persona hero renders first, so the largest paint
-           does not wait for the bundle. React's first commit replaces it. -->
+      <!-- Static menu shell: the same arcade-menu nodes React's Persona entry screen renders first, so
+           the largest paint does not wait for the bundle. React's first commit replaces it. -->
       <div class="theme-persona min-h-screen font-sf bg-[#eef3f7] text-[#0a0f1a] [overflow-x:clip]" data-shell>
-        <div class="fixed top-0 inset-x-0 z-40 h-14 bg-[#eef3f7]/90 border-b border-[#0a0f1a]/10" aria-hidden="true"></div>
-        <main class="pt-14">
-          <section class="relative min-h-[92vh] flex items-center px-4 pt-16 pb-16 md:pt-20 overflow-hidden">
+        <div class="fixed top-0 inset-x-0 z-40 h-12 md:h-14 bg-[#eef3f7]/90 border-b border-[#0a0f1a]/10" aria-hidden="true"></div>
+        <main class="pt-12 md:pt-14 pb-16">
+          <section class="relative min-h-[calc(100svh-3rem)] md:min-h-[calc(100svh-3.5rem)] flex flex-col justify-center px-2 sm:px-4 py-10 overflow-hidden">
             <div aria-hidden="true" class="persona-shell-ghost">MB</div>
-            <div class="max-w-6xl mx-auto w-full relative z-10">
-              <p class="font-persona-label text-sm font-semibold uppercase tracking-[0.35em] text-[#1c6fb0]" data-t="eyebrow">— CTO &amp; Shopify Tech Lead · Digitdeck</p>
-              <h1 class="mt-4 font-persona-display uppercase leading-[0.86] text-[15vw] md:text-[9vw]" style="font-style: oblique 6deg">
-                <span class="block">Maximiliano</span>
-                <span class="block text-[#1c6fb0]">Bustamante</span>
-              </h1>
-              <p class="mt-6 max-w-2xl text-xl md:text-2xl font-sf leading-snug" data-t="positioning">Your Shopify store has traffic. I find where it stops turning into orders.</p>
-              <p class="mt-4 max-w-2xl text-base md:text-lg text-[#0a0f1a]/60 font-sf leading-relaxed" data-t="lead">18+ storefronts, a multi-tenant app suite and a QA harness that catches what a launch would have broken.</p>
-              <div class="mt-9 flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-7">
-                <a href="#contact" class="persona-shell-btn inline-flex items-center justify-center bg-[#1c6fb0] text-white px-7 py-3.5 text-sm font-persona-label font-semibold uppercase tracking-[0.15em]" data-t="ctaPrimary">Get a free 20-minute store review</a>
-                <a href="#shopify" class="text-[#1c6fb0] inline-flex items-center gap-1.5 text-sm font-persona-label font-semibold uppercase tracking-[0.1em]" data-t="ctaSecondary">See the 18+ storefronts ↓</a>
-              </div>
+            <div class="relative z-10 max-w-4xl mx-auto w-full">
+              <p class="font-persona-label text-xs font-semibold uppercase tracking-[0.35em] text-[#1c6fb0] mb-4 px-4 md:px-7" data-t="brand">— Maximiliano Bustamante</p>
+              <nav aria-label="Arcade menu">
+                <a href="#home" class="persona-shell-item" data-t="home">01&nbsp;&nbsp;Home</a>
+                <a href="#work" class="persona-shell-item" data-t="work">02&nbsp;&nbsp;Work</a>
+                <a href="#years" class="persona-shell-item" data-t="years">03&nbsp;&nbsp;Years</a>
+                <a href="#skills" class="persona-shell-item" data-t="skills">04&nbsp;&nbsp;Skills</a>
+                <a href="#contact" class="persona-shell-item" data-t="contact">05&nbsp;&nbsp;Contact</a>
+              </nav>
             </div>
           </section>
         </main>
@@ -95,8 +92,8 @@
       (function () {
         try {
           var L = {
-            es: { eyebrow: '— CTO & Shopify Tech Lead · Digitdeck', positioning: 'Tu tienda Shopify tiene tráfico. Yo encuentro dónde deja de convertirse en pedidos.', lead: '18+ tiendas, una suite de apps multi-tenant y un arnés de QA que atrapa lo que un lanzamiento habría roto.', ctaPrimary: 'Pide tu revisión gratis de 20 minutos', ctaSecondary: 'Ver las 18+ tiendas ↓' },
-            ja: { eyebrow: '— CTO & Shopify Tech Lead · Digitdeck', positioning: 'アクセスはあるのに、注文につながらない。その原因を突き止めます。', lead: '18以上のストア、マルチテナントのアプリ群、リリース前に不具合を捕まえるQAハーネス。', ctaPrimary: '無料20分のストア診断を受ける', ctaSecondary: '18店舗以上の実績を見る ↓' }
+            es: { brand: '— Maximiliano Bustamante', home: '01  Inicio', work: '02  Trabajo', years: '03  Años', skills: '04  Habilidades', contact: '05  Contacto' },
+            ja: { brand: '— Maximiliano Bustamante', home: '01  ホーム', work: '02  仕事', years: '03  沿革', skills: '04  スキル', contact: '05  連絡先' }
           };
           var saved = localStorage.getItem('lang');
           var nav = (navigator.language || '').toLowerCase();
@@ -155,8 +152,21 @@
         mix-blend-mode: overlay;
         white-space: nowrap;
       }
-      .persona-shell-btn {
-        clip-path: polygon(8% 0, 100% 0, 92% 100%, 0% 100%);
+      .persona-shell-item {
+        display: block;
+        font-family: 'Anton', 'Archivo Black', sans-serif;
+        font-style: oblique 6deg;
+        text-transform: uppercase;
+        text-decoration: none;
+        color: inherit;
+        line-height: 0.9;
+        padding: 0.75rem 1.75rem;
+        font-size: 9vw;
+      }
+      @media (min-width: 768px) {
+        .persona-shell-item {
+          font-size: 6.4vw;
+        }
       }
     </style>
   </body>
