@@ -13,6 +13,7 @@ const titles: Record<FaviconType, string> = {
   apple: 'MB | Portfolio',
   luxury: 'MB | Luxury Portfolio',
   brutalist: 'MB | Brutalist Portfolio',
+  neo: 'MB | Neumorphic Portfolio',
   menu: 'MB | Design Menu',
   default: 'MB | Portfolio',
 }

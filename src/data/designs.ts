@@ -1,7 +1,7 @@
 import type { ComponentType } from 'react'
-import { LuxuryPreview, BrutalistPreview, ApplePreview } from '../components/previews'
+import { LuxuryPreview, BrutalistPreview, ApplePreview, NeoPreview } from '../components/previews'
 
-export type DesignId = 'apple' | 'luxury' | 'brutalist'
+export type DesignId = 'apple' | 'luxury' | 'brutalist' | 'neo'
 
 export interface DesignEntry {
   id: DesignId
@@ -54,6 +54,19 @@ export const designs: DesignEntry[] = [
     favicon: '/favicon-brutalist.svg',
     isDefault: false,
     Preview: BrutalistPreview,
+  },
+  {
+    id: 'neo',
+    route: '/neo',
+    nameKey: 'menuPage.designNames.neo',
+    subtitleKey: 'menuPage.designSubtitles.neo',
+    // AA-safe shade of the theme's accent (see src/styles/neo.css) — text-safe at 6:1 on white / 4.9:1 on the surface.
+    accent: '#4453d9',
+    transitionColor: '#e6e9ef',
+    transitionAccent: '#4453d9',
+    favicon: '/favicon-neo.svg',
+    isDefault: false,
+    Preview: NeoPreview,
   },
 ]
 
