@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useRef, useState, type ReactNode, type RefOb
 import { m, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { createPortal } from 'react-dom'
 import { ThemeProvider, useTheme } from '../context/ThemeContext'
-import { SEOHead, TransitionLink, Magnetic, Marquee, RevealText, SmoothScroll, useLenis } from '../components/common'
+import { SEOHead, TransitionLink, Magnetic, Ticker, RevealText, SmoothScroll, useLenis } from '../components/common'
 import { ContactFormModal } from '../components/modals'
 import { MenuPreview } from '../components/previews'
 import { StatBand } from '../components/sections/StatBand'
@@ -416,7 +416,22 @@ function PersonaContent() {
               </SnapIn>
             </div>
             <div className="mt-10">
-              <Marquee items={registry.stores.filter((s) => !s.legacy).map((s) => ({ name: s.name, meta: c.stores[s.slug]?.industry, live: s.status === 'live' }))} dark={isDark} label={c.sections.now.band} />
+              <Ticker
+                variant="reverse-hover"
+                skew
+                duration={40}
+                label={c.sections.now.band}
+                items={registry.stores.filter((s) => !s.legacy)}
+                keyOf={(s) => s.slug}
+                itemClassName="flex shrink-0 items-center gap-3 whitespace-nowrap px-6 py-3"
+                renderItem={(s) => (
+                  <>
+                    <span className={`h-2 w-2 ${s.status !== 'live' ? (isDark ? 'bg-[#f5f2ee]/40' : 'bg-[#0a0f1a]/30') : isDark ? 'bg-[#c8102e]' : 'bg-[#1c6fb0]'}`} aria-hidden="true" />
+                    <span className={`font-persona-label text-xl uppercase tracking-[0.12em] ${isDark ? 'text-[#f5f2ee]' : 'text-[#0a0f1a]'}`}>{s.name}</span>
+                    {c.stores[s.slug]?.industry && <span className={`font-persona-label text-sm uppercase tracking-[0.15em] ${isDark ? 'text-[#f5f2ee]/55' : 'text-[#0a0f1a]/60'}`}>{c.stores[s.slug].industry}</span>}
+                  </>
+                )}
+              />
             </div>
           </section>
 

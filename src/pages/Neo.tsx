@@ -4,7 +4,7 @@ import { ThemeProvider, useTheme } from '../context/ThemeContext'
 import { useLanguage, supportedLocales } from '../context/LanguageContext'
 import '../styles/neo.css'
 // Direct imports (not the component barrels) so the main chunk carries only what this route needs.
-import { SEOHead, TransitionLink, ThemeToggle, Magnetic, RevealText, Marquee } from '../components/common'
+import { SEOHead, TransitionLink, ThemeToggle, Magnetic, RevealText, Ticker } from '../components/common'
 import { ContactFormModal } from '../components/modals'
 import { StatBand } from '../components/sections/StatBand'
 import { Experience } from '../components/sections/Experience'
@@ -350,10 +350,21 @@ function NeoContent() {
               </Reveal>
             </div>
             <div className="mt-10">
-              <Marquee
-                items={registry.stores.filter((s) => !s.legacy).map((s) => ({ name: s.name, meta: c.stores[s.slug]?.industry, live: s.status === 'live' }))}
-                dark={isDark}
+              <Ticker
+                variant="speed-hover"
+                skew
+                duration={46}
                 label={c.sections.now.band}
+                items={registry.stores.filter((s) => !s.legacy)}
+                keyOf={(s) => s.slug}
+                itemClassName="flex shrink-0 items-center gap-2.5 whitespace-nowrap px-5 py-3"
+                renderItem={(s) => (
+                  <>
+                    <span className={`h-1.5 w-1.5 rounded-full ${s.status !== 'live' ? 'bg-[#ff9f0a]' : 'bg-[#34c759]'}`} aria-hidden="true" />
+                    <span className={`font-neo text-lg font-semibold tracking-[-0.01em] ${isDark ? 'text-neo-darkInk' : 'text-neo-ink'}`}>{s.name}</span>
+                    {c.stores[s.slug]?.industry && <span className={`text-sm ${isDark ? 'text-neo-darkInkMuted' : 'text-neo-inkMuted'}`}>{c.stores[s.slug].industry}</span>}
+                  </>
+                )}
               />
             </div>
           </section>
