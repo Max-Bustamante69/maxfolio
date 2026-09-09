@@ -1,7 +1,7 @@
 import type { ComponentType } from 'react'
-import { LuxuryPreview, BrutalistPreview, ApplePreview } from '../components/previews'
+import { LuxuryPreview, BrutalistPreview, ApplePreview, PersonaPreview } from '../components/previews'
 
-export type DesignId = 'apple' | 'luxury' | 'brutalist'
+export type DesignId = 'apple' | 'luxury' | 'brutalist' | 'persona'
 
 export interface DesignEntry {
   id: DesignId
@@ -54,6 +54,18 @@ export const designs: DesignEntry[] = [
     favicon: '/favicon-brutalist.svg',
     isDefault: false,
     Preview: BrutalistPreview,
+  },
+  {
+    id: 'persona',
+    route: '/arcade',
+    nameKey: 'menuPage.designNames.persona',
+    subtitleKey: 'menuPage.designSubtitles.persona',
+    accent: '#1c6fb0',
+    transitionColor: '#0a0f1a',
+    transitionAccent: '#3fa9dc',
+    favicon: '/favicon-persona.svg',
+    isDefault: false,
+    Preview: PersonaPreview,
   },
 ]
 
