@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- A/B: this is the "persona" landing variant's static shell. The edge middleware sets this meta
+         tag on rewrite so the client (src/ab.ts) knows which variant it is without a flash. -->
+    <meta name="mf-variant" content="persona" />
+
+    <!-- Primary Meta Tags -->
+    <title>Maximiliano Bustamante | CTO & Shopify Tech Lead</title>
+    <meta name="title" content="Maximiliano Bustamante | CTO & Shopify Tech Lead" />
+    <meta name="description" content="CTO & Shopify Tech Lead at Digitdeck. 18+ Shopify storefronts, a production app suite, and the delivery system behind them. Open for Shopify CRO consulting." />
+    <meta name="keywords" content="Shopify Developer, Shopify Tech Lead, Shopify CRO, Liquid, React, Remix, Shopify Functions, Shopify Apps, E-commerce, CTO, Medellín, Colombia" />
+    <meta name="author" content="Maximiliano Bustamante" />
+    <meta name="robots" content="index, follow" />
+    <meta name="language" content="English" />
+
+    <!-- Canonical URL: the persona variant lives at /arcade -->
+    <link rel="canonical" href="https://www.maxfolio.dev/arcade" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon-persona.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-persona.svg" />
+
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#eef3f7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#111013" media="(prefers-color-scheme: dark)" />
+    <meta name="msapplication-TileColor" content="#0a0f1a" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.maxfolio.dev/arcade" />
+    <meta property="og:title" content="Maximiliano Bustamante | CTO & Shopify Tech Lead" />
+    <meta property="og:description" content="18+ Shopify storefronts, a production app suite, and the delivery system behind them. Open for Shopify CRO consulting." />
+    <meta property="og:image" content="https://www.maxfolio.dev/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="es_CO" />
+    <meta property="og:locale:alternate" content="ja_JP" />
+    <meta property="og:site_name" content="Maxfolio" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://www.maxfolio.dev/arcade" />
+    <meta name="twitter:title" content="Maximiliano Bustamante | CTO & Shopify Tech Lead" />
+    <meta name="twitter:description" content="18+ Shopify storefronts, a production app suite, and the delivery system behind them. Open for Shopify CRO consulting." />
+    <meta name="twitter:image" content="https://www.maxfolio.dev/og-image.png" />
+
+    <!-- Preconnect to external domains for performance -->
+    <link rel="preload" href="/locales/en.json" as="fetch" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- DNS Prefetch -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+
+    <!-- Google Fonts for the Persona (Arcade) theme: Anton display slabs, Rajdhani condensed labels.
+         Loaded without blocking first paint — the print/onload swap trick used on every other entry. -->
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Anton&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" /></noscript>
+  </head>
+  <body>
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <div id="root">
+      <!-- Static hero shell: the same nodes React's Persona hero renders first, so the largest paint
+           does not wait for the bundle. React's first commit replaces it. -->
+      <div class="theme-persona min-h-screen font-sf bg-[#eef3f7] text-[#0a0f1a] [overflow-x:clip]" data-shell>
+        <div class="fixed top-0 inset-x-0 z-40 h-14 bg-[#eef3f7]/90 border-b border-[#0a0f1a]/10" aria-hidden="true"></div>
+        <main class="pt-14">
+          <section class="relative min-h-[92vh] flex items-center px-4 pt-16 pb-16 md:pt-20 overflow-hidden">
+            <div aria-hidden="true" class="persona-shell-ghost">MB</div>
+            <div class="max-w-6xl mx-auto w-full relative z-10">
+              <p class="font-persona-label text-sm font-semibold uppercase tracking-[0.35em] text-[#1c6fb0]" data-t="eyebrow">— CTO &amp; Shopify Tech Lead · Digitdeck</p>
+              <h1 class="mt-4 font-persona-display uppercase leading-[0.86] text-[15vw] md:text-[9vw]" style="font-style: oblique 6deg">
+                <span class="block">Maximiliano</span>
+                <span class="block text-[#1c6fb0]">Bustamante</span>
+              </h1>
+              <p class="mt-6 max-w-2xl text-xl md:text-2xl font-sf leading-snug" data-t="positioning">Your Shopify store has traffic. I find where it stops turning into orders.</p>
+              <p class="mt-4 max-w-2xl text-base md:text-lg text-[#0a0f1a]/60 font-sf leading-relaxed" data-t="lead">18+ storefronts, a multi-tenant app suite and a QA harness that catches what a launch would have broken.</p>
+              <div class="mt-9 flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-7">
+                <a href="#contact" class="persona-shell-btn inline-flex items-center justify-center bg-[#1c6fb0] text-white px-7 py-3.5 text-sm font-persona-label font-semibold uppercase tracking-[0.15em]" data-t="ctaPrimary">Get a free 20-minute store review</a>
+                <a href="#shopify" class="text-[#1c6fb0] inline-flex items-center gap-1.5 text-sm font-persona-label font-semibold uppercase tracking-[0.1em]" data-t="ctaSecondary">See the 18+ storefronts ↓</a>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+    <script>
+      (function () {
+        try {
+          var L = {
+            es: { eyebrow: '— CTO & Shopify Tech Lead · Digitdeck', positioning: 'Tu tienda Shopify tiene tráfico. Yo encuentro dónde deja de convertirse en pedidos.', lead: '18+ tiendas, una suite de apps multi-tenant y un arnés de QA que atrapa lo que un lanzamiento habría roto.', ctaPrimary: 'Pide tu revisión gratis de 20 minutos', ctaSecondary: 'Ver las 18+ tiendas ↓' },
+            ja: { eyebrow: '— CTO & Shopify Tech Lead · Digitdeck', positioning: 'アクセスはあるのに、注文につながらない。その原因を突き止めます。', lead: '18以上のストア、マルチテナントのアプリ群、リリース前に不具合を捕まえるQAハーネス。', ctaPrimary: '無料20分のストア診断を受ける', ctaSecondary: '18店舗以上の実績を見る ↓' }
+          };
+          var saved = localStorage.getItem('lang');
+          var nav = (navigator.language || '').toLowerCase();
+          var lang = saved || (nav.indexOf('es') === 0 ? 'es' : nav.indexOf('ja') === 0 ? 'ja' : 'en');
+          var s = L[lang];
+          if (s) {
+            document.documentElement.lang = lang;
+            var nodes = document.querySelectorAll('#root [data-t]');
+            for (var i = 0; i < nodes.length; i++) { var v = s[nodes[i].getAttribute('data-t')]; if (v) nodes[i].textContent = v; }
+          }
+          if (localStorage.getItem('persona-theme') === 'dark') {
+            var r = document.querySelector('#root [data-shell]');
+            if (r) { r.classList.remove('bg-[#eef3f7]', 'text-[#0a0f1a]'); r.classList.add('bg-[#111013]', 'text-[#f5f2ee]'); }
+            var bar = document.querySelector('#root [data-shell] > div');
+            if (bar) { bar.classList.remove('bg-[#eef3f7]/90', 'border-[#0a0f1a]/10'); bar.classList.add('bg-[#111013]/90', 'border-[#f5f2ee]/10'); }
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <script type="module" src="/src/main.tsx"></script>
+
+    <!-- Inline critical CSS: skip link + the handful of shell-only rules the static hero needs before
+         the Persona route's own stylesheet (src/styles/persona.css) can load. -->
+    <style>
+      .skip-link {
+        position: absolute;
+        top: -100px;
+        left: 0;
+        background: #000;
+        color: #fff;
+        padding: 8px 16px;
+        z-index: 10000;
+        text-decoration: none;
+        font-family: system-ui, -apple-system, sans-serif;
+        font-size: 14px;
+        transition: top 0.2s;
+      }
+      .skip-link:focus {
+        top: 0;
+        outline: 2px solid #1c6fb0;
+        outline-offset: 2px;
+      }
+      .persona-shell-ghost {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        user-select: none;
+        overflow: hidden;
+        font-family: 'Anton', 'Archivo Black', sans-serif;
+        font-size: 22vw;
+        line-height: 1;
+        opacity: 0.05;
+        mix-blend-mode: overlay;
+        white-space: nowrap;
+      }
+      .persona-shell-btn {
+        clip-path: polygon(8% 0, 100% 0, 92% 100%, 0% 100%);
+      }
+    </style>
+  </body>
+</html>

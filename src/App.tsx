@@ -14,11 +14,11 @@ const Home = lazy(() => import('./pages/Home'))
 const Design1 = lazy(() => import('./pages/Design1'))
 const Design4 = lazy(() => import('./pages/Design4'))
 const Neo = lazy(() => import('./pages/Neo'))
+const Persona = lazy(() => import('./pages/Persona'))
 
-// A/B: the landing at `/` is the visitor's variant. Variants without a page yet fall back to the control.
-// `neo` is registered here so a future split can pick it up, but ab.config.ts still lists only `apple` —
-// there is no split running yet.
-const VARIANT_PAGES: Partial<Record<VariantId, ComponentType>> = { apple: Apple, neo: Neo }
+// A/B: the landing at `/` is the visitor's variant. Every theme that can be a variant is registered here;
+// ab.config.ts decides which ones actually take traffic (with only `apple` listed there is no split).
+const VARIANT_PAGES: Partial<Record<VariantId, ComponentType>> = { apple: Apple, neo: Neo, persona: Persona }
 const variant = currentVariant()
 const Landing = VARIANT_PAGES[variant] ?? Apple
 
@@ -60,6 +60,7 @@ function App() {
             <Route path={designById('luxury').route} element={<Design4 />} />
             <Route path={designById('brutalist').route} element={<Design1 />} />
             <Route path={designById('neo').route} element={<Neo />} />
+            <Route path={designById('persona').route} element={<Persona />} />
             <Route path={MENU.route} element={<Home />} />
             {/* Legacy routes */}
             <Route path="/1" element={<Design4 />} />

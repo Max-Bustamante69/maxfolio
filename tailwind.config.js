@@ -15,6 +15,9 @@ export default {
         'accent': ['Space Mono', 'monospace'],
         'sf': ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"SF Pro Text"', 'Inter', 'system-ui', 'sans-serif'],
         'neo': ['Manrope', 'Inter', 'system-ui', 'sans-serif'],
+        // Persona (arcade) theme: Anton display slabs, Rajdhani condensed labels/UI. Body text keeps the system stack.
+        'persona-display': ['Anton', 'Archivo Black', 'sans-serif'],
+        'persona-label': ['Rajdhani', 'sans-serif'],
       },
       spacing: {
         'xs': '8px',

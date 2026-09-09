@@ -3,7 +3,7 @@ export { ThemeToggle, FadeInUp, CompanyLogo, TransitionLink, MobileMenuLuxury, M
 export type { RailSection } from './common'
 
 // Preview components
-export { LuxuryPreview, BrutalistPreview, MenuPreview, ApplePreview } from './previews'
+export { LuxuryPreview, BrutalistPreview, MenuPreview, ApplePreview, PersonaPreview } from './previews'
 
 // Modal components
 export { ContactFormModal } from './modals'

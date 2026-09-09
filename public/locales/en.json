@@ -127,15 +127,17 @@
       "luxuryMinimal": "Luxury Minimal",
       "brutalistEditorial": "Brutalist Editorial",
       "apple": "Apple Clean",
-      "neo": "Soft UI"
+      "neo": "Soft UI",
+      "persona": "Arcade"
     },
     "designSubtitles": {
       "luxuryMinimal": "Elegant & Refined",
       "brutalistEditorial": "Bold & Raw",
       "apple": "Quiet & Precise",
-      "neo": "Tactile & Extruded"
+      "neo": "Tactile & Extruded",
+      "persona": "Loud & Kinetic"
     },
-    "whyVersions": "Why four versions?",
+    "whyVersions": "Why five versions?",
     "whyVersionsDesc": "Different aesthetics for different contexts. Same skills, proven versatility."
   },
   "contactModal": {

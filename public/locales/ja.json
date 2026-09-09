@@ -127,15 +127,17 @@
       "luxuryMinimal": "ラグジュアリー・ミニマル",
       "brutalistEditorial": "ブルータリスト・エディトリアル",
       "apple": "Apple Clean",
-      "neo": "ソフトUI"
+      "neo": "ソフトUI",
+      "persona": "アーケード"
     },
     "designSubtitles": {
       "luxuryMinimal": "エレガント＆洗練",
       "brutalistEditorial": "大胆で生っぽい",
       "apple": "静かで正確",
-      "neo": "触感的で立体的"
+      "neo": "触感的で立体的",
+      "persona": "ラウド＆キネティック"
     },
-    "whyVersions": "なぜ4つのデザイン？",
+    "whyVersions": "なぜ5つのデザイン？",
     "whyVersionsDesc": "文脈に合わせた異なる美学。同じスキルで、確かな対応力を。"
   },
   "contactModal": {

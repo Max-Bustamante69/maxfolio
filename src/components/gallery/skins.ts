@@ -2,7 +2,7 @@
 // each experience only decides colors, radii and type.
 import type { CSSProperties } from 'react'
 
-export type FrameStyle = 'apple' | 'luxury' | 'brutalist' | 'neo'
+export type FrameStyle = 'apple' | 'luxury' | 'brutalist' | 'neo' | 'persona'
 
 /** Tokens the vendored house Carousel reads (`--color-control-*`, `--duration-base`). Without them the
  *  controls fall back to currentColor and an invalid transition, so every skin defines the full set. */
@@ -12,6 +12,10 @@ export function carouselTokens(frame: FrameStyle, isDark: boolean): CSSPropertie
     luxury: { arrow: isDark ? '#d4af37' : '#C9A962', on: isDark ? '#f5f0e1' : '#1a1a1a', dot: isDark ? 'rgba(245,240,225,0.3)' : 'rgba(26,26,26,0.2)', active: isDark ? '#d4af37' : '#C9A962', brand: isDark ? '#d4af37' : '#C9A962', surface: isDark ? '#1a1f3c' : '#faf8f5' },
     brutalist: { arrow: '#dc2626', on: isDark ? '#f5f5f4' : '#1c1917', dot: isDark ? 'rgba(245,245,244,0.3)' : 'rgba(28,25,23,0.25)', active: '#dc2626', brand: '#dc2626', surface: isDark ? '#0c0a09' : '#f5f5f4' },
     neo: { arrow: isDark ? '#e7e9ee' : '#3a3f4b', on: isDark ? '#8b93ff' : '#4453d9', dot: isDark ? 'rgba(231,233,238,0.3)' : 'rgba(58,63,75,0.22)', active: isDark ? '#8b93ff' : '#4453d9', brand: isDark ? '#8b93ff' : '#4453d9', surface: isDark ? '#262a33' : '#e6e9ef' },
+    // Ink variant (dark) = P5-evoking red; ice variant (light) = P3-evoking blue. One hero accent only.
+    persona: isDark
+      ? { arrow: '#c8102e', on: '#f5f2ee', dot: 'rgba(245,242,238,0.3)', active: '#c8102e', brand: '#c8102e', surface: '#111013' }
+      : { arrow: '#1c6fb0', on: '#0a0f1a', dot: 'rgba(10,15,26,0.25)', active: '#1c6fb0', brand: '#1c6fb0', surface: '#eef3f7' },
   }[frame]
   return {
     '--color-control-arrow': t.arrow,
@@ -113,5 +117,28 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     divider: d ? 'divide-white/10 border-white/10' : 'divide-black/[0.06] border-black/[0.06]',
     line: d ? 'border-white/10' : 'border-black/[0.08]',
     accentBg: d ? 'bg-neo-darkAccent' : 'bg-neo-accent',
+  }),
+  // Ice variant is the default (light); Ink is the dark mode. Two-key-color law: ink/paper neutrals
+  // plus exactly one hero accent per mode — no diluting sub-colors (wf4-persona.md idea #1).
+  persona: (d) => ({
+    frame: 'persona',
+    dark: d,
+    card: `border ${d ? 'border-[#c8102e]/25 bg-[#18161a]' : 'border-[#1c6fb0]/20 bg-white'} clip-corner-sm`,
+    title: `font-persona-label uppercase tracking-wide ${d ? 'text-[#f5f2ee]' : 'text-[#0a0f1a]'}`,
+    body: d ? 'text-[#f5f2ee]/80' : 'text-[#0a0f1a]/80',
+    // /55 clears AA against every surface this theme puts under it (page ink, the lighter card bg);
+    // paper needs /60 for the same 4.5:1 floor (measured against the page bg).
+    muted: d ? 'text-[#f5f2ee]/55' : 'text-[#0a0f1a]/60',
+    // Small text on ink (#111013) needs its own lighter tint of the hero red — #c8102e itself only
+    // clears ~3.2:1 there, short of AA's 4.5:1 for text this size; #e8465f clears 4.9:1 (measured).
+    accent: d ? 'text-[#e8465f]' : 'text-[#1c6fb0]',
+    chip: `font-persona-label uppercase tracking-[0.15em] px-2.5 py-1 text-[11px] skew-chip ${d ? 'bg-[#f5f2ee]/10 text-[#f5f2ee]/70' : 'bg-[#0a0f1a]/5 text-[#0a0f1a]/70'}`,
+    chipOn: `font-persona-label uppercase tracking-[0.15em] px-2.5 py-1 text-[11px] skew-chip ${d ? 'bg-[#c8102e] text-[#f5f2ee]' : 'bg-[#1c6fb0] text-white'}`,
+    badgeLive: d ? 'bg-[#c8102e] text-[#f5f2ee] font-persona-label uppercase' : 'bg-[#1c6fb0] text-white font-persona-label uppercase',
+    badgeDev: `border ${d ? 'border-[#c8102e] text-[#e8465f]' : 'border-[#1c6fb0] text-[#1c6fb0]'} font-persona-label uppercase`,
+    rowHover: d ? 'hover:bg-[#c8102e]/[0.06] hover:skew-row' : 'hover:bg-[#1c6fb0]/[0.05] hover:skew-row',
+    divider: d ? 'divide-[#f5f2ee]/10 border-[#f5f2ee]/10' : 'divide-[#0a0f1a]/10 border-[#0a0f1a]/10',
+    line: d ? 'border-[#f5f2ee]/10' : 'border-[#0a0f1a]/10',
+    accentBg: d ? 'bg-[#c8102e]' : 'bg-[#1c6fb0]',
   }),
 }
