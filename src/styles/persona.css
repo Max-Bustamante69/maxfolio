@@ -1,0 +1,109 @@
+/**
+ * Persona ("Arcade") theme — scoped decoration only. Imported once, by src/pages/Persona.tsx, so
+ * nothing here leaks into the other four experiences. Color and type live as Tailwind arbitrary
+ * values in the page/skin; this file is shapes, motion primitives and the parallax wiring.
+ *
+ * Two-key-color law (own hex ranges, not sampled from any game): ice = #eef3f7 paper / #0a0f1a ink /
+ * #1c6fb0 accent (light = default); ink = #f5f2ee paper / #111013 ink / #c8102e accent (dark).
+ */
+
+.theme-persona {
+  --p-scroll-y: 0; /* px, written by the page's Lenis/scroll listener; consumed by [data-parallax] */
+}
+
+/* ---------- Ghost oversized wordmark watermark (hero) ---------- */
+.persona-ghost-wordmark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  user-select: none;
+  overflow: hidden;
+  font-family: 'Anton', 'Archivo Black', sans-serif;
+  font-size: 22vw;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  white-space: nowrap;
+}
+
+/* ---------- Thin rotating ring motif ---------- */
+.persona-ring {
+  animation: persona-ring-spin 120s linear infinite;
+  transform-origin: center;
+}
+@keyframes persona-ring-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---------- Halftone dot wash (sparse, 1-2 places per page) ---------- */
+.persona-halftone {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(currentColor 1px, transparent 1.4px);
+  background-size: 14px 14px;
+  opacity: 0.1;
+}
+
+/* ---------- Diagonal torn cut-in panel (photo/case-study mounts) ---------- */
+.persona-torn {
+  clip-path: polygon(9% 0, 100% 0, 100% 100%, 0 92%, 0 18%);
+}
+.persona-torn-r {
+  clip-path: polygon(14% 0, 100% 0, 100% 100%, 3% 100%, 0 30%);
+}
+
+/* ---------- Skewed parallelogram button/chip (flag/blade shape; label stays upright) ---------- */
+.persona-skew-btn {
+  clip-path: polygon(8% 0, 100% 0, 92% 100%, 0% 100%);
+}
+.skew-chip {
+  clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+}
+
+/* ---------- Angled corner-cut small card frame (used by the persona Skin's `card`) ---------- */
+.clip-corner-sm {
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+}
+
+/* ---------- Hover skew + color-invert on index rows (visual only — hit box is untouched) ---------- */
+.skew-row {
+  transition: transform 120ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+@media (hover: hover) and (pointer: fine) {
+  .skew-row:hover {
+    transform: skewX(-2deg);
+  }
+}
+
+/* ---------- Dialogue-box contact panel: one notch cut into the top-left corner ---------- */
+.persona-notch {
+  clip-path: polygon(0 22px, 22px 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* ---------- Sticker callout label (gallery captions) ---------- */
+.persona-sticker {
+  transform: rotate(-3deg);
+}
+
+/* ---------- Parallax layers, driven by --p-scroll-y (updated via Lenis or window scroll) ---------- */
+[data-parallax='back'] {
+  transform: translateY(calc(var(--p-scroll-y) * 0.2px));
+}
+[data-parallax='front'] {
+  transform: translateY(calc(var(--p-scroll-y) * -0.15px));
+}
+
+/* ---------- Reduced motion: freeze every ambient/parallax/ring animation ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .persona-ring {
+    animation: none !important;
+  }
+  [data-parallax] {
+    transform: none !important;
+  }
+}
