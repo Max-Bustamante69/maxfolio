@@ -251,7 +251,7 @@ implementation sketch — perf/a11y — evidence.
 
 Directory: `scratchpad/refs3/mobile-transform/` (paths given relative to it above use the plain
 filename; full path is
-`C:\Users\Usuario\AppData\Local\Temp\claude\C--Users-Usuario-Desktop-P-Github-Digitdeck\75fa9a07-350d-4734-9d2e-ac255cc6dd8f\scratchpad\refs3\mobile-transform\`).
+`scratchpad/efs3\mobile-transform\`).
 Raw run log with per-target errors: `_log.json` in the same directory.
 
 **Complete desktop+mobile pairs (used as [shot] evidence above):** `apple-iphone-*` (6 files),
