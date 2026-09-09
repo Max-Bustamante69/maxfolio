@@ -49,6 +49,28 @@
   opacity: 0.1;
 }
 
+/* ---------- Drifting stripe field (arcade menu + home hero) ---------- */
+/* GPU-only: a single oversized layer translated with `transform`, never `background-position`
+   (which forces a repaint each frame). Color comes from `currentColor` so it inherits the skin's
+   accent without a second custom property. */
+.persona-drift {
+  position: absolute;
+  inset: -20% -30%;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(115deg, currentColor 0, currentColor 2px, transparent 2px, transparent 28px);
+  opacity: 0.05;
+  animation: persona-drift-move 40s linear infinite;
+  will-change: transform;
+}
+@keyframes persona-drift-move {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-120px, -80px, 0);
+  }
+}
+
 /* ---------- Diagonal torn cut-in panel (photo/case-study mounts) ---------- */
 .persona-torn {
   clip-path: polygon(9% 0, 100% 0, 100% 100%, 0 92%, 0 18%);
@@ -101,6 +123,9 @@
 /* ---------- Reduced motion: freeze every ambient/parallax/ring animation ---------- */
 @media (prefers-reduced-motion: reduce) {
   .persona-ring {
+    animation: none !important;
+  }
+  .persona-drift {
     animation: none !important;
   }
   [data-parallax] {
