@@ -128,7 +128,7 @@ export const en: PortfolioContent = {
         productsUnitOne: '{n} product',
         roleUnit: '{n} client roles',
         roleUnitOne: '{n} client role',
-        noData: 'Used across the app suite & platform, no fleet count yet',
+        noData: 'In the toolkit, no fleet count yet',
         legendLabel: 'Ring legend',
         triLiquid: 'Lines of Liquid, across the fleet',
         triTs: 'Lines of TypeScript, across the fleet',

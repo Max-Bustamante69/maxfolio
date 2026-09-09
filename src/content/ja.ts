@@ -128,7 +128,7 @@ export const ja: PortfolioContent = {
         productsUnitOne: '{n} プロダクト',
         roleUnit: '{n} 件のクライアント案件',
         roleUnitOne: '{n} 件のクライアント案件',
-        noData: 'アプリ群とプラットフォームで使用、店舗集計はまだなし',
+        noData: 'ツールセットの一部、店舗集計はまだなし',
         legendLabel: 'リング凡例',
         triLiquid: '全店舗のLiquid行数',
         triTs: '全店舗のTypeScript行数',

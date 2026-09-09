@@ -128,7 +128,7 @@ export const es: PortfolioContent = {
         productsUnitOne: '{n} producto',
         roleUnit: '{n} roles con cliente',
         roleUnitOne: '{n} rol con cliente',
-        noData: 'Se usa en la app suite y la plataforma, aún sin conteo de flota',
+        noData: 'En el kit de herramientas, aún sin conteo de flota',
         legendLabel: 'Leyenda de anillos',
         triLiquid: 'Líneas de Liquid en toda la flota',
         triTs: 'Líneas de TypeScript en toda la flota',
