@@ -1,0 +1,250 @@
+{
+  "profilePage": {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    "url": "https://www.maxfolio.dev",
+    "name": "Maxfolio",
+    "inLanguage": [
+      "en",
+      "es",
+      "ja"
+    ],
+    "dateModified": "2026-09-09",
+    "mainEntity": {
+      "@type": "Person",
+      "name": "Maximiliano Bustamante",
+      "url": "https://www.maxfolio.dev",
+      "image": "https://www.maxfolio.dev/og-image.png",
+      "jobTitle": "CTO & Shopify Tech Lead",
+      "hasOccupation": {
+        "@type": "Occupation",
+        "name": "CTO & Shopify Tech Lead",
+        "occupationLocation": {
+          "@type": "City",
+          "name": "Medellín"
+        }
+      },
+      "worksFor": {
+        "@type": "Organization",
+        "name": "Digitdeck",
+        "url": "https://digitdeck.co"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Medellín",
+        "addressCountry": "Colombia"
+      },
+      "email": "maxbustamanteg@gmail.com",
+      "knowsAbout": [
+        "Shopify",
+        "Liquid",
+        "Shopify Functions",
+        "Shopify Apps",
+        "React",
+        "Remix",
+        "TypeScript",
+        "Conversion Rate Optimization",
+        "A/B Testing",
+        "E-commerce"
+      ],
+      "alumniOf": {
+        "@type": "EducationalOrganization",
+        "name": "EAFIT University"
+      },
+      "sameAs": [
+        "https://www.linkedin.com/in/maximiliano-bustamante-998b77173/",
+        "https://github.com/Max-Bustamante69"
+      ]
+    }
+  },
+  "storefronts": {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Shopify storefronts built by Maximiliano Bustamante",
+    "numberOfItems": 14,
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@type": "CreativeWork",
+          "name": "The Gummy Box",
+          "url": "https://thegummyboxwellness.com",
+          "creator": {
+            "@type": "Person",
+            "name": "Maximiliano Bustamante"
+          }
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "item": {
+          "@type": "CreativeWork",
+          "name": "NOS Café",
+          "url": "https://cafesnos.com",
+          "creator": {
+            "@type": "Person",
+            "name": "Maximiliano Bustamante"
+          }
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@type": "CreativeWork",
+          "name": "Perfumería Millennio",
+          "url": "https://perfumeriamillennio.com",
+          "creator": {
+            "@type": "Person",
+            "name": "Maximiliano Bustamante"
+          }
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "item": {
+          "@type": "CreativeWork",
+          "name": "Mindfuel",
+          "url": "https://joinmindfuel.com",
+          "creator": {
+            "@type": "Person",
+            "name": "Maximiliano Bustamante"
+          }
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 5,
+        "item": {
+          "@type": "CreativeWork",
+          "name": "Nalua Skincare",
+          "url": "https://naluaskincare.co",
+          "creator": {
+            "@type": "Person",
+            "name": "Maximiliano Bustamante"
+          }
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 6,
+        "item": {
+          "@type": "CreativeWork",
+          "name": "Sebum",
+          "url": "https://www.sebumcremas.com",
+          "creator": {
+            "@type": "Person",
+            "name": "Maximiliano Bustamante"
+          }
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 7,
+        "item": {
+          "@type": "CreativeWork",
+          "name": "Valdo Café",
+          "url": "https://valdocafe.co",
+          "creator": {
+            "@type": "Person",
+            "name": "Maximiliano Bustamante"
+          }
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 8,
+        "item": {
+          "@type": "CreativeWork",
+          "name": "Factores 2x2",
+          "url": "https://factoresdetransferenciaacc.com.co",
+          "creator": {
+            "@type": "Person",
+            "name": "Maximiliano Bustamante"
+          }
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 9,
+        "item": {
+          "@type": "CreativeWork",
+          "name": "Pixxiesx",
+          "url": "https://www.pixxiesx.co",
+          "creator": {
+            "@type": "Person",
+            "name": "Maximiliano Bustamante"
+          }
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 10,
+        "item": {
+          "@type": "CreativeWork",
+          "name": "Luxe Shine",
+          "url": "https://luxeshiine.com",
+          "creator": {
+            "@type": "Person",
+            "name": "Maximiliano Bustamante"
+          }
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 11,
+        "item": {
+          "@type": "CreativeWork",
+          "name": "Atmósfera Tecnológica",
+          "url": "https://atmosferatecnologica.com",
+          "creator": {
+            "@type": "Person",
+            "name": "Maximiliano Bustamante"
+          }
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 12,
+        "item": {
+          "@type": "CreativeWork",
+          "name": "Saint Theory",
+          "url": "https://www.saint-theory.com",
+          "creator": {
+            "@type": "Person",
+            "name": "Maximiliano Bustamante"
+          }
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 13,
+        "item": {
+          "@type": "CreativeWork",
+          "name": "Joystaz Jeans",
+          "url": "https://joystazjeans.com",
+          "creator": {
+            "@type": "Person",
+            "name": "Maximiliano Bustamante"
+          }
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 14,
+        "item": {
+          "@type": "CreativeWork",
+          "name": "New Urban",
+          "url": "https://newurbanisa.com",
+          "creator": {
+            "@type": "Person",
+            "name": "Maximiliano Bustamante"
+          }
+        }
+      }
+    ]
+  }
+}

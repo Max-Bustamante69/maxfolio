@@ -257,14 +257,15 @@ function AppleContent() {
           </section>
 
           {/* Experience — split 50/50 */}
-          <section className={`px-4 py-20 md:py-28 ${surface}`}>
+          <section id="experience" className={`px-4 py-20 md:py-28 scroll-mt-20 ${surface}`}>
             <div className="max-w-5xl mx-auto">
               <Experience skin={skin} heading={Heading} />
             </div>
           </section>
 
-          {/* Year by year — editorial timeline */}
-          <section className="px-4 py-20 md:py-28">
+          {/* Year by year — editorial timeline. content-visibility:auto was tried and reverted here
+              — see docs/seo.md "content-visibility" for the measured instability. */}
+          <section id="years" className="px-4 py-20 md:py-28 scroll-mt-20">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Years skin={skin} heading={Heading} />
@@ -282,7 +283,7 @@ function AppleContent() {
           </section>
 
           {/* Shopify work — the index */}
-          <section className="px-4 py-20 md:py-28">
+          <section id="shopify" className="px-4 py-20 md:py-28 scroll-mt-20">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <ShopifyWork skin={skin} heading={Heading} />
@@ -290,8 +291,8 @@ function AppleContent() {
             </div>
           </section>
 
-          {/* Gallery — media carousel */}
-          <section className={`px-4 py-20 md:py-28 ${surface}`}>
+          {/* Gallery — media carousel. content-visibility:auto tried and reverted — docs/seo.md. */}
+          <section id="gallery" className={`px-4 py-20 md:py-28 scroll-mt-20 ${surface}`}>
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Gallery skin={skin} heading={Heading} />
@@ -307,8 +308,8 @@ function AppleContent() {
           {/* Testimonials (absent until a real quote exists) */}
           <Testimonials skin={skin} heading={Heading} />
 
-          {/* Projects — index list */}
-          <section className="px-4 py-20 md:py-28">
+          {/* Projects — index list. content-visibility:auto tried and reverted — docs/seo.md. */}
+          <section id="projects" className="px-4 py-20 md:py-28 scroll-mt-20">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Projects skin={skin} heading={Heading} />
@@ -316,8 +317,8 @@ function AppleContent() {
             </div>
           </section>
 
-          {/* Skills — narrative with inline chips */}
-          <section className={`px-4 py-20 md:py-28 ${surface}`}>
+          {/* Skills — narrative with inline chips. content-visibility:auto tried and reverted — docs/seo.md. */}
+          <section id="skills" className={`px-4 py-20 md:py-28 scroll-mt-20 ${surface}`}>
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Skills skin={skin} heading={Heading} />
@@ -335,7 +336,7 @@ function AppleContent() {
           </section>
 
           {/* Contact — typographic close */}
-          <section className={`px-4 py-24 md:py-32 ${surface}`}>
+          <section id="contact" className={`px-4 py-24 md:py-32 scroll-mt-20 ${surface}`}>
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Contact skin={skin} ctaClass={`${primaryBtn} px-7`} onContact={openContact} />
