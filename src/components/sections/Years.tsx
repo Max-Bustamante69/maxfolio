@@ -167,9 +167,12 @@ export function Years({ skin, heading, variant = 'rows', depth = false }: YearsP
                       role="img"
                       aria-label={cellLabel}
                       title={cellLabel}
-                      className={`aspect-square min-w-[6px] rounded-[1px] ${c.now ? 'bg-red-600' : c.active ? skin.accentBg : skin.dark ? 'bg-stone-700' : 'bg-stone-300'}`}
+                      className={`relative aspect-square min-w-[6px] rounded-[1px] ${c.now ? 'bg-red-600' : c.active ? skin.accentBg : skin.dark ? 'bg-stone-700' : 'bg-stone-300'}`}
+                      // Brutalist's own accent IS red, so an active cell and the "now" cell can share
+                      // the exact fill — the ring is what actually marks "now" distinct from "active".
+                      style={c.now ? { boxShadow: `inset 0 0 0 2px ${skin.dark ? '#f5f5f4' : '#1c1917'}` } : undefined}
                       initial={reduced ? false : { opacity: 0, scale: 0.5 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
+                      whileInView={{ opacity: 1, scale: c.now ? 1.15 : 1 }}
                       viewport={{ once: true, margin: '-40px' }}
                       transition={{ duration: 0.2, delay: 0.15 + STRIP_YEARS.indexOf(r.year) * 0.06, ease: EASE }}
                     />
