@@ -214,6 +214,11 @@ export function BuildTimeline({ skin, heading }: BuildTimelineProps) {
                     const barW = EMPLOYER_ROW_H * 0.55
                     return (
                       <m.g key={seg.id} tabIndex={0} role="img" aria-label={label} className="cursor-default outline-none" onMouseEnter={(e) => showTip(e, label)} onFocus={(e) => showTip(e, label)} onMouseLeave={hideTip} onBlur={hideTip}>
+                        {/* Invisible wider stroke = the real hit target (a mouse/touch never has to land on the
+                            visible 13px bar); capped at the row's own height so it never bleeds into the row
+                            above/below. Still short of 44px in a 5-row-per-screen ribbon — the accessible
+                            record is the sr-only table below, this is a reach, not the only path to the data. */}
+                        <line x1={x1} y1={y1} x2={x2} y2={y2} strokeWidth={EMPLOYER_ROW_H - 2} strokeLinecap="round" stroke="transparent" />
                         <m.line
                           x1={x1}
                           y1={y1}
@@ -248,6 +253,10 @@ export function BuildTimeline({ skin, heading }: BuildTimelineProps) {
                   >
                     {wide ? `${row.year} · ${bt.storefronts}` : row.year}
                   </text>
+                  {/* Storefront-build bars stack at (YEAR_BAR_H + YEAR_BAR_GAP) = 4.5px pitch — up to 18 in
+                      one year (2026) — so there is no room to widen the hit target without one bar's hover
+                      stealing the next one's hover. Left at the drawn 3px width; the sr-only table below and
+                      the always-visible "{year} · storefronts" label carry the record on touch/keyboard. */}
                   {row.stores.map((s, si) => {
                     const barCenter = wide ? yTop + si * (YEAR_BAR_H + YEAR_BAR_GAP) + YEAR_BAR_H / 2 : cy
                     const label = buildAria(s.name, String(row.year))
@@ -298,28 +307,24 @@ export function BuildTimeline({ skin, heading }: BuildTimelineProps) {
                   const label = dotAria(d.name, d.year)
                   const [x, y] = pt(d.t, cy)
                   return (
-                    <m.circle
-                      key={d.id}
-                      cx={x}
-                      cy={y}
-                      r={row.kind === 'products' ? 4 : 3}
-                      className="outline-none"
-                      style={barFillStyle}
-                      opacity={row.kind === 'products' ? 1 : 0.6}
-                      tabIndex={0}
-                      role="img"
-                      aria-label={label}
-                      onMouseEnter={(e) => showTip(e, label)}
-                      onFocus={(e) => showTip(e, label)}
-                      onMouseLeave={hideTip}
-                      onBlur={hideTip}
-                      initial={reduced ? false : { scale: 0 }}
-                      whileInView={{ scale: 1 }}
-                      viewport={{ once: true, margin: '-40px' }}
-                      transition={{ duration: 0.3, delay: 0.1, ease: EASE }}
-                    >
-                      <title>{label}</title>
-                    </m.circle>
+                    <g key={d.id} tabIndex={0} role="img" aria-label={label} className="cursor-default outline-none" onMouseEnter={(e) => showTip(e, label)} onFocus={(e) => showTip(e, label)} onMouseLeave={hideTip} onBlur={hideTip}>
+                      {/* Invisible bigger circle = the real hit target, capped at the row height (MARK_ROW_H)
+                          so neighboring dots and the row above/below stay unaffected. */}
+                      <circle cx={x} cy={y} r={MARK_ROW_H / 2 - 1} fill="transparent" />
+                      <m.circle
+                        cx={x}
+                        cy={y}
+                        r={row.kind === 'products' ? 4 : 3}
+                        style={barFillStyle}
+                        opacity={row.kind === 'products' ? 1 : 0.6}
+                        initial={reduced ? false : { scale: 0 }}
+                        whileInView={{ scale: 1 }}
+                        viewport={{ once: true, margin: '-40px' }}
+                        transition={{ duration: 0.3, delay: 0.1, ease: EASE }}
+                      >
+                        <title>{label}</title>
+                      </m.circle>
+                    </g>
                   )
                 })}
               </g>
