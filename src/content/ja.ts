@@ -29,7 +29,7 @@ export const ja: PortfolioContent = {
   sections: {
     experience: { eyebrow: 'すべての役割を、順番通りに', title: '仕事をしてきた', titleAccent: '場所', achievements: '成果', technologies: '技術スタック', visit: 'サイトを見る' },
     shopify: {
-      eyebrow: '18店舗、すべて実際のチェックアウト',
+      eyebrow: '実在するストア、実際のチェックアウト',
       title: 'ストア、アプリ、',
       titleAccent: 'そしてその裏側のプラットフォーム',
       lead: '下のどのストアを開いても、モックアップではなく実際のチェックアウトまで1クリックです。18店舗以上：Shopify Functionsで価格計算するバンドル、商品診断クイズ、レビューウォール、二通貨カタログ、FramerやWooCommerceからの移行。',

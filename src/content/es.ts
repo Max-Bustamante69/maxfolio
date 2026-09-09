@@ -29,7 +29,7 @@ export const es: PortfolioContent = {
   sections: {
     experience: { eyebrow: 'Cada rol, en orden', title: 'Dónde pasó', titleAccent: 'el trabajo', achievements: 'Qué se entregó', technologies: 'Stack', visit: 'Visitar sitio' },
     shopify: {
-      eyebrow: '18 tiendas, checkout real',
+      eyebrow: 'Tiendas reales, checkout real',
       title: 'Tiendas, apps',
       titleAccent: 'y la plataforma detrás',
       lead: 'Abre cualquier tienda de abajo y estás a un clic de su checkout real, no de una simulación. 18+ tiendas: combos con precio calculado por Shopify Functions, quizzes de producto, muros de reseñas, catálogos en dos monedas, migraciones desde Framer y WooCommerce.',
