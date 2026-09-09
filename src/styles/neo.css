@@ -1,0 +1,263 @@
+/**
+ * Neo — "Soft UI" / neumorphism theme tokens and utilities.
+ * Imported ONLY by src/pages/Neo.tsx. Scoped under .theme-neo so nothing leaks into the other themes.
+ * Formula, scale and accessibility fix layer per wf4-neumorphism.md §2.
+ */
+
+.theme-neo {
+  /* §2.1 palette — light (default) */
+  --neo-surface: #e6e9ef;
+  --neo-surface-raised: #eef1f6;
+  --neo-shadow-dark: #b8bcc7;
+  --neo-shadow-light: #ffffff;
+  --neo-ink: #3a3f4b;
+  --neo-ink-muted: #6b7280;
+  /* #5b6cff (the research spec's literal value) reads at 3.4:1 on this surface and 4.2:1 under white
+     button text — under the WCAG AA 4.5:1 floor the accessibility fix layer (§2.5.1) requires. Darkened
+     to the nearest in-family shade that clears both checks (6.0:1 / 4.9:1), measured in the build proof. */
+  --neo-accent: #4453d9;
+  --neo-accent-ink: #ffffff;
+  --neo-focus: #4453d9;
+  color-scheme: light;
+}
+
+/* §2.2 palette — dark. The highlight is a *lighter tint of the base*, never white (Avoid list #6). */
+.theme-neo[data-theme='dark'] {
+  --neo-surface: #262a33;
+  --neo-surface-raised: #2c303a;
+  --neo-shadow-dark: #16181e;
+  --neo-shadow-light: #333844;
+  --neo-ink: #e7e9ee;
+  --neo-ink-muted: #9aa0ac;
+  --neo-accent: #8b93ff;
+  --neo-accent-ink: #14151a;
+  --neo-focus: #8b93ff;
+  color-scheme: dark;
+}
+
+.theme-neo {
+  background: var(--neo-surface);
+  color: var(--neo-ink);
+}
+
+/* §2.4 scale tokens — distance / blur (3:1 ratio) / radius */
+.neo-sm {
+  --neo-d: 4px;
+  --neo-b: 12px;
+  --neo-r: 10px;
+}
+.neo-md {
+  --neo-d: 8px;
+  --neo-b: 24px;
+  --neo-r: 18px;
+}
+.neo-lg {
+  --neo-d: 14px;
+  --neo-b: 42px;
+  --neo-r: 24px;
+}
+.neo-xl {
+  --neo-d: 20px;
+  --neo-b: 60px;
+  --neo-r: 36px;
+}
+
+/* §2.3 the extrusion primitive */
+.neo-raised,
+.neo-inset,
+.neo-btn,
+.neo-field,
+.neo-chip,
+.neo-chip-on {
+  --neo-d: 8px;
+  --neo-b: 24px;
+  --neo-r: 18px; /* md default when no scale class is present */
+  background: var(--neo-surface);
+  color: var(--neo-ink);
+  border: none;
+  border-radius: var(--neo-r);
+  transition:
+    box-shadow 200ms ease,
+    transform 150ms ease,
+    background-color 200ms ease;
+}
+
+.neo-raised {
+  box-shadow:
+    var(--neo-d) var(--neo-d) var(--neo-b) var(--neo-shadow-dark),
+    calc(var(--neo-d) * -1) calc(var(--neo-d) * -1) var(--neo-b) var(--neo-shadow-light);
+}
+
+.neo-raised-surface {
+  background: var(--neo-surface-raised);
+}
+
+/* Flat token-driven background, for spots (e.g. the Process badge cutout) that must match the
+ * current surface exactly in both palettes — a static Tailwind color class can't track the toggle. */
+.neo-canvas {
+  background: var(--neo-surface);
+}
+
+/* §2.3 pressed / active — both shadows flip inward (Idea 2, the universal "active" signal) */
+.neo-inset,
+.neo-field,
+.neo-raised[data-state='pressed'] {
+  box-shadow:
+    inset var(--neo-d) var(--neo-d) var(--neo-b) var(--neo-shadow-dark),
+    inset calc(var(--neo-d) * -1) calc(var(--neo-d) * -1) var(--neo-b) var(--neo-shadow-light);
+}
+
+/* §2.7 motion — soft lift on hover-capable devices only, press-in everywhere */
+@media (hover: hover) {
+  .neo-interactive:hover,
+  .neo-btn:not(.neo-btn-accent):hover,
+  .neo-chip:hover {
+    transform: translateY(-2px);
+  }
+}
+.neo-interactive:active,
+.neo-btn:not(.neo-btn-accent):active,
+.neo-chip:active {
+  transform: scale(0.97);
+  box-shadow:
+    inset var(--neo-d) var(--neo-d) var(--neo-b) var(--neo-shadow-dark),
+    inset calc(var(--neo-d) * -1) calc(var(--neo-d) * -1) var(--neo-b) var(--neo-shadow-light);
+}
+
+/* buttons: monochrome-extruded by default, one flat accent break for the primary CTA (Idea 11 / §2.5.2) */
+.neo-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 9999px;
+}
+.neo-btn-accent {
+  background: var(--neo-accent);
+  color: var(--neo-accent-ink);
+  box-shadow: 0 10px 24px -8px color-mix(in srgb, var(--neo-accent) 60%, transparent);
+}
+.neo-btn-accent:active {
+  transform: scale(0.97);
+}
+
+/* form fields: recessed, the shadow IS the border (Idea 13) */
+.neo-field {
+  padding: 0.85rem 1.25rem;
+  color: var(--neo-ink);
+  width: 100%;
+}
+.neo-field::placeholder {
+  color: var(--neo-ink-muted);
+}
+
+/* chips / segmented controls (Idea 4, 9) — idle raised, active inset + accent fill (never shadow alone) */
+.neo-chip {
+  --neo-d: 4px;
+  --neo-b: 12px;
+  --neo-r: 9999px;
+  box-shadow:
+    var(--neo-d) var(--neo-d) var(--neo-b) var(--neo-shadow-dark),
+    calc(var(--neo-d) * -1) calc(var(--neo-d) * -1) var(--neo-b) var(--neo-shadow-light);
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.95rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--neo-ink-muted);
+}
+.neo-chip-on {
+  --neo-d: 4px;
+  --neo-b: 12px;
+  --neo-r: 9999px;
+  background: var(--neo-accent);
+  color: var(--neo-accent-ink);
+  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.2);
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.95rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* §2.5.3 focus-visible: the accent ring is layered ON TOP of the extrusion, never a substitute for it */
+.theme-neo :is(.neo-raised, .neo-inset, .neo-btn, .neo-field, .neo-chip, .neo-chip-on, a, button):focus-visible {
+  outline: 3px solid var(--neo-focus);
+  outline-offset: 2px;
+}
+
+/* §2.7 / Idea 21 — ambient breathing, reserved for exactly one hero surface per page */
+@keyframes neo-breathe {
+  0%,
+  100% {
+    box-shadow:
+      var(--neo-d) var(--neo-d) var(--neo-b) var(--neo-shadow-dark),
+      calc(var(--neo-d) * -1) calc(var(--neo-d) * -1) var(--neo-b) var(--neo-shadow-light);
+  }
+  50% {
+    box-shadow:
+      calc(var(--neo-d) * 1.15) calc(var(--neo-d) * 1.15) calc(var(--neo-b) * 1.15) var(--neo-shadow-dark),
+      calc(var(--neo-d) * -1.15) calc(var(--neo-d) * -1.15) calc(var(--neo-b) * 1.15) var(--neo-shadow-light);
+  }
+}
+.neo-breathe {
+  animation: neo-breathe 10s ease-in-out infinite;
+}
+
+/* indicator-light pulse (Idea 10) */
+@keyframes neo-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+.neo-pulse {
+  animation: neo-pulse 2.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .neo-breathe,
+  .neo-pulse {
+    animation: none;
+  }
+  .neo-raised,
+  .neo-btn,
+  .neo-chip,
+  .neo-inset,
+  .neo-field {
+    transition: none;
+  }
+  .neo-interactive:hover,
+  .neo-btn:hover,
+  .neo-chip:hover,
+  .neo-interactive:active,
+  .neo-btn:active,
+  .neo-chip:active {
+    transform: none;
+  }
+}
+
+/* §2.5.5 / Avoid list #8 — the escape hatch: flatten every extruded surface to a plain bordered card */
+@media (prefers-contrast: more) {
+  .theme-neo .neo-raised,
+  .theme-neo .neo-inset,
+  .theme-neo .neo-btn,
+  .theme-neo .neo-field,
+  .theme-neo .neo-chip,
+  .theme-neo .neo-chip-on {
+    box-shadow: none !important;
+    border: 1.5px solid var(--neo-ink) !important;
+  }
+  .theme-neo .neo-btn-accent,
+  .theme-neo .neo-chip-on {
+    border-color: var(--neo-accent-ink) !important;
+  }
+}
