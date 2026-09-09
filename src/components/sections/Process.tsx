@@ -112,8 +112,8 @@ export function Process({ skin, heading, canvas = '' }: ProcessProps) {
                 className={`text-[11px] font-semibold uppercase tracking-[0.18em] ${skin.muted}`}
                 initial={reduced ? false : { opacity: 0 }}
                 animate={{ opacity: 1 }}
-                exit={{ opacity: 0, transition: { duration: 0.25, ease: EASE } }}
-                transition={{ duration: 0.45, ease: EASE }}
+                exit={reduced ? { opacity: 1 } : { opacity: 0, transition: { duration: 0.25, ease: EASE } }}
+                transition={reduced ? { duration: 0 } : { duration: 0.45, ease: EASE }}
               >
                 {p.stepOf.replace('{n}', String(active + 1)).replace('{total}', String(total))}
               </m.p>
@@ -129,8 +129,8 @@ export function Process({ skin, heading, canvas = '' }: ProcessProps) {
                   className="absolute inset-x-0 top-0 font-sf text-[150px] font-semibold leading-none tracking-[-0.06em] tabular-nums"
                   initial={reduced ? false : { opacity: 0, y: 40 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -40, transition: { duration: 0.25, ease: EASE } }}
-                  transition={{ duration: 0.45, ease: EASE }}
+                  exit={reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: -40, transition: { duration: 0.25, ease: EASE } }}
+                  transition={reduced ? { duration: 0 } : { duration: 0.45, ease: EASE }}
                   aria-hidden="true"
                 >
                   {num(active)}
@@ -144,8 +144,8 @@ export function Process({ skin, heading, canvas = '' }: ProcessProps) {
                 className={`${skin.title} mt-4 text-2xl`}
                 initial={reduced ? false : { opacity: 0 }}
                 animate={{ opacity: 1 }}
-                exit={{ opacity: 0, transition: { duration: 0.25, ease: EASE } }}
-                transition={{ duration: 0.45, ease: EASE }}
+                exit={reduced ? { opacity: 1 } : { opacity: 0, transition: { duration: 0.25, ease: EASE } }}
+                transition={reduced ? { duration: 0 } : { duration: 0.45, ease: EASE }}
                 aria-hidden="true"
               >
                 {p.steps[active].title}
