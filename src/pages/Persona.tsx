@@ -1,8 +1,7 @@
-import { lazy, Suspense, useEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { m, AnimatePresence, useReducedMotion } from 'framer-motion'
-import { createPortal } from 'react-dom'
 import { ThemeProvider, useTheme } from '../context/ThemeContext'
-import { SEOHead, TransitionLink, Magnetic, Ticker, RevealText, SmoothScroll, useLenis } from '../components/common'
+import { SEOHead, TransitionLink, Magnetic, Ticker, LanguageSelectorMenu, SmoothScroll, useLenis } from '../components/common'
 import { ContactFormModal } from '../components/modals'
 import { MenuPreview } from '../components/previews'
 import { StatBand } from '../components/sections/StatBand'
@@ -12,7 +11,9 @@ import { useDynamicFavicon, useI18n, useContent } from '../hooks'
 import { designById, otherDesigns, MENU } from '../data/designs'
 import '../styles/persona.css'
 
-// Below the fold, each section arrives as its own chunk.
+// Each screen's heavier sections arrive as their own chunk, one shared Suspense boundary per screen
+// (not one per section) — a screen either shows its finished content or one themed loading state,
+// never several stacked blank fallbacks at different scroll depths.
 const Years = lazy(() => import('../components/sections/Years').then((mod) => ({ default: mod.Years })))
 const Process = lazy(() => import('../components/sections/Process').then((mod) => ({ default: mod.Process })))
 const ShopifyWork = lazy(() => import('../components/sections/ShopifyWork').then((mod) => ({ default: mod.ShopifyWork })))
@@ -23,19 +24,160 @@ const Skills = lazy(() => import('../components/sections/Skills').then((mod) => 
 const Faq = lazy(() => import('../components/sections/Faq').then((mod) => ({ default: mod.Faq })))
 const Contact = lazy(() => import('../components/sections/Contact').then((mod) => ({ default: mod.Contact })))
 
-const Pending = ({ h = 'min-h-[60vh]' }: { h?: string }) => <div className={h} aria-hidden="true" />
-
-// Snap-in-with-overshoot: a visible spring, not an ease curve (wf4-persona.md idea #15).
 const SNAP = { type: 'spring' as const, stiffness: 420, damping: 24 }
 const EASE = [0.23, 1, 0.32, 1] as const
 
-/** Panels slam in from off-axis and overshoot slightly before settling, staggered per child. */
-const SnapIn = ({ children, delay = 0, x = 0, y = 24, className = '' }: { children: ReactNode; delay?: number; x?: number; y?: number; className?: string }) => {
+// ---------------------------------------------------------------------------
+// Screens & hash routing — the menu is the entry ("" / "#menu"); each screen is its own hash so
+// deep links, Back/Forward and the persistent bar all address the same five destinations.
+// ---------------------------------------------------------------------------
+type ScreenId = 'home' | 'work' | 'years' | 'skills' | 'contact'
+type Route = ScreenId | ''
+const SCREEN_IDS: ScreenId[] = ['home', 'work', 'years', 'skills', 'contact']
+
+function normalizeHash(hash: string): Route {
+  const v = hash.replace(/^#/, '').toLowerCase()
+  if (v === '' || v === 'menu') return ''
+  return (SCREEN_IDS as string[]).includes(v) ? (v as ScreenId) : ''
+}
+
+/** Reads/writes the URL hash as the single source of truth for which screen is showing. */
+function useHashRoute(): [Route, (r: Route) => void] {
+  const [route, setRoute] = useState<Route>(() => (typeof window === 'undefined' ? '' : normalizeHash(window.location.hash)))
+  useEffect(() => {
+    const onHash = () => setRoute(normalizeHash(window.location.hash))
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
+  const navigate = useCallback((r: Route) => {
+    const target = r === '' ? '#menu' : `#${r}`
+    if (window.location.hash === target) return
+    window.location.hash = target
+  }, [])
+  return [route, navigate]
+}
+
+/** Writes the page's own scroll offset to `--p-scroll-y` (Lenis when running, window scroll otherwise) — one listener for the whole parallax system. Off under reduced motion. */
+function useScrollVar(rootRef: RefObject<HTMLElement | null>) {
+  const lenis = useLenis()
+  const reduced = useReducedMotion()
+  useEffect(() => {
+    if (reduced) return
+    const el = rootRef.current
+    if (!el) return
+    const setVar = (y: number) => el.style.setProperty('--p-scroll-y', String(y))
+    if (lenis) return lenis.on('scroll', (l) => setVar(l.scroll))
+    const onWinScroll = () => setVar(window.scrollY)
+    window.addEventListener('scroll', onWinScroll, { passive: true })
+    onWinScroll()
+    return () => window.removeEventListener('scroll', onWinScroll)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lenis, reduced])
+}
+
+/** Muted-by-default optional select blip — a tiny generated WebAudio tone, never an audio file. */
+function useSfx() {
+  const [enabled, setEnabled] = useState(false)
+  const ctxRef = useRef<AudioContext | null>(null)
+  useEffect(() => {
+    try {
+      setEnabled(localStorage.getItem('persona-sfx') === '1')
+    } catch {
+      /* private mode / storage blocked: stay muted */
+    }
+  }, [])
+  const toggle = useCallback(() => {
+    setEnabled((v) => {
+      const next = !v
+      try {
+        localStorage.setItem('persona-sfx', next ? '1' : '0')
+      } catch {
+        /* ignore */
+      }
+      return next
+    })
+  }, [])
+  const play = useCallback(
+    (freq = 760) => {
+      if (!enabled) return
+      try {
+        const Ctx = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
+        if (!Ctx) return
+        const ctx = ctxRef.current ?? new Ctx()
+        ctxRef.current = ctx
+        const osc = ctx.createOscillator()
+        const gain = ctx.createGain()
+        osc.type = 'square'
+        osc.frequency.value = freq
+        gain.gain.setValueAtTime(0.05, ctx.currentTime)
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.08)
+        osc.connect(gain).connect(ctx.destination)
+        osc.start()
+        osc.stop(ctx.currentTime + 0.09)
+      } catch {
+        /* autoplay policy or no AudioContext: silently skip */
+      }
+    },
+    [enabled],
+  )
+  return { enabled, toggle, play }
+}
+
+// ---------------------------------------------------------------------------
+// Ransom-note lettering — own implementation: each glyph gets a small, seeded (not animated-away)
+// rotation/offset/scale, like letters cut from print and pasted at odd angles. Frozen flush under
+// reduced motion.
+// ---------------------------------------------------------------------------
+function hashStr(s: string) {
+  let h = 0
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0
+  return h || 1
+}
+function mulberry32(seed: number) {
+  let a = seed
+  return () => {
+    a |= 0
+    a = (a + 0x6d2b79f5) | 0
+    let t = Math.imul(a ^ (a >>> 15), 1 | a)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+
+function RansomText({ text, className = '', intensity = 1 }: { text: string; className?: string; intensity?: number }) {
+  const reduced = useReducedMotion()
+  const glyphs = useMemo(() => {
+    const rand = mulberry32(hashStr(text))
+    return text.split('').map((ch) => ({
+      ch,
+      rotate: (rand() - 0.5) * 14 * intensity,
+      y: (rand() - 0.5) * 10 * intensity,
+      scale: 1 + (rand() - 0.5) * 0.16 * intensity,
+    }))
+  }, [text, intensity])
+  return (
+    <span className={className} aria-label={text}>
+      {glyphs.map((g, i) => (
+        <span
+          key={i}
+          aria-hidden="true"
+          className="inline-block"
+          style={reduced ? undefined : { transform: `translateY(${g.y.toFixed(2)}px) rotate(${g.rotate.toFixed(2)}deg) scale(${g.scale.toFixed(3)})`, transformOrigin: 'bottom' }}
+        >
+          {g.ch === ' ' ? ' ' : g.ch}
+        </span>
+      ))}
+    </span>
+  )
+}
+
+/** Tilted card-in entrance: panels arrive slightly rotated and settle flush, once, on view. */
+const CardIn = ({ children, delay = 0, x = 0, y = 26, rotate = -2.5, className = '' }: { children: ReactNode; delay?: number; x?: number; y?: number; rotate?: number; className?: string }) => {
   const reduced = useReducedMotion()
   return (
     <m.div
-      initial={reduced ? false : { opacity: 0, x, y, scale: 0.96 }}
-      whileInView={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+      initial={reduced ? false : { opacity: 0, x, y, rotate, scale: 0.97 }}
+      whileInView={{ opacity: 1, x: 0, y: 0, rotate: 0, scale: 1 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ ...SNAP, delay }}
       className={className}
@@ -45,29 +187,7 @@ const SnapIn = ({ children, delay = 0, x = 0, y = 24, className = '' }: { childr
   )
 }
 
-/** Hero-only headline pop: each letter jitters in with a small random rotation before settling flush. */
-const LetterJitter = ({ text, className = '' }: { text: string; className?: string }) => {
-  const reduced = useReducedMotion()
-  const seedRef = useRef(text.split('').map(() => (Math.random() > 0.5 ? 1 : -1) * (4 + Math.random() * 4)))
-  return (
-    <span className={className} aria-label={text}>
-      {text.split('').map((ch, i) => (
-        <m.span
-          key={`${ch}-${i}`}
-          aria-hidden="true"
-          className="inline-block"
-          initial={reduced ? false : { opacity: 0, y: 14, rotate: seedRef.current[i] }}
-          animate={{ opacity: 1, y: 0, rotate: 0 }}
-          transition={{ duration: 0.4, delay: 0.5 + i * 0.025, ease: EASE }}
-        >
-          {ch === ' ' ? ' ' : ch}
-        </m.span>
-      ))}
-    </span>
-  )
-}
-
-/** "Crash" tap primitive + "Breakout" shard burst on click, for the primary CTA. */
+/** "Crash" tap primitive + "Breakout" shard burst on click, for primary CTAs. */
 const CrashButton = ({ onClick, className = '', children }: { onClick: () => void; className?: string; children: ReactNode }) => {
   const [burst, setBurst] = useState(0)
   const reduced = useReducedMotion()
@@ -126,161 +246,531 @@ const Icon = {
       <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14m0 0-6-6m6 6 6-6" />
     </svg>
   ),
-  menu: (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={1.8} viewBox="0 0 24 24" aria-hidden="true">
-      <path strokeLinecap="round" d="M4 7h16M4 12h16M4 17h16" />
-    </svg>
-  ),
-  close: (
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-    </svg>
-  ),
-  down12: (
-    <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
-      <path d="M2.5 4.5 6 8l3.5-3.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
 }
 
-/** Writes the page's own scroll offset to `--p-scroll-y` (Lenis when running, window scroll otherwise) — one listener for the whole parallax system. Off under reduced motion. */
-function useScrollVar(rootRef: RefObject<HTMLElement | null>) {
-  const lenis = useLenis()
+/** One themed loading state per screen — never several stacked blank fallbacks. Pulsing dots are
+ * purely decorative motion, so they're skipped (static, mid-opacity) under reduced motion. */
+function ScreenLoading({ accentCls, muted }: { accentCls: string; muted: string }) {
   const reduced = useReducedMotion()
-  useEffect(() => {
-    if (reduced) return
-    const el = rootRef.current
-    if (!el) return
-    const setVar = (y: number) => el.style.setProperty('--p-scroll-y', String(y))
-    if (lenis) return lenis.on('scroll', (l) => setVar(l.scroll))
-    const onWinScroll = () => setVar(window.scrollY)
-    window.addEventListener('scroll', onWinScroll, { passive: true })
-    onWinScroll()
-    return () => window.removeEventListener('scroll', onWinScroll)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lenis, reduced])
+  return (
+    <div className="min-h-[55vh] flex flex-col items-center justify-center gap-4" role="status" aria-label="Loading screen">
+      <span className={`font-persona-display text-3xl uppercase ${accentCls}`} style={{ fontStyle: 'oblique 6deg' }}>
+        <RansomText text="Loading" intensity={0.6} />
+      </span>
+      <span className={`flex gap-1.5 ${muted}`} aria-hidden="true">
+        {[0, 1, 2].map((i) => (
+          <m.span
+            key={i}
+            className="h-1.5 w-6 bg-current"
+            style={{ clipPath: 'polygon(20% 0,100% 0,80% 100%,0 100%)', opacity: reduced ? 0.6 : undefined }}
+            animate={reduced ? undefined : { opacity: [0.25, 1, 0.25] }}
+            transition={reduced ? undefined : { duration: 1.1, repeat: Infinity, delay: i * 0.15 }}
+          />
+        ))}
+      </span>
+    </div>
+  )
 }
 
+// ---------------------------------------------------------------------------
+// Arcade menu — the real entry screen: a vertical list of big skewed items, staggered in, a large
+// animated selector, keyboard (Arrow/Enter/Escape), mouse hover and touch tap.
+// ---------------------------------------------------------------------------
+interface MenuItem {
+  id: ScreenId
+  label: string
+}
+
+function ArcadeMenu({
+  items,
+  onActivate,
+  accentCls,
+  accentBg,
+  muted,
+  isDark,
+  suspended,
+  playBlip,
+}: {
+  items: MenuItem[]
+  onActivate: (id: ScreenId) => void
+  accentCls: string
+  accentBg: string
+  muted: string
+  isDark: boolean
+  suspended: boolean
+  playBlip: () => void
+}) {
+  const [index, setIndex] = useState(0)
+  const reduced = useReducedMotion()
+
+  useEffect(() => {
+    if (suspended) return
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        setIndex((i) => (i + 1) % items.length)
+        playBlip()
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        setIndex((i) => (i - 1 + items.length) % items.length)
+        playBlip()
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        onActivate(items[index].id)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [items, index, onActivate, playBlip, suspended])
+
+  const activeText = isDark ? 'text-[#f5f2ee]' : 'text-white'
+
+  // A plain labeled nav of real, independently-focusable buttons (Tab reaches every one, in DOM
+  // order) — not role="menu"/"menuitem" (that ARIA pattern implies roving-tabindex focus movement
+  // on Arrow keys, which this doesn't do: Arrow keys move a visual selection, not DOM focus).
+  return (
+    <nav aria-label="Choose a screen" className="relative flex flex-col">
+      {items.map((item, i) => {
+        const active = i === index
+        return (
+          <m.button
+            key={item.id}
+            type="button"
+            aria-current={active || undefined}
+            onMouseEnter={() => {
+              if (i !== index) {
+                setIndex(i)
+                playBlip()
+              }
+            }}
+            onFocus={() => setIndex(i)}
+            onClick={() => onActivate(item.id)}
+            initial={reduced ? false : { opacity: 0, x: -70, skewX: -8 }}
+            animate={{ opacity: 1, x: 0, skewX: 0 }}
+            transition={{ ...SNAP, delay: 0.07 * i }}
+            className="relative text-left outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-current"
+          >
+            {active && <m.span layoutId="arcade-selector" className={`absolute inset-y-1.5 left-0 right-0 ${accentBg} persona-skew-selector`} transition={reduced ? { duration: 0 } : SNAP} aria-hidden="true" />}
+            <span
+              className={`relative z-10 flex items-baseline gap-3 md:gap-5 px-4 md:px-7 py-3 md:py-4 font-persona-display uppercase leading-[0.9] text-[13vw] sm:text-[9vw] md:text-[6.4vw] transition-colors duration-150 ${active ? activeText : ''}`}
+              style={{ fontStyle: 'oblique 6deg' }}
+            >
+              <span className={`font-persona-label text-[3.2vw] sm:text-xs md:text-sm ${active ? activeText : muted}`}>{String(i + 1).padStart(2, '0')}</span>
+              <RansomText text={item.label} intensity={0.55} />
+            </span>
+          </m.button>
+        )
+      })}
+      <p className={`mt-6 px-4 md:px-7 font-persona-label text-[10px] md:text-xs uppercase tracking-[0.25em] ${muted}`}>
+        <span className={accentCls}>↑↓</span> select · <span className={accentCls}>↵</span> confirm · tap to jump
+      </p>
+    </nav>
+  )
+}
+
+interface SkinLike {
+  accentCls: string
+  accentBg: string
+  muted: string
+  line: string
+  surface: string
+  isDark: boolean
+  bg: string
+}
+
+// ---------------------------------------------------------------------------
+// Screens
+// ---------------------------------------------------------------------------
+type HeadingFn = (eyebrow: string, title: string, accent: string, lead?: string) => ReactNode
+
+function HomeScreen({ chrome, openContact, skin }: { chrome: SkinLike; openContact: () => void; skin: ReturnType<typeof skins.persona> }) {
+  const { t } = useI18n()
+  const { strings: c, registry } = useContent()
+  const { accentCls, accentBg, muted, line, surface, isDark } = chrome
+  const liveCount = registry.stores.filter((s) => s.status === 'live').length
+  const devCount = registry.stores.filter((s) => s.status === 'dev').length
+  const primaryBtn = `persona-skew-btn inline-flex items-center justify-center ${accentBg} ${isDark ? 'text-[#f5f2ee]' : 'text-white'} px-7 py-3.5 text-sm font-persona-label font-semibold uppercase tracking-[0.15em]`
+
+  return (
+    <>
+      <section className="relative min-h-[68vh] flex items-center px-4 py-16 md:py-20 overflow-clip" aria-labelledby="home-heading">
+        <div aria-hidden="true" className="persona-ghost-wordmark" data-parallax="back">
+          MB
+        </div>
+        <svg className="persona-ring absolute w-[60vw] max-w-[520px] aspect-square opacity-20 pointer-events-none" style={{ left: '50%', top: '48%', transform: 'translate(-50%,-50%)' }} viewBox="0 0 200 200" aria-hidden="true" data-parallax="back">
+          <circle cx="100" cy="100" r="88" fill="none" stroke="currentColor" className={accentCls} strokeWidth="0.6" strokeDasharray="2 5" />
+        </svg>
+        <div aria-hidden="true" className={`persona-drift ${accentCls}`} />
+
+        <div className="max-w-5xl mx-auto w-full relative z-10">
+          <p className={`font-persona-label text-sm font-semibold uppercase tracking-[0.35em] ${accentCls} before:content-['—'] before:mr-2`}>{c.hero.eyebrow}</p>
+          <h1 id="home-heading" className="mt-4 font-persona-display uppercase leading-[0.86] text-[13vw] sm:text-[9vw] md:text-[6.6vw]" style={{ fontStyle: 'oblique 6deg' }}>
+            <span className="block">
+              <RansomText text={registry.personal.firstName} />
+            </span>
+            <span className={`block ${accentCls}`}>
+              <RansomText text={registry.personal.lastName} />
+            </span>
+          </h1>
+          <p className="mt-6 max-w-2xl text-lg md:text-xl font-sf leading-snug">{c.hero.positioning}</p>
+          <p className={`mt-4 max-w-2xl text-base ${muted} font-sf leading-relaxed`}>{c.hero.lead}</p>
+          <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-7">
+            <Magnetic>
+              <CrashButton onClick={openContact} className={primaryBtn}>
+                {c.hero.ctaPrimary}
+              </CrashButton>
+            </Magnetic>
+            <a href="#work" className={`${accentCls} inline-flex items-center gap-1.5 text-sm font-persona-label font-semibold uppercase tracking-[0.1em]`}>
+              {c.hero.ctaSecondary} {Icon.down}
+            </a>
+            <a href={registry.personal.cv} download className={`${muted} text-sm font-persona-label font-semibold uppercase tracking-[0.1em]`}>
+              {c.hero.ctaCv} ›
+            </a>
+          </div>
+          <div className="mt-7 flex flex-wrap items-center gap-3 text-xs">
+            <span className={`inline-flex items-center gap-2 skew-chip px-3.5 py-1.5 font-persona-label uppercase tracking-[0.1em] ${surface} border ${line}`}>
+              <span className="w-2 h-2 rounded-full bg-[#34c759]" aria-hidden="true" />
+              {c.hero.availability}
+            </span>
+            <span className={`inline-flex items-center gap-2 skew-chip px-3.5 py-1.5 font-persona-label uppercase tracking-[0.1em] ${surface} border ${line} ${muted}`}>{c.hero.location}</span>
+          </div>
+        </div>
+      </section>
+
+      <section className={`relative px-4 py-14 md:py-20 ${surface} overflow-clip`}>
+        <div aria-hidden="true" className={`persona-halftone ${accentCls}`} />
+        <div className="max-w-5xl mx-auto relative">
+          <p className={`font-persona-label text-xs font-semibold uppercase tracking-[0.35em] ${accentCls} mb-6`}>[ {c.sections.statBand.label} ]</p>
+          <StatBand skin={skin} />
+        </div>
+      </section>
+
+      <section className="px-4 py-14 md:py-20" aria-label={c.sections.now.label}>
+        <div className="max-w-5xl mx-auto">
+          <CardIn className={`inline-flex flex-wrap items-center gap-x-5 gap-y-2 skew-chip px-5 py-2.5 text-sm ${surface} border ${line}`}>
+            <span className="inline-flex items-center gap-2 font-persona-label font-semibold uppercase tracking-[0.1em]">
+              <span className="relative flex h-2 w-2" aria-hidden="true">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34c759] opacity-60 motion-reduce:animate-none" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-[#34c759]" />
+              </span>
+              {c.sections.now.label}
+            </span>
+            <span className={muted}>{c.sections.now.live.replace('{n}', String(liveCount))}</span>
+            <span className={muted}>{c.sections.now.dev.replace('{n}', String(devCount))}</span>
+          </CardIn>
+        </div>
+        <div className="mt-10">
+          <Ticker
+            variant="reverse-hover"
+            skew
+            duration={40}
+            label={c.sections.now.band}
+            items={registry.stores.filter((s) => !s.legacy)}
+            keyOf={(s) => s.slug}
+            itemClassName="flex shrink-0 items-center gap-3 whitespace-nowrap px-6 py-3"
+            renderItem={(s) => (
+              <>
+                <span className={`h-2 w-2 ${s.status !== 'live' ? (isDark ? 'bg-[#f5f2ee]/40' : 'bg-[#0a0f1a]/30') : isDark ? 'bg-[#c8102e]' : 'bg-[#1c6fb0]'}`} aria-hidden="true" />
+                <span className={`font-persona-label text-xl uppercase tracking-[0.12em] ${isDark ? 'text-[#f5f2ee]' : 'text-[#0a0f1a]'}`}>{s.name}</span>
+                {c.stores[s.slug]?.industry && <span className={`font-persona-label text-sm uppercase tracking-[0.15em] ${isDark ? 'text-[#f5f2ee]/55' : 'text-[#0a0f1a]/60'}`}>{c.stores[s.slug].industry}</span>}
+              </>
+            )}
+          />
+        </div>
+      </section>
+      <p className="sr-only">{t('nav.home')}</p>
+    </>
+  )
+}
+
+function WorkScreen({ chrome, heading, skin }: { chrome: SkinLike; heading: HeadingFn; skin: ReturnType<typeof skins.persona> }) {
+  const { surface, accentBg, accentCls, muted } = chrome
+  const { strings: c } = useContent()
+  return (
+    <>
+      <section id="work-experience" className={`relative px-4 py-14 md:py-20 ${surface} overflow-clip scroll-mt-16`}>
+        <div aria-hidden="true" className={`persona-torn absolute right-0 top-0 h-full w-1/3 ${chrome.isDark ? 'bg-[#f5f2ee]/[0.03]' : 'bg-[#0a0f1a]/[0.03]'}`} />
+        <div className="max-w-5xl mx-auto relative">
+          <Experience skin={skin} heading={heading} />
+        </div>
+      </section>
+
+      <Suspense fallback={<ScreenLoading accentCls={accentCls} muted={muted} />}>
+        <section id="work-shopify" className="px-4 py-14 md:py-20 scroll-mt-16">
+          <div className="max-w-5xl mx-auto">
+            <ShopifyWork skin={skin} heading={heading} />
+          </div>
+        </section>
+
+        <section id="work-gallery" className={`relative px-4 py-14 md:py-20 ${surface} scroll-mt-16`}>
+          <div className="max-w-5xl mx-auto">
+            <span className={`persona-sticker inline-block skew-chip ${accentBg} ${chrome.isDark ? 'text-[#f5f2ee]' : 'text-white'} px-3 py-1 text-[11px] font-persona-label font-bold uppercase tracking-[0.1em] mb-4`}>
+              — {c.sections.gallery.viewLabel} —
+            </span>
+            <Gallery skin={skin} heading={heading} />
+          </div>
+        </section>
+
+        <div aria-hidden="true" className="relative h-6 overflow-hidden flex items-center justify-center gap-1">
+          <m.span className={`h-1.5 w-10 ${accentBg}`} style={{ clipPath: 'polygon(0 0,100% 0,80% 100%,0 100%)' }} initial={{ x: -60, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} viewport={{ once: true }} transition={SNAP} />
+          <m.span className={`h-1.5 w-10 ${accentBg}`} style={{ clipPath: 'polygon(20% 0,100% 0,100% 100%,0 100%)' }} initial={{ x: 60, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} viewport={{ once: true }} transition={SNAP} />
+        </div>
+        <Manifesto skin={skin} />
+
+        <section id="work-projects" className="px-4 py-14 md:py-20 scroll-mt-16">
+          <div className="max-w-5xl mx-auto">
+            <Projects skin={skin} heading={heading} />
+          </div>
+        </section>
+      </Suspense>
+    </>
+  )
+}
+
+function YearsScreen({ chrome, heading, skin }: { chrome: SkinLike; heading: HeadingFn; skin: ReturnType<typeof skins.persona> }) {
+  const { surface, accentCls, muted } = chrome
+  return (
+    <Suspense fallback={<ScreenLoading accentCls={accentCls} muted={muted} />}>
+      <section className="px-4 py-14 md:py-20">
+        <div className="max-w-5xl mx-auto">
+          <Years skin={skin} heading={(e, ti, a, l) => heading(`[ ${e} ]`, ti, a, l)} />
+        </div>
+      </section>
+      <section className={`relative px-4 py-14 md:py-20 ${surface} overflow-clip`}>
+        <svg className="persona-ring absolute w-[46vw] max-w-[420px] aspect-square opacity-[0.08] pointer-events-none" style={{ right: '-8%', top: '8%' }} viewBox="0 0 200 200" aria-hidden="true" data-parallax="back">
+          <circle cx="100" cy="100" r="90" fill="none" stroke="currentColor" className={accentCls} strokeWidth="0.8" strokeDasharray="1 6" />
+        </svg>
+        <div className="max-w-5xl mx-auto relative">
+          <Process skin={skin} heading={heading} canvas={surface} />
+        </div>
+      </section>
+    </Suspense>
+  )
+}
+
+function SkillsScreen({ chrome, heading, skin }: { chrome: SkinLike; heading: HeadingFn; skin: ReturnType<typeof skins.persona> }) {
+  const { surface, line, accentCls, muted } = chrome
+  return (
+    <Suspense fallback={<ScreenLoading accentCls={accentCls} muted={muted} />}>
+      <section className={`px-4 py-14 md:py-20 ${surface}`}>
+        <div className="max-w-5xl mx-auto">
+          <Skills skin={skin} heading={heading} />
+        </div>
+      </section>
+      <section className="px-4 py-14 md:py-20">
+        <div className={`max-w-5xl mx-auto persona-notch border ${line} ${surface} p-6 md:p-10`}>
+          <Faq skin={skin} heading={heading} />
+        </div>
+      </section>
+    </Suspense>
+  )
+}
+
+function ContactScreen({ chrome, heading, skin, primaryBtn, openContact, self, t }: { chrome: SkinLike; heading: HeadingFn; skin: ReturnType<typeof skins.persona>; primaryBtn: string; openContact: () => void; self: ReturnType<typeof designById>; t: ReturnType<typeof useI18n>['t'] }) {
+  const { strings: c, registry } = useContent()
+  const { surface, line, bg, accentCls, muted } = chrome
+
+  return (
+    <Suspense fallback={<ScreenLoading accentCls={accentCls} muted={muted} />}>
+      <section className={`px-4 py-16 md:py-20 ${surface}`}>
+        <div className={`max-w-5xl mx-auto persona-notch border ${line} ${bg} p-6 md:p-12`}>
+          <Contact skin={skin} ctaClass={primaryBtn} onContact={openContact} />
+        </div>
+      </section>
+
+      <section className="px-4 py-14 md:py-20" aria-labelledby="explore-heading">
+        <div className="max-w-5xl mx-auto">
+          {heading(c.sections.explore.eyebrow, c.sections.explore.title, '', c.sections.explore.lead)}
+          <div className="grid sm:grid-cols-3 gap-4">
+            {otherDesigns('persona').map((d) => (
+              <TransitionLink key={d.id} to={d.href} transitionColor={d.transitionColor} transitionAccent={d.transitionAccent} transitionLabel={t(d.nameKey)} className={`block clip-corner-sm overflow-hidden border ${line} ${surface} transition-transform duration-150 hover:-skew-x-1`}>
+                <div className="h-28 overflow-hidden">
+                  <d.Preview size="md" />
+                </div>
+                <div className="p-4">
+                  <p className="font-persona-label text-sm font-semibold uppercase tracking-[0.1em]">{t(d.nameKey)}</p>
+                  <p className={`${muted} text-xs`}>{t(d.subtitleKey)}</p>
+                </div>
+              </TransitionLink>
+            ))}
+            <TransitionLink to={MENU.route} transitionColor={chrome.isDark ? '#171717' : '#fafafa'} transitionAccent={chrome.isDark ? '#ffffff' : '#171717'} transitionLabel={t(MENU.labelKey)} className={`block clip-corner-sm overflow-hidden border ${line} ${surface} transition-transform duration-150 hover:-skew-x-1`}>
+              <div className="h-28 overflow-hidden">
+                <MenuPreview isDark={chrome.isDark} />
+              </div>
+              <div className="p-4">
+                <p className="font-persona-label text-sm font-semibold uppercase tracking-[0.1em]">{t(MENU.labelKey)}</p>
+                <p className={`${muted} text-xs`}>{t(MENU.subtitleKey)}</p>
+              </div>
+            </TransitionLink>
+          </div>
+        </div>
+      </section>
+
+      <footer className={`px-4 pb-10 pt-6 text-xs ${muted}`} role="contentinfo" aria-label="Site footer">
+        <div className={`max-w-5xl mx-auto flex flex-col gap-3 border-t pt-8 md:flex-row md:items-baseline md:justify-between font-persona-label uppercase tracking-[0.1em] ${line}`}>
+          <p>
+            © 2026 {registry.personal.name}. {c.footer.rights}
+          </p>
+          <p className="md:text-center">
+            <span className={accentCls}>{t(self.nameKey)}</span> — {t(self.subtitleKey)}
+          </p>
+          <button type="button" onClick={() => { window.location.hash = '#menu' }} className={`${accentCls} inline-flex items-center gap-1 font-semibold`}>
+            {c.footer.backToTop} ↑
+          </button>
+        </div>
+      </footer>
+    </Suspense>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Persistent chrome — top identity bar + bottom game bar (menu, screens, status, utilities). Fixed
+// but never pinned mid-content: it never intercepts or transforms the scrolling column beneath it.
+// ---------------------------------------------------------------------------
+function TopBar({ chrome, self, t, isDark, toggleTheme, openContact, navigate }: { chrome: SkinLike; self: ReturnType<typeof designById>; t: ReturnType<typeof useI18n>['t']; isDark: boolean; toggleTheme: () => void; openContact: () => void; navigate: (r: Route) => void }) {
+  const { line } = chrome
+  return (
+    <div className={`fixed top-0 inset-x-0 z-40 h-12 md:h-14 ${isDark ? 'bg-[#111013]/90' : 'bg-[#eef3f7]/90'} backdrop-blur-xl border-b ${line}`}>
+      <div className="max-w-6xl mx-auto h-full px-3 md:px-6 flex items-center justify-between gap-3">
+        <button type="button" onClick={() => navigate('')} className="inline-flex items-center gap-2">
+          <span className={`persona-skew-btn w-7 h-7 md:w-8 md:h-8 flex items-center justify-center ${chrome.accentBg} ${isDark ? 'text-[#f5f2ee]' : 'text-white'} font-persona-label text-[11px] font-bold`}>MB</span>
+          <span className="hidden sm:inline font-persona-label text-sm font-semibold uppercase tracking-[0.2em]">{t(self.nameKey)}</span>
+        </button>
+        <div className="flex items-center gap-1.5 md:gap-2">
+          <button type="button" onClick={openContact} aria-label={t('nav.contact')} className={`w-8 h-8 flex items-center justify-center ${chrome.muted}`}>
+            {Icon.mail}
+          </button>
+          <LanguageSelectorMenu size="sm" />
+          <button type="button" onClick={toggleTheme} aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'} className={`w-8 h-8 flex items-center justify-center ${chrome.muted}`}>
+            {isDark ? Icon.sun : Icon.moon}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function BottomBar({ chrome, route, navigate, items, sfx, liveCount }: { chrome: SkinLike; route: Route; navigate: (r: Route) => void; items: MenuItem[]; sfx: ReturnType<typeof useSfx>; liveCount: number }) {
+  const { line, accentBg, accentCls, muted, isDark } = chrome
+  const chipBase = 'shrink-0 font-persona-label text-[10px] md:text-xs font-semibold uppercase tracking-[0.12em] px-3 py-1.5 skew-chip transition-colors duration-150'
+  const on = `${accentBg} ${isDark ? 'text-[#f5f2ee]' : 'text-white'}`
+  const off = `${muted} hover:text-current`
+  return (
+    <nav className={`fixed bottom-0 inset-x-0 z-40 border-t ${line} ${isDark ? 'bg-[#111013]/92' : 'bg-[#eef3f7]/92'} backdrop-blur-xl`} aria-label="Screen navigation">
+      <div className="max-w-6xl mx-auto flex items-center gap-1.5 px-2.5 py-2 overflow-x-auto">
+        <button type="button" onClick={() => navigate('')} aria-current={route === '' ? 'page' : undefined} className={`${chipBase} ${route === '' ? on : off}`}>
+          Menu
+        </button>
+        {items.map((it) => (
+          <button key={it.id} type="button" onClick={() => navigate(it.id)} aria-current={route === it.id ? 'page' : undefined} className={`${chipBase} ${route === it.id ? on : off}`}>
+            {it.label}
+          </button>
+        ))}
+        <span className="flex-1 min-w-2" />
+        <span className={`hidden sm:inline-flex shrink-0 items-center gap-1.5 font-persona-label text-[10px] uppercase tracking-[0.15em] ${muted}`}>
+          <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34c759] opacity-60 motion-reduce:animate-none" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#34c759]" />
+          </span>
+          {liveCount} live
+        </span>
+        <button type="button" onClick={sfx.toggle} aria-pressed={sfx.enabled} className={`shrink-0 font-persona-label text-[10px] uppercase tracking-[0.12em] px-2.5 py-1.5 border ${line} ${sfx.enabled ? accentCls : muted}`}>
+          SFX {sfx.enabled ? 'On' : 'Off'}
+        </button>
+      </div>
+    </nav>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Root
+// ---------------------------------------------------------------------------
 function PersonaContent() {
   const { isDark, toggleTheme } = useTheme()
   const { t } = useI18n()
   const { strings: c, registry } = useContent()
   const [contactOpen, setContactOpen] = useState(false)
   const [contactPrefill, setContactPrefill] = useState('')
-  const [mobileOpen, setMobileOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
   useDynamicFavicon('persona')
   useScrollVar(rootRef)
+  const sfx = useSfx()
+  const reduced = useReducedMotion()
+
+  const [route, navigate] = useHashRoute()
+  const [displayRoute, setDisplayRoute] = useState<Route>(route)
+  const [wiping, setWiping] = useState(false)
+  const displayRouteRef = useRef<Route>(route)
+  useEffect(() => {
+    displayRouteRef.current = displayRoute
+  }, [displayRoute])
+
+  // Diagonal wipe + flash, ~500ms, fired only by a route change (never by scroll). Depends on `route`
+  // alone (not `displayRoute`) so its own timers are never cancelled by the swap they themselves cause.
+  useEffect(() => {
+    if (route === displayRouteRef.current) return
+    if (reduced) {
+      setDisplayRoute(route)
+      return
+    }
+    setWiping(true)
+    const t1 = window.setTimeout(() => setDisplayRoute(route), 260)
+    const t2 = window.setTimeout(() => setWiping(false), 560)
+    return () => {
+      window.clearTimeout(t1)
+      window.clearTimeout(t2)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [route, reduced])
+
+  // Escape returns to the arcade menu from any screen (never fights an open modal).
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape' && route !== '' && !contactOpen) {
+        e.preventDefault()
+        navigate('')
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [route, navigate, contactOpen])
 
   const skin = skins.persona(isDark)
   const self = designById('persona')
 
-  // Ice (light, default) vs Ink (dark) — two-key-color law: ink/paper neutrals plus one hero accent.
   const bg = isDark ? 'bg-[#111013] text-[#f5f2ee]' : 'bg-[#eef3f7] text-[#0a0f1a]'
   const surface = isDark ? 'bg-[#18161a]' : 'bg-white'
   const muted = skin.muted
   const accentCls = skin.accent
   const accentBg = skin.accentBg
   const line = skin.line
+  const chrome: SkinLike = { accentCls, accentBg, muted, line, surface, isDark, bg }
 
   const openContact = (prefill?: string) => {
     setContactPrefill(prefill ?? '')
     setContactOpen(true)
   }
 
-  const nav = [
-    ['#hero', t('nav.home')],
-    ['#experience', t('nav.experience')],
-    ['#shopify', t('nav.shopify')],
-    ['#gallery', t('nav.gallery')],
-    ['#skills', t('nav.skills')],
-    ['#contact', t('nav.contact')],
-  ] as const
+  const items: MenuItem[] = [
+    { id: 'home', label: t('nav.home') },
+    { id: 'work', label: t('nav.work') },
+    { id: 'years', label: t('nav.years') },
+    { id: 'skills', label: t('nav.skills') },
+    { id: 'contact', label: t('nav.contact') },
+  ]
 
-  const Heading = (eyebrow: string, title: string, accent: string, lead?: string) => (
-    <SnapIn className="mb-10 md:mb-14">
+  const Heading: HeadingFn = (eyebrow, title, accent, lead) => (
+    <CardIn className="mb-10 md:mb-14">
       <p className={`font-persona-label text-xs font-semibold uppercase tracking-[0.35em] ${accentCls} mb-3 before:content-['—'] before:mr-2`}>{eyebrow}</p>
       <h2 className="font-persona-display text-4xl md:text-6xl uppercase leading-[0.95]" style={{ fontStyle: 'oblique 6deg' }}>
-        <RevealText text={title} /> <RevealText text={accent} className={muted} delay={0.1} />
+        {title} {accent && <RansomText text={accent} className={muted} intensity={0.6} />}
       </h2>
       {lead && <p className={`${muted} text-lg md:text-xl mt-5 max-w-2xl leading-relaxed font-sf`}>{lead}</p>}
-    </SnapIn>
+    </CardIn>
   )
 
   const primaryBtn = `persona-skew-btn inline-flex items-center justify-center ${accentBg} ${isDark ? 'text-[#f5f2ee]' : 'text-white'} px-7 py-3.5 text-sm font-persona-label font-semibold uppercase tracking-[0.15em]`
-  const secondaryLink = `${accentCls} inline-flex items-center gap-1.5 text-sm font-persona-label font-semibold uppercase tracking-[0.1em]`
-  // Both branches are written out in full (not `hover:${accentCls}`) so Tailwind's static scanner can see the class.
-  const navLink = `inline-flex items-center h-10 font-persona-label text-xs font-semibold uppercase tracking-[0.15em] ${muted} transition-transform duration-150 hover:-skew-x-6 ${isDark ? 'hover:text-[#e8465f]' : 'hover:text-[#1c6fb0]'}`
-
   const liveCount = registry.stores.filter((s) => s.status === 'live').length
-  const devCount = registry.stores.filter((s) => s.status === 'dev').length
-
-  const mobileSheet = (
-    <AnimatePresence>
-      {mobileOpen && (
-        <m.div
-          key="sheet"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: 0.18 } }}
-          className={`fixed inset-0 z-[9999] ${isDark ? 'bg-[#111013]/95' : 'bg-[#eef3f7]/95'} backdrop-blur-xl`}
-          onClick={() => setMobileOpen(false)}
-        >
-          <m.div
-            initial={{ x: '8%', opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: '4%', opacity: 0, transition: { duration: 0.15 } }}
-            transition={SNAP}
-            className="h-full flex flex-col px-6 pt-4 pb-10"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between h-11">
-              <span className="font-persona-label text-sm font-semibold uppercase tracking-[0.2em]">{t('mobileMenu.menu')}</span>
-              <button type="button" onClick={() => setMobileOpen(false)} className="w-9 h-9 flex items-center justify-center" aria-label="Close menu">
-                {Icon.close}
-              </button>
-            </div>
-            <nav className="mt-8 flex-1">
-              {nav.map(([href, label], i) => (
-                <m.a
-                  key={href}
-                  href={href}
-                  onClick={() => setMobileOpen(false)}
-                  initial={{ opacity: 0, x: 16 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.04 * i, duration: 0.3, ease: EASE }}
-                  className="block py-3 font-persona-display text-3xl uppercase"
-                  style={{ fontStyle: 'oblique 6deg' }}
-                >
-                  {label}
-                </m.a>
-              ))}
-            </nav>
-            <button
-              type="button"
-              onClick={() => {
-                setMobileOpen(false)
-                setContactOpen(true)
-              }}
-              className={`persona-skew-btn w-full ${accentBg} ${isDark ? 'text-[#f5f2ee]' : 'text-white'} py-3.5 text-sm font-persona-label font-semibold uppercase tracking-[0.15em]`}
-            >
-              {c.hero.ctaContact}
-            </button>
-            <div className="mt-6">
-              <p className={`text-[11px] font-persona-label uppercase tracking-[0.2em] ${muted} mb-3`}>{t('logoSelector.otherExperiences')}</p>
-              <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
-                {otherDesigns('persona').map((d) => (
-                  <TransitionLink key={d.id} to={d.href} transitionColor={d.transitionColor} transitionAccent={d.transitionAccent} transitionLabel={t(d.nameKey)} className={accentCls}>
-                    {t(d.nameKey)} ›
-                  </TransitionLink>
-                ))}
-              </div>
-            </div>
-          </m.div>
-        </m.div>
-      )}
-    </AnimatePresence>
-  )
 
   return (
     <>
@@ -288,330 +778,47 @@ function PersonaContent() {
       <ContactFormModal isOpen={contactOpen} onClose={() => setContactOpen(false)} variant="persona" isDark={isDark} initialMessage={contactPrefill} />
 
       <div ref={rootRef} className={`theme-persona min-h-screen font-sf ${bg} transition-colors duration-300 [overflow-x:clip]`} role="document">
-        {/* Nav */}
-        <nav className={`fixed top-0 inset-x-0 z-40 h-14 ${isDark ? 'bg-[#111013]/90' : 'bg-[#eef3f7]/90'} backdrop-blur-xl border-b ${line}`} aria-label="Main navigation">
-          <div className="max-w-6xl mx-auto h-full px-4 md:px-6 flex items-center justify-between gap-3">
-            <TransitionLink to="/arcade" transitionColor={self.transitionColor} transitionAccent={self.transitionAccent} transitionLabel={t(self.nameKey)} className="inline-flex items-center gap-2">
-              <span className={`persona-skew-btn w-8 h-8 flex items-center justify-center ${accentBg} ${isDark ? 'text-[#f5f2ee]' : 'text-white'} font-persona-label text-[11px] font-bold`}>MB</span>
-              <span className="font-persona-label text-sm font-semibold uppercase tracking-[0.2em]">Maxfolio</span>
-            </TransitionLink>
-            <div className="hidden md:flex items-center gap-7">
-              {nav.map(([href, label]) => (
-                <a key={href} href={href} className={navLink}>
-                  {label}
-                </a>
-              ))}
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setContactOpen(true)}
-                className={`hidden sm:inline-flex h-9 items-center persona-skew-btn ${accentBg} ${isDark ? 'text-[#f5f2ee]' : 'text-white'} px-4 text-xs font-persona-label font-semibold uppercase tracking-[0.15em]`}
-              >
-                {c.hero.ctaContact}
-              </button>
-              <button
-                type="button"
-                onClick={toggleTheme}
-                aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-                className={`w-8 h-8 flex items-center justify-center ${muted}`}
-              >
-                {isDark ? Icon.sun : Icon.moon}
-              </button>
-              <button type="button" onClick={() => setMobileOpen(true)} className="md:hidden w-8 h-8 flex items-center justify-center" aria-label="Open menu">
-                {Icon.menu}
-              </button>
-            </div>
-          </div>
-        </nav>
-        {typeof document !== 'undefined' && createPortal(mobileSheet, document.body)}
+        <TopBar chrome={chrome} self={self} t={t} isDark={isDark} toggleTheme={toggleTheme} openContact={() => openContact()} navigate={navigate} />
 
-        <main id="main-content" className="pt-14">
-          {/* Hero — "menu screen": ghost wordmark, ring motif, eyebrow dash, stacked headline, CTA pair */}
-          {/* pb-28 on mobile keeps the availability pills clear of the fixed mobile contact FAB. */}
-          <section id="hero" className="relative min-h-[92vh] flex items-center px-4 pt-16 pb-28 md:pt-20 md:pb-16 overflow-clip scroll-mt-14" aria-labelledby="hero-heading">
-            <div aria-hidden="true" className="persona-ghost-wordmark" data-parallax="back">
-              MB
-            </div>
-            <svg className="persona-ring absolute w-[70vw] max-w-[620px] aspect-square opacity-25 pointer-events-none" style={{ left: '50%', top: '48%', transform: 'translate(-50%,-50%)' }} viewBox="0 0 200 200" aria-hidden="true" data-parallax="back">
-              <circle cx="100" cy="100" r="88" fill="none" stroke="currentColor" className={accentCls} strokeWidth="0.6" strokeDasharray="2 5" />
-              <circle cx="100" cy="100" r="70" fill="none" stroke="currentColor" className={muted} strokeWidth="0.4" />
-            </svg>
-            <div aria-hidden="true" className={`persona-halftone ${accentCls}`} />
-
-            <div className="max-w-6xl mx-auto w-full relative z-10">
-              <m.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }} className={`font-persona-label text-sm font-semibold uppercase tracking-[0.35em] ${accentCls} before:content-['—'] before:mr-2`}>
-                {c.hero.eyebrow}
-              </m.p>
-              {/* Sized so the longest name (11 chars, Anton condensed) never orphan-wraps mid-word on a 390px phone. */}
-              <h1 id="hero-heading" className="mt-4 font-persona-display uppercase leading-[0.86] text-[11vw] sm:text-[9.5vw] md:text-[8vw]" style={{ fontStyle: 'oblique 6deg' }}>
-                <span className="block whitespace-nowrap">
-                  <LetterJitter text={registry.personal.firstName} />
-                </span>
-                <span className={`block whitespace-nowrap ${accentCls}`}>{registry.personal.lastName}</span>
-              </h1>
-              <m.p initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.7 }} className="mt-6 max-w-2xl text-xl md:text-2xl font-sf leading-snug">
-                {c.hero.positioning}
-              </m.p>
-              <m.p initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.85 }} className={`mt-4 max-w-2xl text-base md:text-lg ${muted} font-sf leading-relaxed`}>
-                {c.hero.lead}
-              </m.p>
-              <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 1 }} className="mt-9 flex flex-col sm:flex-row items-start sm:items-center gap-5 sm:gap-7">
-                <Magnetic>
-                  <CrashButton onClick={() => openContact()} className={primaryBtn}>
-                    {c.hero.ctaPrimary}
-                  </CrashButton>
-                </Magnetic>
-                <a href="#shopify" className={secondaryLink}>
-                  {c.hero.ctaSecondary} {Icon.down}
-                </a>
-                <a href={registry.personal.cv} download className={`${muted} text-sm font-persona-label font-semibold uppercase tracking-[0.1em]`}>
-                  {c.hero.ctaCv} ›
-                </a>
-              </m.div>
-              <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 1.2 }} className="mt-7 flex flex-wrap items-center gap-3 text-xs">
-                <span className={`inline-flex items-center gap-2 skew-chip px-3.5 py-1.5 font-persona-label uppercase tracking-[0.1em] ${surface} border ${line}`}>
-                  <span className="w-2 h-2 rounded-full bg-[#34c759]" aria-hidden="true" />
-                  {c.hero.availability}
-                </span>
-                <span className={`inline-flex items-center gap-2 skew-chip px-3.5 py-1.5 font-persona-label uppercase tracking-[0.1em] ${surface} border ${line} ${muted}`}>{c.hero.location}</span>
-              </m.div>
-            </div>
-          </section>
-
-          {/* One-time diagonal screen-wipe between hero and the status band (wf4-persona.md idea #20). */}
-          <div aria-hidden="true" className="relative h-3 overflow-hidden">
-            <m.div
-              className={`absolute inset-0 ${accentBg}`}
-              style={{ clipPath: 'polygon(0 0, 100% 0, 94% 100%, 0% 100%)' }}
-              initial={{ scaleX: 0 }}
-              whileInView={{ scaleX: [0, 1, 0] }}
-              viewport={{ once: true, margin: '-40px' }}
-              transition={{ duration: 0.9, ease: EASE, times: [0, 0.55, 1] }}
-            />
-          </div>
-
-          {/* Stat band — "status cards" */}
-          <section className={`relative px-4 py-16 md:py-24 ${surface} overflow-clip`}>
-            <div aria-hidden="true" className={`persona-halftone ${accentCls}`} />
-            <div className="max-w-5xl mx-auto relative">
-              <p className={`font-persona-label text-xs font-semibold uppercase tracking-[0.35em] ${accentCls} mb-6`}>[ {c.sections.statBand.label} ]</p>
-              <StatBand skin={skin} />
-            </div>
-          </section>
-
-          {/* Now + fleet ticker */}
-          <section className="px-4 py-16 md:py-24" aria-label={c.sections.now.label}>
-            <div className="max-w-5xl mx-auto">
-              <SnapIn className={`inline-flex flex-wrap items-center gap-x-5 gap-y-2 skew-chip px-5 py-2.5 text-sm ${surface} border ${line}`}>
-                <span className="inline-flex items-center gap-2 font-persona-label font-semibold uppercase tracking-[0.1em]">
-                  <span className="relative flex h-2 w-2" aria-hidden="true">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34c759] opacity-60 motion-reduce:animate-none" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-[#34c759]" />
-                  </span>
-                  {c.sections.now.label}
-                </span>
-                <span className={muted}>{c.sections.now.live.replace('{n}', String(liveCount))}</span>
-                <span className={muted}>{c.sections.now.dev.replace('{n}', String(devCount))}</span>
-              </SnapIn>
-            </div>
-            <div className="mt-10">
-              <Ticker
-                variant="reverse-hover"
-                skew
-                duration={40}
-                label={c.sections.now.band}
-                items={registry.stores.filter((s) => !s.legacy)}
-                keyOf={(s) => s.slug}
-                itemClassName="flex shrink-0 items-center gap-3 whitespace-nowrap px-6 py-3"
-                renderItem={(s) => (
-                  <>
-                    <span className={`h-2 w-2 ${s.status !== 'live' ? (isDark ? 'bg-[#f5f2ee]/40' : 'bg-[#0a0f1a]/30') : isDark ? 'bg-[#c8102e]' : 'bg-[#1c6fb0]'}`} aria-hidden="true" />
-                    <span className={`font-persona-label text-xl uppercase tracking-[0.12em] ${isDark ? 'text-[#f5f2ee]' : 'text-[#0a0f1a]'}`}>{s.name}</span>
-                    {c.stores[s.slug]?.industry && <span className={`font-persona-label text-sm uppercase tracking-[0.15em] ${isDark ? 'text-[#f5f2ee]/55' : 'text-[#0a0f1a]/60'}`}>{c.stores[s.slug].industry}</span>}
-                  </>
-                )}
+        {/* Diagonal wipe + flash — ~500ms, fires only on a route change, never on scroll. */}
+        <AnimatePresence>
+          {wiping && (
+            <m.div key="wipe" aria-hidden="true" className="pointer-events-none fixed inset-0 z-[9999] overflow-hidden">
+              <m.div
+                className={`absolute inset-0 ${accentBg}`}
+                style={{ clipPath: 'polygon(0 0, 100% 0, 82% 100%, 0 100%)' }}
+                initial={{ x: '-120%' }}
+                animate={{ x: ['-120%', '0%', '120%'] }}
+                transition={{ duration: 0.56, times: [0, 0.46, 1], ease: EASE }}
               />
-            </div>
-          </section>
+              <m.div className="absolute inset-0 bg-white" style={{ mixBlendMode: 'overlay' }} initial={{ opacity: 0 }} animate={{ opacity: [0, 0.85, 0] }} transition={{ duration: 0.56, times: [0, 0.46, 1] }} />
+            </m.div>
+          )}
+        </AnimatePresence>
 
-          {/* Experience — a torn diagonal ink panel frames the section from behind */}
-          <section id="experience-wrap" className={`relative px-4 py-16 md:py-24 ${surface} overflow-clip`}>
-            <div aria-hidden="true" className={`persona-torn absolute right-0 top-0 h-full w-1/3 ${isDark ? 'bg-[#f5f2ee]/[0.03]' : 'bg-[#0a0f1a]/[0.03]'}`} data-parallax="back" />
-            <div className="max-w-5xl mx-auto relative">
-              <Experience skin={skin} heading={Heading} />
-            </div>
-          </section>
-
-          {/* Years — reskinned as a bracketed calendar timeline */}
-          <section className="px-4 py-16 md:py-24">
-            <div className="max-w-5xl mx-auto">
-              <Suspense fallback={<Pending />}>
-                <Years skin={skin} heading={(e, ti, a, l) => Heading(`[ ${e} ]`, ti, a, l)} />
-              </Suspense>
-            </div>
-          </section>
-
-          {/* Process — the ring motif drifts as ambient background */}
-          <section className={`relative px-4 py-16 md:py-24 ${surface} overflow-clip`}>
-            <svg className="persona-ring absolute w-[50vw] max-w-[440px] aspect-square opacity-[0.08] pointer-events-none" style={{ right: '-8%', top: '10%' }} viewBox="0 0 200 200" aria-hidden="true" data-parallax="back">
-              <circle cx="100" cy="100" r="90" fill="none" stroke="currentColor" className={accentCls} strokeWidth="0.8" strokeDasharray="1 6" />
-            </svg>
-            <div className="max-w-5xl mx-auto relative">
-              <Suspense fallback={<Pending />}>
-                <Process skin={skin} heading={Heading} canvas={surface} />
-              </Suspense>
-            </div>
-          </section>
-
-          {/* Shopify work — the index, in the skin's skewed row/chip vocabulary */}
-          <section className="px-4 py-16 md:py-24">
-            <div className="max-w-5xl mx-auto">
-              <Suspense fallback={<Pending />}>
-                <ShopifyWork skin={skin} heading={Heading} />
-              </Suspense>
-            </div>
-          </section>
-
-          {/* Gallery — a sticker callout label pinned above the frame */}
-          <section className={`relative px-4 py-16 md:py-24 ${surface}`}>
-            <div className="max-w-5xl mx-auto">
-              <span className={`persona-sticker inline-block skew-chip ${accentBg} ${isDark ? 'text-[#f5f2ee]' : 'text-white'} px-3 py-1 text-[11px] font-persona-label font-bold uppercase tracking-[0.1em] mb-4`}>
-                — {c.sections.gallery.viewLabel} —
-              </span>
-              <Suspense fallback={<Pending />}>
-                <Gallery skin={skin} heading={Heading} />
-              </Suspense>
-            </div>
-          </section>
-
-          {/* Manifesto — two accent shards crash together ahead of the inverted band */}
-          <div aria-hidden="true" className="relative h-6 overflow-hidden flex items-center justify-center gap-1">
-            <m.span className={`h-1.5 w-10 ${accentBg}`} style={{ clipPath: 'polygon(0 0,100% 0,80% 100%,0 100%)' }} initial={{ x: -60, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} viewport={{ once: true }} transition={SNAP} />
-            <m.span className={`h-1.5 w-10 ${accentBg}`} style={{ clipPath: 'polygon(20% 0,100% 0,100% 100%,0 100%)' }} initial={{ x: 60, opacity: 0 }} whileInView={{ x: 0, opacity: 1 }} viewport={{ once: true }} transition={SNAP} />
-          </div>
-          <Suspense fallback={<Pending h="min-h-[40vh]" />}>
-            <Manifesto skin={skin} />
-          </Suspense>
-
-          {/* Projects — index list */}
-          <section className="px-4 py-16 md:py-24">
-            <div className="max-w-5xl mx-auto">
-              <Suspense fallback={<Pending />}>
-                <Projects skin={skin} heading={Heading} />
-              </Suspense>
-            </div>
-          </section>
-
-          {/* Skills — own-glyph tag pattern via the skin's skewed chips */}
-          <section id="skills" className={`px-4 py-16 md:py-24 ${surface} scroll-mt-14`}>
-            <div className="max-w-5xl mx-auto">
-              <Suspense fallback={<Pending />}>
-                <Skills skin={skin} heading={Heading} />
-              </Suspense>
-            </div>
-          </section>
-
-          {/* FAQ — dialogue-box panel (notch-cut corner) */}
-          <section className="px-4 py-16 md:py-24">
-            <div className={`max-w-5xl mx-auto persona-notch border ${line} ${surface} p-6 md:p-10`}>
-              <Suspense fallback={<Pending h="min-h-[40vh]" />}>
-                <Faq skin={skin} heading={Heading} />
-              </Suspense>
-            </div>
-          </section>
-
-          {/* Contact — the same dialogue-box, this time for the ask */}
-          <section className={`px-4 py-20 md:py-28 ${surface}`}>
-            <div className={`max-w-5xl mx-auto persona-notch border ${line} ${bg} p-6 md:p-12`}>
-              <Suspense fallback={<Pending />}>
-                <Contact skin={skin} ctaClass={primaryBtn} onContact={openContact} />
-              </Suspense>
-            </div>
-          </section>
-
-          {/* Explore — the other four experiences, cursor-tracking selector energy via skewed hover */}
-          <section id="explore" className="px-4 py-16 md:py-24 scroll-mt-14">
-            <div className="max-w-5xl mx-auto">
-              {Heading(c.sections.explore.eyebrow, c.sections.explore.title, '', c.sections.explore.lead)}
-              <div className="grid sm:grid-cols-3 gap-4">
-                {otherDesigns('persona').map((d) => (
-                  <TransitionLink
-                    key={d.id}
-                    to={d.href}
-                    transitionColor={d.transitionColor}
-                    transitionAccent={d.transitionAccent}
-                    transitionLabel={t(d.nameKey)}
-                    className={`block clip-corner-sm overflow-hidden border ${line} ${surface} transition-transform duration-150 hover:-skew-x-1`}
-                  >
-                    <div className="h-28 overflow-hidden">
-                      <d.Preview size="md" />
-                    </div>
-                    <div className="p-4">
-                      <p className="font-persona-label text-sm font-semibold uppercase tracking-[0.1em]">{t(d.nameKey)}</p>
-                      <p className={`${muted} text-xs`}>{t(d.subtitleKey)}</p>
-                    </div>
-                  </TransitionLink>
-                ))}
-                <TransitionLink
-                  to={MENU.route}
-                  transitionColor={isDark ? '#171717' : '#fafafa'}
-                  transitionAccent={isDark ? '#ffffff' : '#171717'}
-                  transitionLabel={t(MENU.labelKey)}
-                  className={`block clip-corner-sm overflow-hidden border ${line} ${surface} transition-transform duration-150 hover:-skew-x-1`}
-                >
-                  <div className="h-28 overflow-hidden">
-                    <MenuPreview isDark={isDark} />
-                  </div>
-                  <div className="p-4">
-                    <p className="font-persona-label text-sm font-semibold uppercase tracking-[0.1em]">{t(MENU.labelKey)}</p>
-                    <p className={`${muted} text-xs`}>{t(MENU.subtitleKey)}</p>
-                  </div>
-                </TransitionLink>
+        <main id="main-content" className="pt-12 md:pt-14 pb-16">
+          {displayRoute === '' && (
+            <section className="relative min-h-[calc(100svh-3rem)] md:min-h-[calc(100svh-3.5rem)] flex flex-col justify-center px-2 sm:px-4 py-10 overflow-clip" aria-label="Arcade menu">
+              <div aria-hidden="true" className={`persona-drift ${accentCls}`} />
+              <div aria-hidden="true" className={`persona-halftone ${accentCls}`} />
+              <svg className="persona-ring absolute w-[80vw] max-w-[640px] aspect-square opacity-[0.12] pointer-events-none" style={{ right: '-10%', top: '50%', transform: 'translateY(-50%)' }} viewBox="0 0 200 200" aria-hidden="true" data-parallax="back">
+                <circle cx="100" cy="100" r="88" fill="none" stroke="currentColor" className={accentCls} strokeWidth="0.6" strokeDasharray="2 5" />
+              </svg>
+              <div className="relative z-10 max-w-4xl mx-auto w-full">
+                <p className={`font-persona-label text-xs font-semibold uppercase tracking-[0.35em] ${accentCls} mb-4 px-4 md:px-7 before:content-['—'] before:mr-2`}>{t(self.nameKey)}</p>
+                <ArcadeMenu items={items} onActivate={navigate} accentCls={accentCls} accentBg={accentBg} muted={muted} isDark={isDark} suspended={contactOpen} playBlip={() => sfx.play(760)} />
               </div>
-              <p className={`${muted} text-xs mt-8 text-center font-persona-label uppercase tracking-[0.1em]`}>
-                {c.sections.explore.viewing}: <span className={accentCls}>{t(self.nameKey)}</span>
-              </p>
-            </div>
-          </section>
+            </section>
+          )}
+
+          {displayRoute === 'home' && <HomeScreen chrome={chrome} openContact={() => openContact()} skin={skin} />}
+          {displayRoute === 'work' && <WorkScreen chrome={chrome} heading={Heading} skin={skin} />}
+          {displayRoute === 'years' && <YearsScreen chrome={chrome} heading={Heading} skin={skin} />}
+          {displayRoute === 'skills' && <SkillsScreen chrome={chrome} heading={Heading} skin={skin} />}
+          {displayRoute === 'contact' && <ContactScreen chrome={chrome} heading={Heading} skin={skin} primaryBtn={primaryBtn} openContact={openContact} self={self} t={t} />}
         </main>
 
-        {/* Footer */}
-        <footer className={`px-4 pb-10 pt-8 text-xs ${muted}`} role="contentinfo" aria-label="Site footer">
-          <div className={`max-w-5xl mx-auto flex flex-col gap-3 border-t pt-8 md:flex-row md:items-baseline md:justify-between font-persona-label uppercase tracking-[0.1em] ${line}`}>
-            <p>
-              © 2026 {registry.personal.name}. {c.footer.rights}
-            </p>
-            <p className="md:text-center">
-              <span className={accentCls}>{t(self.nameKey)}</span> — {t(self.subtitleKey)}
-            </p>
-            <a href="#hero" className={`${accentCls} inline-flex items-center gap-1 font-semibold`}>
-              {c.footer.backToTop} ↑
-            </a>
-          </div>
-        </footer>
-
-        {/* Front parallax shards — sparse, capped, decorative only */}
-        <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 overflow-hidden hidden md:block">
-          {[0, 1, 2, 3].map((i) => (
-            <span
-              key={i}
-              data-parallax="front"
-              className={`absolute h-3 w-3 ${accentBg} opacity-[0.12]`}
-              style={{ clipPath: 'polygon(50% 0,100% 100%,0 100%)', left: `${12 + i * 24}%`, top: `${18 + i * 20}%` }}
-            />
-          ))}
-        </div>
-
-        {/* Mobile contact FAB */}
-        <button
-          type="button"
-          onClick={() => setContactOpen(true)}
-          aria-label="Open contact form"
-          className={`fixed bottom-6 right-6 md:hidden w-14 h-14 persona-skew-btn ${accentBg} ${isDark ? 'text-[#f5f2ee]' : 'text-white'} shadow-lg z-30 flex items-center justify-center`}
-        >
-          {Icon.mail}
-        </button>
+        <BottomBar chrome={chrome} route={displayRoute} navigate={navigate} items={items} sfx={sfx} liveCount={liveCount} />
       </div>
     </>
   )
