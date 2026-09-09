@@ -575,10 +575,10 @@ function Design4Content() {
             </div>
           </section>
 
-          {/* Years: the career year by year, opened by the unit chart of shipped work */}
+          {/* Years: the unit chart stays, each year re-narrated as one composed serif sentence — "five years in five lines" */}
           <section className={`py-20 md:py-32 px-6 md:px-16 ${bgPrimary}`}>
             <div className="max-w-7xl mx-auto">
-              <Years skin={skin} heading={LuxuryHeading} />
+              <Years skin={skin} heading={LuxuryHeading} variant="lines" />
             </div>
           </section>
 

@@ -450,10 +450,10 @@ function Design1Content() {
             </div>
           </section>
 
-          {/* Years: the career year by year, opened by the unit chart of shipped work */}
+          {/* Years: opened by a Year Strip calendar (60 mono cells) instead of the unit chart */}
           <section className={`py-16 md:py-24 border-t-4 ${borderStrong}`}>
             <div className="max-w-[1800px] mx-auto px-4 md:px-6">
-              <Years skin={skin} heading={(e, ti, a, l) => BrutalHeading(nextSection() + ' · ' + e, ti, a, l)} />
+              <Years skin={skin} heading={(e, ti, a, l) => BrutalHeading(nextSection() + ' · ' + e, ti, a, l)} variant="strip" />
             </div>
           </section>
 

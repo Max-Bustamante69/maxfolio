@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { useContent, useMediaQuery } from '../../hooks'
 import { RevealText } from '../common'
@@ -9,9 +9,18 @@ import type { SectionHeading } from './Gallery'
 interface YearsProps {
   skin: Skin
   heading: SectionHeading
+  /** 'rows' (default, Arcade/Persona): the unit chart + editorial rows/scrubber, unchanged.
+   *  'lines' (Luxury): the unit chart stays, each year's era line becomes a composed sentence.
+   *  'strip' (Brutalist): the unit chart is replaced by a 60-month calendar grid. */
+  variant?: 'rows' | 'lines' | 'strip'
+  /** Soft UI (Neo): the unit chart's tiles render with the raised/inset depth treatment instead of flat fills. */
+  depth?: boolean
 }
 
 const EASE = [0.23, 1, 0.32, 1] as const
+const NOW_YM = '2026-09'
+const STRIP_YEARS = [2022, 2023, 2024, 2025, 2026]
+const STRIP_MONTHS = Array.from({ length: 12 }, (_, i) => i + 1)
 
 /**
  * The career as an editorial timeline derived from the registry, opened by a small real chart
@@ -20,11 +29,13 @@ const EASE = [0.23, 1, 0.32, 1] as const
  * side projects as sentences on the right. Phones: the same records as a year scrubber with one panel,
  * so five years cost one screen.
  */
-export function Years({ skin, heading }: YearsProps) {
-  const { strings, registry, formatPeriod } = useContent()
+export function Years({ skin, heading, variant = 'rows', depth = false }: YearsProps) {
+  const { strings, registry, formatPeriod, locale } = useContent()
   const reduced = useReducedMotion()
   const wide = useMediaQuery('(min-width: 768px)', true)
   const y = strings.sections.years
+  const fl = strings.sections.fiveLines
+  const ys = strings.sections.yearStrip
   const years = [...timeline].reverse()
   const [picked, setPicked] = useState(years[0].year)
   const dot = (s: YearEntry['stores'][number]) => (s.status === 'live' ? 'bg-[#34c759]' : 'bg-[#ff9f0a]')
@@ -35,6 +46,24 @@ export function Years({ skin, heading }: YearsProps) {
   const kindFill: Record<WorkKind, string> = { stores: skin.accentBg, work: `${skin.accentBg} opacity-70`, products: `${skin.accentBg} opacity-45`, personal: `${skin.accentBg} opacity-25` }
   const kindLabel: Record<WorkKind, string> = { stores: y.shipped, work: y.work, products: y.products, personal: y.side }
   const roleName = (w: YearEntry['work'][number]) => `${strings.roleWork[w.id]} · ${registry.experience.find((e) => e.id === w.role)?.company ?? ''}`
+
+  /** Luxury's "five years in five lines": the same unit-chart counts, spelled out as one sentence. */
+  const fiveLineSentence = (entry: YearEntry) => {
+    const parts = WORK_KINDS.map((k) => {
+      const n = workCount(entry, k)
+      if (n === 0) return null
+      const kind = fl.kinds[k]
+      const word = n === 1 ? kind.one : (fl.numberWords[n] ?? String(n))
+      const noun = n === 1 ? kind.singular : kind.plural
+      return `${word}${fl.joiner}${noun}`
+    }).filter((s): s is string => s !== null)
+    if (parts.length === 0) return fl.empty
+    const sentence = parts.length === 1 ? parts[0] : parts.slice(0, -1).join(fl.listJoiner) + fl.listFinal + parts[parts.length - 1]
+    return sentence.charAt(0).toUpperCase() + sentence.slice(1)
+  }
+
+  /** Brutalist's Year Strip: a month is active when a storefront build or a role's window covers it — string compare works because YYYY-MM sorts lexicographically. */
+  const monthActive = (ym: string) => registry.stores.some((s) => ym >= s.timeline.start && ym <= s.timeline.end) || registry.experience.some((e) => ym >= e.start && ym <= (e.end ?? NOW_YM))
 
   const Names = ({ items }: { items: { key: string; name: string; dot?: string }[] }) => (
     <p className="text-base leading-relaxed md:text-lg">
@@ -55,6 +84,11 @@ export function Years({ skin, heading }: YearsProps) {
    */
   const UNIT = wide ? 5 : 4
   const GAP = 1.5
+  // Depth (Neo): a raised tile per shipped unit, an inset placeholder for every unused slot up to the
+  // busiest year — the meter reads "how full" a year is, not just "how tall". Small-scale shadows read
+  // off the theme's own tokens (`--neo-shadow-*`), never a hardcoded value, so light/dark stay correct.
+  const raisedStyle: CSSProperties = { boxShadow: '2px 2px 5px var(--neo-shadow-dark), -2px -2px 5px var(--neo-shadow-light)' }
+  const insetStyle: CSSProperties = { boxShadow: 'inset 1.5px 1.5px 3px var(--neo-shadow-dark), inset -1.5px -1.5px 3px var(--neo-shadow-light)', background: 'var(--neo-surface)' }
   const PerYear = () => (
     <figure className="m-0 mb-10 max-w-xl md:mb-14">
       <figcaption className={label}>{y.perYear}</figcaption>
@@ -64,25 +98,33 @@ export function Years({ skin, heading }: YearsProps) {
         role="img"
         aria-label={timeline.map((e) => `${e.year}: ${workTotal(e)} (${WORK_KINDS.filter((k) => workCount(e, k) > 0).map((k) => `${kindLabel[k]} ${workCount(e, k)}`).join(', ')})`).join('; ')}
       >
-        {timeline.map((e, i) => (
-          <div key={e.year} className="flex flex-col">
-            <p className="mb-2 text-sm font-semibold tabular-nums">{workTotal(e)}</p>
-            <div className="flex flex-col-reverse justify-start" style={{ height: maxTotal * UNIT + (maxTotal - 1) * GAP, gap: GAP }}>
-              {WORK_KINDS.flatMap((k) => Array.from({ length: workCount(e, k) }, (_, u) => ({ k, u }))).map(({ k, u }, j) => (
-                <m.div
-                  key={`${k}-${u}`}
-                  className={`w-full shrink-0 rounded-[1px] ${kindFill[k]}`}
-                  style={{ height: UNIT, transformOrigin: 'left' }}
-                  initial={reduced ? false : { scaleX: 0 }}
-                  whileInView={{ scaleX: 1 }}
-                  viewport={{ once: true, margin: '-40px' }}
-                  transition={{ duration: 0.3, delay: 0.1 + i * 0.06 + j * 0.025, ease: EASE }}
-                />
-              ))}
+        {timeline.map((e, i) => {
+          const filled = WORK_KINDS.flatMap((k) => Array.from({ length: workCount(e, k) }, (_, u) => ({ k, u })))
+          const emptyCount = depth ? Math.max(0, maxTotal - filled.length) : 0
+          return (
+            <div key={e.year} className="flex flex-col">
+              <p className="mb-2 text-sm font-semibold tabular-nums">{workTotal(e)}</p>
+              <div className="flex flex-col-reverse justify-start" style={{ height: maxTotal * UNIT + (maxTotal - 1) * GAP, gap: GAP }}>
+                {depth &&
+                  Array.from({ length: emptyCount }, (_, j) => (
+                    <div key={`empty-${j}`} className="w-full shrink-0 rounded-[1px]" style={{ height: UNIT, ...insetStyle }} />
+                  ))}
+                {filled.map(({ k, u }, j) => (
+                  <m.div
+                    key={`${k}-${u}`}
+                    className={`w-full shrink-0 rounded-[1px] ${kindFill[k]}`}
+                    style={{ height: UNIT, transformOrigin: 'left', ...(depth ? raisedStyle : {}) }}
+                    initial={reduced ? false : { scaleX: 0 }}
+                    whileInView={{ scaleX: 1 }}
+                    viewport={{ once: true, margin: '-40px' }}
+                    transition={{ duration: 0.3, delay: 0.1 + i * 0.06 + j * 0.025, ease: EASE }}
+                  />
+                ))}
+              </div>
+              <p className={`${skin.muted} mt-1.5 border-t pt-1.5 text-xs tabular-nums ${skin.line}`}>{e.year}</p>
             </div>
-            <p className={`${skin.muted} mt-1.5 border-t pt-1.5 text-xs tabular-nums ${skin.line}`}>{e.year}</p>
-          </div>
-        ))}
+          )
+        })}
       </div>
       <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5" aria-hidden="true">
         {WORK_KINDS.map((k) => (
@@ -92,8 +134,93 @@ export function Years({ skin, heading }: YearsProps) {
           </li>
         ))}
       </ul>
+      {/* `sr-only` on the wrapper — see StackByYear for why the table itself never gets it directly. */}
+      <div className="sr-only">
+        <table>
+          <caption>{y.perYear}</caption>
+          <tbody>
+            {timeline.map((e) => (
+              <tr key={e.year}>
+                <th scope="row">{e.year}</th>
+                {WORK_KINDS.filter((k) => workCount(e, k) > 0).map((k) => (
+                  <td key={k}>
+                    {kindLabel[k]}: {workCount(e, k)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </figure>
   )
+
+  /**
+   * Brutalist's replacement for the unit chart: every month from 2022-01 to 2026-12 as a dense mono
+   * grid, one row per year, a cell filled when a storefront build or a role touched that month. The
+   * current month gets a red marker regardless of state — "now", not "active".
+   */
+  const YearStrip = () => {
+    const rows = STRIP_YEARS.map((yr) => {
+      const cells = STRIP_MONTHS.map((mo) => {
+        const ym = `${yr}-${String(mo).padStart(2, '0')}`
+        return { ym, active: monthActive(ym), now: ym === NOW_YM }
+      })
+      return { year: yr, cells, count: cells.filter((c) => c.active).length }
+    })
+    const monthFmt = new Intl.DateTimeFormat(locale, { month: 'short', year: 'numeric' })
+    return (
+      <figure className="m-0 mb-10 max-w-xl md:mb-14">
+        <figcaption className={label}>{ys.legend}</figcaption>
+        <div className="mt-3 space-y-[3px]" role="img" aria-label={`${ys.legend}: ${rows.map((r) => `${r.year} — ${r.count} ${ys.countUnit}`).join('; ')}`}>
+          {rows.map((r) => (
+            <div key={r.year} className="flex items-center gap-2">
+              <span className={`w-10 shrink-0 font-mono text-[11px] tabular-nums ${skin.muted}`}>{r.year}</span>
+              <div className="grid flex-1 grid-cols-12 gap-[3px]">
+                {r.cells.map((c) => {
+                  const cellLabel = ys.monthAria.replace('{month}', monthFmt.format(new Date(`${c.ym}-01T12:00:00`))).replace('{state}', c.now ? ys.currentState : c.active ? ys.activeState : ys.inactiveState)
+                  return (
+                    <m.span
+                      key={c.ym}
+                      role="img"
+                      aria-label={cellLabel}
+                      title={cellLabel}
+                      className={`relative aspect-square min-w-[6px] rounded-[1px] ${c.now ? 'bg-red-600' : c.active ? skin.accentBg : skin.dark ? 'bg-stone-700' : 'bg-stone-300'}`}
+                      // Brutalist's own accent IS red, so an active cell and the "now" cell can share
+                      // the exact fill — the ring is what actually marks "now" distinct from "active".
+                      style={c.now ? { boxShadow: `inset 0 0 0 2px ${skin.dark ? '#f5f5f4' : '#1c1917'}` } : undefined}
+                      initial={reduced ? false : { opacity: 0, scale: 0.5 }}
+                      whileInView={{ opacity: 1, scale: c.now ? 1.15 : 1 }}
+                      viewport={{ once: true, margin: '-40px' }}
+                      transition={{ duration: 0.2, delay: 0.15 + STRIP_YEARS.indexOf(r.year) * 0.06, ease: EASE }}
+                    />
+                  )
+                })}
+              </div>
+              <span className={`w-6 shrink-0 text-right font-mono text-[11px] tabular-nums ${skin.muted}`}>{r.count}</span>
+            </div>
+          ))}
+        </div>
+        <p className={`mt-3 text-xs ${skin.muted}`}>{ys.countUnit}</p>
+        {/* `sr-only` on the wrapper — see StackByYear for why the table itself never gets it directly. */}
+        <div className="sr-only">
+          <table>
+            <caption>{ys.legend}</caption>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.year}>
+                  <th scope="row">{r.year}</th>
+                  {r.cells.map((c) => (
+                    <td key={c.ym}>{ys.monthAria.replace('{month}', c.ym).replace('{state}', c.now ? ys.currentState : c.active ? ys.activeState : ys.inactiveState)}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </figure>
+    )
+  }
 
   const Body = ({ entry }: { entry: YearEntry }) => (
     <div className="space-y-6">
@@ -153,7 +280,7 @@ export function Years({ skin, heading }: YearsProps) {
   return (
     <section id="years" className="scroll-mt-20">
       {heading(y.eyebrow, y.title, y.titleAccent, y.lead)}
-      <PerYear />
+      {variant === 'strip' ? <YearStrip /> : <PerYear />}
 
       {wide ? (
         <ol className={`border-t ${skin.line}`}>
@@ -170,7 +297,11 @@ export function Years({ skin, heading }: YearsProps) {
                 <p className="font-sf text-6xl font-semibold leading-none tracking-[-0.05em] tabular-nums md:text-7xl">
                   <RevealText text={String(entry.year)} />
                 </p>
-                {y.eras[String(entry.year)] && <p className={`${skin.accent} mt-3 text-sm font-medium`}>{y.eras[String(entry.year)]}</p>}
+                {variant === 'lines' ? (
+                  <p className={`${skin.accent} font-display mt-3 text-base italic leading-snug md:text-lg`}>{fiveLineSentence(entry)}.</p>
+                ) : (
+                  y.eras[String(entry.year)] && <p className={`${skin.accent} mt-3 text-sm font-medium`}>{y.eras[String(entry.year)]}</p>
+                )}
               </div>
               <div className="md:col-span-9">
                 <Body entry={entry} />
@@ -204,7 +335,11 @@ export function Years({ skin, heading }: YearsProps) {
           </div>
           <AnimatePresence mode="wait" initial={false}>
             <m.div key={picked} role="tabpanel" className="pt-6" initial={reduced ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, transition: { duration: 0.1 } }} transition={{ duration: 0.28, ease: EASE }}>
-              {y.eras[String(picked)] && <p className={`${skin.accent} mb-5 text-sm font-medium`}>{y.eras[String(picked)]}</p>}
+              {variant === 'lines' ? (
+                <p className={`${skin.accent} font-display mb-5 text-base italic leading-snug`}>{fiveLineSentence(years.find((e) => e.year === picked) ?? years[0])}.</p>
+              ) : (
+                y.eras[String(picked)] && <p className={`${skin.accent} mb-5 text-sm font-medium`}>{y.eras[String(picked)]}</p>
+              )}
               <Body entry={years.find((e) => e.year === picked) ?? years[0]} />
             </m.div>
           </AnimatePresence>
