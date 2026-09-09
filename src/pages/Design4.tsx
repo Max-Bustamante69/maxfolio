@@ -238,7 +238,7 @@ function Design4Content() {
 
         <main id="main-content">
           {/* Hero Section */}
-          <section id="hero" className="min-h-[70vh] flex items-center py-16 md:py-20 px-6 md:px-16" aria-labelledby="hero-heading">
+          <section id="hero" className="md:min-h-[70vh] flex items-center py-16 md:py-20 px-6 md:px-16" aria-labelledby="hero-heading">
             <div className="max-w-7xl mx-auto w-full">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-24 items-end">
                 <div className="lg:col-span-8">

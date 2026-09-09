@@ -220,8 +220,8 @@ export function Ticker<T>({ items, renderItem, keyOf, variant, label, duration =
     return (
       <div role="region" aria-label={label}>
         {/* compact: a wrapped strip of the first twelve items, not a tall column (measured ~800 px on phones) */}
-        <ul className={`ticker-static-wrap flex flex-wrap items-center gap-x-2 gap-y-1 ${className}`}>
-          {items.slice(0, 12).map((item, i) => (
+        <ul className={`ticker-static-wrap flex flex-wrap items-center gap-x-2 gap-y-1 text-sm ${className}`}>
+          {items.slice(0, 8).map((item, i) => (
             <li key={getKey(item, i)} className={`${itemClassName} !px-2 !py-1`}>
               {renderItem(item, i)}
             </li>

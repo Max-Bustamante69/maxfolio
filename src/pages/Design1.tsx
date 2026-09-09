@@ -199,7 +199,7 @@ function Design1Content() {
 
         {/* Hero - Editorial Spread */}
         <main id="main-content">
-          <section className="min-h-[70vh] pt-20 relative" aria-labelledby="hero-heading">
+          <section className="md:min-h-[70vh] pt-20 relative" aria-labelledby="hero-heading">
             <div className="max-w-[1800px] mx-auto px-4 md:px-6">
               {/* Masthead */}
               <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} className={`py-8 md:py-12 border-b-2 ${borderStrong}`}>
