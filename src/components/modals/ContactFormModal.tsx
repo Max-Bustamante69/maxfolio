@@ -8,7 +8,7 @@ import { useI18n } from '../../hooks'
 interface ContactFormModalProps {
   isOpen: boolean
   onClose: () => void
-  variant?: 'luxury' | 'brutalist' | 'apple'
+  variant?: 'luxury' | 'brutalist' | 'apple' | 'persona'
   isDark?: boolean
   /** Text placed in the message field when the form opens (e.g. the store URL from the contact section). */
   initialMessage?: string
@@ -139,8 +139,23 @@ export function ContactFormModal({
       : 'border-black/10 text-[#1d1d1f] hover:bg-black/5 rounded-full press',
   }
 
-  const styles = variant === 'apple' ? appleStyles : variant === 'luxury' ? luxuryStyles : brutalistStyles
-  const successCircle = variant === 'apple' ? 'bg-[#0071e3]/15' : variant === 'luxury' ? 'bg-deco-gold/20' : 'bg-red-600/20'
+  // Persona variant: a "dialogue box" — a notch-cut name-plate corner, ink/paper ground, one accent.
+  const personaStyles = {
+    bgModal: isDark ? 'bg-[#111013] persona-notch' : 'bg-[#f5f2ee] persona-notch',
+    bgInput: isDark
+      ? 'bg-[#f5f2ee]/[0.06] border-[#f5f2ee]/20 text-[#f5f2ee] placeholder:text-[#f5f2ee]/40 focus:border-[#c8102e]'
+      : 'bg-[#0a0f1a]/[0.03] border-[#0a0f1a]/15 text-[#0a0f1a] placeholder:text-[#0a0f1a]/40 focus:border-[#1c6fb0]',
+    textPrimary: isDark ? 'text-[#f5f2ee]' : 'text-[#0a0f1a]',
+    textSecondary: isDark ? 'text-[#f5f2ee]/70' : 'text-[#0a0f1a]/70',
+    textMuted: isDark ? 'text-[#f5f2ee]/45' : 'text-[#0a0f1a]/45',
+    // #e8465f (not #c8102e) for text on ink: the deep red only clears ~3.2:1 there, short of AA.
+    accent: isDark ? 'text-[#e8465f]' : 'text-[#1c6fb0]',
+    btnPrimary: isDark ? 'bg-[#c8102e] text-[#f5f2ee] hover:bg-[#8f0b1f]' : 'bg-[#1c6fb0] text-white hover:bg-[#0a0f1a]',
+    btnSecondary: isDark ? 'border-[#f5f2ee]/20 text-[#f5f2ee] hover:bg-[#f5f2ee]/10' : 'border-[#0a0f1a]/20 text-[#0a0f1a] hover:bg-[#0a0f1a]/5',
+  }
+
+  const styles = variant === 'apple' ? appleStyles : variant === 'luxury' ? luxuryStyles : variant === 'persona' ? personaStyles : brutalistStyles
+  const successCircle = variant === 'apple' ? 'bg-[#0071e3]/15' : variant === 'luxury' ? 'bg-deco-gold/20' : variant === 'persona' ? (isDark ? 'bg-[#c8102e]/20' : 'bg-[#1c6fb0]/15') : 'bg-red-600/20'
 
   return (
     <AnimatePresence>
