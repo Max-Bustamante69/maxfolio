@@ -6,6 +6,30 @@ interface SectionHeading {
   titleAccent: string
 }
 
+/**
+ * Commerce-oriented figures for the "By the numbers" block (catalog/offer/delivery/reach), read
+ * from the live storefront (src/data/commerce.json) and the registry — never a conversion rate,
+ * revenue or AOV figure, which are not measured for these stores.
+ */
+export interface CommerceLabels {
+  title: string // "By the numbers" — the block heading, replaces the build-trail block's old spot
+  catalogLabel: string
+  offerLabel: string
+  deliveryLabel: string
+  reachLabel: string
+  catalogLine: string // '{products} products · {collections} collections · from {price}'
+  catalogLineNoPrice: string // '{products} products · {collections} collections'
+  deliveryLine: string // 'Shipped in {weeks} weeks · live since {month}'
+  reachLine: string // '{currency} · ships to {n} places'
+  reachLineSingle: string // '{currency} pricing'
+  offerFallback: string // generic offer line when nothing more specific is derivable
+  offerKind: Record<string, string> // short offer-mechanic labels keyed by the registry fact id
+  vsFleetPct: string // '{sign}{pct}% vs fleet median'
+  vsFleetWeeks: string // '{sign}{n} wk vs fleet median'
+  unavailable: string // 'Public catalog not shown' — protected/unreachable storefronts
+  engineering: string // collapsed row summary at the bottom of the sheet
+}
+
 export interface PortfolioContent {
   meta: { title: string; description: string }
   hero: {
@@ -70,7 +94,10 @@ export interface PortfolioContent {
       elsewhere: string
     }
     explore: { eyebrow: string; title: string; lead: string; viewing: string }
-    caseStudy: { facts: string; results: string; stack: string; visit: string; prev: string; next: string; timeline: string; commits: string; sections: string; open: string; metrics: string; perf: string; a11y: string; bp: string; seo: string; lcp: string; measured: string; trail: string; trailNote: string; perWeek: string; peak: string; codebase: string; liquidLines: string; islandLines: string; sectionsCount: string; weeks: string; copyLink: string; copied: string }
+    caseStudy: {
+      facts: string; results: string; stack: string; visit: string; prev: string; next: string; timeline: string; commits: string; sections: string; open: string; metrics: string; perf: string; a11y: string; bp: string; seo: string; lcp: string; measured: string; trail: string; trailNote: string; perWeek: string; peak: string; codebase: string; liquidLines: string; islandLines: string; sectionsCount: string; weeks: string; copyLink: string; copied: string
+      commerce: CommerceLabels
+    }
   }
   badges: { live: string; dev: string; current: string; completed: string; roles: Record<StoreRole, string> }
   experience: Record<

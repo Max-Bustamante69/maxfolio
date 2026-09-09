@@ -14,6 +14,6 @@ export function useContent() {
     const fmt = new Intl.DateTimeFormat(INTL[locale], { month: 'short', year: 'numeric' })
     const formatPeriod = (start: string, end: string | null) =>
       `${fmt.format(new Date(`${start}-01T12:00:00`))} – ${end ? fmt.format(new Date(`${end}-01T12:00:00`)) : PRESENT[locale]}`
-    return { strings, registry, formatPeriod, locale }
+    return { strings, registry, formatPeriod, locale, intlLocale: INTL[locale], monthFmt: fmt }
   }, [locale, strings])
 }

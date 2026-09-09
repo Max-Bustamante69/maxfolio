@@ -8,11 +8,19 @@ import type { FrameShots } from './ProjectFrame'
 import { Carousel } from '../../vendor/carousel'
 import type { StoreMetrics } from '../../data/registry'
 import type { StoreTelemetry } from '../../data/telemetry'
+import type { CommerceLabels } from '../../content/types'
 import { CountUp, VolumeBars, WeeklyBars } from './charts'
 
 export interface CaseStudyStat {
   label: string
   value: string
+}
+
+/** One "By the numbers" tile: catalog, offer, delivery or reach — see src/data/commerceLines.ts. */
+export interface CommerceTile {
+  label: string
+  value: string
+  deltas: string[] // "vs fleet" chips, only ever populated when both sides are real measured numbers
 }
 
 export interface CaseStudyData {
@@ -23,7 +31,8 @@ export interface CaseStudyData {
   tagline: string
   description: string
   metrics?: StoreMetrics // Lighthouse lab scores, live stores only
-  trail?: { data: StoreTelemetry; range: string } // real build telemetry from the store repo's git history
+  trail?: { data: StoreTelemetry; range: string } // real build telemetry from the store repo's git history — collapsed, de-emphasized
+  commerceTiles: CommerceTile[] // catalog / offer / delivery / reach — the sheet's lead numbers
   stats: CaseStudyStat[] // verifiable store facts (build window, ladders, modules…)
   results: CaseStudyStat[] // measured business outcomes; hidden when empty
   stack: string[]
@@ -61,6 +70,7 @@ export interface CaseStudyLabels {
   weeks: string
   copyLink: string
   copied: string
+  commerce: CommerceLabels
 }
 
 interface ProjectModalProps {
@@ -284,35 +294,18 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
               <p className={`${skin.accent} mt-4 text-sm font-medium`}>{data.tagline}</p>
               <p className="mt-2 text-sm leading-relaxed">{data.description}</p>
 
-              {data.trail && (
-                <>
-                  <p className={`mt-6 ${label}`}>{labels.trail}</p>
-                  {/* the headline is real: commits in the store repo, then the shape of the build week by week */}
-                  <p className="mt-3 flex items-baseline gap-3">
-                    <CountUp value={data.trail.data.commits} delay={0.15} className="text-4xl font-semibold tabular-nums tracking-[-0.03em]" />
-                    <span className={`${skin.muted} text-sm`}>
-                      {labels.commits} · {data.trail.data.weeks.length} {labels.weeks}
-                    </span>
-                  </p>
-                  <div className="mt-4">
-                    <WeeklyBars weeks={data.trail.data.weeks} weekOf={data.trail.data.weekOf} caption={labels.perWeek} peakLabel={labels.peak.replace('{n}', String(data.trail.data.busiestWeek.commits))} color={accent} dark={dark} delay={0.25} />
+              {/* Commerce-oriented, not engineering telemetry: catalog, offer, delivery, reach — the
+                  same four angles the index chip and gallery caption each show one slice of. */}
+              <p className={`mt-6 ${label}`}>{labels.commerce.title}</p>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                {data.commerceTiles.map((t) => (
+                  <div key={t.label} className={tile}>
+                    <p className={`text-[10px] font-semibold uppercase tracking-[0.16em] ${skin.muted}`}>{t.label}</p>
+                    <p className="mt-1 text-[13px] font-medium leading-snug">{t.value}</p>
+                    {t.deltas.length > 0 && <p className={`mt-1 text-[11px] leading-tight ${skin.muted}`}>{t.deltas.join(' · ')}</p>}
                   </div>
-                  <p className={`mt-5 ${label}`}>{labels.codebase}</p>
-                  <div className="mt-2">
-                    <VolumeBars
-                      rows={[
-                        { label: labels.sectionsCount, value: data.trail.data.sections },
-                        { label: labels.liquidLines, value: data.trail.data.lines.liquid },
-                        ...(data.trail.data.lines.islands > 0 ? [{ label: labels.islandLines, value: data.trail.data.lines.islands }] : []),
-                      ]}
-                      color={accent}
-                      dark={dark}
-                      delay={0.4}
-                    />
-                  </div>
-                  <p className={`${skin.muted} mt-3 text-[11px] leading-snug`}>{labels.trailNote.replace('{n}', String(data.trail.data.commits)).replace('{range}', data.trail.range)}</p>
-                </>
-              )}
+                ))}
+              </div>
 
               {data.metrics && (
                 <>
@@ -370,6 +363,47 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
                 <a href={data.url} target="_blank" rel="noopener noreferrer" className={`${skin.accent} mt-6 inline-block text-sm font-medium`}>
                   {labels.visit} ›
                 </a>
+              )}
+
+              {/* The real build trail (commits, weekly shape, codebase volume) — kept, just de-emphasized
+                  behind a native disclosure so the commerce numbers above lead the sheet. */}
+              {data.trail && (
+                <details className="group mt-8 border-t pt-4" style={{ borderColor: dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}>
+                  <summary className={`press cursor-pointer list-none ${label}`}>
+                    <span className="inline-flex items-center gap-1.5">
+                      {labels.commerce.engineering}
+                      <svg viewBox="0 0 20 20" className="h-3 w-3 shrink-0 transition-transform group-open:rotate-90" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                        <path d="M7 5l6 5-6 5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </span>
+                  </summary>
+                  <div className="mt-3">
+                    {/* the headline is real: commits in the store repo, then the shape of the build week by week */}
+                    <p className="flex items-baseline gap-3">
+                      <CountUp value={data.trail.data.commits} delay={0.05} className="text-3xl font-semibold tabular-nums tracking-[-0.03em]" />
+                      <span className={`${skin.muted} text-sm`}>
+                        {labels.commits} · {data.trail.data.weeks.length} {labels.weeks}
+                      </span>
+                    </p>
+                    <div className="mt-4">
+                      <WeeklyBars weeks={data.trail.data.weeks} weekOf={data.trail.data.weekOf} caption={labels.perWeek} peakLabel={labels.peak.replace('{n}', String(data.trail.data.busiestWeek.commits))} color={accent} dark={dark} delay={0.1} />
+                    </div>
+                    <p className={`mt-5 ${label}`}>{labels.codebase}</p>
+                    <div className="mt-2">
+                      <VolumeBars
+                        rows={[
+                          { label: labels.sectionsCount, value: data.trail.data.sections },
+                          { label: labels.liquidLines, value: data.trail.data.lines.liquid },
+                          ...(data.trail.data.lines.islands > 0 ? [{ label: labels.islandLines, value: data.trail.data.lines.islands }] : []),
+                        ]}
+                        color={accent}
+                        dark={dark}
+                        delay={0.2}
+                      />
+                    </div>
+                    <p className={`${skin.muted} mt-3 text-[11px] leading-snug`}>{labels.trailNote.replace('{n}', String(data.trail.data.commits)).replace('{range}', data.trail.range)}</p>
+                  </div>
+                </details>
               )}
             </div>
           </m.div>

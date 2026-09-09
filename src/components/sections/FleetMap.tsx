@@ -20,7 +20,7 @@ const DOT_COLOR = { live: '#34c759', dev: '#ff9f0a' } as const
  * dot opens the same case-study sheet as the Shopify Work index — real data, one click deeper.
  */
 export function FleetMap({ skin, heading }: FleetMapProps) {
-  const { strings, registry, formatPeriod } = useContent()
+  const { strings, registry, formatPeriod, intlLocale, monthFmt } = useContent()
   const reduced = useReducedMotion()
   const fm = strings.sections.fleetMap
   const [role, setRole] = useState<StoreRole | null>(null)
@@ -126,7 +126,7 @@ export function FleetMap({ skin, heading }: FleetMapProps) {
         <Suspense fallback={null}>
           <ProjectModal
             open={!!openStore}
-            data={openStore ? caseStudyFor(openStore, strings, skin, formatPeriod) : null}
+            data={openStore ? caseStudyFor(openStore, strings, skin, formatPeriod, intlLocale, monthFmt) : null}
             skin={skin}
             labels={caseStudyLabels(strings)}
             onClose={() => setOpenStore(null)}

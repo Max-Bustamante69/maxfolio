@@ -1,0 +1,528 @@
+{
+  "the-gummy-box": {
+    "status": "live",
+    "fetchedAt": "2026-09-09T21:51:11.206Z",
+    "shopName": "THE BOX COLOMBIA",
+    "currency": "COP",
+    "country": "CO",
+    "shipsToCount": 2,
+    "products": 24,
+    "collections": 15,
+    "priceMin": 79000,
+    "priceMax": 289900,
+    "onSaleShare": 0.56,
+    "variantsPerProduct": 2,
+    "productTypes": [
+      {
+        "type": "Salud",
+        "count": 11
+      },
+      {
+        "type": "Ropa Deportiva",
+        "count": 1
+      }
+    ]
+  },
+  "nos-cafe": {
+    "status": "live",
+    "fetchedAt": "2026-09-09T21:51:11.845Z",
+    "shopName": "NOS - Lumiria Coffee Roasters",
+    "currency": "PEN",
+    "country": "PE",
+    "shipsToCount": 1,
+    "products": 14,
+    "collections": 13,
+    "priceMin": 49,
+    "priceMax": 209,
+    "onSaleShare": 0,
+    "variantsPerProduct": 6.71,
+    "productTypes": [
+      {
+        "type": "Café de especialidad",
+        "count": 9
+      },
+      {
+        "type": "Cápsulas de café",
+        "count": 3
+      },
+      {
+        "type": "Bundle padre",
+        "count": 1
+      },
+      {
+        "type": "Tarjeta de regalo",
+        "count": 1
+      }
+    ]
+  },
+  "millennio": {
+    "status": "live",
+    "fetchedAt": "2026-09-09T21:51:14.493Z",
+    "shopName": "Perfumería Millennio",
+    "currency": "COP",
+    "country": "CO",
+    "shipsToCount": 1,
+    "products": 1064,
+    "collections": 125,
+    "priceMin": 500,
+    "priceMax": 2300000,
+    "onSaleShare": 0.41,
+    "variantsPerProduct": 2.49,
+    "productTypes": [
+      {
+        "type": "perfume",
+        "count": 1064
+      }
+    ]
+  },
+  "mindfuel": {
+    "status": "live",
+    "fetchedAt": "2026-09-09T21:51:15.039Z",
+    "shopName": "Mindfuel",
+    "currency": "COP",
+    "country": "CO",
+    "shipsToCount": 1,
+    "products": 2,
+    "collections": 1,
+    "priceMin": 129900,
+    "priceMax": 129900,
+    "onSaleShare": 0,
+    "variantsPerProduct": 1,
+    "productTypes": [
+      {
+        "type": "Salud",
+        "count": 1
+      }
+    ]
+  },
+  "nalua": {
+    "status": "live",
+    "fetchedAt": "2026-09-09T21:51:15.646Z",
+    "shopName": "Nalua Skincare",
+    "currency": "COP",
+    "country": "CO",
+    "shipsToCount": 1,
+    "products": 21,
+    "collections": 8,
+    "priceMin": 15000,
+    "priceMax": 149000,
+    "onSaleShare": 0.67,
+    "variantsPerProduct": 1.14,
+    "productTypes": [
+      {
+        "type": "Belleza",
+        "count": 18
+      },
+      {
+        "type": "General",
+        "count": 3
+      }
+    ]
+  },
+  "sebum": {
+    "status": "live",
+    "fetchedAt": "2026-09-09T21:51:16.263Z",
+    "shopName": "Sebum",
+    "currency": "COP",
+    "country": "CO",
+    "shipsToCount": 29,
+    "products": 3,
+    "collections": 5,
+    "priceMin": 75900,
+    "priceMax": 134900,
+    "onSaleShare": 0.33,
+    "variantsPerProduct": 1,
+    "productTypes": [
+      {
+        "type": "Bálsamo facial",
+        "count": 2
+      },
+      {
+        "type": "Kit y combo",
+        "count": 1
+      }
+    ]
+  },
+  "valdo-cafe": {
+    "status": "live",
+    "fetchedAt": "2026-09-09T21:51:17.037Z",
+    "shopName": "Valdo",
+    "currency": "COP",
+    "country": "CO",
+    "shipsToCount": 29,
+    "products": 5,
+    "collections": 5,
+    "priceMin": 14500,
+    "priceMax": 144000,
+    "onSaleShare": 0.46,
+    "variantsPerProduct": 7,
+    "productTypes": []
+  },
+  "factores-2x2": {
+    "status": "live",
+    "fetchedAt": "2026-09-09T21:51:17.943Z",
+    "shopName": "Factores 2x2 Plus",
+    "currency": "COP",
+    "country": "CO",
+    "shipsToCount": 1,
+    "products": 5,
+    "collections": 1,
+    "priceMin": 145000,
+    "priceMax": 675000,
+    "onSaleShare": 0.86,
+    "variantsPerProduct": 4.2,
+    "productTypes": []
+  },
+  "pixxiesx": {
+    "status": "live",
+    "fetchedAt": "2026-09-09T21:51:20.157Z",
+    "shopName": "PIXXIESX SUNGLASSES",
+    "currency": "COP",
+    "country": "CO",
+    "shipsToCount": 1,
+    "products": 473,
+    "collections": 102,
+    "priceMin": 10000,
+    "priceMax": 782000,
+    "onSaleShare": 0.15,
+    "variantsPerProduct": 1.63,
+    "productTypes": [
+      {
+        "type": "Gafas",
+        "count": 67
+      },
+      {
+        "type": "tarjetero",
+        "count": 8
+      },
+      {
+        "type": "LensAdvizor",
+        "count": 6
+      },
+      {
+        "type": "Gift Option",
+        "count": 1
+      },
+      {
+        "type": "Virtual",
+        "count": 1
+      }
+    ]
+  },
+  "luxe-shine": {
+    "status": "live",
+    "fetchedAt": "2026-09-09T21:51:20.752Z",
+    "shopName": "Luxe Shine ",
+    "currency": "USD",
+    "country": "US",
+    "shipsToCount": 28,
+    "products": 12,
+    "collections": 6,
+    "priceMin": 69.99,
+    "priceMax": 80,
+    "onSaleShare": 0,
+    "variantsPerProduct": 3.67,
+    "productTypes": [
+      {
+        "type": "Watch",
+        "count": 1
+      }
+    ]
+  },
+  "atmosfera": {
+    "status": "live",
+    "fetchedAt": "2026-09-09T21:51:21.457Z",
+    "shopName": "ATMOSFERA TECNOLOGICA",
+    "currency": "COP",
+    "country": "CO",
+    "shipsToCount": 29,
+    "products": 13,
+    "collections": 4,
+    "priceMin": 1701000,
+    "priceMax": 17222625,
+    "onSaleShare": 0.46,
+    "variantsPerProduct": 2,
+    "productTypes": [
+      {
+        "type": "Portátil",
+        "count": 13
+      }
+    ]
+  },
+  "saint-theory": {
+    "status": "live",
+    "fetchedAt": "2026-09-09T21:51:22.120Z",
+    "shopName": "SAINT THEORY",
+    "currency": "COP",
+    "country": "CO",
+    "shipsToCount": 29,
+    "products": 235,
+    "collections": 25,
+    "priceMin": 128000,
+    "priceMax": 890000,
+    "onSaleShare": 0.1,
+    "variantsPerProduct": 4.77,
+    "productTypes": [
+      {
+        "type": "Shirt",
+        "count": 131
+      },
+      {
+        "type": "Hoodie",
+        "count": 33
+      },
+      {
+        "type": "Pants",
+        "count": 26
+      },
+      {
+        "type": "TrackSuit",
+        "count": 12
+      },
+      {
+        "type": "Shorts",
+        "count": 7
+      },
+      {
+        "type": "Sneakers",
+        "count": 2
+      }
+    ]
+  },
+  "peluna": {
+    "status": "live",
+    "fetchedAt": "2026-09-09T21:51:22.702Z",
+    "shopName": "Peluna Pets Marca",
+    "currency": "COP",
+    "country": "US",
+    "shipsToCount": 29,
+    "products": 2,
+    "collections": 1,
+    "priceMin": 89900,
+    "priceMax": 89900,
+    "onSaleShare": 0,
+    "variantsPerProduct": 1,
+    "productTypes": [
+      {
+        "type": "Otro",
+        "count": 1
+      },
+      {
+        "type": "Mascotas",
+        "count": 1
+      }
+    ]
+  },
+  "en-amor-a-dos": {
+    "status": "live",
+    "fetchedAt": "2026-09-09T21:51:23.247Z",
+    "shopName": "EN AMOR A DOS",
+    "currency": "COP",
+    "country": "CO",
+    "shipsToCount": 2,
+    "products": 13,
+    "collections": 9,
+    "priceMin": 39000,
+    "priceMax": 255000,
+    "onSaleShare": 0.11,
+    "variantsPerProduct": 40.77,
+    "productTypes": [
+      {
+        "type": "Combo",
+        "count": 3
+      }
+    ]
+  },
+  "unik": {
+    "status": "live",
+    "fetchedAt": "2026-09-09T21:51:24.107Z",
+    "shopName": "Unik Jeans",
+    "currency": "COP",
+    "country": "CO",
+    "shipsToCount": 2,
+    "products": 68,
+    "collections": 13,
+    "priceMin": 67700,
+    "priceMax": 500000,
+    "onSaleShare": 0.18,
+    "variantsPerProduct": 8.75,
+    "productTypes": [
+      {
+        "type": "Moda",
+        "count": 52
+      },
+      {
+        "type": "Jeans de dama",
+        "count": 11
+      },
+      {
+        "type": "General",
+        "count": 4
+      },
+      {
+        "type": "Mascotas",
+        "count": 1
+      }
+    ]
+  },
+  "origen-vital": {
+    "status": "live",
+    "fetchedAt": "2026-09-09T21:51:24.717Z",
+    "shopName": "Origen Vital COLOMBIA",
+    "currency": "COP",
+    "country": "CO",
+    "shipsToCount": 2,
+    "products": 4,
+    "collections": 7,
+    "priceMin": 79900,
+    "priceMax": 129900,
+    "onSaleShare": 0.75,
+    "variantsPerProduct": 1,
+    "productTypes": [
+      {
+        "type": "DESARROLLO",
+        "count": 3
+      },
+      {
+        "type": "SALUD Y BIENESTAR",
+        "count": 1
+      }
+    ]
+  },
+  "para-machos": {
+    "status": "live",
+    "fetchedAt": "2026-09-09T21:51:25.273Z",
+    "shopName": "Para Machos",
+    "currency": "COP",
+    "country": "CO",
+    "shipsToCount": 1,
+    "products": 18,
+    "collections": 8,
+    "priceMin": 35000,
+    "priceMax": 150000,
+    "onSaleShare": 0.72,
+    "variantsPerProduct": 1,
+    "productTypes": []
+  },
+  "tierramont": {
+    "status": "live",
+    "fetchedAt": "2026-09-09T21:51:26.055Z",
+    "shopName": "Tierramont",
+    "currency": "COP",
+    "country": "CO",
+    "shipsToCount": 29,
+    "products": 100,
+    "collections": 27,
+    "priceMin": 19000,
+    "priceMax": 500000,
+    "onSaleShare": 0.6,
+    "variantsPerProduct": 2.95,
+    "productTypes": [
+      {
+        "type": "Chaqueta senderismo",
+        "count": 18
+      },
+      {
+        "type": "Rompevientos",
+        "count": 17
+      },
+      {
+        "type": "Gorro tejido a mano",
+        "count": 15
+      },
+      {
+        "type": "sweater térmico",
+        "count": 14
+      },
+      {
+        "type": "Banda o balaca tejida a mano",
+        "count": 6
+      },
+      {
+        "type": "Gorro térmico",
+        "count": 6
+      }
+    ]
+  },
+  "alma-de-aviador": {
+    "status": "unreachable",
+    "fetchedAt": "2026-09-09T21:51:29.389Z",
+    "note": "HTTP 404"
+  },
+  "joystaz": {
+    "status": "live",
+    "fetchedAt": "2026-09-09T21:51:29.976Z",
+    "shopName": "Joy Staz Jeans ",
+    "currency": "COP",
+    "country": "CO",
+    "shipsToCount": 1,
+    "products": 146,
+    "collections": 66,
+    "priceMin": 44900,
+    "priceMax": 249900,
+    "onSaleShare": 0.05,
+    "variantsPerProduct": 4.67,
+    "productTypes": [
+      {
+        "type": "Jean Wide Leg Mujer",
+        "count": 34
+      },
+      {
+        "type": "Jean Bota Recta Hombre",
+        "count": 20
+      },
+      {
+        "type": "Jean Skinny Mujer",
+        "count": 17
+      },
+      {
+        "type": "Jean Clásico Hombre",
+        "count": 11
+      },
+      {
+        "type": "Sets",
+        "count": 8
+      },
+      {
+        "type": "Jean Barrel Mujer",
+        "count": 8
+      }
+    ]
+  },
+  "new-urban": {
+    "status": "live",
+    "fetchedAt": "2026-09-09T21:51:31.990Z",
+    "shopName": "New Urban",
+    "currency": "COP",
+    "country": "CO",
+    "shipsToCount": 1,
+    "products": 223,
+    "collections": 81,
+    "priceMin": 35000,
+    "priceMax": 1149900,
+    "onSaleShare": 0.08,
+    "variantsPerProduct": 7.46,
+    "productTypes": [
+      {
+        "type": "Calzado",
+        "count": 203
+      },
+      {
+        "type": "Ropa",
+        "count": 8
+      },
+      {
+        "type": "gorra",
+        "count": 3
+      },
+      {
+        "type": "Gorras",
+        "count": 2
+      },
+      {
+        "type": "Accesorios",
+        "count": 2
+      }
+    ]
+  }
+}

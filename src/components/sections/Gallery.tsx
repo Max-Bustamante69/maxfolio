@@ -4,9 +4,15 @@ import { useContent, useSheetHistory } from '../../hooks'
 import { ProjectFrame, GlassControls, carouselTokens, type Skin, type FrameShots, type LightboxItem, type CaseStudyData } from '../gallery'
 import type { CaseStudyLabels } from '../gallery/ProjectModal'
 import { Carousel } from '../../vendor/carousel'
-import { metrics, type StoreEntry } from '../../data/registry'
+import { metrics, stores as allStores, type StoreEntry } from '../../data/registry'
 import { telemetry } from '../../data/telemetry'
+import { commerce, isLiveCommerce } from '../../data/commerce'
+import { computeFleetMedians, lineForAngle, pickCommerceLine, vsFleetPctChip, vsFleetWeeksChip, weeksFor } from '../../data/commerceLines'
 import type { PortfolioContent } from '../../content/types'
+
+// Computed once at module scope: registry/commerce/telemetry are static build-time data, so every
+// open sheet compares against the same real fleet snapshot rather than re-deriving it per render.
+const FLEET_MEDIANS = computeFleetMedians(allStores, commerce, telemetry)
 
 export type SectionHeading = (eyebrow: string, title: string, accent: string, lead?: string) => ReactNode
 
@@ -46,6 +52,7 @@ export const caseStudyLabels = (strings: PortfolioContent): CaseStudyLabels => {
     metrics: cs.metrics, perf: cs.perf, a11y: cs.a11y, bp: cs.bp, seo: cs.seo, lcp: cs.lcp, measured: cs.measured,
     trail: cs.trail, trailNote: cs.trailNote, perWeek: cs.perWeek, peak: cs.peak, codebase: cs.codebase, liquidLines: cs.liquidLines, islandLines: cs.islandLines, sectionsCount: cs.sectionsCount, commits: cs.commits, weeks: cs.weeks,
     copyLink: cs.copyLink, copied: cs.copied,
+    commerce: cs.commerce,
   }
 }
 
@@ -55,15 +62,43 @@ export function caseStudyFor(
   strings: PortfolioContent,
   skin: Skin,
   formatPeriod: (start: string, end: string | null) => string,
+  intlLocale: string,
+  monthFmt: Intl.DateTimeFormat,
 ): CaseStudyData {
   const c = strings.stores[st.slug]
   const cs = strings.sections.caseStudy
+  const cm = cs.commerce
   const stats = [
     { label: cs.timeline, value: formatPeriod(st.timeline.start, st.timeline.end) },
     ...st.facts.map((f) => ({ label: c?.factLabels?.[f.id] ?? f.id, value: f.value })),
   ]
   const results = st.results.map((r) => ({ label: c?.factLabels?.[r.id] ?? r.id, value: r.value }))
-  // Client-facing sheet: the engineering trail (commits, custom sections) stays in the registry but off the page.
+
+  // "By the numbers": the four commerce angles, always all four (offer and delivery always
+  // resolve; catalog and reach fall back to `unavailable` for a protected/unreachable storefront).
+  const commerceEntry = commerce[st.slug]
+  const ctx = { store: st, storeContent: c, filters: strings.sections.shopify.filters, cs: cm, commerceEntry, telemetryEntry: telemetry[st.slug], intlLocale, monthFmt }
+  const weeks = weeksFor(st, telemetry[st.slug])
+  const priceMid = isLiveCommerce(commerceEntry) && commerceEntry.priceMin !== null && commerceEntry.priceMax !== null ? (commerceEntry.priceMin + commerceEntry.priceMax) / 2 : null
+  const commerceTiles = [
+    {
+      label: cm.catalogLabel,
+      value: lineForAngle('catalog', ctx) ?? cm.unavailable,
+      deltas: [
+        isLiveCommerce(commerceEntry) ? vsFleetPctChip(commerceEntry.products, FLEET_MEDIANS.products, cm.vsFleetPct) : null,
+        isLiveCommerce(commerceEntry) && commerceEntry.currency && priceMid !== null ? vsFleetPctChip(priceMid, FLEET_MEDIANS.priceMidByCurrency[commerceEntry.currency], cm.vsFleetPct) : null,
+      ].filter((d): d is string => !!d),
+    },
+    { label: cm.offerLabel, value: lineForAngle('offer', ctx, true) ?? cm.offerFallback, deltas: [] },
+    {
+      label: cm.deliveryLabel,
+      value: lineForAngle('delivery', ctx) ?? cm.offerFallback,
+      deltas: [vsFleetWeeksChip(weeks, FLEET_MEDIANS.weeks, cm.vsFleetWeeks)].filter((d): d is string => !!d),
+    },
+    { label: cm.reachLabel, value: lineForAngle('reach', ctx) ?? cm.unavailable, deltas: [] },
+  ]
+
+  // Client-facing sheet: the engineering trail (commits, custom sections) stays in the registry but collapsed at the bottom.
   return {
     name: st.name,
     url: st.url || undefined,
@@ -73,6 +108,7 @@ export function caseStudyFor(
     description: c?.description ?? '',
     metrics: st.status === 'live' ? metrics[st.slug] : undefined,
     trail: telemetry[st.slug] ? { data: telemetry[st.slug], range: formatPeriod(telemetry[st.slug].first.slice(0, 7), telemetry[st.slug].last.slice(0, 7)) } : undefined,
+    commerceTiles,
     stats,
     results,
     stack: st.stack,
@@ -90,7 +126,7 @@ interface GalleryProps {
  * the same, or a wall of phones — and a case-study sheet on click. The facts live in Shopify Work.
  */
 export function Gallery({ skin, heading }: GalleryProps) {
-  const { strings, registry, formatPeriod } = useContent()
+  const { strings, registry, formatPeriod, intlLocale, monthFmt } = useContent()
   const g = strings.sections.gallery
   const cs = strings.sections.caseStudy
   const [filter, setFilter] = useState<Filter>('all')
@@ -111,14 +147,32 @@ export function Gallery({ skin, heading }: GalleryProps) {
   const open = openSlug ? registry.stores.find((s) => s.slug === openSlug) : null
   const chip = (active: boolean) => `${active ? skin.chipOn : skin.chip} compact-touch transition-colors`
 
-  const Caption = ({ s }: { s: StoreEntry }) => (
-    <figcaption className="mt-3 flex items-center justify-between gap-3">
-      <span className={`${skin.title} truncate text-sm`}>{s.name}</span>
-      <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] ${s.status === 'live' ? skin.badgeLive : skin.badgeDev}`}>
-        {s.status === 'live' ? strings.badges.live : strings.badges.dev}
-      </span>
-    </figcaption>
-  )
+  // A different angle than the index chip's (offset 2 of 4) so the same store reads two distinct,
+  // still-honest commerce facts across the two surfaces instead of repeating one line everywhere.
+  const Caption = ({ s }: { s: StoreEntry }) => {
+    const c = strings.stores[s.slug]
+    const { text } = pickCommerceLine(s.slug, 2, {
+      store: s,
+      storeContent: c,
+      filters: strings.sections.shopify.filters,
+      cs: cs.commerce,
+      commerceEntry: commerce[s.slug],
+      telemetryEntry: telemetry[s.slug],
+      intlLocale,
+      monthFmt,
+    })
+    return (
+      <figcaption className="mt-3">
+        <div className="flex items-center justify-between gap-3">
+          <span className={`${skin.title} truncate text-sm`}>{s.name}</span>
+          <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] ${s.status === 'live' ? skin.badgeLive : skin.badgeDev}`}>
+            {s.status === 'live' ? strings.badges.live : strings.badges.dev}
+          </span>
+        </div>
+        <p className={`${skin.muted} mt-0.5 truncate text-xs`}>{text}</p>
+      </figcaption>
+    )
+  }
 
   return (
     <section id="gallery" className="scroll-mt-20">
@@ -208,7 +262,7 @@ export function Gallery({ skin, heading }: GalleryProps) {
         <Suspense fallback={null}>
           <ProjectModal
             open={!!open}
-            data={open ? caseStudyFor(open, strings, skin, formatPeriod) : null}
+            data={open ? caseStudyFor(open, strings, skin, formatPeriod, intlLocale, monthFmt) : null}
             skin={skin}
             labels={caseStudyLabels(strings)}
             onClose={() => setOpenSlug(null)}

@@ -7,6 +7,8 @@ import { useHoverPreview } from '../gallery/HoverPreview'
 import { lightboxItems, caseStudyFor, caseStudyLabels, ProjectModal, type SectionHeading } from './Gallery'
 import type { StoreEntry, ProductEntry } from '../../data/registry'
 import { telemetry } from '../../data/telemetry'
+import { commerce } from '../../data/commerce'
+import { pickCommerceLine } from '../../data/commerceLines'
 
 interface ShopifyWorkProps {
   skin: Skin
@@ -34,10 +36,11 @@ const FEATURES: { id: string; test: RegExp }[] = [
  * opens, so the section stays scannable. The Gallery is the visual wall.
  */
 export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
-  const { strings, registry, formatPeriod } = useContent()
+  const { strings, registry, formatPeriod, intlLocale, monthFmt } = useContent()
   const s = strings.sections.shopify
   const g = strings.sections.gallery
   const cs = strings.sections.caseStudy
+  const cm = cs.commerce
   const [tab, setTab] = useState<'stores' | 'products'>('stores')
   const [showAll, setShowAll] = useState(false)
   const [feature, setFeature] = useState<string | null>(null)
@@ -67,17 +70,22 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
   const hidden = registry.stores.length - visibleFleet.length
   const chipFor = (on: boolean) => `${on ? skin.chipOn : skin.chip} compact-touch transition-colors`
 
-  /** The store's real build trail as a small chip (commits and weeks from its git history), before the sheet opens. */
-  const Headline = ({ slug }: { slug: string }) => {
-    const t = telemetry[slug]
-    if (!t) return null
-    return (
-      <span className={`${skin.chip} mt-1.5 inline-flex items-center gap-1.5`}>
-        <span className="font-semibold tabular-nums">{t.commits}</span>
-        <span>{cs.commits}</span>
-        <span className={skin.muted}>· {t.weeks.length} {cs.weeks}</span>
-      </span>
-    )
+  /** One commerce-oriented figure per store — catalog, offer, delivery or reach, rotated
+   *  deterministically by slug so the index reads varied while staying on one honest system. The
+   *  full picture (all four angles) lives in the case-study sheet this chip's row opens. */
+  const Headline = ({ st }: { st: StoreEntry }) => {
+    const c = strings.stores[st.slug]
+    const { text } = pickCommerceLine(st.slug, 0, {
+      store: st,
+      storeContent: c,
+      filters: s.filters,
+      cs: cm,
+      commerceEntry: commerce[st.slug],
+      telemetryEntry: telemetry[st.slug],
+      intlLocale,
+      monthFmt,
+    })
+    return <span className={`${skin.chip} mt-1.5 inline-flex items-center gap-1.5`}>{text}</span>
   }
 
   // A cursor spotlight for pointer devices: a radial highlight that tracks the pointer inside the
@@ -111,7 +119,7 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
             <p className={`${skin.muted} mt-0.5 text-xs`}>
               {c?.industry} · {formatPeriod(st.timeline.start, st.timeline.end)}
             </p>
-            <Headline slug={st.slug} />
+            <Headline st={st} />
           </div>
           <p className={`${skin.body} text-sm leading-snug md:col-span-5 md:line-clamp-2`}>{c?.tagline}</p>
           <div className="flex items-center gap-x-4 text-sm md:col-span-3 md:justify-end">
@@ -198,7 +206,7 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
         <Suspense fallback={null}>
           <ProjectModal
             open={!!openStore}
-            data={openStore ? caseStudyFor(openStore, strings, skin, formatPeriod) : null}
+            data={openStore ? caseStudyFor(openStore, strings, skin, formatPeriod, intlLocale, monthFmt) : null}
             skin={skin}
             labels={caseStudyLabels(strings)}
             onClose={() => setOpenStore(null)}
