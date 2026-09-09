@@ -52,12 +52,31 @@ export function weeksFor(store: StoreEntry, tel: StoreTelemetry | undefined): nu
   return Math.round(months * 4.345)
 }
 
+// Singular-noun swaps for EN/ES so "1 collections"/"1 colecciones" doesn't ship (real fleet stores
+// do land on exactly one collection or product) — Japanese counters don't inflect, so left alone.
+const SINGULAR_SWAPS: [RegExp, string][] = [
+  [/\bcollections\b/, 'collection'],
+  [/\bcolecciones\b/, 'colección'],
+  [/\bproducts\b/, 'product'],
+  [/\bproductos\b/, 'producto'],
+]
+function singularize(text: string, n: number): string {
+  if (n !== 1) return text
+  return SINGULAR_SWAPS.reduce((s, [re, word]) => s.replace(re, word), text)
+}
+
 function catalogText(c: StoreCommerceLive, cs: CommerceLabels, intlLocale: string): string {
   const collections = c.collections ?? 0
-  if (c.priceMin !== null && c.currency) {
-    return fill(cs.catalogLine, { products: c.products, collections, price: formatMoney(c.priceMin, c.currency, intlLocale) })
-  }
-  return fill(cs.catalogLineNoPrice, { products: c.products, collections })
+  const line =
+    c.priceMin !== null && c.currency
+      ? fill(cs.catalogLine, { products: c.products, collections, price: formatMoney(c.priceMin, c.currency, intlLocale) })
+      : fill(cs.catalogLineNoPrice, { products: c.products, collections })
+  // Two independently-plural counts share one string, so each singular swap must anchor to its own
+  // number: split on the products/collections boundary (the " · " the templates always place between
+  // them) and singularize each half against its own count.
+  const [productsHalf, ...rest] = line.split(' · ')
+  const collectionsHalf = rest.join(' · ')
+  return [singularize(productsHalf, c.products), singularize(collectionsHalf, collections)].filter(Boolean).join(' · ')
 }
 
 function offerText(store: StoreEntry, storeContent: PortfolioContent['stores'][string] | undefined, filters: Record<string, string>, cs: CommerceLabels, joinAll: boolean): string {
