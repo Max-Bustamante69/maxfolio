@@ -15,18 +15,22 @@ function weekIndex(weekOf: string): number {
   return Math.floor((t - YEAR_START) / (7 * 86400000))
 }
 
-/** Every store's weekly commit counts, summed onto one 52-slot row for 2026 — the real week each fell in, not a synthetic spread. */
+/**
+ * Every store's weekly commit counts, summed onto one 52-slot row for 2026 — the real week each
+ * fell in, not a synthetic spread. `total` is derived from `cells` (not a separate running sum of
+ * every telemetry week regardless of year), so the headline can never drift from what the row
+ * actually draws if a store's telemetry ever extends outside the 2026 window.
+ */
 function buildYearRow(): { cells: number[]; total: number } {
   const cells = new Array<number>(WEEKS_IN_YEAR).fill(0)
-  let total = 0
   for (const t of Object.values(telemetry)) {
     const base = weekIndex(t.weekOf)
     t.weeks.forEach((n, i) => {
       const idx = base + i
       if (idx >= 0 && idx < WEEKS_IN_YEAR) cells[idx] += n
-      total += n
     })
   }
+  const total = cells.reduce((sum, n) => sum + n, 0)
   return { cells, total }
 }
 
