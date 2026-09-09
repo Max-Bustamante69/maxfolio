@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "gallery:capture": "node scripts/capture-gallery.mjs",
-    "gallery:capture:one": "node scripts/capture-gallery.mjs --only"
+    "gallery:capture:one": "node scripts/capture-gallery.mjs --only",
+    "qa:pages": "node scripts/qa-pages.mjs"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
