@@ -83,6 +83,16 @@
 .persona-skew-btn {
   clip-path: polygon(8% 0, 100% 0, 92% 100%, 0% 100%);
 }
+
+/* ---------- Arcade menu selector: only the trailing edge skews ---------- */
+/* Used behind full-row-width menu labels (arcade menu). Skewing BOTH edges (like .persona-skew-btn)
+   insets the left edge by 8% of the row's own width — on a ~900px-wide row that is 40-70px, easily
+   wider than the row's left padding, so the leading character(s) of the label can sit outside the
+   highlight color (near-invisible contrast against the page background behind it). Keeping the left
+   edge vertical removes that risk while keeping the same blade taper on the right. */
+.persona-skew-selector {
+  clip-path: polygon(0 0, 100% 0, 92% 100%, 0 100%);
+}
 .skew-chip {
   clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
 }

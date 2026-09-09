@@ -248,8 +248,10 @@ const Icon = {
   ),
 }
 
-/** One themed loading state per screen — never several stacked blank fallbacks. */
+/** One themed loading state per screen — never several stacked blank fallbacks. Pulsing dots are
+ * purely decorative motion, so they're skipped (static, mid-opacity) under reduced motion. */
 function ScreenLoading({ accentCls, muted }: { accentCls: string; muted: string }) {
+  const reduced = useReducedMotion()
   return (
     <div className="min-h-[55vh] flex flex-col items-center justify-center gap-4" role="status" aria-label="Loading screen">
       <span className={`font-persona-display text-3xl uppercase ${accentCls}`} style={{ fontStyle: 'oblique 6deg' }}>
@@ -260,9 +262,9 @@ function ScreenLoading({ accentCls, muted }: { accentCls: string; muted: string 
           <m.span
             key={i}
             className="h-1.5 w-6 bg-current"
-            style={{ clipPath: 'polygon(20% 0,100% 0,80% 100%,0 100%)' }}
-            animate={{ opacity: [0.25, 1, 0.25] }}
-            transition={{ duration: 1.1, repeat: Infinity, delay: i * 0.15 }}
+            style={{ clipPath: 'polygon(20% 0,100% 0,80% 100%,0 100%)', opacity: reduced ? 0.6 : undefined }}
+            animate={reduced ? undefined : { opacity: [0.25, 1, 0.25] }}
+            transition={reduced ? undefined : { duration: 1.1, repeat: Infinity, delay: i * 0.15 }}
           />
         ))}
       </span>
@@ -323,15 +325,17 @@ function ArcadeMenu({
 
   const activeText = isDark ? 'text-[#f5f2ee]' : 'text-white'
 
+  // A plain labeled nav of real, independently-focusable buttons (Tab reaches every one, in DOM
+  // order) — not role="menu"/"menuitem" (that ARIA pattern implies roving-tabindex focus movement
+  // on Arrow keys, which this doesn't do: Arrow keys move a visual selection, not DOM focus).
   return (
-    <div role="menu" aria-label="Arcade menu" className="relative flex flex-col">
+    <nav aria-label="Choose a screen" className="relative flex flex-col">
       {items.map((item, i) => {
         const active = i === index
         return (
           <m.button
             key={item.id}
             type="button"
-            role="menuitem"
             aria-current={active || undefined}
             onMouseEnter={() => {
               if (i !== index) {
@@ -346,7 +350,7 @@ function ArcadeMenu({
             transition={{ ...SNAP, delay: 0.07 * i }}
             className="relative text-left outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-current"
           >
-            {active && <m.span layoutId="arcade-selector" className={`absolute inset-y-1.5 left-0 right-0 ${accentBg} persona-skew-btn`} transition={reduced ? { duration: 0 } : SNAP} aria-hidden="true" />}
+            {active && <m.span layoutId="arcade-selector" className={`absolute inset-y-1.5 left-0 right-0 ${accentBg} persona-skew-selector`} transition={reduced ? { duration: 0 } : SNAP} aria-hidden="true" />}
             <span
               className={`relative z-10 flex items-baseline gap-3 md:gap-5 px-4 md:px-7 py-3 md:py-4 font-persona-display uppercase leading-[0.9] text-[13vw] sm:text-[9vw] md:text-[6.4vw] transition-colors duration-150 ${active ? activeText : ''}`}
               style={{ fontStyle: 'oblique 6deg' }}
@@ -360,7 +364,7 @@ function ArcadeMenu({
       <p className={`mt-6 px-4 md:px-7 font-persona-label text-[10px] md:text-xs uppercase tracking-[0.25em] ${muted}`}>
         <span className={accentCls}>↑↓</span> select · <span className={accentCls}>↵</span> confirm · tap to jump
       </p>
-    </div>
+    </nav>
   )
 }
 
