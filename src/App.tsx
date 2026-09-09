@@ -19,8 +19,14 @@ const Persona = lazy(() => import('./pages/Persona'))
 // A/B: the landing at `/` is the visitor's variant. Every theme that can be a variant is registered here;
 // ab.config.ts decides which ones actually take traffic (with only `apple` listed there is no split).
 const VARIANT_PAGES: Partial<Record<VariantId, ComponentType>> = { apple: Apple, neo: Neo, persona: Persona }
-const variant = currentVariant()
-const Landing = VARIANT_PAGES[variant] ?? Apple
+
+/** The landing at `/`: the pinned variant, or the one forced by `?v=` (theme links), resolved on every navigation. */
+function Landing() {
+  const { search } = useLocation()
+  const variant = currentVariant()
+  const Page = VARIANT_PAGES[variant] ?? Apple
+  return <Page key={`${variant}${search}`} />
+}
 
 function ScrollToTop() {
   const { pathname } = useLocation()

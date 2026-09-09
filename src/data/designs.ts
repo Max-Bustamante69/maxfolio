@@ -6,6 +6,8 @@ export type DesignId = 'apple' | 'luxury' | 'brutalist' | 'neo' | 'persona'
 export interface DesignEntry {
   id: DesignId
   route: string
+  /** Where links go: the route, plus `?v=` for the control so a visitor pinned to another variant can still reach it. */
+  href: string
   nameKey: string // i18n key in public/locales/*.json
   subtitleKey: string
   accent: string
@@ -22,6 +24,7 @@ export const designs: DesignEntry[] = [
   {
     id: 'apple',
     route: '/',
+    href: '/?v=apple',
     nameKey: 'menuPage.designNames.apple',
     subtitleKey: 'menuPage.designSubtitles.apple',
     accent: '#0071e3',
@@ -34,6 +37,7 @@ export const designs: DesignEntry[] = [
   {
     id: 'luxury',
     route: '/luxury',
+    href: '/luxury',
     nameKey: 'menuPage.designNames.luxuryMinimal',
     subtitleKey: 'menuPage.designSubtitles.luxuryMinimal',
     accent: '#C9A962',
@@ -46,6 +50,7 @@ export const designs: DesignEntry[] = [
   {
     id: 'brutalist',
     route: '/brutalist',
+    href: '/brutalist',
     nameKey: 'menuPage.designNames.brutalistEditorial',
     subtitleKey: 'menuPage.designSubtitles.brutalistEditorial',
     accent: '#dc2626',
@@ -58,6 +63,7 @@ export const designs: DesignEntry[] = [
   {
     id: 'neo',
     route: '/neo',
+    href: '/neo',
     nameKey: 'menuPage.designNames.neo',
     subtitleKey: 'menuPage.designSubtitles.neo',
     // AA-safe shade of the theme's accent (see src/styles/neo.css) — text-safe at 6:1 on white / 4.9:1 on the surface.
@@ -71,6 +77,7 @@ export const designs: DesignEntry[] = [
   {
     id: 'persona',
     route: '/arcade',
+    href: '/arcade',
     nameKey: 'menuPage.designNames.persona',
     subtitleKey: 'menuPage.designSubtitles.persona',
     accent: '#1c6fb0',

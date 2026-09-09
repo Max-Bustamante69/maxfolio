@@ -162,7 +162,7 @@ export function MobileMenuBrutalist({ navItems, isDark, onContactClick }: Mobile
                 {otherDesigns('brutalist').map((d) => (
                   <TransitionLink
                     key={d.id}
-                    to={d.route}
+                    to={d.href}
                     transitionColor={d.transitionColor}
                     transitionAccent={d.transitionAccent}
                     transitionLabel={t(d.nameKey)}

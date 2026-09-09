@@ -480,7 +480,7 @@ function AppleContent() {
                 {otherDesigns('apple').map((d) => (
                   <TransitionLink
                     key={d.id}
-                    to={d.route}
+                    to={d.href}
                     transitionColor={d.transitionColor}
                     transitionAccent={d.transitionAccent}
                     transitionLabel={t(d.nameKey)}

@@ -24,7 +24,7 @@ export function ExploreDesignsLuxury({ isDark }: ExploreDesignsLuxuryProps) {
   const cards = [
     ...otherDesigns('luxury').map((d) => ({
       key: d.id,
-      to: d.route,
+      to: d.href,
       color: d.transitionColor,
       accentHex: d.transitionAccent,
       title: t(d.nameKey),

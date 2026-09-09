@@ -261,7 +261,7 @@ function NeoContent() {
                   <p className={`text-[11px] uppercase tracking-[0.2em] ${muted} mb-3`}>{t('logoSelector.otherExperiences')}</p>
                   <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
                     {otherDesigns('neo').map((d) => (
-                      <TransitionLink key={d.id} to={d.route} transitionColor={d.transitionColor} transitionAccent={d.transitionAccent} transitionLabel={t(d.nameKey)} className={accent}>
+                      <TransitionLink key={d.id} to={d.href} transitionColor={d.transitionColor} transitionAccent={d.transitionAccent} transitionLabel={t(d.nameKey)} className={accent}>
                         {t(d.nameKey)} ›
                       </TransitionLink>
                     ))}
@@ -294,6 +294,9 @@ function NeoContent() {
                   </Magnetic>
                   <a href="#shopify" className={`neo-raised neo-sm neo-interactive inline-flex items-center gap-1.5 !rounded-full px-5 py-3 text-sm font-semibold`}>
                     {c.hero.ctaSecondary} {Icon.down}
+                  </a>
+                  <a href={registry.personal.cv} download className={`${muted} text-sm font-semibold`}>
+                    {c.hero.ctaCv} ›
                   </a>
                 </div>
                 <p className={`${muted} mt-4 text-xs`}>{c.hero.ctaNote}</p>
@@ -459,7 +462,7 @@ function NeoContent() {
                 {otherDesigns('neo').map((d) => (
                   <TransitionLink
                     key={d.id}
-                    to={d.route}
+                    to={d.href}
                     transitionColor={d.transitionColor}
                     transitionAccent={d.transitionAccent}
                     transitionLabel={t(d.nameKey)}

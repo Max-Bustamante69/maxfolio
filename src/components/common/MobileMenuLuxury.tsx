@@ -173,7 +173,7 @@ export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMen
                   <span key={d.id} className="flex gap-4">
                     <span className={textMuted}>·</span>
                     <TransitionLink
-                      to={d.route}
+                      to={d.href}
                       transitionColor={d.transitionColor}
                       transitionAccent={d.transitionAccent}
                       transitionLabel={t(d.nameKey)}

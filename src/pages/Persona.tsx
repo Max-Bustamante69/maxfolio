@@ -270,7 +270,7 @@ function PersonaContent() {
               <p className={`text-[11px] font-persona-label uppercase tracking-[0.2em] ${muted} mb-3`}>{t('logoSelector.otherExperiences')}</p>
               <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
                 {otherDesigns('persona').map((d) => (
-                  <TransitionLink key={d.id} to={d.route} transitionColor={d.transitionColor} transitionAccent={d.transitionAccent} transitionLabel={t(d.nameKey)} className={accentCls}>
+                  <TransitionLink key={d.id} to={d.href} transitionColor={d.transitionColor} transitionAccent={d.transitionAccent} transitionLabel={t(d.nameKey)} className={accentCls}>
                     {t(d.nameKey)} ›
                   </TransitionLink>
                 ))}
@@ -329,7 +329,7 @@ function PersonaContent() {
         <main id="main-content" className="pt-14">
           {/* Hero — "menu screen": ghost wordmark, ring motif, eyebrow dash, stacked headline, CTA pair */}
           {/* pb-28 on mobile keeps the availability pills clear of the fixed mobile contact FAB. */}
-          <section id="hero" className="relative min-h-[92vh] flex items-center px-4 pt-16 pb-28 md:pt-20 md:pb-16 overflow-hidden scroll-mt-14" aria-labelledby="hero-heading">
+          <section id="hero" className="relative min-h-[92vh] flex items-center px-4 pt-16 pb-28 md:pt-20 md:pb-16 overflow-clip scroll-mt-14" aria-labelledby="hero-heading">
             <div aria-hidden="true" className="persona-ghost-wordmark" data-parallax="back">
               MB
             </div>
@@ -392,7 +392,7 @@ function PersonaContent() {
           </div>
 
           {/* Stat band — "status cards" */}
-          <section className={`relative px-4 py-16 md:py-24 ${surface} overflow-hidden`}>
+          <section className={`relative px-4 py-16 md:py-24 ${surface} overflow-clip`}>
             <div aria-hidden="true" className={`persona-halftone ${accentCls}`} />
             <div className="max-w-5xl mx-auto relative">
               <p className={`font-persona-label text-xs font-semibold uppercase tracking-[0.35em] ${accentCls} mb-6`}>[ {c.sections.statBand.label} ]</p>
@@ -436,7 +436,7 @@ function PersonaContent() {
           </section>
 
           {/* Experience — a torn diagonal ink panel frames the section from behind */}
-          <section id="experience-wrap" className={`relative px-4 py-16 md:py-24 ${surface} overflow-hidden`}>
+          <section id="experience-wrap" className={`relative px-4 py-16 md:py-24 ${surface} overflow-clip`}>
             <div aria-hidden="true" className={`persona-torn absolute right-0 top-0 h-full w-1/3 ${isDark ? 'bg-[#f5f2ee]/[0.03]' : 'bg-[#0a0f1a]/[0.03]'}`} data-parallax="back" />
             <div className="max-w-5xl mx-auto relative">
               <Experience skin={skin} heading={Heading} />
@@ -453,7 +453,7 @@ function PersonaContent() {
           </section>
 
           {/* Process — the ring motif drifts as ambient background */}
-          <section className={`relative px-4 py-16 md:py-24 ${surface} overflow-hidden`}>
+          <section className={`relative px-4 py-16 md:py-24 ${surface} overflow-clip`}>
             <svg className="persona-ring absolute w-[50vw] max-w-[440px] aspect-square opacity-[0.08] pointer-events-none" style={{ right: '-8%', top: '10%' }} viewBox="0 0 200 200" aria-hidden="true" data-parallax="back">
               <circle cx="100" cy="100" r="90" fill="none" stroke="currentColor" className={accentCls} strokeWidth="0.8" strokeDasharray="1 6" />
             </svg>
@@ -538,7 +538,7 @@ function PersonaContent() {
                 {otherDesigns('persona').map((d) => (
                   <TransitionLink
                     key={d.id}
-                    to={d.route}
+                    to={d.href}
                     transitionColor={d.transitionColor}
                     transitionAccent={d.transitionAccent}
                     transitionLabel={t(d.nameKey)}

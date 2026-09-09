@@ -22,7 +22,7 @@ export function ExploreDesignsBrutalist({ isDark }: ExploreDesignsBrutalistProps
   const rows = [
     ...otherDesigns('brutalist').map((d) => ({
       key: d.id,
-      to: d.route,
+      to: d.href,
       color: d.transitionColor,
       accentHex: d.transitionAccent,
       title: t(d.nameKey),

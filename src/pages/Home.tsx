@@ -55,7 +55,7 @@ function HomeContent() {
         <header className={`border-b ${border} transition-colors duration-300`} role="banner">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
           <TransitionLink
-            to={defaultDesign.route}
+            to={defaultDesign.href}
             transitionColor={defaultDesign.transitionColor}
             transitionAccent={defaultDesign.transitionAccent}
             transitionLabel={t(defaultDesign.nameKey)}
@@ -164,7 +164,7 @@ function HomeContent() {
                   transition={{ delay: 0.5 + index * 0.1 }}
                 >
                   <TransitionLink
-                    to={design.route}
+                    to={design.href}
                     transitionColor={design.transitionColor}
                     transitionAccent={design.transitionAccent}
                     transitionLabel={designName}
@@ -234,7 +234,7 @@ function HomeContent() {
               <p className={`text-sm ${textSecondary}`}>{t('menuPage.whyVersionsDesc')}</p>
             </div>
             <TransitionLink
-              to={defaultDesign.route}
+              to={defaultDesign.href}
               transitionColor={defaultDesign.transitionColor}
               transitionAccent={defaultDesign.transitionAccent}
               transitionLabel={t(defaultDesign.nameKey)}

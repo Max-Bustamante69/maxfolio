@@ -660,7 +660,7 @@ function Design4Content() {
                   {otherDesigns("luxury").map((d) => (
                     <li key={d.id}>
                       <TransitionLink
-                        to={d.route}
+                        to={d.href}
                         transitionColor={d.transitionColor}
                         transitionAccent={d.transitionAccent}
                         transitionLabel={t(d.nameKey)}

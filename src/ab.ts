@@ -6,6 +6,12 @@ import { AB, isVariant, type VariantId } from '../ab.config'
  */
 export function currentVariant(): VariantId {
   if (typeof document === 'undefined') return AB.variants[0].id
+  // A forced variant in the URL wins (theme links use it), and is pinned so the server agrees on the next request.
+  const forced = new URLSearchParams(window.location.search).get('v')
+  if (isVariant(forced)) {
+    if (AB.variants.length > 1) document.cookie = `${AB.cookie}=${forced}; Path=/; Max-Age=${AB.maxAge}; SameSite=Lax; Secure`
+    return forced
+  }
   const meta = document.querySelector('meta[name="mf-variant"]')?.getAttribute('content')
   if (isVariant(meta)) return meta
   const pinned = document.cookie
