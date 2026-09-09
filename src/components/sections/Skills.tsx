@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { useContent, useMediaQuery } from '../../hooks'
+import { Ticker } from '../common'
 import type { SkillGroupId } from '../../data/registry'
 import type { Skin } from '../gallery'
 import type { SectionHeading } from './Gallery'
@@ -40,6 +41,22 @@ export function Skills({ skin, heading }: SkillsProps) {
   const [open, setOpen] = useState<SkillGroupId>(groups[0])
   const label = `text-[11px] font-semibold uppercase tracking-[0.18em] ${skin.muted}`
   const track = skin.dark ? 'bg-white/10' : 'bg-black/[0.06]'
+
+  // Every tool named across the groups, deduplicated, in group order — real registry data, not a curated highlight reel.
+  const tools = useMemo(() => {
+    const seen = new Set<string>()
+    const out: string[] = []
+    for (const g of groups) {
+      for (const tool of registry.skillGroups[g] as readonly string[]) {
+        if (!seen.has(tool)) {
+          seen.add(tool)
+          out.push(tool)
+        }
+      }
+    }
+    return out
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [registry.skillGroups])
 
   const usage = useMemo(() => {
     const rows = USAGE.map((u) => ({ id: u.id, count: registry.stores.filter((s) => s.stack.some((t) => u.test.test(t))).length }))
@@ -154,6 +171,18 @@ export function Skills({ skin, heading }: SkillsProps) {
             </div>
           )}
         </div>
+      </div>
+
+      <div className="mt-14 rail-wide md:mt-16">
+        <Ticker
+          variant="outline-fill"
+          duration={38}
+          label={sk.usageLabel}
+          items={tools}
+          keyOf={(t) => t}
+          itemClassName="shrink-0 whitespace-nowrap px-5 py-2 font-sf text-2xl font-semibold tracking-[-0.02em] md:text-4xl"
+          renderItem={(t) => t}
+        />
       </div>
     </section>
   )

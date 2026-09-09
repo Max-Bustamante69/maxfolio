@@ -11,6 +11,7 @@ import {
   LanguageSelectorBrutalist,
   ShopifyWork,
   Gallery,
+  Ticker,
 } from '../components'
 import { skins } from '../components/gallery'
 import { Years } from '../components/sections/Years'
@@ -278,6 +279,24 @@ function Design1Content() {
               </m.div>
             </div>
           </section>
+
+          {/* Fleet ticker — two counter-rotating rows, brutalist mono stamp */}
+          <div className={`overflow-hidden border-y-4 ${borderStrong} ${bgPrimary} py-5`}>
+            <Ticker
+              variant="stacked"
+              duration={34}
+              label={c.sections.now.band}
+              items={registry.stores.filter((st) => !st.legacy)}
+              keyOf={(st) => st.slug}
+              itemClassName={`flex shrink-0 items-center gap-3 whitespace-nowrap px-6 font-mono text-lg uppercase tracking-[0.1em] md:text-2xl ${textPrimary}`}
+              renderItem={(st) => (
+                <>
+                  <span className={`h-2.5 w-2.5 ${st.status === 'live' ? 'bg-red-600' : 'bg-stone-500'}`} aria-hidden="true" />
+                  {st.name}
+                </>
+              )}
+            />
+          </div>
 
           {/* Work Section */}
           <section id="work" className={`py-16 md:py-24 border-t-4 ${borderStrong}`}>
