@@ -66,8 +66,8 @@ export interface ImpactCharts {
   rings: { metrics: RingMetric[]; fetchedAt: string } | null // desktop Performance/Accessibility/SEO, ≥50 only
   perfDual: { before: number; after: number; fetchedAt: string } | null // desktop performance before→after
   cwv: { data: CwvData; fetchedAt: string } | null // CrUX field data, when the origin has enough real-user traffic
-  speed: { seconds: number; fetchedAt: string } | null // lab LCP gauge fallback when `cwv` is null
-  loadTime: { beforeSeconds: number; afterSeconds: number; deltaPct: number; fetchedAt: string } | null
+  speed: { seconds: number; fetchedAt: string; form: 'mobile' | 'desktop' } | null // lab LCP gauge fallback when `cwv` is null
+  loadTime: { beforeSeconds: number; afterSeconds: number; deltaPct: number; fetchedAt: string; form: 'mobile' | 'desktop' } | null
 }
 
 /** One "By the numbers" tile: catalog, offer, delivery or reach — see src/data/commerceLines.ts. */
@@ -567,8 +567,8 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
                         ) : (
                           impact.speed && (
                             <div className={`${tile} ${impact.perfDual ? '' : 'sm:col-span-2'}`}>
-                              <SpeedGauge seconds={impact.speed.seconds} label={il.speedLabel} targetLabel={il.speedTarget.replace('{n}', '2.5')} dark={dark} delay={0.25} />
-                              <p className={`${skin.muted} mt-2 text-[11px] leading-snug`}>{il.speedSource.replace('{date}', fmtDate(impact.speed.fetchedAt))}</p>
+                              <SpeedGauge seconds={impact.speed.seconds} label={il.speedLabel.replace('{form}', impact.speed.form === 'mobile' ? il.formMobile : il.formDesktop)} targetLabel={il.speedTarget.replace('{n}', '2.5')} dark={dark} delay={0.25} />
+                              <p className={`${skin.muted} mt-2 text-[11px] leading-snug`}>{il.speedSource.replace('{form}', impact.speed.form === 'mobile' ? il.formMobile : il.formDesktop).replace('{date}', fmtDate(impact.speed.fetchedAt))}</p>
                             </div>
                           )
                         )}
@@ -584,7 +584,7 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
                               dark={dark}
                               delay={0.3}
                             />
-                            <p className={`${skin.muted} mt-2 text-[11px] leading-snug`}>{il.loadTimeSource.replace('{date}', fmtDate(impact.loadTime.fetchedAt))}</p>
+                            <p className={`${skin.muted} mt-2 text-[11px] leading-snug`}>{il.loadTimeSource.replace('{form}', impact.loadTime.form === 'mobile' ? il.formMobile : il.formDesktop).replace('{date}', fmtDate(impact.loadTime.fetchedAt))}</p>
                           </div>
                         )}
                       </div>

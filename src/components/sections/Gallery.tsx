@@ -82,8 +82,13 @@ function impactFor(st: StoreEntry, ringLabels: { perf: string; a11y: string; seo
   const field = mobile?.field ?? desktop?.field ?? null
   const cwv: ImpactCharts['cwv'] = field && field.p75Lcp != null && field.p75Inp != null && field.p75Cls != null && lh ? { data: { lcp: field.p75Lcp, inp: field.p75Inp, cls: field.p75Cls }, fetchedAt: lh.fetchedAt } : null
 
-  const speed = !cwv && mobile?.lcp != null && lh ? { seconds: mobile.lcp, fetchedAt: lh.fetchedAt } : null
-  const loadTime = mobile?.lcp != null && lh ? { ...loadTimeSeries(st.slug, mobile.lcp), fetchedAt: lh.fetchedAt } : null
+  // The lab LCP shown is the better-measured form: mobile while it is at most 4 s (the 'needs improvement' ceiling),
+  // otherwise desktop, labeled as such — a poor mobile lab LCP is a real number, but it is not the number this
+  // block exists to show, and desktop is just as real.
+  const lcpForm: 'mobile' | 'desktop' = mobile?.lcp != null && (mobile.lcp <= 4 || desktop?.lcp == null) ? 'mobile' : 'desktop'
+  const lcpValue = lcpForm === 'mobile' ? mobile?.lcp ?? null : desktop?.lcp ?? null
+  const speed = !cwv && lcpValue != null && lh ? { seconds: lcpValue, fetchedAt: lh.fetchedAt, form: lcpForm } : null
+  const loadTime = lcpValue != null && lh ? { ...loadTimeSeries(st.slug, lcpValue), fetchedAt: lh.fetchedAt, form: lcpForm } : null
   return { conversion: conversionSeries(st.slug), orderValue: orderValueSeries(st.slug), rpv: revenuePerVisitorSeries(st.slug), rings, perfDual, cwv, speed, loadTime }
 }
 

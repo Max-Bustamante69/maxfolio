@@ -1,5 +1,10 @@
 [
   {
+    "hash": "c68a2a3",
+    "date": "2026-09-10",
+    "subject": "chore(terminal): regenerated changelog.json"
+  },
+  {
     "hash": "c83ab77",
     "date": "2026-09-10",
     "subject": "chore(terminal): regenerated changelog.json"
@@ -53,10 +58,5 @@
     "hash": "85a69bb",
     "date": "2026-09-09",
     "subject": "fix(sheet): the illustrative Lighthouse baseline only pairs with a real score that clears it by 8 points (no red deltas "
-  },
-  {
-    "hash": "1750dc8",
-    "date": "2026-09-09",
-    "subject": "chore(terminal): regenerated changelog.json"
   }
 ]

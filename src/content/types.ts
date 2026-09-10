@@ -224,6 +224,8 @@ export interface PortfolioContent {
         cwvCls: string // "CLS" — pill label
         cwvSource: string // 'Real-user field data (CrUX), {date}.' — under the CWV strip
         speedLabel: string // "Mobile LCP, measured" — lab gauge label (CWV-strip fallback)
+        formMobile: string // 'mobile' — lowercase form word for {form} placeholders
+        formDesktop: string // 'desktop'
         speedTarget: string // '≤{n}s — the "good" LCP threshold'
         speedSource: string // 'Measured Lighthouse LCP (mobile), {date}.'
         disclaimer: string // the required small-print line, verbatim, EN/ES/JA
