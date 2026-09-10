@@ -73,6 +73,9 @@ export default function ScrollObjectScene({ variant, active }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const activeRef = useRef(active)
   activeRef.current = active
+  const startRef = useRef<(() => void) | null>(null)
+  // Re-entering the viewport restarts the paused loop (the scene effect above only starts it once).
+  useEffect(() => { if (active) startRef.current?.() }, [active])
 
   useEffect(() => {
     const container = containerRef.current
@@ -143,9 +146,11 @@ export default function ScrollObjectScene({ variant, active }: Props) {
     let lastFrameTime = 0
     const MAX_ROT_FROM_POINTER = 0.1 // ~±6deg
 
+    // The loop only lives while the object is in view: when `active` drops, the next frame exits without
+    // rescheduling (no idle 60 Hz wake-ups), and the `[active]` effect below restarts it on re-entry.
     const animate = (now: number) => {
+      if (!activeRef.current) { raf = 0; return }
       raf = requestAnimationFrame(animate)
-      if (!activeRef.current) return
       if (now - lastFrameTime < FRAME_INTERVAL) return
       lastFrameTime = now
       const t = clock.getElapsedTime()
@@ -154,7 +159,8 @@ export default function ScrollObjectScene({ variant, active }: Props) {
       mesh.position.y = Math.sin(scrollProgress * Math.PI) * 0.15 - scrollProgress * 0.25
       renderer.render(scene, camera)
     }
-    raf = requestAnimationFrame(animate)
+    startRef.current = () => { if (!raf && activeRef.current) raf = requestAnimationFrame(animate) }
+    startRef.current()
 
     const onResize = () => {
       width = container.clientWidth || 1
@@ -167,7 +173,9 @@ export default function ScrollObjectScene({ variant, active }: Props) {
     ro.observe(container)
 
     return () => {
-      cancelAnimationFrame(raf)
+      startRef.current = null
+      if (raf) cancelAnimationFrame(raf)
+      raf = 0
       window.removeEventListener('pointermove', onPointerMove)
       window.removeEventListener('scroll', updateScroll)
       window.removeEventListener('resize', updateScroll)

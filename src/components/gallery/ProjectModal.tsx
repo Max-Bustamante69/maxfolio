@@ -420,7 +420,9 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
                 {hasCharts && (
                   <>
                     <p className={`mt-6 ${label}`}>{cl.title}</p>
-                    <div className="mt-3 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+                    {/* Keyed by store: prev/next remounts the charts so each store draws in from zero instead of
+                        morphing from the previous store's values. */}
+                    <div key={data.name} className="mt-3 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
                       {compareRows.length > 0 && (
                         <div className={`${tile} sm:col-span-2`}>
                           <p className={`text-[10px] font-semibold uppercase tracking-[0.16em] ${skin.muted}`}>{cl.compareLabel}</p>
