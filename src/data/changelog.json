@@ -1,5 +1,10 @@
 [
   {
+    "hash": "0debd8d",
+    "date": "2026-09-10",
+    "subject": "fix(sheet): the LCP gauge and load-time pair show the better-measured form (desktop, labeled, when the mobile lab LCP is"
+  },
+  {
     "hash": "c68a2a3",
     "date": "2026-09-10",
     "subject": "chore(terminal): regenerated changelog.json"
@@ -53,10 +58,5 @@
     "hash": "c6bdd22",
     "date": "2026-09-09",
     "subject": "chore(terminal): regenerated changelog.json"
-  },
-  {
-    "hash": "85a69bb",
-    "date": "2026-09-09",
-    "subject": "fix(sheet): the illustrative Lighthouse baseline only pairs with a real score that clears it by 8 points (no red deltas "
   }
 ]

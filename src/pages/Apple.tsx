@@ -17,7 +17,6 @@ const Chapters = lazy(() => import('../components/sections/Chapters').then((mod)
 const Process = lazy(() => import('../components/sections/Process').then((mod) => ({ default: mod.Process })))
 const ShopifyWork = lazy(() => import('../components/sections/ShopifyWork').then((mod) => ({ default: mod.ShopifyWork })))
 const Gallery = lazy(() => import('../components/sections/Gallery').then((mod) => ({ default: mod.Gallery })))
-const FeaturedBuild = lazy(() => import('../components/sections/FeaturedBuild').then((mod) => ({ default: mod.FeaturedBuild })))
 const Manifesto = lazy(() => import('../components/sections/Manifesto').then((mod) => ({ default: mod.Manifesto })))
 const Projects = lazy(() => import('../components/sections/Projects').then((mod) => ({ default: mod.Projects })))
 const Skills = lazy(() => import('../components/sections/Skills').then((mod) => ({ default: mod.Skills })))
@@ -407,15 +406,6 @@ function AppleContent() {
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Gallery skin={skin} heading={Heading} />
-              </Suspense>
-            </div>
-          </section>
-
-          {/* Featured build — one storefront (NOS Café), followed through four real beats */}
-          <section className="px-4 py-14 md:py-20 scroll-mt-20">
-            <div className="max-w-5xl mx-auto">
-              <Suspense fallback={<Pending h="min-h-[60vh]" />}>
-                <FeaturedBuild skin={skin} heading={Heading} />
               </Suspense>
             </div>
           </section>

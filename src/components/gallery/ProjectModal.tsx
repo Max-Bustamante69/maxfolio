@@ -151,6 +151,8 @@ export interface CaseStudyLabels {
     chipLighthouseLabel: string
     loadTimeLabel: string
     loadTimeSource: string
+    formMobile: string
+    formDesktop: string
   }
   charts: {
     title: string
