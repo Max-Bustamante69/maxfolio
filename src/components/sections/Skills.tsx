@@ -169,7 +169,6 @@ function Tile({ skin, tone, tool, usageChip, active, pinned, onHover, onHoverEnd
     <button
       type="button"
       aria-pressed={pinned}
-      aria-label={`${tool.tool} — ${usageChip}`}
       onMouseEnter={onHover}
       onMouseLeave={onHoverEnd}
       onFocus={onHover}

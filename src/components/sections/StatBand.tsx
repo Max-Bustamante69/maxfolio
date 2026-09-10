@@ -23,7 +23,7 @@ interface StatBandProps {
  */
 export function StatBand({ skin, tileClassName = '' }: StatBandProps) {
   const { strings, registry } = useContent()
-  const ref = useRef<HTMLDListElement>(null)
+  const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
   const reduced = useReducedMotion()
   const s = strings.sections.statBand
@@ -59,7 +59,7 @@ export function StatBand({ skin, tileClassName = '' }: StatBandProps) {
       {/* Three columns, two rows, at every width from md up — never six-across: at least one of these
           six real values ($45k/yr, 10,000+) is long enough that a six-column track overflows its own
           cell into the next one (measured, 2026-09-09), and three keeps every numeral at full size. */}
-      <dl ref={ref} className={`hidden border-b md:grid md:grid-cols-3 ${skin.line}`}>
+      <div ref={ref} className={`hidden border-b md:grid md:grid-cols-3 ${skin.line}`}>
         {registry.stats.map((st, i) => {
           const p = parse(st.value)
           const cols = [i % 3 !== 0 ? 'md:border-l md:pl-5' : 'md:pl-0', i >= 3 ? 'md:border-t' : ''].join(' ')
@@ -86,8 +86,8 @@ export function StatBand({ skin, tileClassName = '' }: StatBandProps) {
                 title={source}
                 className="press -m-1 block w-full min-w-0 rounded-md p-1 text-left"
               >
-                <dt className={`${skin.muted} mt-3 text-sm leading-snug`}>{strings.stats[st.id]}</dt>
-                <dd className="m-0 whitespace-nowrap text-4xl font-semibold leading-none tracking-[-0.04em] tabular-nums md:text-5xl">
+                <span className={`${skin.muted} mt-3 block text-sm leading-snug`}>{strings.stats[st.id]}</span>
+                <span className="m-0 block whitespace-nowrap text-4xl font-semibold leading-none tracking-[-0.04em] tabular-nums md:text-5xl">
                   {p ? (
                     <>
                       <span className="sr-only">{st.value}</span>
@@ -96,7 +96,7 @@ export function StatBand({ skin, tileClassName = '' }: StatBandProps) {
                   ) : (
                     st.value
                   )}
-                </dd>
+                </span>
               </button>
               {/* Collapsed by max-height, never by opacity alone, so a screen reader (via aria-describedby)
                   and a hovering/focusing pointer both always reach the same real text. */}
@@ -112,7 +112,7 @@ export function StatBand({ skin, tileClassName = '' }: StatBandProps) {
             </m.div>
           )
         })}
-      </dl>
+      </div>
     </section>
   )
 }
