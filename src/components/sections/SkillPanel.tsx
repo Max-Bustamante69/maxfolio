@@ -27,10 +27,15 @@ interface PanelTone {
   line: string
 }
 
-/** Per-skin panel background, matching the brief's four looks. Apple/Luxury/Neo/Persona sit on the
- *  page's own light/dark surface, so they reuse the skin's own text tokens unchanged. Brutalist's
- *  "black slab" is a deliberate poster-style accent independent of light/dark mode (like its
- *  `badgeLive`/`chipOn` already are) — it needs its own forced-dark text tokens for contrast. */
+/** Per-skin panel background, matching the brief's four looks. Apple/Neo/Persona sit on the page's
+ *  own light/dark surface with an already AA-verified `skin.muted`, so they reuse it unchanged.
+ *  Luxury's panel forces an opaque `#faf5ea` card (not the alpha `bg-white/60` the rest of the theme
+ *  sits on), and the shared `skin.muted` (`text-luxury-black/50`) measures only ~3.3:1 there — short
+ *  of AA's 4.5:1 for the panel's own 11px eyebrow/hint text — so the panel darkens the tint locally
+ *  (measured 5.2:1) rather than touching the shared token used site-wide. Brutalist's "black slab" is
+ *  a deliberate poster-style accent independent of light/dark mode (like its `badgeLive`/`chipOn`
+ *  already are); its shared `muted` (`text-stone-500`) measures ~4.1:1 on the forced `stone-950`, also
+ *  short of AA, so it gets its own forced-dark, contrast-safe text tokens (measured 7.8:1). */
 function panelTone(skin: Skin): PanelTone {
   switch (skin.frame) {
     case 'apple':
@@ -48,8 +53,12 @@ function panelTone(skin: Skin): PanelTone {
         className: `border ${skin.dark ? 'border-deco-gold/25 bg-deco-navy/40' : 'border-luxury-black/10 bg-[#faf5ea]'} border-t-2 ${skin.dark ? 'border-t-deco-gold' : 'border-t-luxury-gold'}`,
         title: skin.title,
         body: skin.body,
-        muted: skin.muted,
-        accent: skin.accent,
+        muted: skin.dark ? 'text-deco-cream/60' : 'text-luxury-black/65',
+        // `skin.accent` (`#c9a962`) is the same hairline gold Skills.tsx's `sentenceAccentClass`
+        // already documented as ~2.1:1 on this cream — a fill/border color, not text-safe. The
+        // "Pinned" button renders it AS text, so it needs the same darkened gold (measured 4.5:1)
+        // rather than reusing the raw accent like a border would.
+        accent: skin.dark ? skin.accent : 'text-[#836e40]',
         chip: skin.chip,
         line: skin.line,
       }
@@ -58,7 +67,7 @@ function panelTone(skin: Skin): PanelTone {
         className: 'border-2 border-t-4 border-stone-950 border-t-red-600 bg-stone-950',
         title: 'font-editorial italic text-stone-50',
         body: 'text-stone-300',
-        muted: 'text-stone-500',
+        muted: 'text-stone-400',
         accent: 'text-red-500',
         chip: 'font-mono text-[10px] px-2 py-1 bg-stone-800 text-stone-400',
         line: 'border-stone-700',
