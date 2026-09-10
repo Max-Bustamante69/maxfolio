@@ -156,12 +156,3 @@ export function revenueSeries(slug: string, conversionDeltaPct: number, orderVal
   const points = shape.map((s) => round1(100 + s * targetPct + (jitter() - 0.5) * 1.4))
   return { points, deltaPct: targetPct }
 }
-
-/** An illustrative "typical agency" delivery reference, 14–18 weeks, seeded per store — the muted bar
- *  the store's own real delivery weeks (src/data/telemetry.json, or the registry's build-window
- *  fallback — see commerceLines.weeksFor) is measured against in the sheet's "time to launch" chart.
- *  Never itself shown as a store's own number; always the illustrative half of a real/illustrative
- *  pair, same house rule as `loadTimeSeries` above. */
-export function deliveryReferenceWeeks(slug: string): number {
-  return Math.round(14 + rngFrom(seedFrom(slug, 'delivery-reference'))() * 4)
-}

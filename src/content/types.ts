@@ -186,20 +186,22 @@ export interface PortfolioContent {
        *  index rows — see CommerceLabels above. The case-study sheet itself no longer reads this. */
       commerce: CommerceLabels
       /**
-       * The sheet's "Impact" block — as of 2026-09-10 the sheet's entire numbers story (header →
-       * captures → tagline/description → Impact → stack → Visit store). Fixed layout order: headline
-       * chips (Conversion, Revenue, Load time, Delivery) → score rings row (Performance/Accessibility/
-       * SEO, real, caption carries the Lighthouse before→after delta when it exists) → performance dual
-       * ring (+ Core Web Vitals or the LCP gauge) → the "time to launch" delivery bar → the four indexed
-       * lines (conversion, order value, revenue, revenue per visitor) → the block-level small print.
-       * Conversion, order value, revenue, revenue per visitor, the dual ring's thin inner "before" arc
-       * and the delivery bar's "typical agency" reference are illustrative (deterministic per store, see
+       * The sheet's "Impact" block — as of 2026-09-10 (owner restructure) the sheet's entire numbers
+       * story (header → captures → tagline/description → Impact → stack → Visit store). Fixed layout
+       * order: three hero numerals (Conversion, Revenue, Load time, big figures first) → the Lighthouse
+       * score rings (Performance/Accessibility/SEO, real, the before→after delta a small badge beside
+       * Performance) → the speed pair (real desktop-LCP load-time bars beside the performance dual
+       * ring) → the four indexed lines as a fixed 2×2 grid, each tile's label on top and its numeral
+       * at the bottom under its own chart → the block-level small print. No dates and no delivery chart
+       * anywhere in this block per the owner's 2026-09-10 call. Conversion, order value, revenue,
+       * revenue per visitor, the dual ring's thin inner "before" arc and the load-time chart's
+       * illustrative "before" seconds are illustrative (deterministic per store, see
        * src/data/illustrative.ts) and anchored to the real ranges on the CV; the score rings, the dual
-       * ring's real "after" arc, the Core Web Vitals strip, the LCP gauge and the delivery bar's own
-       * weeks figure are REAL (src/data/lighthouse.json, src/data/telemetry.json). No per-chip or
-       * per-chart illustrative tag anywhere in this block — `disclaimer` (the block-level small print)
-       * is the sheet's only disclosure. `disclaimer` and `infoSentence` are fixed, owner-approved
-       * copy — do not paraphrase them.
+       * ring's real "after" arc and the load-time chart's real "after" seconds (the desktop lab LCP,
+       * preferred) are REAL (src/data/lighthouse.json). No per-chip or per-chart illustrative tag
+       * anywhere in this block — `disclaimer` (the block-level small print) is the sheet's only
+       * disclosure. `disclaimer` and `infoSentence` are fixed, owner-approved copy — do not paraphrase
+       * them.
        */
       impact: {
         title: string // "Impact" — the block heading
@@ -207,37 +209,23 @@ export interface PortfolioContent {
         rpvLabel: string // "Revenue per visitor, indexed" — indexed-line label
         orderValueLabel: string // "Order value, indexed" — indexed-line label
         revenueLabel: string // "Revenue, indexed" — indexed-line label, the compounded headline figure
-        ringsCaption: string // 'Desktop · measured {date}.' — under the score rings row, no perfDual
-        ringsCaptionWithDelta: string // 'Desktop · +{delta} pts vs. an unoptimized baseline · measured {date}.' — with perfDual
-        before: string // dual-ring / load-time-pair / delivery-pair label — illustrative
+        ringsCaption: string // 'Lighthouse · desktop · measured.' — under the score rings row, no date
+        ringsDelta: string // '+{n} pts' — small badge next to Performance's numeral, only when perfDual exists
+        before: string // dual-ring / load-time-pair label — illustrative
         after: string // dual-ring / load-time-pair label — REAL
         perfDualLabel: string // "Performance" — the dual ring's own label
-        cwvTitle: string // "Core Web Vitals" — strip heading
-        cwvLcp: string // "LCP" — pill label
-        cwvInp: string // "INP" — pill label
-        cwvCls: string // "CLS" — pill label
-        cwvSource: string // 'Real-user field data (CrUX), {date}.' — under the CWV strip
-        speedLabel: string // "Mobile LCP, measured" — lab gauge label (CWV-strip fallback)
-        formMobile: string // 'mobile' — lowercase form word for {form} placeholders
-        formDesktop: string // 'desktop'
-        speedTarget: string // '≤{n}s — the "good" LCP threshold'
-        speedSource: string // 'Measured Lighthouse LCP (mobile), {date}.'
         disclaimer: string // the required small-print line, verbatim, EN/ES/JA
         infoLabel: string // aria-label for the info-affordance button (aria-expanded)
         infoSentence: string // one sentence: ranges come from measured client work 2023–2026
-        // Headline strip: four chips above the chart grid, computed from the same data as the charts
-        // below them, no per-chip tag of their own (see ProjectModal's headline-chip block).
-        chipConversionLabel: string // "Conversion" — headline chip label
-        chipRevenueLabel: string // "Revenue" — headline chip label
-        chipLoadTimeLabel: string // "Load time" — headline chip label
-        chipDeliveryLabel: string // "Delivery" — headline chip label
-        deliveryWeeksUnit: string // 'wk' — short unit suffix for the delivery chip's weeks numeral
-        loadTimeLabel: string // "Load time" — paired-bar chart heading (distinct from the LCP gauge)
-        loadTimeSource: string // 'Before: baseline · After: measured LCP, {date}.'
-        deliveryLabel: string // "Time to launch" — the delivery paired-bar chart heading
-        deliveryBeforeLabel: string // "Typical agency" — illustrative reference bar label
-        deliveryAfterLabel: string // "This build" — real weeks bar label
-        deliverySource: string // source line under the delivery bar
+        // Hero numerals: three big figures above the chart grid, computed from the same data as the
+        // charts below them, no per-numeral tag of their own (see ProjectModal's hero-numeral block).
+        chipConversionLabel: string // "Conversion" — hero numeral label
+        chipRevenueLabel: string // "Revenue" — hero numeral label
+        chipLoadTimeLabel: string // "Load time" — hero numeral label
+        formMobile: string // 'mobile' — lowercase form word for {form} placeholders
+        formDesktop: string // 'desktop'
+        loadTimeLabel: string // "Load time" — paired-bar chart heading
+        loadTimeSource: string // '{form} LCP, measured.' — no date; {form} is formMobile/formDesktop
         indexChip: string // '+{pct}% conversion' — the Shopify Work index row's per-store chip
       }
     }

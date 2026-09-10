@@ -94,8 +94,14 @@ export function Gauge({ value, label, color, dark, delay = 0 }: { value: number;
  * When `band` is given (conversion: the CV's own +10%/+20% floor and ceiling) it's drawn as a soft
  * fill the store's own seeded line always sits inside, so a single trajectory reads as one
  * representation of a known, disclosed range rather than a standalone number. Paint-only animation
- * (opacity + stroke-dash), an sr-only table underneath, headline delta counts up in the good-direction
- * color since every series here is a seeded lift, never a decline.
+ * (opacity + stroke-dash), an sr-only table underneath.
+ *
+ * Layout (2026-09-10 restructure): label on top (11px caps — already reads "…, indexed"), the line
+ * itself fixed at a 64px box so all four tiles in the indexed grid line up edge to edge, the headline
+ * delta numeral LAST at the bottom in the display face — a `clamp()` size keyed to the tile's own
+ * container width (not the viewport) so it never overflows the ~450–520px desktop panel or the
+ * full-width 390px sheet. Every series here is a seeded lift, never a decline, so the numeral always
+ * paints in the good-direction color.
  */
 export function IndexAreaLine({
   points,
@@ -138,12 +144,9 @@ export function IndexAreaLine({
     : null
   const baselineY = y(100)
   return (
-    <figure className="m-0">
-      <div className="flex items-baseline justify-between gap-2">
-        <figcaption className={`text-[11px] leading-tight ${mutedText(dark)}`}>{label}</figcaption>
-        <CountUp value={deltaPct} prefix="+" suffix="%" delay={delay + 0.6} duration={0.8} className={`${big ? 'text-2xl' : 'text-xl'} font-semibold leading-none tabular-nums ${goodText(dark)}`} />
-      </div>
-      <svg viewBox={`0 0 ${w} ${h}`} className="mt-1.5 h-[62px] w-full" preserveAspectRatio="none" role="img" aria-label={`${label}: ${points[0]} → ${points[n - 1]} (index, base 100)`}>
+    <figure className="m-0 flex min-w-0 flex-col gap-1.5">
+      <figcaption className={`min-w-0 text-[11px] font-semibold uppercase leading-tight tracking-[0.08em] ${mutedText(dark)}`}>{label}</figcaption>
+      <svg viewBox={`0 0 ${w} ${h}`} className="h-16 w-full" preserveAspectRatio="none" role="img" aria-label={`${label}: ${points[0]} → ${points[n - 1]} (index, base 100)`}>
         <line x1={pad} x2={w - pad} y1={baselineY} y2={baselineY} stroke={dark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)'} strokeWidth={1} strokeDasharray="3 4" />
         {bandPath && (
           <m.path d={bandPath} fill={color} fillOpacity={dark ? 0.14 : 0.09} stroke="none" initial={reduced ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: delay + 0.3, duration: 0.5 }} />
@@ -169,6 +172,14 @@ export function IndexAreaLine({
           transition={{ delay: delay + 0.8, duration: 0.3, ease: EASE }}
         />
       </svg>
+      <CountUp
+        value={deltaPct}
+        prefix="+"
+        suffix="%"
+        delay={delay + 0.6}
+        duration={0.8}
+        className={`${big ? 'text-[clamp(24px,5.5cqw,32px)]' : 'text-[clamp(22px,5cqw,30px)]'} font-semibold leading-none tabular-nums ${goodText(dark)}`}
+      />
       <SrTable caption={label} rows={points.map((v, i) => [`W${i + 1}`, String(v)] as [string, string])} />
     </figure>
   )
@@ -182,8 +193,9 @@ export const scoreColor = (score: number) => (score >= 90 ? '#34c759' : score >=
 const RINGS_R = 20
 const RINGS_C = 2 * Math.PI * RINGS_R
 
-/** A single small Lighthouse-style ring inside ScoreRingsRow — count-up numeral, band-colored arc. */
-function MiniRing({ value, label, delay, dark }: { value: number; label: string; delay: number; dark: boolean }) {
+/** A single small Lighthouse-style ring inside ScoreRingsRow — count-up numeral, band-colored arc, an
+ *  optional small "+N pts" badge beside the numeral (Performance's real before→after delta). */
+function MiniRing({ value, label, delay, dark, badge }: { value: number; label: string; delay: number; dark: boolean; badge?: string }) {
   const reduced = useReducedMotion()
   const mv = useMotionValue(reduced ? value : 0)
   const shown = useTransform(mv, (v) => Math.round(v))
@@ -203,9 +215,12 @@ function MiniRing({ value, label, delay, dark }: { value: number; label: string;
         <m.circle cx="24" cy="24" r={RINGS_R} fill="none" strokeWidth="4.5" strokeLinecap="round" stroke={scoreColor(value)} strokeDasharray={RINGS_C} style={{ strokeDashoffset: dash }} transform="rotate(-90 24 24)" />
       </svg>
       <div className="min-w-0">
-        <m.p className="text-lg font-semibold leading-none tabular-nums" aria-label={`${label}: ${value}`}>
-          {shown}
-        </m.p>
+        <div className="flex items-baseline gap-1.5">
+          <m.p className="text-lg font-semibold leading-none tabular-nums" aria-label={`${label}: ${value}${badge ? ` (${badge})` : ''}`}>
+            {shown}
+          </m.p>
+          {badge && <span className={`text-[11px] font-semibold leading-none tabular-nums ${goodText(dark)}`}>{badge}</span>}
+        </div>
         <p className={`mt-0.5 text-[10px] leading-tight ${mutedText(dark)}`}>{label}</p>
       </div>
     </div>
@@ -219,18 +234,21 @@ export interface RingMetric {
 }
 
 /** Score-rings row — Performance, Accessibility, SEO (whatever the caller passes; Best Practices and
- *  any sub-50 score are filtered out upstream), one small animated ring each, real measured values. */
-export function ScoreRingsRow({ metrics, caption, dark, delay = 0 }: { metrics: RingMetric[]; caption?: string; dark: boolean; delay?: number }) {
+ *  any sub-50 score are filtered out upstream), one small animated ring each, real measured values.
+ *  `badges` (keyed by the metric's `key`, e.g. `{ perf: '+52 pts' }`) renders a small delta pill next
+ *  to that one ring's numeral — Performance's real before→after lift, per the owner's 2026-09-10 call
+ *  to move it out of the caption and next to the ring it describes. */
+export function ScoreRingsRow({ metrics, caption, badges, dark, delay = 0 }: { metrics: RingMetric[]; caption?: string; badges?: Record<string, string>; dark: boolean; delay?: number }) {
   if (metrics.length === 0) return null
   return (
     <figure className="m-0">
-      <div className="flex flex-wrap gap-x-5 gap-y-3" role="img" aria-label={metrics.map((m) => `${m.label}: ${m.value}`).join(', ')}>
+      <div className="flex flex-wrap gap-x-5 gap-y-3" role="img" aria-label={metrics.map((m) => `${m.label}: ${m.value}${badges?.[m.key] ? ` (${badges[m.key]})` : ''}`).join(', ')}>
         {metrics.map((m, i) => (
-          <MiniRing key={m.key} value={m.value} label={m.label} delay={delay + i * 0.1} dark={dark} />
+          <MiniRing key={m.key} value={m.value} label={m.label} delay={delay + i * 0.1} dark={dark} badge={badges?.[m.key]} />
         ))}
       </div>
       {caption && <p className={`mt-2 text-[11px] leading-snug ${mutedText(dark)}`}>{caption}</p>}
-      <SrTable caption={caption ?? 'Score rings'} rows={metrics.map((m) => [m.label, String(m.value)] as [string, string])} />
+      <SrTable caption={caption ?? 'Score rings'} rows={metrics.map((m) => [m.label, badges?.[m.key] ? `${m.value} (${badges[m.key]})` : String(m.value)] as [string, string])} />
     </figure>
   )
 }
@@ -477,81 +495,5 @@ export function SpeedGauge({
         <p className={`text-[11px] leading-tight ${mutedText(dark)}`}>{targetLabel}</p>
       </div>
     </div>
-  )
-}
-
-/** Paired before/after bars for delivery weeks: "before" is the illustrative "typical agency" reference
- *  (src/data/illustrative.ts deliveryReferenceWeeks, 14–18 weeks), muted like every other illustrative
- *  bar in this file; "after" is this build's REAL delivery weeks (src/data/telemetry.json, or the
- *  registry's build-window fallback — see commerceLines.weeksFor), always in the accent color since a
- *  real delivery inside the illustrative reference band is the point of the chart. Same visual language
- *  as LoadTimePairedBar just above, integer weeks instead of seconds. */
-export function DeliveryPairedBar({
-  beforeWeeks,
-  afterWeeks,
-  deltaPct,
-  beforeLabel,
-  afterLabel,
-  label,
-  weekUnit,
-  color,
-  dark,
-  delay = 0,
-}: {
-  beforeWeeks: number
-  afterWeeks: number
-  deltaPct: number // positive: % faster than the illustrative reference, shown as "−N%"
-  beforeLabel: string
-  afterLabel: string
-  label: string
-  weekUnit: string
-  dark: boolean
-  delay?: number
-} & Palette) {
-  const reduced = useReducedMotion()
-  const domainMax = Math.max(beforeWeeks, afterWeeks, 1) * 1.08
-  const bars = [
-    { key: beforeLabel, v: beforeWeeks, c: dark ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.16)' },
-    { key: afterLabel, v: afterWeeks, c: color },
-  ]
-  return (
-    <figure className="m-0">
-      <div className="flex items-baseline justify-between gap-2">
-        <figcaption className={`text-[11px] leading-tight ${mutedText(dark)}`}>{label}</figcaption>
-        <CountUp value={deltaPct} prefix="−" suffix="%" delay={delay + 0.5} duration={0.8} className={`text-xs font-semibold tabular-nums ${goodText(dark)}`} />
-      </div>
-      <div className="mt-1.5 space-y-2.5" role="img" aria-label={`${label}: ${beforeLabel} ${beforeWeeks} ${weekUnit}, ${afterLabel} ${afterWeeks} ${weekUnit}`}>
-        {/* Label sits above its own bar (not beside it, in a fixed-width column) so a longer localized
-            phrase — "Esta construcción", "一般的な代理店" — always has the chart's full width to wrap or
-            breathe in, never clipped mid-word the way a fixed w-14 truncate column silently did. */}
-        {bars.map((b, j) => (
-          <div key={b.key}>
-            <div className="flex items-baseline justify-between gap-2">
-              <span className={`text-[10px] uppercase tracking-[0.12em] ${mutedText(dark)}`}>{b.key}</span>
-              <span className="shrink-0 text-xs font-semibold tabular-nums">
-                {b.v}
-                {weekUnit}
-              </span>
-            </div>
-            <div className={`mt-1 h-2.5 overflow-hidden rounded-full ${dark ? 'bg-white/10' : 'bg-black/[0.06]'}`}>
-              <m.div
-                className="h-full rounded-full"
-                style={{ backgroundColor: b.c }}
-                initial={reduced ? false : { width: 0 }}
-                animate={{ width: `${Math.max(2, (b.v / domainMax) * 100)}%` }}
-                transition={{ delay: delay + j * 0.12, duration: 0.8, ease: EASE }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-      <SrTable
-        caption={label}
-        rows={[
-          [beforeLabel, `${beforeWeeks}${weekUnit}`],
-          [afterLabel, `${afterWeeks}${weekUnit}`],
-        ]}
-      />
-    </figure>
   )
 }
