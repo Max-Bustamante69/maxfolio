@@ -172,7 +172,9 @@ export interface PortfolioContent {
       layoutExtra: {
         wallFilterLabel: string
         allLabel: string
-        hoverRing: string
+        /** Orbit layout only: caption for the center card's at-rest "in-house products" fleet stat
+         *  (the other three at-rest stats reuse `depthLabel.*`, which is already fixed at three keys). */
+        productsLabel: string
         unpin: string
         toolsSuffix: string
       }

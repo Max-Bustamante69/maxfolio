@@ -252,7 +252,7 @@ export const es: PortfolioContent = {
       layoutExtra: {
         wallFilterLabel: 'Filtrar el muro por grupo',
         allLabel: 'Todo',
-        hoverRing: 'Pasa el cursor sobre un anillo',
+        productsLabel: 'Productos propios',
         unpin: 'Desfijar',
         toolsSuffix: 'herramientas',
       },
