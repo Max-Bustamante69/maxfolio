@@ -46,7 +46,7 @@ export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, st
               onMouseLeave={() => onHoverGroup?.(null)}
               onFocus={() => onHoverGroup?.(g)}
               onBlur={() => onHoverGroup?.(null)}
-              className={`compact-touch rounded-full px-2.5 py-1 text-[11px] transition-colors ${on ? skin.chipOn : skin.chip}`}
+              className={`compact-touch max-lg:inline-flex max-lg:min-h-11 max-lg:min-w-11 max-lg:items-center max-lg:justify-center rounded-full px-2.5 py-1 text-[11px] transition-colors ${on ? skin.chipOn : skin.chip}`}
             >
               {groupLabel[g]} · {toolsByGroup[g].length} {sk.layoutExtra.toolsSuffix} · {formatGroup(storesPerGroup[g])}
             </button>
@@ -61,7 +61,7 @@ export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, st
             role="radio"
             aria-checked={filter.surface === null}
             onClick={() => filter.setSurface(null)}
-            className={`compact-touch rounded-full px-2.5 py-1 text-[11px] transition-colors ${filter.surface === null ? skin.chipOn : skin.chip}`}
+            className={`compact-touch max-lg:inline-flex max-lg:min-h-11 max-lg:min-w-11 max-lg:items-center max-lg:justify-center rounded-full px-2.5 py-1 text-[11px] transition-colors ${filter.surface === null ? skin.chipOn : skin.chip}`}
           >
             {sk.layoutExtra.allLabel}
           </button>
@@ -72,7 +72,7 @@ export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, st
               role="radio"
               aria-checked={filter.surface === s}
               onClick={() => filter.setSurface(s)}
-              className={`compact-touch rounded-full px-2.5 py-1 text-[11px] transition-colors ${filter.surface === s ? skin.chipOn : skin.chip}`}
+              className={`compact-touch max-lg:inline-flex max-lg:min-h-11 max-lg:min-w-11 max-lg:items-center max-lg:justify-center rounded-full px-2.5 py-1 text-[11px] transition-colors ${filter.surface === s ? skin.chipOn : skin.chip}`}
             >
               {ob[SURFACE_LABEL[s]]}
             </button>
@@ -87,12 +87,12 @@ export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, st
             onChange={onQueryChange}
             placeholder={ob.searchPlaceholder}
             aria-label={ob.searchLabel}
-            className={`w-36 rounded-full border bg-transparent px-3 py-1 text-[11px] outline-none transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current sm:w-44 ${skin.line} ${skin.body}`}
+            className={`w-36 max-lg:min-h-11 rounded-full border bg-transparent px-3 py-1 text-[11px] outline-none transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current sm:w-44 ${skin.line} ${skin.body}`}
           />
         </label>
 
         {filter.isActive && (
-          <button type="button" onClick={filter.clear} className={`compact-touch rounded-full px-2.5 py-1 text-[11px] underline-offset-2 hover:underline ${skin.accent}`}>
+          <button type="button" onClick={filter.clear} className={`compact-touch max-lg:inline-flex max-lg:min-h-11 max-lg:min-w-11 max-lg:items-center max-lg:justify-center rounded-full px-2.5 py-1 text-[11px] underline-offset-2 hover:underline ${skin.accent}`}>
             {ob.clear}
           </button>
         )}
