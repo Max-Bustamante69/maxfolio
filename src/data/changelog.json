@@ -1,5 +1,10 @@
 [
   {
+    "hash": "1d02678",
+    "date": "2026-09-10",
+    "subject": "fix(a11y): the orbit dots are toggle buttons in a group, not list items (aria-pressed is not allowed on listitem)"
+  },
+  {
     "hash": "dae305c",
     "date": "2026-09-10",
     "subject": "chore(terminal): regenerated changelog.json"
@@ -53,10 +58,5 @@
     "hash": "363ea16",
     "date": "2026-09-10",
     "subject": "fix(neo): flatten the leftover raised Design Menu explore tile"
-  },
-  {
-    "hash": "b3728e2",
-    "date": "2026-09-10",
-    "subject": "chore(themes): remove Skyline theme, derive design-count copy from designs.ts"
   }
 ]
