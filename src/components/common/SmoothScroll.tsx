@@ -1,55 +1,40 @@
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
-import Lenis from 'lenis'
+import { createContext, useContext, useEffect, type ReactNode } from 'react'
+import type Lenis from 'lenis'
 
 const LenisContext = createContext<Lenis | null>(null)
 
-/** The running Lenis instance (null before mount, under reduced motion, or outside the provider). */
+/**
+ * Always null now: the page scrolls natively. Consumers keep their `if (lenis) … else window.scrollTo`
+ * branches, so the native path is the one that runs.
+ */
 export const useLenis = () => useContext(LenisContext)
 
 interface SmoothScrollProps {
   children: ReactNode
-  /** Fixed-header height to keep above anchored sections. */
+  /** Fixed-header height to keep above anchored sections that carry no scroll margin. */
   offset?: number
 }
 
 /**
- * Inertial page scroll on Lenis (~10 KB gz). The window stays the scroll container, so
- * framer-motion's useScroll, scroll-snap rails and `scrollTo` keep working; anchors are routed
- * through Lenis so the nav lands smoothly under the fixed header. Off under reduced motion.
+ * Native scroll (2026-09-09). Lenis used to drive an inertial scroll here; every "the scroll gets stuck"
+ * report traced back to Lenis fighting something — the case-study sheet's own scroller, the gallery rail
+ * that opted out of it and then jumped when the pointer left, chunks landing mid-scroll. The browser's own
+ * scroll never has those seams, `scroll-behavior: smooth` in index.css keeps anchors gentle, and
+ * framer-motion's useScroll/whileInView work on the window either way. The provider stays so nothing
+ * else had to change; it simply never hands out an instance.
  */
 export function SmoothScroll({ children, offset = 56 }: SmoothScrollProps) {
-  const [lenis, setLenis] = useState<Lenis | null>(null)
-  const ref = useRef<Lenis | null>(null)
-
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    // Construction waits for an idle frame so Lenis never sits on the cold-load critical path
-    // (Lighthouse's TBT window); the page scrolls natively until then.
-    let cancelled = false
-    const idle = (window as Window & { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 1))
-    idle(() => {
-      if (cancelled) return
-      // Sections carry `scroll-mt` for the fixed header and Lenis honors it, so anchors need no extra offset;
-      // `offset` only applies to targets without a scroll margin.
-      const instance = new Lenis({ autoRaf: true, lerp: 0.1, wheelMultiplier: 1, anchors: true })
-      ref.current = instance
-      setLenis(instance)
-      // Hash on load: land on the section under the header instead of behind it.
-      if (window.location.hash) {
-        const target = document.querySelector(window.location.hash) as HTMLElement | null
-        if (target) {
-          const hasMargin = parseFloat(getComputedStyle(target).scrollMarginTop || '0') > 0
-          requestAnimationFrame(() => instance.scrollTo(target, { offset: hasMargin ? 0 : -offset, immediate: true }))
-        }
-      }
+    // Hash on load: land on the section under the fixed header instead of behind it.
+    if (!window.location.hash) return
+    const target = document.querySelector(window.location.hash) as HTMLElement | null
+    if (!target) return
+    const hasMargin = parseFloat(getComputedStyle(target).scrollMarginTop || '0') > 0
+    requestAnimationFrame(() => {
+      const top = target.getBoundingClientRect().top + window.scrollY - (hasMargin ? 0 : offset)
+      window.scrollTo({ top, behavior: 'auto' })
     })
-    return () => {
-      cancelled = true
-      ref.current?.destroy()
-      ref.current = null
-      setLenis(null)
-    }
   }, [offset])
 
-  return <LenisContext.Provider value={lenis}>{children}</LenisContext.Provider>
+  return <LenisContext.Provider value={null}>{children}</LenisContext.Provider>
 }
