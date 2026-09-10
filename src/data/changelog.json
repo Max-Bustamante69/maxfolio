@@ -1,5 +1,10 @@
 [
   {
+    "hash": "dae305c",
+    "date": "2026-09-10",
+    "subject": "chore(terminal): regenerated changelog.json"
+  },
+  {
     "hash": "e8d9514",
     "date": "2026-09-10",
     "subject": "chore(terminal): regenerated changelog.json"
@@ -53,10 +58,5 @@
     "hash": "b3728e2",
     "date": "2026-09-10",
     "subject": "chore(themes): remove Skyline theme, derive design-count copy from designs.ts"
-  },
-  {
-    "hash": "244b16c",
-    "date": "2026-09-10",
-    "subject": "docs(research): awwwards portfolio pages 10-12 + personal lens, and the library index refreshed (all references tagged)"
   }
 ]

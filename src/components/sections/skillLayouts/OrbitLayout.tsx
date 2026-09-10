@@ -218,7 +218,8 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
           </svg>
 
           {/* Rotating dot layer — one wrapper per ring, transform-only ambient spin. */}
-          <div role="list" aria-label={sk.eyebrow} className="absolute inset-0">
+          {/* A group of toggle buttons, not a list: aria-pressed is not allowed on a listitem (Lighthouse aria-allowed-attr). */}
+          <div role="group" aria-label={sk.eyebrow} className="absolute inset-0">
             {ringSpecs.map((ring) => (
               <div
                 key={ring.group}
@@ -252,7 +253,6 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
                     <button
                       key={u.tool}
                       type="button"
-                      role="listitem"
                       aria-pressed={isPressed}
                       aria-label={`${u.tool} — ${groupLabel[u.group]} — ${formatTool(u)}`}
                       onMouseEnter={() => setHovered(u.tool)}
