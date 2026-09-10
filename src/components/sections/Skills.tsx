@@ -136,6 +136,16 @@ function tileTone(skin: Skin): TileTone {
         // so they skip the skew and keep it on the tile container itself instead.
         chip: skin.chip.replace('skew-chip', '').trim(),
       }
+    case 'terminal':
+      return {
+        base: 'border border-[var(--term-line)] bg-transparent',
+        onBase: 'border-[var(--term-accent)] bg-[var(--term-accent)]/[0.06]',
+        pinnedRing: 'ring-1 ring-[var(--term-accent)]',
+        icon: 'bg-[var(--term-line)]/40 text-[var(--term-muted)]',
+        iconOn: 'bg-[var(--term-accent)]/10 text-[var(--term-accent)]',
+        title: skin.title,
+        chip: skin.chip,
+      }
   }
 }
 

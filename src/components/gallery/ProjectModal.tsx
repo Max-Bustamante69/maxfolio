@@ -246,12 +246,12 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
       /* clipboard unavailable: the URL bar already carries the link */
     }
   }
-  const panel = skin.frame === 'apple' ? 'rounded-[28px]' : skin.frame === 'luxury' ? 'rounded-none' : 'rounded-none border-2 border-stone-900'
-  const panelBg = dark ? 'bg-[#141416] text-[#f5f5f7]' : 'bg-white text-[#1d1d1f]'
+  const panel = skin.frame === 'apple' ? 'rounded-[28px]' : skin.frame === 'luxury' ? 'rounded-none' : skin.frame === 'terminal' ? 'rounded-none border border-[var(--term-line)]' : 'rounded-none border-2 border-stone-900'
+  const panelBg = skin.frame === 'terminal' ? 'bg-[var(--term-bg)] text-[var(--term-ink)]' : dark ? 'bg-[#141416] text-[#f5f5f7]' : 'bg-white text-[#1d1d1f]'
   const radius = skin.frame === 'apple' ? 'rounded-[14px]' : 'rounded-none'
-  const tile = `${radius} p-3 ${dark ? 'bg-white/5' : 'bg-black/[0.04]'}`
+  const tile = `${radius} p-3 ${skin.frame === 'terminal' ? 'bg-[var(--term-line)]/30' : dark ? 'bg-white/5' : 'bg-black/[0.04]'}`
   const label = `text-[11px] font-semibold uppercase tracking-[0.18em] ${skin.muted}`
-  const accent = skin.frame === 'apple' ? (dark ? '#2997ff' : '#0071e3') : skin.frame === 'luxury' ? '#C9A962' : '#dc2626'
+  const accent = skin.frame === 'apple' ? (dark ? '#2997ff' : '#0071e3') : skin.frame === 'luxury' ? '#C9A962' : skin.frame === 'terminal' ? 'var(--term-accent)' : '#dc2626'
 
   const scores = data?.metrics
     ? [

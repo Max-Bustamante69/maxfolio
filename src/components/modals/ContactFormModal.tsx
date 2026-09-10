@@ -8,7 +8,7 @@ import { useI18n } from '../../hooks'
 interface ContactFormModalProps {
   isOpen: boolean
   onClose: () => void
-  variant?: 'luxury' | 'brutalist' | 'apple' | 'neo' | 'persona'
+  variant?: 'luxury' | 'brutalist' | 'apple' | 'neo' | 'persona' | 'terminal'
   isDark?: boolean
   /** Text placed in the message field when the form opens (e.g. the store URL from the contact section). */
   initialMessage?: string
@@ -167,8 +167,21 @@ export function ContactFormModal({
     btnSecondary: isDark ? 'border-[#f5f2ee]/20 text-[#f5f2ee] hover:bg-[#f5f2ee]/10' : 'border-[#0a0f1a]/20 text-[#0a0f1a] hover:bg-[#0a0f1a]/5',
   }
 
-  const styles = variant === 'apple' ? appleStyles : variant === 'luxury' ? luxuryStyles : variant === 'neo' ? neoStyles : variant === 'persona' ? personaStyles : brutalistStyles
-  const successCircle = variant === 'apple' ? 'bg-[#0071e3]/15' : variant === 'luxury' ? 'bg-deco-gold/20' : variant === 'neo' ? 'bg-[#4453d9]/15' : variant === 'persona' ? (isDark ? 'bg-[#c8102e]/20' : 'bg-[#1c6fb0]/15') : 'bg-red-600/20'
+  // Terminal variant: a bordered, square-cornered console pane — no fill, the border IS the frame,
+  // fields keep the same hairline border with the phosphor accent only on focus.
+  const terminalStyles = {
+    bgModal: 'border border-[var(--term-line)] bg-[var(--term-bg)]',
+    bgInput: 'bg-transparent border-[var(--term-line)] text-[var(--term-ink)] placeholder:text-[var(--term-muted)] focus:border-[var(--term-accent)]',
+    textPrimary: 'text-[var(--term-ink)]',
+    textSecondary: 'text-[var(--term-muted)]',
+    textMuted: 'text-[var(--term-muted)]',
+    accent: 'text-[var(--term-accent)]',
+    btnPrimary: 'bg-[var(--term-fill)] text-[var(--term-ink)] hover:bg-[var(--term-accent)] hover:text-[var(--term-bg)] border border-[var(--term-accent)]',
+    btnSecondary: 'border-[var(--term-line)] text-[var(--term-ink)] hover:bg-[var(--term-line)]/30',
+  }
+
+  const styles = variant === 'apple' ? appleStyles : variant === 'luxury' ? luxuryStyles : variant === 'neo' ? neoStyles : variant === 'persona' ? personaStyles : variant === 'terminal' ? terminalStyles : brutalistStyles
+  const successCircle = variant === 'apple' ? 'bg-[#0071e3]/15' : variant === 'luxury' ? 'bg-deco-gold/20' : variant === 'neo' ? 'bg-[#4453d9]/15' : variant === 'persona' ? (isDark ? 'bg-[#c8102e]/20' : 'bg-[#1c6fb0]/15') : variant === 'terminal' ? 'bg-[var(--term-accent)]/15' : 'bg-red-600/20'
 
   return (
     <AnimatePresence>

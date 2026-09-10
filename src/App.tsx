@@ -15,6 +15,7 @@ const Design1 = lazy(() => import('./pages/Design1'))
 const Design4 = lazy(() => import('./pages/Design4'))
 const Neo = lazy(() => import('./pages/Neo'))
 const Persona = lazy(() => import('./pages/Persona'))
+const Terminal = lazy(() => import('./pages/Terminal'))
 
 // A/B: the landing at `/` is the visitor's variant. Every theme that can be a variant is registered here;
 // ab.config.ts decides which ones actually take traffic (with only `apple` listed there is no split).
@@ -67,6 +68,7 @@ function App() {
             <Route path={designById('brutalist').route} element={<Design1 />} />
             <Route path={designById('neo').route} element={<Neo />} />
             <Route path={designById('persona').route} element={<Persona />} />
+            <Route path={designById('terminal').route} element={<Terminal />} />
             <Route path={MENU.route} element={<Home />} />
             {/* Legacy routes */}
             <Route path="/1" element={<Design4 />} />

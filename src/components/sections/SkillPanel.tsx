@@ -99,6 +99,17 @@ function panelTone(skin: Skin): PanelTone {
         line: skin.line,
         iconWrap: skin.dark ? 'bg-[#f5f2ee]/10 text-[#e8465f]' : 'bg-[#0a0f1a]/5 text-[#1c6fb0]',
       }
+    case 'terminal':
+      return {
+        className: 'border border-[var(--term-line)] border-t-2 border-t-[var(--term-accent)] bg-[var(--term-panel)]',
+        title: skin.title,
+        body: skin.body,
+        muted: skin.muted,
+        accent: skin.accent,
+        chip: skin.chip,
+        line: skin.line,
+        iconWrap: 'bg-[var(--term-line)]/40 text-[var(--term-accent)]',
+      }
   }
 }
 
