@@ -1,5 +1,10 @@
 [
   {
+    "hash": "ccda2cd",
+    "date": "2026-09-09",
+    "subject": "feat(terminal): add Terminal theme, the engineer-for-engineers register"
+  },
+  {
     "hash": "4a9a240",
     "date": "2026-09-09",
     "subject": "fix(3d,sheet): the scroll object's render loop sleeps while off-screen; the sheet's charts redraw per store on prev/next"
@@ -53,10 +58,5 @@
     "hash": "5003035",
     "date": "2026-09-09",
     "subject": "fix(scroll): native scrolling everywhere; the Manifesto band is never hidden behind a reveal"
-  },
-  {
-    "hash": "275e06d",
-    "date": "2026-09-09",
-    "subject": "fix(a11y): the Apple skill panel's muted text clears AA on its tinted surface"
   }
 ]

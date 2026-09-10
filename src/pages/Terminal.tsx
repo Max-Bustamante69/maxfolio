@@ -257,7 +257,7 @@ function TerminalContent() {
   ]
 
   const BracketNav = ({ size = 'md' }: { size?: 'sm' | 'md' }) => (
-    <nav aria-label={t('nav.work')} className={`flex flex-wrap items-center ${size === 'sm' ? 'gap-x-4 gap-y-1 text-xs' : 'gap-x-3 gap-y-2 text-sm sm:gap-x-6 md:text-base'}`}>
+    <nav aria-label="Section navigation" className={`flex flex-wrap items-center ${size === 'sm' ? 'gap-x-4 gap-y-1 text-xs' : 'gap-x-3 gap-y-2 text-sm sm:gap-x-6 md:text-base'}`}>
       {navItems.map((item) => {
         const active = activeNav === item.id
         return (
