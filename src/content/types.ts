@@ -110,6 +110,8 @@ export interface PortfolioContent {
     skills: SectionHeading & {
       groups: Record<SkillGroupId, string>
       narrative: Record<SkillGroupId, string>
+      /** A one-line honest note per group, standalone (no {skills} placeholder) — used by the skill panel. */
+      groupNote: Record<SkillGroupId, string>
       usageLabel: string
       usageUnit: string
       usageNote: string
@@ -128,6 +130,12 @@ export interface PortfolioContent {
         triTs: string
         triStoresDefault: string
         depthLabel: string
+      }
+      /** The selected-skill panel: name/group/usage come from sunburst.* and groupNote above. */
+      panel: {
+        eyebrow: string
+        pinned: string
+        hint: string
       }
     }
     contact: SectionHeading & {

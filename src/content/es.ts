@@ -155,6 +155,14 @@ export const es: PortfolioContent = {
         cro: 'Los números salen de {skills}.',
         ai: 'El sistema de entrega se construye con {skills}.',
       },
+      groupNote: {
+        shopify: 'Las tiendas y las apps salen directo sobre los primitivos de Shopify.',
+        frontend: 'El front son islas de React montadas en Liquid, solo donde la interacción lo justifica.',
+        backend: 'El backend detrás de las apps y la Plataforma es el mismo que corre en producción.',
+        quality: 'Nada sale al aire sin pasar antes por un chequeo automatizado.',
+        cro: 'Cada número aquí sale de la flota real, no de un benchmark.',
+        ai: 'El propio pipeline de construcción corre sobre agentes de IA, de punta a punta.',
+      },
       sunburst: {
         caption: 'Pasa el cursor, toca o navega con tab por un arco — el número detrás es real.',
         storesUnit: '{n} tiendas',
@@ -169,6 +177,11 @@ export const es: PortfolioContent = {
         triTs: 'Líneas de TypeScript en toda la flota',
         triStoresDefault: '{n} tiendas en la flota',
         depthLabel: 'Profundidad',
+      },
+      panel: {
+        eyebrow: 'Herramienta seleccionada',
+        pinned: 'Fijado',
+        hint: 'Haz clic o presiona Enter para fijarlo — Esc lo libera.',
       },
     },
     contact: {

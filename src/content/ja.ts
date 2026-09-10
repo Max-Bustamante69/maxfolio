@@ -155,6 +155,14 @@ export const ja: PortfolioContent = {
         cro: '数字は {skills} から生まれます。',
         ai: '納品の仕組みは {skills} で構築しています。',
       },
+      groupNote: {
+        shopify: 'ストアとアプリはShopify本来の仕組みの上に直接構築します。',
+        frontend: 'フロントエンドはLiquidに組み込むReactアイランドで、インタラクションが必要な箇所だけに使います。',
+        backend: 'アプリとプラットフォームを支えるバックエンドは、本番で稼働しているものと同じです。',
+        quality: '自動チェックを通さずに公開することはありません。',
+        cro: 'ここに出す数字はすべて実際のストア群から取得したもので、ベンチマークではありません。',
+        ai: '構築パイプライン自体がAIエージェントによってend-to-endで動いています。',
+      },
       sunburst: {
         caption: 'アークにカーソルを合わせる、タップする、またはTabで移動すると、実数が表示されます。',
         storesUnit: '{n} 店舗',
@@ -169,6 +177,11 @@ export const ja: PortfolioContent = {
         triTs: '全店舗のTypeScript行数',
         triStoresDefault: 'フリート全体で{n}店舗',
         depthLabel: '深さ',
+      },
+      panel: {
+        eyebrow: '選択したツール',
+        pinned: '固定中',
+        hint: 'クリックまたはEnterで固定、Escで解除します。',
       },
     },
     contact: {
