@@ -350,7 +350,7 @@ function NeoContent() {
                     height={933}
                     loading="eager"
                     decoding="async"
-                    className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-[0.16]"
+                    className={`pointer-events-none absolute inset-0 h-full w-full object-cover ${isDark ? "opacity-[0.07]" : "opacity-[0.14]"}`}
                   />
                   <div className="relative">
                     <p className={`text-[11px] font-bold uppercase tracking-[0.2em] ${muted}`}>{c.sections.now.label}</p>
