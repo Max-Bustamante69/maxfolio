@@ -83,11 +83,23 @@ export interface PortfolioContent {
       nextAria: string
       highlightsLabel: string
     }
-    /** Apple's new sticky scrollytelling section for one storefront build (FeaturedBuild.tsx). */
+    /** Apple's featured-build section for one storefront (FeaturedBuild.tsx + featuredLayouts/*) — four
+     *  selectable design variants over the same real data, picked with `?featured=a|b|c|d`. */
     featuredBuild: SectionHeading & {
       lead: string
       visit: string
-      beats: { label: string; body: string }[] // problem -> plan -> build -> result, in order; {placeholders} filled from the registry
+      cta: string // opens the gallery case-study sheet for the featured store
+      progressLabel: string // '{n} / {total}'
+      prevAria: string
+      nextAria: string
+      railHint: string // sr-only keyboard hint for the storyboard rail
+      beats: { label: string; body: string; metric: string }[] // problem -> plan -> build -> result; {placeholders} filled from the registry/commerce
+      frames: { label: string; headline: string; fact: string }[] // storyboard rail: problem -> design -> build -> launch -> result
+      ticker: string[] // cinematic variant's fact strip; {placeholders} filled
+      metricLabels: { commits: string; weeks: string; sections: string } // bento count-up captions
+      stackLabel: string
+      shippedLabel: string
+      shipped: string[] // bento "what shipped" list; {placeholders} filled
     }
     /** Apple's new section listing what the Playwright QA harness actually checks (ReviewChecklist.tsx). */
     reviewChecklist: SectionHeading & {
