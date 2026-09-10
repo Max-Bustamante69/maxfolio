@@ -197,19 +197,25 @@ export function DiscountLadder({ steps, unit = '%', label, color, dark, delay = 
   return (
     <figure className="m-0">
       <figcaption className={`text-[11px] leading-tight ${mutedText(dark)}`}>{label}</figcaption>
-      <div className="mt-2 flex h-16 items-end gap-2" role="img" aria-label={`${label}: ${steps.map((s) => `${s}${unit}`).join(' → ')}`}>
+      <div className="mt-2 flex items-end gap-2" role="img" aria-label={`${label}: ${steps.map((s) => `${s}${unit}`).join(' → ')}`}>
         {steps.map((s, i) => (
-          <div key={i} className="flex flex-1 flex-col items-center justify-end gap-1.5">
+          <div key={i} className="flex flex-1 flex-col items-center gap-1.5">
             <span className="text-xs font-semibold tabular-nums">
               <CountUp value={s} suffix={unit} delay={delay + i * 0.15} />
             </span>
-            <m.div
-              className="w-full rounded-t-[3px]"
-              style={{ height: `${Math.max(8, (s / max) * 100)}%`, backgroundColor: i === steps.length - 1 ? color : dark ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.16)', transformOrigin: 'bottom' }}
-              initial={reduced ? false : { scaleY: 0 }}
-              animate={{ scaleY: 1 }}
-              transition={{ delay: delay + i * 0.15, duration: 0.5, ease: EASE }}
-            />
+            {/* The bar's percentage height needs a parent with a definite height to resolve against —
+                putting the label inside this box (as a sibling of the bar) left the box's own height
+                driven by content, which made every percentage height here resolve to 0. Fixed h-16
+                box, bar as its only child, mirrors the (working) WeeklyBars pattern above. */}
+            <div className="flex h-16 w-full items-end">
+              <m.div
+                className="w-full rounded-t-[3px]"
+                style={{ height: `${Math.max(8, (s / max) * 100)}%`, backgroundColor: i === steps.length - 1 ? color : dark ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.16)', transformOrigin: 'bottom' }}
+                initial={reduced ? false : { scaleY: 0 }}
+                animate={{ scaleY: 1 }}
+                transition={{ delay: delay + i * 0.15, duration: 0.5, ease: EASE }}
+              />
+            </div>
           </div>
         ))}
       </div>

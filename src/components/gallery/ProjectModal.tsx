@@ -262,8 +262,10 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
       ]
     : []
 
-  const navBtn = `press compact-touch inline-flex h-8 w-8 items-center justify-center rounded-full transition-opacity disabled:pointer-events-none disabled:opacity-25 ${dark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`
-  const actionBtn = `press compact-touch inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs ${dark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`
+  // No `.compact-touch` here: these are primary navigation/action controls (not decorative dots),
+  // so they keep the app-wide 44px tap-target floor even though the glyph inside stays small.
+  const navBtn = `press inline-flex h-11 w-11 items-center justify-center rounded-full transition-opacity disabled:pointer-events-none disabled:opacity-25 ${dark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`
+  const actionBtn = `press inline-flex h-11 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 text-xs ${dark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`
 
   // "Visualized" charts, built once per open store from `data.charts` (real numbers only — see
   // Gallery.caseStudyFor, which omits any field the underlying data doesn't actually have).
