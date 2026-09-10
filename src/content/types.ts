@@ -177,12 +177,16 @@ export interface PortfolioContent {
         conversionLabel: string // "Conversion, indexed" — line chart label
         conversionRangeNote: string // "Illustrative range: +10% to +20%" — under the conversion chart
         rpvLabel: string // "Revenue per visitor, indexed" — line chart label
+        rpvRangeNote: string // "Illustrative representation" — under the RPV chart, right next to its
+        // own headline number so it never reads as a measured KPI in isolation (mirrors conversionRangeNote)
         lighthouseLabel: string // "Lighthouse performance" — paired-bars block heading
         lighthouseMobile: string
         lighthouseDesktop: string
         before: string // paired-bars row label — illustrative
         after: string // paired-bars row label — REAL
-        lighthouseSource: string // 'After: measured mobile + desktop Lighthouse performance, {date}.'
+        lighthouseSource: string // 'Before: illustrative baseline, not measured. After: measured mobile +
+        // desktop Lighthouse performance, {date}.' — labels BOTH halves of the paired bars, immediately
+        // under that same chart (not just the shared block-level disclaimer further down)
         speedLabel: string // "Mobile LCP, measured" — gauge label
         speedTarget: string // '≤{n}s — the "good" LCP threshold'
         speedSource: string // 'Measured Lighthouse LCP (mobile), {date}.'

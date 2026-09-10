@@ -103,6 +103,7 @@ export interface CaseStudyLabels {
     conversionLabel: string
     conversionRangeNote: string
     rpvLabel: string
+    rpvRangeNote: string
     lighthouseLabel: string
     lighthouseMobile: string
     lighthouseDesktop: string
@@ -184,16 +185,16 @@ function ImpactDisclosure({ disclaimer, infoLabel, infoSentence, dark }: { discl
   const muted = dark ? 'text-[#a1a1a6]' : 'text-[#6e6e73]'
   return (
     <div className="mt-2">
-      <div className="flex items-start gap-1.5">
+      {/* The button itself stays a true 44x44 tap target (the site-wide `button{min-height:44px}` floor
+          in src/styles/index.css enforces that on any button, whatever height/width utility it carries),
+          but only the inner span paints — a small, restrained 16px dot — so the affordance next to this
+          tiny 11px line doesn't turn into an oversized grey disc dominating the disclosure it is labeling. */}
+      <div className="flex items-center gap-1">
         <p className={`text-[11px] leading-snug ${muted}`}>{disclaimer}</p>
-        <button
-          type="button"
-          aria-expanded={open}
-          aria-label={infoLabel}
-          onClick={() => setOpen((o) => !o)}
-          className={`press mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${dark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'} ${muted}`}
-        >
-          <InfoGlyph />
+        <button type="button" aria-expanded={open} aria-label={infoLabel} onClick={() => setOpen((o) => !o)} className={`press inline-flex shrink-0 items-center justify-center rounded-full ${muted}`}>
+          <span className={`inline-flex h-4 w-4 items-center justify-center rounded-full ${dark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`}>
+            <InfoGlyph />
+          </span>
         </button>
       </div>
       {open && <p className={`mt-1 text-[11px] leading-snug ${muted}`}>{infoSentence}</p>}
@@ -501,7 +502,7 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
                         />
                       </div>
                       <div className={tile}>
-                        <IndexAreaLine points={impact.rpv.points} label={il.rpvLabel} deltaPct={impact.rpv.deltaPct} color={accent} dark={dark} delay={0.15} />
+                        <IndexAreaLine points={impact.rpv.points} label={il.rpvLabel} deltaPct={impact.rpv.deltaPct} rangeNote={il.rpvRangeNote} color={accent} dark={dark} delay={0.15} />
                       </div>
                       {showLighthouseChart && (
                         <div className={`${tile} sm:col-span-2`}>

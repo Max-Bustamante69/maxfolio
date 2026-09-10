@@ -422,7 +422,7 @@ export function IndexAreaLine({
           strokeLinejoin="round"
           initial={reduced ? false : { pathLength: 0 }}
           animate={{ pathLength: 1 }}
-          transition={{ delay, duration: 0.9, ease: EASE }}
+          transition={{ delay, duration: 0.8, ease: EASE }}
         />
         <m.circle
           cx={x(n - 1)}
@@ -481,7 +481,7 @@ export function LighthousePairedBars({ rows, beforeLabel, afterLabel, dark, dela
                       style={{ backgroundColor: b.c }}
                       initial={reduced ? false : { width: 0 }}
                       animate={{ width: `${Math.max(2, (b.v / 100) * 100)}%` }}
-                      transition={{ delay: delay + i * 0.15 + j * 0.12, duration: 0.9, ease: EASE }}
+                      transition={{ delay: delay + i * 0.15 + j * 0.12, duration: 0.8, ease: EASE }}
                     />
                   </div>
                   <span className="w-8 shrink-0 text-right text-xs font-semibold tabular-nums">{Math.round(b.v)}</span>
@@ -535,7 +535,7 @@ export function SpeedGauge({
       mv.set(seconds)
       return
     }
-    const ctrl = animate(mv, seconds, { duration: 1, delay, ease: EASE })
+    const ctrl = animate(mv, seconds, { duration: 0.8, delay, ease: EASE })
     return () => ctrl.stop()
   }, [seconds, delay, reduced, mv])
   return (

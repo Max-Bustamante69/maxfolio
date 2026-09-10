@@ -68,13 +68,18 @@ export function conversionSeries(slug: string, weeks = 8): ConversionSeries {
 
 export interface RpvSeries {
   points: number[]
-  deltaPct: number // rounded final lift, always inside [8, 18]
+  deltaPct: number // rounded final lift, always inside the CV's own conversion band [10, 20]
 }
 
-/** Revenue-per-visitor, indexed (before = 100), a shorter/gentler climb than conversion — 100 → 108–118. */
+/** Revenue-per-visitor, indexed (before = 100), a shorter/gentler climb than conversion — 100 → 110–120.
+ *  Deliberately reuses the CV's conversion-lift band (+10–20%) rather than inventing an independent
+ *  range: RPV has no measured figure of its own on the CV, so anchoring it to a *different* fabricated
+ *  band would be a number with no real-world basis at all. Riding the same disclosed range (with its
+ *  own seed, so the number differs from that store's conversion figure) keeps it inside a range the
+ *  small print's "estimated representation" language can honestly cover. */
 export function revenuePerVisitorSeries(slug: string, weeks = 6): RpvSeries {
   const shape = easeShape(weeks)
-  const targetPct = round1(8 + rngFrom(seedFrom(slug, 'rpv')) () * 10)
+  const targetPct = round1(10 + rngFrom(seedFrom(slug, 'rpv'))() * 10)
   const jitter = rngFrom(seedFrom(slug, 'rpv-jitter'))
   const points = shape.map((s) => round1(100 + s * targetPct + (jitter() - 0.5) * 1.2))
   return { points, deltaPct: Math.round(targetPct) }
