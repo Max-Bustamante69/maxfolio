@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type MouseEvent } from 'react'
-import { m, useMotionTemplate, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, useInView, type MotionValue } from 'framer-motion'
+import { m, useMotionTemplate, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, useVelocity, useInView, type MotionValue } from 'framer-motion'
 import type { Skin } from './skins'
 import { LaptopFrame, PhoneFrame } from './DeviceFrame'
 
@@ -111,6 +111,13 @@ export function ProjectFrame({ name, shots, skin, onOpen, alt, variant = 'compos
   const glareX = useTransform(sx, (v) => `${Math.round(v * 100)}%`)
   const glareY = useTransform(sy, (v) => `${Math.round(v * 100)}%`)
   const glare = useMotionTemplate`radial-gradient(circle at ${glareX} ${glareY}, rgba(255,255,255,0.38), rgba(255,255,255,0.08) 32%, rgba(255,255,255,0) 60%)`
+  // Scroll-velocity tilt: the device leans ±4° along Z with how fast the page is scrolling (not its
+  // position), transform-only, easing back to 0 as scrolling settles — orthogonal to the pointer
+  // tilt above (rotateZ vs rotateX/Y) so a fast flick and a hover don't fight for the same axis.
+  const { scrollY } = useScroll()
+  const scrollVelocity = useVelocity(scrollY)
+  const smoothVelocity = useSpring(scrollVelocity, { damping: 50, stiffness: 400 })
+  const velocityTilt = useTransform(smoothVelocity, [-2400, 0, 2400], [-4, 0, 4], { clamp: true })
 
   const onMove = (e: MouseEvent<HTMLElement>) => {
     if (reduced) return
@@ -135,7 +142,7 @@ export function ProjectFrame({ name, shots, skin, onOpen, alt, variant = 'compos
       rest()
     },
   }
-  const tilt = reduced ? {} : { rotateX, rotateY }
+  const tilt = reduced ? {} : { rotateX, rotateY, rotateZ: velocityTilt }
   const lift = hover && !reduced
 
   const Glare = () => (

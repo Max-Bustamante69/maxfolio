@@ -104,7 +104,7 @@ const Reveal = ({ children, delay = 0, className = '' }: { children: ReactNode; 
   <m.div
     initial={{ opacity: 0, y: 20, scale: 0.985 }}
     whileInView={{ opacity: 1, y: 0, scale: 1 }}
-    viewport={{ once: true, margin: '-60px' }}
+    viewport={{ once: true, amount: 0.1 }}
     transition={{ duration: 0.6, delay, ease: EASE }}
     className={className}
   >
@@ -420,9 +420,9 @@ function AppleContent() {
             </div>
           </section>
 
-          {/* Manifesto — an inverted typographic band between two media-heavy sections */}
+          {/* Manifesto — an inverted typographic band between two media-heavy sections, grounded on a very quiet frosted-glass gradient */}
           <Suspense fallback={<Pending h="min-h-[40vh]" />}>
-            <Manifesto skin={skin} />
+            <Manifesto skin={skin} backdropSrc="/art/apple/frosted-glass.webp" />
           </Suspense>
 
           {/* Testimonials (absent until a real quote exists) */}

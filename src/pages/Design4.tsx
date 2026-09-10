@@ -1,4 +1,4 @@
-import { m, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useState, ReactNode } from "react";
 import { ThemeProvider, useTheme } from "../context/ThemeContext";
 import {
@@ -20,6 +20,7 @@ import {
   Skills,
   Ticker,
   RevealText,
+  ScrollObject,
 } from "../components";
 import { skins } from "../components/gallery";
 import { Years } from "../components/sections/Years";
@@ -79,7 +80,7 @@ const FadeInUp = ({ children, delay = 0, className = "" }: { children: ReactNode
   <m.div
     initial={{ opacity: 0, y: 30 }}
     whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: "-50px" }}
+    viewport={{ once: true, amount: 0.1 }}
     transition={{ duration: 0.6, delay, ease: "easeOut" }}
     className={className}
   >
@@ -111,6 +112,7 @@ const DownloadIcon = () => (
 
 function Design4Content() {
   const { isDark } = useTheme();
+  const reducedMotion = useReducedMotion();
   const { t } = useI18n();
   const { strings: c, registry, formatPeriod } = useContent();
   const [isContactOpen, setIsContactOpen] = useState(false);
@@ -239,7 +241,7 @@ function Design4Content() {
 
         <main id="main-content">
           {/* Hero Section — an ink-wash wash behind the copy, scrimmed to the page ground so text stays AA-legible */}
-          <section id="hero" className="relative md:min-h-[70vh] flex items-center py-16 md:py-20 px-6 md:px-16 overflow-hidden" aria-labelledby="hero-heading">
+          <section id="hero" data-scroll-object-track className="relative md:min-h-[70vh] flex items-center py-16 md:py-20 px-6 md:px-16 overflow-hidden" aria-labelledby="hero-heading">
             <div className="pointer-events-none absolute inset-0" aria-hidden="true">
               <img
                 src="/art/luxury/ink-wash.webp"
@@ -335,12 +337,14 @@ function Design4Content() {
                 </div>
 
                 {/* Side Stats */}
-                <div className="lg:col-span-4">
+                <div className="lg:col-span-4 relative isolate">
+                  {/* Procedural gold torus knot, desktop+motion-ok+in-view only — drifts with scroll, tilts ±6° toward the pointer. `isolate` above gives this column its own stacking context so z-0 here stays contained instead of escaping to some unrelated ancestor. Sits behind the stats, never intercepts clicks. */}
+                  <ScrollObject variant="luxury" className="-inset-x-6 -top-20 bottom-1/2 hidden lg:block z-0" />
                   <m.div
                     initial={{ opacity: 0, x: 30 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.8, delay: 1 }}
-                    className={`border-l ${borderColor} pl-6 md:pl-8 grid grid-cols-2 lg:grid-cols-1 gap-6 lg:gap-6`}
+                    className={`relative z-10 border-l ${borderColor} pl-6 md:pl-8 grid grid-cols-2 lg:grid-cols-1 gap-6 lg:gap-6`}
                   >
                     {registry.stats.slice(0, 4).map((stat) => (
                       <div key={stat.id}>
@@ -452,14 +456,16 @@ function Design4Content() {
                       ))}
                     </div>
 
-                    {/* Job Details */}
-                    <div className="lg:col-span-8 order-1 lg:order-2">
+                    {/* Job Details — a subtle perspective card flip on tab change (rotateY, transform-only); a plain crossfade under reduced motion. */}
+                    <div className="lg:col-span-8 order-1 lg:order-2" style={reducedMotion ? undefined : { perspective: 1400 }}>
                       <AnimatePresence mode="wait">
                         <m.div
                           key={selectedJob.id}
-                          initial={{ opacity: 0, x: 20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -20 }}
+                          initial={reducedMotion ? { opacity: 0 } : { opacity: 0, rotateY: -10 }}
+                          animate={reducedMotion ? { opacity: 1 } : { opacity: 1, rotateY: 0 }}
+                          exit={reducedMotion ? { opacity: 0 } : { opacity: 0, rotateY: 10 }}
+                          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                          style={reducedMotion ? undefined : { transformStyle: 'preserve-3d' }}
                           className={`border ${borderColor} ${isDark ? "bg-deco-navy/30" : "bg-white/5"} p-6 md:p-8 ${selectedJob.end === null ? "luxury-border-beam" : ""}`}
                         >
                           <div className="flex flex-wrap items-start gap-4 md:gap-6 mb-6 md:mb-8">
@@ -605,9 +611,17 @@ function Design4Content() {
             </div>
           </section>
 
-          {/* Gallery */}
-          <section className={`py-14 md:py-20 px-6 md:px-16 ${isDark ? "bg-slate-950/60" : "bg-luxury-black/[0.03]"}`}>
-            <div className="max-w-7xl mx-auto">
+          {/* Gallery — a faint ink-brushstroke ground, low enough opacity it never fights the case-study frames */}
+          <section className={`relative overflow-hidden py-14 md:py-20 px-6 md:px-16 ${isDark ? "bg-slate-950/60" : "bg-luxury-black/[0.03]"}`}>
+            <img
+              src="/art/luxury/brushstroke.webp"
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+              decoding="async"
+              className={`pointer-events-none absolute inset-0 h-full w-full object-cover ${isDark ? "opacity-[0.05]" : "opacity-[0.06]"}`}
+            />
+            <div className="relative max-w-7xl mx-auto">
               <Gallery skin={skin} heading={LuxuryHeading} />
             </div>
           </section>
@@ -633,9 +647,17 @@ function Design4Content() {
             </div>
           </section>
 
-          {/* Contact Section */}
-          <section id="contact" className={`py-14 md:py-20 px-6 md:px-16 ${bgPrimary}`}>
-            <div className="max-w-5xl mx-auto">
+          {/* Contact Section — a whisper of gold foil grounding the close */}
+          <section id="contact" className={`relative overflow-hidden py-14 md:py-20 px-6 md:px-16 ${bgPrimary}`}>
+            <img
+              src="/art/luxury/foil.webp"
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+              decoding="async"
+              className={`pointer-events-none absolute inset-0 h-full w-full object-cover ${isDark ? "opacity-[0.05]" : "opacity-[0.04]"}`}
+            />
+            <div className="relative max-w-5xl mx-auto">
               <Contact skin={skin} ctaClass={`press inline-flex items-center justify-center gap-2 px-8 py-4 text-sm tracking-[0.2em] uppercase ${isDark ? "bg-deco-gold text-deco-navy" : "bg-luxury-black text-luxury-cream"} hover:opacity-90 transition-all`} onContact={openContact} />
             </div>
           </section>

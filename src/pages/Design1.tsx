@@ -18,6 +18,7 @@ import {
   Contact,
   Skills,
   Ticker,
+  ScrollObject,
 } from '../components'
 import { skins } from '../components/gallery'
 import { Years } from '../components/sections/Years'
@@ -199,7 +200,7 @@ function Design1Content() {
 
         {/* Hero - Editorial Spread */}
         <main id="main-content">
-          <section className="md:min-h-[70vh] pt-20 relative" aria-labelledby="hero-heading">
+          <section data-scroll-object-track className="md:min-h-[70vh] pt-20 relative" aria-labelledby="hero-heading">
             <div className="max-w-[1800px] mx-auto px-4 md:px-6">
               {/* Masthead */}
               <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} className={`py-8 md:py-12 border-b-2 ${borderStrong}`}>
@@ -320,6 +321,11 @@ function Design1Content() {
                 </>
               )}
             />
+          </div>
+
+          {/* Diagonal strip — the low-poly dodecahedron object, wireframe-edged, cutting between the ticker and the index. Desktop+motion-ok+in-view only; the strip is otherwise just flat ground. */}
+          <div data-scroll-object-track className={`relative h-28 md:h-40 overflow-hidden border-y-4 ${borderStrong} ${bgSecondary}`} aria-hidden="true">
+            <ScrollObject variant="brutalist" className="[clip-path:polygon(0_100%,100%_0,100%_100%)]" />
           </div>
 
           {/* Stat band — the work, in numerals, on a hairline grid */}
@@ -490,15 +496,23 @@ function Design1Content() {
             </div>
           </section>
 
-          {/* Gallery */}
-          <section className={`py-12 md:py-16 border-t-4 ${borderStrong} ${bgSecondary}`}>
-            <div className="max-w-[1800px] mx-auto px-4 md:px-6">
+          {/* Gallery — a grainy photocopied halftone crowd underneath, barely there */}
+          <section className={`relative overflow-hidden py-12 md:py-16 border-t-4 ${borderStrong} ${bgSecondary}`}>
+            <img
+              src="/art/brutalist/halftone-crowd.webp"
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+              decoding="async"
+              className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-[0.06] grayscale"
+            />
+            <div className="relative max-w-[1800px] mx-auto px-4 md:px-6">
               <Gallery skin={skin} heading={(e, ti, a, l) => BrutalHeading(nextSection() + ' · ' + e, ti, a, l)} />
             </div>
           </section>
 
-          {/* Manifesto — inverted typographic band */}
-          <Manifesto skin={skin} />
+          {/* Manifesto — inverted typographic band, grounded on raw concrete + a strip of red tape */}
+          <Manifesto skin={skin} backdropSrc="/art/brutalist/concrete-tape.webp" />
 
           {/* Skills Section — the ledger + narrative sentences */}
           <section id="about" className={`py-12 md:py-16 border-t-4 ${borderStrong}`}>
