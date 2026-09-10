@@ -513,7 +513,7 @@ function NeoContent() {
           </section>
 
           {/* Skills — tool tiles read their raised/inset state off the shared .neo-raised primitive */}
-          <section id="skills" className="px-4 py-14 md:py-20 scroll-mt-24">
+          <section className="px-4 py-14 md:py-20">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Skills skin={skin} heading={Heading} />

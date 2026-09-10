@@ -5,7 +5,8 @@
  * other themes, same convention as neo.css.
  */
 
-.theme-terminal {
+.theme-terminal,
+:root:has(.theme-terminal) { /* body-portalled sheets/drawers inherit the theme */
   --term-bg: #0a0d0a;
   --term-panel: #0d100d;
   --term-line: #1d251d;
@@ -25,11 +26,13 @@
    hue used only where a shared section hardcodes white text on top of `accentBg` (Contact's step
    badges, Projects' hover monogram) — white on the bright accent fails AA, white on this fill
    clears it (~4.6:1). */
-.theme-terminal {
+.theme-terminal,
+:root:has(.theme-terminal) {
   --term-accent: #39ff88;
   --term-fill: #157347;
 }
-.theme-terminal[data-accent='amber'] {
+.theme-terminal[data-accent='amber'],
+:root:has(.theme-terminal[data-accent='amber']) {
   --term-accent: #ffb000;
   --term-fill: #8a5a00;
 }

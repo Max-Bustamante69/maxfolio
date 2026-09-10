@@ -639,7 +639,7 @@ function Design4Content() {
           />
 
           {/* Skills Section — the ledger + narrative sentences */}
-          <section id="skills" className={`py-14 md:py-20 px-6 md:px-16 ${bgPrimary}`}>
+          <section className={`py-14 md:py-20 px-6 md:px-16 ${bgPrimary}`}>
             <div className="max-w-7xl mx-auto">
               <Skills skin={skin} heading={LuxuryHeading} />
             </div>

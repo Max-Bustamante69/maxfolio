@@ -1,5 +1,10 @@
 [
   {
+    "hash": "e025ae0",
+    "date": "2026-09-10",
+    "subject": "chore(terminal): regenerated changelog.json"
+  },
+  {
     "hash": "bcc13dd",
     "date": "2026-09-10",
     "subject": "fix(skills): one dialog at a time when a capture opens the case-study sheet"
@@ -53,10 +58,5 @@
     "hash": "e8d9514",
     "date": "2026-09-10",
     "subject": "chore(terminal): regenerated changelog.json"
-  },
-  {
-    "hash": "d6907a5",
-    "date": "2026-09-10",
-    "subject": "fix(sheet): stop clipping the delivery bar's row labels, un-crowd the Impact grids"
   }
 ]
