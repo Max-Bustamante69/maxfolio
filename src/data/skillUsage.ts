@@ -1,8 +1,8 @@
 // Real per-tool usage, derived once from the registry — never a curated or invented number.
 // A tool's count is how many storefronts, products or named client-role deliverables actually list
 // it in their own `stack` array. A tool that never appears there (internal tooling, editorial-only
-// entries in skillGroups) gets `total: 0` — the sunburst gives those a minimum visible arc and an
-// honest "no fleet count yet" tag instead of a fabricated number (Skills.tsx / SkillsSunburst.tsx).
+// entries in skillGroups) gets `total: 0` — its tile shows an honest "no fleet count yet" tag instead
+// of a fabricated number (Skills.tsx / SkillPanel.tsx).
 import { products, roleWork, skillGroups, stores, type RoleWorkId, type SkillGroupId } from './registry'
 import { telemetry } from './telemetry'
 
@@ -105,22 +105,8 @@ export const toolUsage: ToolUsage[] = (Object.keys(skillGroups) as SkillGroupId[
 
 export const toolUsageById = new Map(toolUsage.map((u) => [u.tool, u]))
 
-/** Real storefront names (not just a count) that list a given tool in their own `stack` — for any UI
- *  that wants to name the fleet rather than just count it. Empty array, never invented, for a tool
- *  with no alias or no matching store. */
-export const storeNamesByTool: Record<string, string[]> = Object.fromEntries(
-  toolUsage.map((u) => {
-    const re = ALIASES[u.tool]
-    return [u.tool, re ? matches(stores, re).map((s) => s.name) : []]
-  }),
-)
-
-/** Real usage summed per group — the honest weight for the sunburst's ring 1. */
-export const groupUsage: Record<SkillGroupId, number> = Object.fromEntries(
-  (Object.keys(skillGroups) as SkillGroupId[]).map((g) => [g, toolUsage.filter((u) => u.group === g).reduce((a, u) => a + u.total, 0)]),
-) as Record<SkillGroupId, number>
-
-/** Distinct storefronts that name at least one tool from a group — a real, non-double-counted figure. */
+/** Distinct storefronts that name at least one tool from a group — a real, non-double-counted figure,
+ *  used only to annotate the group-filter tabs above the tile grid. */
 export const storesPerGroup: Record<SkillGroupId, number> = Object.fromEntries(
   (Object.keys(skillGroups) as SkillGroupId[]).map((g) => {
     const res = (skillGroups[g] as readonly string[]).map((t) => ALIASES[t]).filter(Boolean) as RegExp[]
@@ -128,16 +114,6 @@ export const storesPerGroup: Record<SkillGroupId, number> = Object.fromEntries(
     return [g, n]
   }),
 ) as Record<SkillGroupId, number>
-
-/** Distinct storefront names behind `storesPerGroup` — real names, not a count, for the skill panel
- *  when a whole group (not a single tool) is the active selection. */
-export const groupStoreNames: Record<SkillGroupId, string[]> = Object.fromEntries(
-  (Object.keys(skillGroups) as SkillGroupId[]).map((g) => {
-    const res = (skillGroups[g] as readonly string[]).map((t) => ALIASES[t]).filter(Boolean) as RegExp[]
-    const names = stores.filter((s) => res.some((re) => s.stack.some((tag) => re.test(tag)))).map((s) => s.name)
-    return [g, names]
-  }),
-) as Record<SkillGroupId, string[]>
 
 /** Fleet-wide depth: real lines of Liquid and of TypeScript/TSX islands, summed from every store's own
  *  git-derived telemetry (`scripts/store-telemetry.mjs`) — never estimated. */

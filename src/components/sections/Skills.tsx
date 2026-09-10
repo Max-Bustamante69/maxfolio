@@ -1,327 +1,220 @@
 import { useMemo, useState, type KeyboardEvent } from 'react'
-import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
-import { useContent, useMediaQuery } from '../../hooks'
+import { useContent } from '../../hooks'
 import { Ticker } from '../common'
 import type { SkillGroupId } from '../../data/registry'
-import { toolUsage, storesPerGroup, storeNamesByTool, fleetLiquidLines, fleetIslandLines, fleetStoreCount } from '../../data/skillUsage'
-import { personaArt } from '../../data/personaArt'
+import { toolUsage, toolUsageById, storesPerGroup, fleetLiquidLines, fleetIslandLines, fleetStoreCount, type ToolUsage } from '../../data/skillUsage'
 import { CountUp } from '../gallery/charts'
 import type { Skin } from '../gallery'
 import type { SectionHeading } from './Gallery'
-import { SkillsSunburst, sameSel, type SunburstSelection } from './SkillsSunburst'
 import { SkillPanel } from './SkillPanel'
 import { formatTool, formatGroup, type SkillsStrings } from './skillsFormat'
+import { toolIcon, monogram, ToolMark } from './skillIcons'
 
 interface SkillsProps {
   skin: Skin
   heading: SectionHeading
-  /** Overrides the usage ledger's track background, e.g. a recessed Neo groove instead of the flat tint. */
-  trackClassName?: string
 }
 
-const EASE = [0.23, 1, 0.32, 1] as const
-const label = (skin: Skin) => `text-[11px] font-semibold uppercase tracking-[0.18em] ${skin.muted}`
-
-/** `skin.accent` as TEXT (not a small badge/eyebrow) for the hover/focus-highlighted tool name below.
- *  Luxury's light accent (`#C9A962` on the `#faf8f5` page) is a fill/border color tuned for large
- *  gold hairlines, not type — it measures ~2.1:1 on that surface, under WCAG AA even at this large
- *  (22px/bold) size. `#836e40` is the same gold family darkened until it clears 4.5:1 there (measured).
- *  Luxury dark (`deco-gold` on the navy surface) already clears 7.6:1 and needs no override. */
-const sentenceAccentClass = (skin: Skin) => (skin.frame === 'luxury' && !skin.dark ? 'text-[#836e40]' : skin.accent)
-
-/** What to count across the store index, keyed to the labels in the locale files. */
-const USAGE: { id: string; test: RegExp }[] = [
-  { id: 'liquid', test: /liquid/i },
-  { id: 'react', test: /react/i },
-  { id: 'framer', test: /framer/i },
-  { id: 'tailwind', test: /tailwind/i },
-  { id: 'metaobjects', test: /metaobject/i },
-  { id: 'tracking', test: /track|pixel/i },
-  { id: 'bundles', test: /bundle/i },
-  { id: 'quiz', test: /quiz/i },
-  { id: 'reviews', test: /review/i },
-  { id: 'migration', test: /woocommerce|transfer|migrat/i },
-]
-
-interface SentenceProps {
-  sk: SkillsStrings
+interface DepthStatProps {
   skin: Skin
-  g: SkillGroupId
-  groupTools: readonly string[]
-  /** `hovered ?? locked` — drives the highlight. */
-  active: SunburstSelection
-  /** The persistent selection alone — drives the pinned indicator, independent of hover. */
-  locked: SunburstSelection
-  onToolHover: (g: SkillGroupId, tool: string) => void
-  onToolHoverEnd: () => void
-  onToolToggle: (g: SkillGroupId, tool: string) => void
-  onToolUnlock: () => void
+  value: number
+  text: string
 }
 
-/** Hoisted to module scope (never redefined per Skills() render) so a parent re-render — a sunburst
- *  hover, a media-query flip — reconciles these spans in place instead of tearing them down: a nested
- *  component here would drop keyboard focus on every re-render and, worse, reset any child with its
- *  own mount-triggered animation state (see TriStat below). */
-function Sentence({ sk, skin, g, groupTools, active, locked, onToolHover, onToolHoverEnd, onToolToggle, onToolUnlock }: SentenceProps) {
-  const [before, after] = sk.narrative[g].split('{skills}')
-  return (
-    <>
-      {before}
-      {groupTools.map((tool, i) => {
-        const on = active?.level === 'tool' && active.group === g && active.tool === tool
-        const pinned = locked?.level === 'tool' && locked.group === g && locked.tool === tool
-        return (
-          <span key={tool}>
-            <span
-              tabIndex={0}
-              role="button"
-              aria-label={`${tool} — ${formatTool(sk, toolUsage.find((u) => u.group === g && u.tool === tool)!)}`}
-              aria-pressed={pinned}
-              onMouseEnter={() => onToolHover(g, tool)}
-              onMouseLeave={onToolHoverEnd}
-              onFocus={() => onToolHover(g, tool)}
-              onBlur={onToolHoverEnd}
-              onClick={() => onToolToggle(g, tool)}
-              onKeyDown={(e: KeyboardEvent) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault()
-                  onToolToggle(g, tool)
-                } else if (e.key === 'Escape') {
-                  onToolUnlock()
-                }
-              }}
-              className={`cursor-pointer font-semibold underline decoration-2 transition-colors ${pinned ? 'underline-offset-[6px]' : 'underline-offset-4'} ${on ? `${sentenceAccentClass(skin)} decoration-current` : `${skin.title} decoration-transparent`}`}
-            >
-              {tool}
-            </span>
-            {i < groupTools.length - 1 ? (i === groupTools.length - 2 ? <span className={skin.muted}> · </span> : <span className={skin.muted}>, </span>) : ''}
-          </span>
-        )
-      })}
-      {after}
-    </>
-  )
-}
-
-interface LedgerProps {
-  sk: SkillsStrings
-  skin: Skin
-  track: string
-  reduced: boolean | null
-  usage: { rows: { id: string; count: number }[]; max: number }
-  storesCount: number
-}
-
-function Ledger({ sk, skin, track, reduced, usage, storesCount }: LedgerProps) {
+/** One typographic stat in the depth strip — a number and a caption, no card/box around it, per the
+ *  brief's "compact strip... as small typographic stats, not boxes". */
+function DepthStat({ skin, value, text }: DepthStatProps) {
   return (
     <div>
-      <p className={label(skin)}>{sk.usageLabel}</p>
-      <ol className="mt-4 space-y-3">
-        {usage.rows.map((r, i) => (
-          <li key={r.id}>
-            <div className="flex items-baseline justify-between gap-4 text-sm">
-              <span>{sk.usageItems[r.id] ?? r.id}</span>
-              <span className={`${skin.muted} tabular-nums`}>
-                {r.count} {sk.usageUnit}
-              </span>
-            </div>
-            <div className={`mt-1.5 h-1.5 overflow-hidden rounded-full ${track}`}>
-              <m.div
-                className={`h-full rounded-full ${skin.accentBg}`}
-                initial={reduced ? false : { scaleX: 0 }}
-                whileInView={{ scaleX: 1 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.9, delay: 0.1 + i * 0.06, ease: EASE }}
-                style={{ width: `${(r.count / usage.max) * 100}%`, transformOrigin: 'left' }}
-              />
-            </div>
-          </li>
-        ))}
-      </ol>
-      <p className={`${skin.muted} mt-4 text-xs leading-relaxed`}>{sk.usageNote.replace('{n}', String(storesCount))}</p>
+      <p className={`text-2xl font-semibold tabular-nums md:text-3xl ${skin.title}`}>
+        <CountUp value={value} />
+      </p>
+      <p className={`mt-1 text-[11px] uppercase leading-tight tracking-wide ${skin.muted}`}>{text}</p>
     </div>
   )
 }
 
-interface TriStatProps {
-  sk: SkillsStrings
+interface GroupTabProps {
   skin: Skin
-  active: SunburstSelection
-  groupLabel: Record<SkillGroupId, string>
+  active: boolean
+  label: string
+  count: string
+  onSelect: () => void
 }
 
-/** A compact 3-number depth readout: two fleet-wide totals (always the same, real, from telemetry)
- *  plus a third figure that reads whatever's currently active on the sunburst — a group's real
- *  store count, a tool's real usage, or the fleet's store count when nothing is focused.
- *  Hoisted to module scope: `CountUp` below only counts up once on mount, so this component's
- *  identity must stay stable across `Skills()` re-renders (a sunburst hover updates `active` on every
- *  parent render) — a nested definition here previously got redefined every render, which unmounted
- *  and remounted `CountUp` before its 1s tween ever finished, freezing both numbers at "0". */
-function TriStat({ sk, skin, active, groupLabel }: TriStatProps) {
-  const dynamicLabel =
-    active?.level === 'tool'
-      ? formatTool(sk, toolUsage.find((u) => u.group === active.group && u.tool === active.tool)!)
-      : active?.level === 'group'
-        ? formatGroup(sk, storesPerGroup[active.group])
-        : sk.sunburst.triStoresDefault.replace('{n}', String(fleetStoreCount))
-  // Persona/Arcade gets its own comic device on these three numbers: a thick-bordered tilted panel
-  // per cell, alternating tilt direction (never a plain grid line like the other four themes).
-  const persona = skin.frame === 'persona'
-  const cell = (i: number) => (persona ? `persona-num-panel px-2 py-3 ${i === 1 ? '' : i === 0 ? '-rotate-2' : 'rotate-2'}` : '')
+/** One tab in the horizontal group-filter strip. Scrolls on phones (`no-scrollbar` + `overflow-x-auto`
+ *  on the parent), sits flush once the six groups fit a wider viewport — no separate mobile/desktop
+ *  markup, the same row just stops needing to scroll. */
+function GroupTab({ skin, active, label, count, onSelect }: GroupTabProps) {
   return (
-    <div className={`mt-7 grid grid-cols-3 ${persona ? 'gap-2.5' : 'gap-3 border-t pt-5'} text-center ${persona ? '' : skin.line}`}>
-      <div className={cell(0)}>
-        <p className={`text-lg font-semibold tabular-nums ${skin.title}`}>
-          <CountUp value={fleetLiquidLines} />
-        </p>
-        <p className={`mt-1 text-[10px] uppercase leading-tight tracking-wide ${skin.muted}`}>{sk.sunburst.triLiquid}</p>
-      </div>
-      <div className={cell(1)}>
-        <p className={`text-lg font-semibold tabular-nums ${skin.title}`}>
-          <CountUp value={fleetIslandLines} />
-        </p>
-        <p className={`mt-1 text-[10px] uppercase leading-tight tracking-wide ${skin.muted}`}>{sk.sunburst.triTs}</p>
-      </div>
-      <div className={cell(2)}>
-        <p className={`text-sm font-semibold leading-tight ${skin.title}`}>{dynamicLabel}</p>
-        {active && <p className={`mt-1 text-[10px] uppercase leading-tight tracking-wide ${skin.muted}`}>{groupLabel[active.group]}</p>}
-      </div>
-    </div>
-  )
-}
-
-interface RingLegendProps {
-  sk: SkillsStrings
-  skin: Skin
-  groups: SkillGroupId[]
-  groupLabel: Record<SkillGroupId, string>
-  locked: SunburstSelection
-  onToggleGroup: (g: SkillGroupId) => void
-  onToggleTool: (g: SkillGroupId, tool: string) => void
-}
-
-/** Mobile substitute for the SVG: one horizontally scrollable row of group capsules, each carrying
- *  its own tools as small real-count chips — the ring legend the brief calls for, touch-sized. Every
- *  header and chip is a real button: tapping one locks it, feeding the same SkillPanel the ring uses
- *  on desktop (an underline marks whichever one is currently pinned). */
-function RingLegend({ sk, skin, groups, groupLabel, locked, onToggleGroup, onToggleTool }: RingLegendProps) {
-  return (
-    <div>
-      <p className={label(skin)}>{sk.sunburst.legendLabel}</p>
-      <div className="-mx-4 mt-4 flex gap-3 overflow-x-auto px-4 pb-2 no-scrollbar" role="list" aria-label={sk.sunburst.legendLabel}>
-        {groups.map((g) => {
-          const groupTools = toolUsage.filter((u) => u.group === g)
-          const groupPinned = locked?.level === 'group' && locked.group === g
-          return (
-            <div key={g} role="listitem" className={`w-[220px] shrink-0 rounded-2xl border p-4 ${skin.line}`}>
-              <button type="button" onClick={() => onToggleGroup(g)} aria-pressed={groupPinned} className="flex w-full items-baseline justify-between gap-2 text-left">
-                <span className={`text-sm font-semibold underline decoration-2 underline-offset-4 ${groupPinned ? 'decoration-current' : 'decoration-transparent'} ${skin.title}`}>{groupLabel[g]}</span>
-                <span className={`${skin.muted} text-[11px] tabular-nums`}>{formatGroup(sk, storesPerGroup[g])}</span>
-              </button>
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {groupTools.map((u) => {
-                  const toolPinned = locked?.level === 'tool' && locked.group === g && locked.tool === u.tool
-                  return (
-                    <button
-                      type="button"
-                      key={u.tool}
-                      onClick={() => onToggleTool(g, u.tool)}
-                      aria-pressed={toolPinned}
-                      title={`${u.tool} — ${formatTool(sk, u)}`}
-                      className={`${u.total > 0 || toolPinned ? skin.chipOn : skin.chip} ${toolPinned ? 'underline decoration-2 underline-offset-2' : ''}`}
-                    >
-                      {u.tool}
-                      {u.total > 0 ? <span className="ml-1 tabular-nums opacity-80">{u.total}</span> : null}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-interface PersonaSkillPanelProps {
-  sk: SkillsStrings
-  skin: Skin
-  active: SunburstSelection
-  groupLabel: Record<SkillGroupId, string>
-}
-
-/** Arcade/Persona-only "selected skill" panel: a slanted ink panel with the Skills-screen comic art
- *  behind it, naming whichever tool or group is hovered/focused/tapped on the sunburst (desktop) or
- *  the ring legend (phones) — the tool's display name, its group, its real fleet usage (and which
- *  stores, by name, from `skillUsage.ts`), and a depth stat in the theme's own thick-bordered number
- *  panel. Idle, it shows the fleet-wide caption instead of an empty box. */
-function PersonaSkillPanel({ sk, skin, active, groupLabel }: PersonaSkillPanelProps) {
-  const art = useMemo(() => personaArt('skills', skin.dark), [skin.dark])
-  const tool = active?.level === 'tool' ? toolUsage.find((u) => u.group === active.group && u.tool === active.tool) : undefined
-  const storeNames = tool ? storeNamesByTool[tool.tool] ?? [] : []
-  const scrim = skin.dark ? 'rgba(17,16,19,0.88)' : 'rgba(238,243,247,0.9)'
-
-  return (
-    <div
-      className={`persona-torn relative overflow-hidden border-2 p-5 md:p-6 ${skin.dark ? 'border-[#c8102e]/40' : 'border-[#1c6fb0]/35'}`}
-      style={{ backgroundImage: `linear-gradient(${scrim},${scrim}), url(${art})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+    <button
+      type="button"
+      role="tab"
+      aria-selected={active}
+      aria-label={`${label} — ${count}`}
+      onClick={onSelect}
+      className={`shrink-0 whitespace-nowrap transition-colors ${active ? skin.chipOn : skin.chip}`}
     >
-      <p className={label(skin)}>{sk.sunburst.legendLabel}</p>
-      {tool ? (
-        <div className="mt-3">
-          <p className={`font-persona-display text-2xl uppercase leading-tight md:text-3xl ${skin.title}`} style={{ fontStyle: 'oblique 6deg' }}>
-            {tool.tool}
-          </p>
-          <p className={`mt-1 text-xs font-semibold uppercase tracking-[0.15em] ${skin.accent}`}>{groupLabel[tool.group]}</p>
-          <p className={`mt-3 text-sm ${skin.body}`}>{formatTool(sk, tool)}</p>
-          {storeNames.length > 0 && <p className={`mt-1.5 text-xs leading-relaxed ${skin.muted}`}>{storeNames.join(' · ')}</p>}
-          <div className="persona-num-panel mt-4 inline-flex items-baseline gap-2 px-3 py-1.5">
-            <span className={`text-xl font-semibold tabular-nums ${skin.title}`}>{tool.total}</span>
-            <span className={`text-[10px] uppercase tracking-wide ${skin.muted}`}>{sk.sunburst.depthLabel}</span>
-          </div>
-        </div>
-      ) : active?.level === 'group' ? (
-        <div className="mt-3">
-          <p className={`font-persona-display text-2xl uppercase leading-tight md:text-3xl ${skin.title}`} style={{ fontStyle: 'oblique 6deg' }}>
-            {groupLabel[active.group]}
-          </p>
-          <p className={`mt-3 text-sm ${skin.body}`}>{formatGroup(sk, storesPerGroup[active.group])}</p>
-        </div>
-      ) : (
-        <p className={`mt-3 text-sm ${skin.muted}`}>{sk.sunburst.caption}</p>
-      )}
-    </div>
+      {label}
+    </button>
+  )
+}
+
+interface TileTone {
+  base: string
+  onBase: string
+  pinnedRing: string
+  icon: string
+  iconOn: string
+  title: string
+  chip: string
+}
+
+/** Per-skin idle/hover/pinned classes for a tool tile — the five looks the brief calls for. Brutalist
+ *  forces a black slab in both light and dark mode (a deliberate poster-style accent, same pattern the
+ *  panel and the sunburst-era arcs already used), Neo reads its lift/press state off the shared
+ *  `.neo-raised` extrusion primitive (`data-state="pressed"` in the Tile below), and Persona's skew
+ *  comes from a Tailwind transform utility on the tile itself. */
+function tileTone(skin: Skin): TileTone {
+  switch (skin.frame) {
+    case 'apple':
+      return {
+        base: `rounded-2xl border ${skin.line} ${skin.dark ? 'bg-white/[0.02]' : 'bg-white'}`,
+        onBase: skin.dark ? 'border-[#2997ff]/60 bg-white/[0.05]' : 'border-[#0066cc]/40 bg-[#f5f9ff]',
+        pinnedRing: skin.dark ? 'ring-1 ring-[#2997ff]/70' : 'ring-1 ring-[#0066cc]/45',
+        icon: skin.dark ? 'bg-white/[0.06] text-[#a1a1a6]' : 'bg-black/[0.03] text-[#6e6e73]',
+        iconOn: skin.dark ? 'bg-[#2997ff]/15 text-[#2997ff]' : 'bg-[#0066cc]/10 text-[#0066cc]',
+        title: skin.title,
+        chip: skin.chip,
+      }
+    case 'luxury':
+      return {
+        base: `border-x border-b border-t-2 ${skin.dark ? 'border-t-deco-gold/35 border-deco-gold/15 bg-deco-navy/20' : 'border-t-luxury-gold/50 border-luxury-black/10 bg-[#faf5ea]'}`,
+        onBase: skin.dark ? 'border-t-deco-gold bg-deco-navy/40' : 'border-t-luxury-gold bg-[#f5ecd8]',
+        pinnedRing: skin.dark ? 'ring-1 ring-deco-gold/60' : 'ring-1 ring-luxury-gold/60',
+        icon: skin.dark ? 'bg-deco-cream/5 text-deco-cream/50' : 'bg-luxury-black/5 text-luxury-black/50',
+        iconOn: skin.dark ? 'bg-deco-gold/15 text-deco-gold' : 'bg-luxury-gold/15 text-[#836e40]',
+        title: skin.title,
+        chip: skin.chip,
+      }
+    case 'brutalist':
+      return {
+        // A "black slab" like the panel's, but not literally the page's own bg-stone-950 in dark
+        // mode — that would make every tile border invisible against the page. Dark mode steps one
+        // shade up (stone-900/stone-700) so the grid still reads as distinct cards; light mode keeps
+        // the full poster-black-on-stone-100 contrast.
+        base: skin.dark ? 'border-2 border-stone-700 bg-stone-900' : 'border-2 border-stone-950 bg-stone-950',
+        onBase: 'border-red-600',
+        pinnedRing: 'ring-2 ring-red-600',
+        icon: 'bg-stone-800 text-stone-400',
+        iconOn: 'bg-red-600/15 text-red-500',
+        title: 'font-mono uppercase text-stone-50',
+        chip: 'font-mono text-[10px] px-2 py-1 bg-stone-800 text-stone-400',
+      }
+    case 'neo':
+      return {
+        base: 'neo-raised neo-md neo-interactive',
+        onBase: '',
+        pinnedRing: '',
+        icon: skin.dark ? 'neo-canvas text-neo-darkInkMuted' : 'neo-canvas text-neo-inkMuted',
+        iconOn: skin.dark ? 'neo-canvas text-neo-darkAccent' : 'neo-canvas text-neo-accent',
+        title: skin.title,
+        chip: skin.chip,
+      }
+    case 'persona':
+      return {
+        base: `border clip-corner-sm ${skin.dark ? 'border-[#c8102e]/25 bg-[#18161a]' : 'border-[#1c6fb0]/20 bg-white'}`,
+        onBase: skin.dark ? 'border-[#c8102e]' : 'border-[#1c6fb0]',
+        pinnedRing: skin.dark ? 'ring-2 ring-[#c8102e]/70' : 'ring-2 ring-[#1c6fb0]/55',
+        icon: skin.dark ? 'bg-[#f5f2ee]/10 text-[#f5f2ee]/60' : 'bg-[#0a0f1a]/5 text-[#0a0f1a]/60',
+        iconOn: skin.dark ? 'bg-[#c8102e]/15 text-[#e8465f]' : 'bg-[#1c6fb0]/10 text-[#1c6fb0]',
+        title: skin.title,
+        // `skin.chip`'s `skew-chip` clip-path wedges the top-left corner by a fraction of the element's
+        // OWN height; a usage chip long enough to wrap to two lines ("in the toolkit, no fleet count
+        // yet") turns that sliver into a real chunk that eats the first line's leading letters. Tile
+        // chips can't guarantee a one-line fit (33 real tool names, several with no fleet count yet),
+        // so they skip the skew and keep it on the tile container itself instead.
+        chip: skin.chip.replace('skew-chip', '').trim(),
+      }
+  }
+}
+
+interface TileProps {
+  skin: Skin
+  tone: TileTone
+  tool: ToolUsage
+  usageChip: string
+  active: boolean
+  pinned: boolean
+  onHover: () => void
+  onHoverEnd: () => void
+  onToggle: () => void
+  onEscape: () => void
+}
+
+/**
+ * One tool: its real brand mark (or a monogram when none exists), its name, and an honest usage chip
+ * ("8 stores", "2 products" — never invented). Hover/focus lifts it and fills the panel; click/Enter
+ * pins it (the halo persists after the pointer leaves); Escape releases the pin from wherever focus
+ * currently sits, mirroring the sunburst-era arcs this replaces.
+ */
+function Tile({ skin, tone, tool, usageChip, active, pinned, onHover, onHoverEnd, onToggle, onEscape }: TileProps) {
+  const icon = toolIcon(tool.tool)
+  const isPersona = skin.frame === 'persona'
+  const isNeo = skin.frame === 'neo'
+  const onKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === 'Escape') onEscape()
+  }
+  return (
+    <button
+      type="button"
+      aria-pressed={pinned}
+      aria-label={`${tool.tool} — ${usageChip}`}
+      onMouseEnter={onHover}
+      onMouseLeave={onHoverEnd}
+      onFocus={onHover}
+      onBlur={onHoverEnd}
+      onClick={onToggle}
+      onKeyDown={onKeyDown}
+      data-state={isNeo && pinned ? 'pressed' : undefined}
+      className={`relative flex flex-col items-start gap-2.5 p-3.5 text-left transition-[transform,border-color,background-color,box-shadow] duration-200 ease-out [@media(hover:hover)_and_(pointer:fine)]:hover:-translate-y-1 ${tone.base} ${active ? tone.onBase : ''} ${pinned ? tone.pinnedRing : ''} ${isPersona ? '-skew-x-6' : ''}`}
+    >
+      <span className={isPersona ? 'flex w-full flex-col items-start gap-2.5 skew-x-6' : 'contents'}>
+        <span className={`flex h-9 w-9 items-center justify-center rounded-lg text-sm font-bold transition-colors ${active ? tone.iconOn : tone.icon}`}>
+          {icon ? <ToolMark tool={tool.tool} className="h-5 w-5" /> : monogram(tool.tool)}
+        </span>
+        <span className={`text-sm font-semibold leading-tight ${tone.title}`}>{tool.tool}</span>
+        <span className={`rounded-full px-2 py-0.5 text-[11px] tabular-nums ${tone.chip}`}>{usageChip}</span>
+      </span>
+    </button>
   )
 }
 
 /**
- * The stack three ways, none a grid of tiles: a radial sunburst of the real skillGroups/usage data
- * (center = the person, ring 1 = the six groups, ring 2 = every tool, arc length = a real usage count),
- * the tools as sentences with the names set bold inline and wired to the same hover/focus state as the
- * arcs, and — on phones, where the sunburst can't hold touch precision — a horizontally scrollable ring
- * legend plus the original bar ledger. Every number either comes from `skillUsage.ts` (real fleet
- * counts) or is explicitly labeled as not yet counted; nothing here is a placeholder.
- *
- * Selection has two layers: `hovered` (mouse/focus, transient) and `locked` (click/tap/Enter,
- * persists until toggled off or Esc) — `active = hovered ?? locked` is what every arc/sentence/chip
- * highlights, so pinning a tool keeps the panel on it even after the pointer moves away.
+ * "What I work with" — a grid of real tool tiles grouped by the six skill groups, replacing the old
+ * sunburst (a live audit found it read as decoration, not information). Hovering/focusing a tile fills
+ * the panel on the side; clicking/pressing Enter pins it. A compact depth strip above the grid carries
+ * the three fleet-wide totals that never change with selection (Liquid lines, TypeScript lines, stores),
+ * and a horizontal group-filter strip — scrollable on phones, flush once it fits — switches which
+ * group's tiles the grid shows. Every number traces to `skillUsage.ts`; a tool with no fleet count yet
+ * says so honestly instead of a fabricated figure.
  */
-export function Skills({ skin, heading, trackClassName }: SkillsProps) {
+export function Skills({ skin, heading }: SkillsProps) {
   const { strings, registry } = useContent()
-  const reduced = useReducedMotion()
-  const wide = useMediaQuery('(min-width: 768px)', true)
-  const sk = strings.sections.skills
+  const sk: SkillsStrings = strings.sections.skills
   const groups = Object.keys(registry.skillGroups) as SkillGroupId[]
-  const [open, setOpen] = useState<SkillGroupId>(groups[0])
-  const [hovered, setHovered] = useState<SunburstSelection>(null)
-  const [locked, setLocked] = useState<SunburstSelection>(null)
-  const active = hovered ?? locked
-  const track = trackClassName ?? (skin.dark ? 'bg-white/10' : 'bg-black/[0.06]')
   const groupLabel = sk.groups as Record<SkillGroupId, string>
+  const tone = tileTone(skin)
 
-  // Every tool named across the groups, deduplicated, in group order — real registry data, not a curated highlight reel.
-  const tools = useMemo(() => {
+  const [activeGroup, setActiveGroup] = useState<SkillGroupId>(groups[0])
+  const [hovered, setHovered] = useState<string | null>(null)
+  const [locked, setLocked] = useState<string | null>(null)
+  const active = hovered ?? locked
+  const pinned = !!locked && locked === active
+
+  // Every tool named across the groups, deduplicated, in group order — real registry data, feeds the
+  // bottom ticker so the breadth stays visible even while the grid above is filtered to one group.
+  const allTools = useMemo(() => {
     const seen = new Set<string>()
     const out: string[] = []
     for (const g of groups) {
@@ -336,140 +229,59 @@ export function Skills({ skin, heading, trackClassName }: SkillsProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [registry.skillGroups])
 
-  const usage = useMemo(() => {
-    const rows = USAGE.map((u) => ({ id: u.id, count: registry.stores.filter((s) => s.stack.some((t) => u.test.test(t))).length }))
-      .filter((r) => r.count > 0)
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 8)
-    return { rows, max: rows[0]?.count ?? 1 }
-  }, [registry.stores])
+  const groupTools = useMemo(() => toolUsage.filter((u) => u.group === activeGroup), [activeGroup])
+  const activeTool = active ? (toolUsageById.get(active) ?? null) : null
 
-  const onHover = (sel: SunburstSelection) => setHovered(sel)
+  const onHover = (tool: string) => setHovered(tool)
   const onHoverEnd = () => setHovered(null)
-  const onToggleLock = (sel: SunburstSelection) => setLocked((prev) => (sameSel(prev, sel) ? null : sel))
+  const onToggle = (tool: string) => setLocked((prev) => (prev === tool ? null : tool))
   const onUnlock = () => setLocked(null)
-  const onToolHover = (g: SkillGroupId, tool: string) => onHover({ level: 'tool', group: g, tool })
-  const onToolToggle = (g: SkillGroupId, tool: string) => onToggleLock({ level: 'tool', group: g, tool })
-  const onGroupToggle = (g: SkillGroupId) => onToggleLock({ level: 'group', group: g })
-  const pinned = !!locked && sameSel(locked, active)
 
   return (
     <section id="skills" className="scroll-mt-20">
       {heading(sk.eyebrow, sk.title, sk.titleAccent)}
 
-      {wide ? (
-        <div className="grid gap-10 lg:grid-cols-12 lg:gap-8">
-          <div className="lg:col-span-4">
-            <SkillsSunburst
+      <div className={`mt-8 flex flex-wrap items-baseline gap-x-10 gap-y-3 border-b pb-6 ${skin.line}`}>
+        <DepthStat skin={skin} value={fleetLiquidLines} text={sk.depthLabel.liquid} />
+        <DepthStat skin={skin} value={fleetIslandLines} text={sk.depthLabel.ts} />
+        <DepthStat skin={skin} value={fleetStoreCount} text={sk.depthLabel.stores} />
+      </div>
+
+      <div className="-mx-4 mt-7 flex gap-2 overflow-x-auto px-4 pb-1 no-scrollbar md:mx-0 md:flex-wrap md:px-0" role="tablist" aria-label={sk.groupSelectorLabel}>
+        {groups.map((g) => (
+          <GroupTab key={g} skin={skin} active={g === activeGroup} label={groupLabel[g]} count={formatGroup(sk, storesPerGroup[g])} onSelect={() => setActiveGroup(g)} />
+        ))}
+      </div>
+
+      <div className="mt-6 lg:grid lg:grid-cols-[1fr_320px] lg:items-start lg:gap-8">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
+          {groupTools.map((u) => (
+            <Tile
+              key={u.tool}
               skin={skin}
-              groups={groups}
-              groupLabel={groupLabel}
-              hovered={hovered}
-              locked={locked}
-              onHover={onHover}
+              tone={tone}
+              tool={u}
+              usageChip={formatTool(sk, u)}
+              active={active === u.tool}
+              pinned={locked === u.tool}
+              onHover={() => onHover(u.tool)}
               onHoverEnd={onHoverEnd}
-              onToggleLock={onToggleLock}
-              onUnlock={onUnlock}
-              format={{ tool: (u) => formatTool(sk, u), group: (n) => formatGroup(sk, n), caption: sk.sunburst.caption }}
+              onToggle={() => onToggle(u.tool)}
+              onEscape={onUnlock}
             />
-            <TriStat sk={sk} skin={skin} active={active} groupLabel={groupLabel} />
-            {skin.frame === 'persona' && (
-              <div className="mt-6">
-                <PersonaSkillPanel sk={sk} skin={skin} active={active} groupLabel={groupLabel} />
-              </div>
-            )}
-          </div>
-          <div className="lg:col-span-3">
-            <SkillPanel skin={skin} selection={active} pinned={pinned} onUnpin={onUnlock} />
-          </div>
-          <div className="lg:col-span-5">
-            <div className="space-y-7 md:space-y-8">
-              {groups.map((g, gi) => (
-                <m.p
-                  key={g}
-                  className="text-lg leading-[1.7] tracking-[-0.01em] md:text-[22px] md:leading-[1.7]"
-                  initial={reduced ? false : { opacity: 0, y: 14, filter: 'blur(8px)' }}
-                  whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                  viewport={{ once: true, margin: '-40px' }}
-                  transition={{ duration: 0.7, delay: gi * 0.05, ease: EASE }}
-                >
-                  <span className={`${skin.accent} mr-3 align-middle text-[11px] font-semibold uppercase tracking-[0.18em]`}>{groupLabel[g]}</span>
-                  <span className={skin.muted}>
-                    <Sentence
-                      sk={sk}
-                      skin={skin}
-                      g={g}
-                      groupTools={registry.skillGroups[g] as readonly string[]}
-                      active={active}
-                      locked={locked}
-                      onToolHover={onToolHover}
-                      onToolHoverEnd={onHoverEnd}
-                      onToolToggle={onToolToggle}
-                      onToolUnlock={onUnlock}
-                    />
-                  </span>
-                </m.p>
-              ))}
-            </div>
-          </div>
+          ))}
         </div>
-      ) : (
-        <div>
-          <RingLegend sk={sk} skin={skin} groups={groups} groupLabel={groupLabel} locked={locked} onToggleGroup={onGroupToggle} onToggleTool={onToolToggle} />
-          <div className="mt-6">
-            <SkillPanel skin={skin} selection={active} pinned={pinned} onUnpin={onUnlock} />
-          </div>
-          <div className="mt-10">
-            <Ledger sk={sk} skin={skin} track={track} reduced={reduced} usage={usage} storesCount={registry.stores.length} />
-          </div>
-          <div className={`mt-10 border-t ${skin.line}`}>
-            {groups.map((g) => {
-              const on = open === g
-              const count = registry.skillGroups[g].length
-              return (
-                <div key={g} className={`border-b ${skin.line}`}>
-                  <button type="button" aria-expanded={on} aria-controls={`skills-${g}`} onClick={() => setOpen(g)} className="flex w-full items-center justify-between gap-4 py-4 text-left">
-                    <span className={`${on ? skin.title : skin.muted} text-lg font-semibold transition-colors`}>{groupLabel[g]}</span>
-                    <span className={`${skin.muted} flex items-center gap-2 text-xs tabular-nums`}>
-                      {count}
-                      <m.svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true" animate={{ rotate: on ? 180 : 0 }} transition={{ duration: 0.25, ease: EASE }}>
-                        <path d="m4 6 4 4 4-4" />
-                      </m.svg>
-                    </span>
-                  </button>
-                  <AnimatePresence initial={false}>
-                    {on && (
-                      <m.div id={`skills-${g}`} key="panel" className="overflow-hidden" initial={reduced ? false : { height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3, ease: EASE }}>
-                        <p className={`${skin.muted} pb-5 text-base leading-[1.7]`}>
-                          <Sentence
-                            sk={sk}
-                            skin={skin}
-                            g={g}
-                            groupTools={registry.skillGroups[g] as readonly string[]}
-                            active={active}
-                            locked={locked}
-                            onToolHover={onToolHover}
-                            onToolHoverEnd={onHoverEnd}
-                            onToolToggle={onToolToggle}
-                            onToolUnlock={onUnlock}
-                          />
-                        </p>
-                      </m.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              )
-            })}
-          </div>
+        <div className="mt-6 lg:sticky lg:top-24 lg:mt-0">
+          <SkillPanel skin={skin} tool={activeTool} pinned={pinned} onUnpin={onUnlock} />
         </div>
-      )}
+      </div>
 
       <div className="mt-14 rail-wide md:mt-16">
         <Ticker
           variant="outline-fill"
           duration={38}
-          label={sk.usageLabel}
-          items={tools}
+          label={sk.eyebrow}
+          items={allTools}
           keyOf={(t) => t}
           itemClassName="shrink-0 whitespace-nowrap px-5 py-2 font-sf text-2xl font-semibold tracking-[-0.02em] md:text-4xl"
           renderItem={(t) => t}

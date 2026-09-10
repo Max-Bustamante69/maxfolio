@@ -186,8 +186,6 @@ function NeoContent() {
   // §2.8.12 — the manifesto band always runs the dark palette variant, regardless of the page toggle.
   const manifestoBand = 'bg-neo-dark text-neo-darkInk'
   const manifestoEyebrow = 'text-neo-darkAccent'
-  // §2.8.9 (simplified) — a Neo groove behind the usage ledger's fill bars.
-  const skillsTrack = 'neo-inset neo-sm'
   // §2.8.12 — recessed form field, the shadow IS the border.
   const contactField = 'neo-field neo-md !rounded-full border-transparent focus:outline-none'
 
@@ -495,11 +493,11 @@ function NeoContent() {
             </div>
           </section>
 
-          {/* Skills — §2.8.11: the usage ledger's fill bars ride an inset groove */}
+          {/* Skills — tool tiles read their raised/inset state off the shared .neo-raised primitive */}
           <section id="skills" className="px-4 py-12 md:py-16 scroll-mt-24">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
-                <Skills skin={skin} heading={Heading} trackClassName={skillsTrack} />
+                <Skills skin={skin} heading={Heading} />
               </Suspense>
             </div>
           </section>
