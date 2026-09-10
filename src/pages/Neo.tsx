@@ -1,5 +1,5 @@
-import { lazy, Suspense, useEffect, useState, type ReactNode } from 'react'
-import { m, AnimatePresence } from 'framer-motion'
+import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
+import { m, AnimatePresence, useInView, useReducedMotion } from 'framer-motion'
 import { ThemeProvider, useTheme } from '../context/ThemeContext'
 import { useLanguage, supportedLocales } from '../context/LanguageContext'
 import '../styles/neo.css'
@@ -38,6 +38,43 @@ const Reveal = ({ children, delay = 0, className = '' }: { children: ReactNode; 
     {children}
   </m.div>
 )
+
+/** Odometer-style vertical digit-roll for the hero readout tiles (Soft UI only — the shared StatBand
+ * keeps its flat count-up). Each digit is a 10-row column that spins once into place when the tile
+ * scrolls into view; a non-numeric suffix ("+") stays static. Screen readers get the plain value. */
+const OdometerValue = ({ value }: { value: string }) => {
+  const reduced = useReducedMotion()
+  const ref = useRef<HTMLSpanElement>(null)
+  const inView = useInView(ref, { once: true, margin: '-40px' })
+  const match = value.match(/^(\d+)(.*)$/)
+  if (!match) return <span>{value}</span>
+  const [, digitsStr, suffix] = match
+  if (reduced) return <span>{value}</span>
+  return (
+    <span ref={ref} className="inline-flex items-baseline tabular-nums">
+      <span aria-hidden="true" className="inline-flex">
+        {digitsStr.split('').map((d, i) => (
+          <span key={i} className="relative inline-block h-[1em] w-[0.6em] overflow-hidden align-baseline">
+            <m.span
+              className="absolute inset-x-0 top-0 flex flex-col"
+              initial={{ y: '0%' }}
+              animate={inView ? { y: `-${Number(d) * 10}%` } : { y: '0%' }}
+              transition={{ duration: 0.9, delay: 0.15 + i * 0.08, ease: EASE }}
+            >
+              {Array.from({ length: 10 }, (_, n) => (
+                <span key={n} className="block h-[1em] text-center leading-[1em]">
+                  {n}
+                </span>
+              ))}
+            </m.span>
+          </span>
+        ))}
+        {suffix}
+      </span>
+      <span className="sr-only">{value}</span>
+    </span>
+  )
+}
 
 /** Google Fonts (Manrope) loaded on demand, only while this theme is mounted — no other theme uses it. */
 function useNeoFont() {
@@ -302,28 +339,42 @@ function NeoContent() {
                 <p className={`${muted} mt-4 text-xs`}>{c.hero.ctaNote}</p>
               </div>
 
-              {/* the one ambient "breathing" panel per page (§2.7 / Idea 21) */}
+              {/* the one ambient "breathing" panel per page (§2.7 / Idea 21) — blobs art inset behind it */}
               <div className="lg:col-span-5">
-                <Reveal delay={0.15} className="neo-raised neo-xl neo-breathe !rounded-[36px] p-8 md:p-10">
-                  <p className={`text-[11px] font-bold uppercase tracking-[0.2em] ${muted}`}>{c.sections.now.label}</p>
-                  <div className="mt-3 flex items-center gap-2">
-                    <span className="relative flex h-2.5 w-2.5" aria-hidden="true">
-                      <span className="neo-pulse absolute inline-flex h-full w-full rounded-full bg-[#34c759] opacity-70 motion-reduce:animate-none" />
-                      <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#34c759]" />
-                    </span>
-                    <span className="text-sm font-semibold">{c.hero.availability}</span>
-                  </div>
-                  <div className={`mt-4 flex items-center gap-2 text-sm ${muted}`}>
-                    {Icon.globe}
-                    {c.hero.location}
-                  </div>
-                  <div className="mt-6 grid grid-cols-2 gap-3">
-                    {registry.stats.slice(0, 4).map((st) => (
-                      <div key={st.id} className="neo-inset neo-sm !rounded-2xl px-3 py-3">
-                        <p className={`text-2xl font-extrabold tabular-nums ${accent}`}>{st.value}</p>
-                        <p className={`text-[11px] ${muted} mt-0.5 leading-snug`}>{c.stats[st.id]}</p>
-                      </div>
-                    ))}
+                <Reveal delay={0.15} className="neo-raised neo-xl neo-breathe relative overflow-hidden !rounded-[36px] p-8 md:p-10">
+                  <img
+                    src="/art/softui/blobs.webp"
+                    alt=""
+                    aria-hidden="true"
+                    width={1400}
+                    height={933}
+                    loading="eager"
+                    decoding="async"
+                    className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-[0.16]"
+                  />
+                  <div className="relative">
+                    <p className={`text-[11px] font-bold uppercase tracking-[0.2em] ${muted}`}>{c.sections.now.label}</p>
+                    <div className="mt-3 flex items-center gap-2">
+                      <span className="relative flex h-2.5 w-2.5" aria-hidden="true">
+                        <span className="neo-pulse absolute inline-flex h-full w-full rounded-full bg-[#34c759] opacity-70 motion-reduce:animate-none" />
+                        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#34c759]" />
+                      </span>
+                      <span className="text-sm font-semibold">{c.hero.availability}</span>
+                    </div>
+                    <div className={`mt-4 flex items-center gap-2 text-sm ${muted}`}>
+                      {Icon.globe}
+                      {c.hero.location}
+                    </div>
+                    <div className="mt-6 grid grid-cols-2 gap-3">
+                      {registry.stats.slice(0, 4).map((st) => (
+                        <div key={st.id} className="neo-inset neo-sm neo-interactive !rounded-2xl px-3 py-3">
+                          <p className={`text-2xl font-extrabold ${accent}`}>
+                            <OdometerValue value={st.value} />
+                          </p>
+                          <p className={`text-[11px] ${muted} mt-0.5 leading-snug`}>{c.stats[st.id]}</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </Reveal>
               </div>
@@ -405,8 +456,20 @@ function NeoContent() {
           </section>
 
           {/* Gallery — §2.8.9: the wall floats inside one extruded shell around the real device frames */}
-          <section id="gallery" className="px-4 py-12 md:py-16 scroll-mt-24">
-            <div className="max-w-5xl mx-auto">
+          {/* Gallery band — the pebbles art as a soft textured ground, tinted back to the page surface for contrast */}
+          <section id="gallery" className="relative overflow-hidden px-4 py-12 md:py-16 scroll-mt-24">
+            <img
+              src="/art/softui/pebbles.webp"
+              alt=""
+              aria-hidden="true"
+              width={1400}
+              height={933}
+              loading="lazy"
+              decoding="async"
+              className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-[0.28]"
+            />
+            <div className="absolute inset-0" style={{ background: 'var(--neo-surface)', opacity: 0.55 }} aria-hidden="true" />
+            <div className="relative max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Gallery skin={skin} heading={Heading} />
               </Suspense>
