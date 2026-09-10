@@ -351,7 +351,20 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
   const radius = skin.frame === 'apple' ? 'rounded-[14px]' : 'rounded-none'
   const tile = `${radius} p-3 ${skin.frame === 'terminal' ? 'bg-[var(--term-line)]/30' : dark ? 'bg-white/5' : 'bg-black/[0.04]'}`
   const label = `text-[11px] font-semibold uppercase tracking-[0.18em] ${skin.muted}`
-  const accent = skin.frame === 'apple' ? (dark ? '#2997ff' : '#0071e3') : skin.frame === 'luxury' ? '#C9A962' : skin.frame === 'terminal' ? 'var(--term-accent)' : '#dc2626'
+  const accent =
+    skin.frame === 'apple'
+      ? dark
+        ? '#2997ff'
+        : '#0071e3'
+      : skin.frame === 'luxury'
+        ? '#C9A962'
+        : skin.frame === 'terminal'
+          ? 'var(--term-accent)'
+          : skin.frame === 'neo'
+            ? dark
+              ? '#8b93ff'
+              : '#4453d9'
+            : '#dc2626'
 
   const scores = data?.metrics
     ? [
@@ -364,8 +377,14 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
 
   // No `.compact-touch` here: these are primary navigation/action controls (not decorative dots),
   // so they keep the app-wide 44px tap-target floor even though the glyph inside stays small.
-  const navBtn = `press inline-flex h-11 w-11 items-center justify-center rounded-full transition-opacity disabled:pointer-events-none disabled:opacity-25 ${dark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`
-  const actionBtn = `press inline-flex h-11 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 text-xs ${dark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`
+  // Neo: the case-study sheet's close/nav buttons are the one place in this component that keeps
+  // the raised extrusion (restraint pass, 2026-09-10) — everything else in the sheet stays generic.
+  const isNeo = skin.frame === 'neo'
+  const navBtn = `press inline-flex h-11 w-11 items-center justify-center rounded-full transition-opacity disabled:pointer-events-none disabled:opacity-25 ${isNeo ? (dark ? 'bg-neo-darkSurfaceRaised' : 'bg-neo-surfaceRaised') : dark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`
+  const actionBtn = `press inline-flex h-11 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 text-xs ${isNeo ? (dark ? 'bg-neo-darkSurfaceRaised' : 'bg-neo-surfaceRaised') : dark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`
+  const neoBtnShadow: { boxShadow: string } | undefined = isNeo
+    ? { boxShadow: dark ? '3px 3px 8px #16181e, -3px -3px 8px #333844' : '3px 3px 8px #b8bcc7, -3px -3px 8px #ffffff' }
+    : undefined
 
   // "Visualized" charts, built once per open store from `data.charts` (real numbers only — see
   // Gallery.caseStudyFor, which omits any field the underlying data doesn't actually have).
@@ -489,19 +508,19 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
                   <div className="flex shrink-0 flex-wrap items-center gap-3">
                     {(onPrev || onNext) && (
                       <div className="flex items-center gap-1.5" role="group" aria-label={`${labels.prev} / ${labels.next}`}>
-                        <button type="button" onClick={onPrev} disabled={!onPrev} aria-label={labels.prev} className={navBtn}>
+                        <button type="button" onClick={onPrev} disabled={!onPrev} aria-label={labels.prev} className={navBtn} style={neoBtnShadow}>
                           <ChevronGlyph dir={-1} />
                         </button>
-                        <button type="button" onClick={onNext} disabled={!onNext} aria-label={labels.next} className={navBtn}>
+                        <button type="button" onClick={onNext} disabled={!onNext} aria-label={labels.next} className={navBtn} style={neoBtnShadow}>
                           <ChevronGlyph dir={1} />
                         </button>
                       </div>
                     )}
-                    <button type="button" onClick={copyLink} className={actionBtn} aria-live="polite">
+                    <button type="button" onClick={copyLink} className={actionBtn} style={neoBtnShadow} aria-live="polite">
                       <LinkGlyph />
                       <span className="hidden sm:inline">{copied ? labels.copied : labels.copyLink}</span>
                     </button>
-                    <button type="button" onClick={onClose} className={actionBtn}>
+                    <button type="button" onClick={onClose} className={actionBtn} style={neoBtnShadow}>
                       <CloseGlyph />
                       <span className="hidden sm:inline">{labels.close}</span>
                     </button>

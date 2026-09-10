@@ -78,15 +78,17 @@ function panelTone(skin: Skin): PanelTone {
         iconWrap: 'bg-stone-800 text-red-500',
       }
     case 'neo':
+      // Restraint pass: the panel is a flat, hairline-bordered surface on a faint tint (not a
+      // shadowed card) — only real controls (buttons) keep the raised/inset treatment on this page.
       return {
-        className: 'neo-inset neo-lg',
+        className: `rounded-[20px] border ${skin.line} ${skin.dark ? 'bg-neo-darkSurfaceRaised' : 'bg-neo-surfaceRaised'}`,
         title: skin.title,
         body: skin.body,
         muted: skin.muted,
         accent: skin.accent,
         chip: skin.chip,
         line: skin.line,
-        iconWrap: `neo-raised neo-sm ${skin.dark ? 'text-neo-darkAccent' : 'text-neo-accent'}`,
+        iconWrap: skin.badgeLive,
       }
     case 'persona':
       return {

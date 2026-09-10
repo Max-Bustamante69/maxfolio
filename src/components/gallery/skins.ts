@@ -107,14 +107,17 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
   neo: (d) => ({
     frame: 'neo',
     dark: d,
-    card: 'neo-raised neo-lg',
+    // Restraint pass (2026-09-10): a flat, hairline-bordered card — the raised/inset extrusion is
+    // reserved for the small set of primary controls (CTAs, readouts, the theme/language switch).
+    card: `rounded-[18px] border ${d ? 'border-white/10' : 'border-black/[0.08]'}`,
     title: `font-semibold ${d ? 'text-neo-darkInk' : 'text-neo-ink'}`,
     body: d ? 'text-neo-darkInk' : 'text-neo-ink',
     muted: d ? 'text-neo-darkInkMuted' : 'text-neo-inkMuted',
     accent: d ? 'text-neo-darkAccent' : 'text-neo-accent',
-    // Idle = raised chip; active = inset chip with the flat accent fill (§2.5.4 — state never rides on shadow alone).
-    chip: 'neo-chip',
-    chipOn: 'neo-chip-on',
+    // Flat hairline tag, idle vs. accent-tinted on (§2.5.4 restraint pass — no shadow on ordinary
+    // chip content; the raised/inset .neo-chip stays reserved for the nav's language switch).
+    chip: 'neo-tag',
+    chipOn: 'neo-tag-on',
     badgeLive: d ? 'bg-neo-darkAccent/20 text-neo-darkAccent' : 'bg-neo-accent/15 text-neo-accent',
     badgeDev: d ? 'text-neo-darkInkMuted bg-white/5' : 'text-neo-inkMuted bg-black/5',
     rowHover: d ? 'hover:bg-white/[0.03]' : 'hover:bg-black/[0.02]',

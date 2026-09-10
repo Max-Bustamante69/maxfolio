@@ -181,13 +181,18 @@ function NeoContent() {
   const liveCount = registry.stores.filter((s) => s.status === 'live').length
   const devCount = registry.stores.filter((s) => s.status === 'dev').length
 
-  // §2.8.2 — each numeral in an inset "readout" tile, lit by the accent.
-  const statTile = 'neo-inset neo-sm !rounded-2xl mx-1.5 my-1 px-4'
+  // Restraint pass: StatBand's numerals keep the odometer-style count-up (the theme's signature) but
+  // now sit on the shared component's own plain hairline grid instead of an inset tile per number —
+  // "flat-frame it" rather than dropping the readout itself. §2.8.2's inset frame survives only on
+  // the hero's small readout tiles below (the "few hero tiles" the raised/inset treatment keeps).
   // §2.8.12 — the manifesto band always runs the dark palette variant, regardless of the page toggle.
   const manifestoBand = 'bg-neo-dark text-neo-darkInk'
   const manifestoEyebrow = 'text-neo-darkAccent'
-  // §2.8.12 — recessed form field, the shadow IS the border.
-  const contactField = 'neo-field neo-md !rounded-full border-transparent focus:outline-none'
+  // Restraint pass — a flat, hairline-bordered field (form fields aren't in the surviving-effect
+  // list: CTAs, readout tiles, the theme/language switch, the case-study sheet's nav buttons).
+  const contactField = isDark
+    ? 'border-white/15 bg-neo-dark text-neo-darkInk placeholder:text-neo-darkInkMuted focus:border-neo-darkAccent'
+    : 'border-black/[0.12] bg-neo-surfaceRaised text-neo-ink placeholder:text-neo-inkMuted focus:border-neo-accent'
 
   return (
     <>
@@ -204,13 +209,13 @@ function NeoContent() {
       </div>
 
       <div className="theme-neo min-h-screen font-neo transition-colors duration-300 [overflow-x:clip]" data-theme={isDark ? 'dark' : undefined} role="document">
-        {/* Nav — a raised bar, the mark a small extruded chip */}
+        {/* Nav — restraint pass: a flat hairline bar (the extrusion stays reserved for controls) */}
         <nav className="fixed top-0 inset-x-0 z-40 px-3 pt-3" aria-label="Main navigation">
-          <div className="neo-raised neo-sm !rounded-[20px] max-w-5xl mx-auto h-14 px-4 flex items-center justify-between gap-3">
+          <div
+            className={`border backdrop-blur-md !rounded-[20px] max-w-5xl mx-auto h-14 px-4 flex items-center justify-between gap-3 ${isDark ? 'bg-neo-dark/85 border-white/10' : 'bg-neo-surfaceRaised/85 border-black/[0.08]'}`}
+          >
             <TransitionLink to="/neo" transitionColor="#e6e9ef" transitionAccent="#4453d9" transitionLabel="Neo" className="flex items-center gap-2.5 shrink-0">
-              <span className="neo-raised neo-sm !rounded-[10px] flex h-8 w-8 items-center justify-center">
-                <span className={`h-2 w-2 rounded-full ${skin.accentBg}`} aria-hidden="true" />
-              </span>
+              <span className={`h-2.5 w-2.5 rounded-full ${skin.accentBg}`} aria-hidden="true" />
               <span className="text-sm font-extrabold tracking-tight hidden sm:inline">Maxfolio</span>
             </TransitionLink>
             <div className="hidden md:flex items-center gap-1 text-xs font-semibold">
@@ -242,7 +247,7 @@ function NeoContent() {
               <button
                 type="button"
                 onClick={() => setMobileOpen(true)}
-                className="neo-raised neo-sm !rounded-full md:hidden flex h-9 w-9 items-center justify-center"
+                className={`border !rounded-full md:hidden flex h-9 w-9 items-center justify-center transition-colors ${isDark ? 'border-white/10 hover:bg-white/5' : 'border-black/[0.08] hover:bg-black/[0.03]'}`}
                 aria-label="Open menu"
                 aria-expanded={mobileOpen}
               >
@@ -275,7 +280,12 @@ function NeoContent() {
               >
                 <div className="flex items-center justify-between h-11">
                   <span className="text-sm font-bold">{t('mobileMenu.menu')}</span>
-                  <button type="button" onClick={() => setMobileOpen(false)} className="neo-raised neo-sm !rounded-full flex h-9 w-9 items-center justify-center" aria-label="Close menu">
+                  <button
+                    type="button"
+                    onClick={() => setMobileOpen(false)}
+                    className={`border !rounded-full flex h-9 w-9 items-center justify-center transition-colors ${isDark ? 'border-white/10 hover:bg-white/5' : 'border-black/[0.08] hover:bg-black/[0.03]'}`}
+                    aria-label="Close menu"
+                  >
                     {Icon.close}
                   </button>
                 </div>
@@ -332,7 +342,10 @@ function NeoContent() {
                       {Icon.mail} {c.hero.ctaPrimary}
                     </button>
                   </Magnetic>
-                  <a href="#shopify" className={`neo-raised neo-sm neo-interactive inline-flex items-center gap-1.5 !rounded-full px-5 py-3 text-sm font-semibold`}>
+                  <a
+                    href="#shopify"
+                    className={`border inline-flex items-center gap-1.5 !rounded-full px-5 py-3 text-sm font-semibold transition-colors ${isDark ? 'border-white/10 hover:bg-white/5' : 'border-black/[0.08] hover:bg-black/[0.03]'}`}
+                  >
                     {c.hero.ctaSecondary} {Icon.down}
                   </a>
                   <a href={registry.personal.cv} download className={`${muted} text-sm font-semibold`}>
@@ -386,17 +399,19 @@ function NeoContent() {
             </div>
           </section>
 
-          {/* Stat band — §2.8.2: each numeral in an inset readout tile */}
+          {/* Stat band — the shared plain hairline grid; the odometer digit-roll stays only in the hero tiles above */}
           <section className="px-4 pb-16 md:pb-24">
             <div className="max-w-5xl mx-auto">
-              <StatBand skin={skin} tileClassName={statTile} />
+              <StatBand skin={skin} />
             </div>
           </section>
 
           {/* Now + fleet ticker — §2.8.3: inset indicator-light pill, raised marquee chips */}
           <section className="px-4 pb-16 md:pb-24" aria-label={c.sections.now.label}>
             <div className="max-w-5xl mx-auto">
-              <Reveal className="neo-inset neo-sm inline-flex flex-wrap items-center gap-x-5 gap-y-2 !rounded-full px-5 py-3 text-sm">
+              <Reveal
+                className={`border inline-flex flex-wrap items-center gap-x-5 gap-y-2 !rounded-full px-5 py-3 text-sm ${isDark ? 'border-white/10' : 'border-black/[0.08]'}`}
+              >
                 <span className="inline-flex items-center gap-2 font-semibold">
                   <span className="relative flex h-2 w-2" aria-hidden="true">
                     <span className="neo-pulse absolute inline-flex h-full w-full rounded-full bg-[#34c759] opacity-70 motion-reduce:animate-none" />
@@ -428,15 +443,16 @@ function NeoContent() {
             </div>
           </section>
 
-          {/* Experience — §2.8.4: the rail's active tab already reads as pressed via the accent underline */}
-          <section id="experience" className="px-4 py-12 md:py-16 scroll-mt-24">
-            <div className="max-w-5xl mx-auto neo-raised neo-lg !rounded-[28px] p-6 md:p-10">
+          {/* Experience — restraint pass: a flat tint band (ground color, not a shadowed card) reads
+              as its own surface; the rail's active tab already reads as pressed via the accent underline */}
+          <section id="experience" className={`px-4 py-14 md:py-20 scroll-mt-24 ${isDark ? 'bg-neo-darkSurfaceRaised' : 'bg-neo-surfaceRaised'}`}>
+            <div className="max-w-5xl mx-auto">
               <Experience skin={skin} heading={Heading} />
             </div>
           </section>
 
           {/* Years — the unit chart's tiles get the depth treatment: shipped raised, empty slots inset */}
-          <section className="px-4 py-12 md:py-16">
+          <section className="px-4 py-14 md:py-20">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Years skin={skin} heading={Heading} depth />
@@ -444,16 +460,17 @@ function NeoContent() {
             </div>
           </section>
 
-          {/* Process — §2.8.6: the numbered badges already ride an inset groove that fills with accent */}
-          <section className="px-4 py-12 md:py-16">
-            <div className="max-w-5xl mx-auto neo-inset neo-lg !rounded-[28px] p-6 md:p-10">
-              <Process skin={skin} heading={Heading} canvas="neo-canvas" />
+          {/* Process — restraint pass: a flat tint band, like Experience above; the numbered badges
+              already read as pressed via the accent-filled groove, no card needed around them */}
+          <section className={`px-4 py-14 md:py-20 ${isDark ? 'bg-neo-darkSurfaceRaised' : 'bg-neo-surfaceRaised'}`}>
+            <div className="max-w-5xl mx-auto">
+              <Process skin={skin} heading={Heading} canvas={isDark ? 'bg-neo-darkSurfaceRaised' : 'bg-neo-surfaceRaised'} />
             </div>
           </section>
 
-          {/* Shopify work — §2.8.7: the index sits on a raised "screen" panel */}
-          <section id="shopify" className="px-4 py-12 md:py-16 scroll-mt-24">
-            <div className="max-w-5xl mx-auto neo-raised neo-lg !rounded-[28px] p-6 md:p-10">
+          {/* Shopify work — restraint pass: plain page ground, no card shell around the index */}
+          <section id="shopify" className="px-4 py-14 md:py-20 scroll-mt-24">
+            <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <ShopifyWork skin={skin} heading={Heading} />
               </Suspense>
@@ -462,7 +479,7 @@ function NeoContent() {
 
           {/* Gallery — §2.8.9: the wall floats inside one extruded shell around the real device frames */}
           {/* Gallery band — the pebbles art as a soft textured ground, tinted back to the page surface for contrast */}
-          <section id="gallery" className="relative overflow-hidden px-4 py-12 md:py-16 scroll-mt-24">
+          <section id="gallery" className="relative overflow-hidden px-4 py-14 md:py-20 scroll-mt-24">
             <img
               src="/art/softui/pebbles.webp"
               alt=""
@@ -487,7 +504,7 @@ function NeoContent() {
           </Suspense>
 
           {/* Projects — index list */}
-          <section id="projects" className="px-4 py-12 md:py-16 scroll-mt-24">
+          <section id="projects" className="px-4 py-14 md:py-20 scroll-mt-24">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Projects skin={skin} heading={Heading} />
@@ -496,7 +513,7 @@ function NeoContent() {
           </section>
 
           {/* Skills — tool tiles read their raised/inset state off the shared .neo-raised primitive */}
-          <section id="skills" className="px-4 py-12 md:py-16 scroll-mt-24">
+          <section id="skills" className="px-4 py-14 md:py-20 scroll-mt-24">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Skills skin={skin} heading={Heading} />
@@ -504,9 +521,9 @@ function NeoContent() {
             </div>
           </section>
 
-          {/* FAQ */}
-          <section id="faq" className="px-4 py-12 md:py-16">
-            <div className="max-w-5xl mx-auto neo-inset neo-lg !rounded-[28px] p-6 md:p-10">
+          {/* FAQ — restraint pass: plain page ground, the rows are already a hairline accordion */}
+          <section id="faq" className="px-4 py-14 md:py-20">
+            <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending h="min-h-[40vh]" />}>
                 <Faq skin={skin} heading={Heading} />
               </Suspense>
@@ -531,7 +548,7 @@ function NeoContent() {
           </section>
 
           {/* Explore */}
-          <section className="px-4 py-16 scroll-mt-24">
+          <section className="px-4 py-14 md:py-20 scroll-mt-24">
             <div className="max-w-5xl mx-auto">
               {Heading(c.sections.explore.eyebrow, c.sections.explore.title, '', c.sections.explore.lead)}
               <div className="grid sm:grid-cols-3 gap-3">
@@ -542,7 +559,7 @@ function NeoContent() {
                     transitionColor={d.transitionColor}
                     transitionAccent={d.transitionAccent}
                     transitionLabel={t(d.nameKey)}
-                    className="neo-raised neo-md neo-interactive block !rounded-[22px] overflow-hidden"
+                    className={`border neo-interactive block !rounded-[22px] overflow-hidden ${isDark ? 'border-white/10' : 'border-black/[0.08]'}`}
                   >
                     <div className="h-28 overflow-hidden">
                       <d.Preview size="md" />
@@ -553,7 +570,13 @@ function NeoContent() {
                     </div>
                   </TransitionLink>
                 ))}
-                <TransitionLink to={MENU.route} transitionColor="#171717" transitionAccent="#ffffff" transitionLabel={t(MENU.labelKey)} className="neo-raised neo-md neo-interactive block !rounded-[22px] overflow-hidden">
+                <TransitionLink
+                  to={MENU.route}
+                  transitionColor="#171717"
+                  transitionAccent="#ffffff"
+                  transitionLabel={t(MENU.labelKey)}
+                  className={`border neo-interactive block !rounded-[22px] overflow-hidden ${isDark ? 'border-white/10' : 'border-black/[0.08]'}`}
+                >
                   <div className="h-28 overflow-hidden bg-black/80 flex items-center justify-center text-white text-xs font-semibold">{t(MENU.labelKey)}</div>
                   <div className="p-4">
                     <p className="font-bold text-sm">{t(MENU.labelKey)}</p>
