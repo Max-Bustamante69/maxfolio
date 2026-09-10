@@ -1,5 +1,15 @@
 [
   {
+    "hash": "d6afa55",
+    "date": "2026-09-10",
+    "subject": "docs(lighthouse): rounds 29-32 row"
+  },
+  {
+    "hash": "80de0a0",
+    "date": "2026-09-10",
+    "subject": "chore(terminal): regenerated changelog.json"
+  },
+  {
     "hash": "9a55132",
     "date": "2026-09-10",
     "subject": "fix(sheet): gate the Lighthouse headline chip on the same pairing guard as its chart"
@@ -48,15 +58,5 @@
     "hash": "3e93ca1",
     "date": "2026-09-09",
     "subject": "fix(seo): the sitemap lists every theme route (Soft UI, Arcade, Terminal, Skyline were missing)"
-  },
-  {
-    "hash": "5883970",
-    "date": "2026-09-09",
-    "subject": "fix(terminal): label the bracket nav landmark correctly"
-  },
-  {
-    "hash": "17f2a85",
-    "date": "2026-09-09",
-    "subject": "fix(menu): make the design-count copy track the real total"
   }
 ]
