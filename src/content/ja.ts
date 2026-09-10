@@ -227,7 +227,7 @@ export const ja: PortfolioContent = {
       layoutExtra: {
         wallFilterLabel: 'グループで壁を絞り込む',
         allLabel: 'すべて',
-        hoverRing: 'リングにカーソルを合わせてください',
+        productsLabel: '自社プロダクト',
         unpin: '固定解除',
         toolsSuffix: 'ツール',
       },

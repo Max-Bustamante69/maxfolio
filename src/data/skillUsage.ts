@@ -120,3 +120,6 @@ export const storesPerGroup: Record<SkillGroupId, number> = Object.fromEntries(
 export const fleetLiquidLines = Object.values(telemetry).reduce((a, t) => a + t.lines.liquid, 0)
 export const fleetIslandLines = Object.values(telemetry).reduce((a, t) => a + t.lines.islands, 0)
 export const fleetStoreCount = stores.length
+/** Real in-house products shipped (Apps, Platform, Track…) — feeds the orbit layout's center-card
+ *  at-rest stat, never a curated or rounded figure. */
+export const fleetProductCount = products.length

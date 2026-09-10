@@ -227,7 +227,7 @@ export const en: PortfolioContent = {
       layoutExtra: {
         wallFilterLabel: 'Filter the wall by group',
         allLabel: 'All',
-        hoverRing: 'Hover a ring',
+        productsLabel: 'In-house products',
         unpin: 'Unpin',
         toolsSuffix: 'tools',
       },
