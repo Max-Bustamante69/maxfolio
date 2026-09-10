@@ -176,7 +176,12 @@ function Design4Content() {
       {/* SEO */}
       <SEOHead title={`${c.meta.title} — ${t(self.nameKey)}`} description={c.meta.description} canonical="https://www.maxfolio.dev/luxury" />
 
-      <div className={`min-h-screen ${bgPrimary} ${textPrimary} font-body overflow-x-hidden transition-colors duration-500`} role="document">
+      {/* `overflow-x:clip` not `overflow-x-hidden`: `hidden` on either axis makes the browser compute the
+          other axis to `auto`, turning this root wrapper into a scroll container that hijacks `position:
+          sticky` for every descendant (measured: the Process section's pinned readout column never stuck —
+          its top just tracked the page scroll 1:1). `clip` clips the same horizontal bleed without creating
+          a scroll container, so vertical sticky descendants work again. */}
+      <div className={`min-h-screen ${bgPrimary} ${textPrimary} font-body [overflow-x:clip] transition-colors duration-500`} role="document">
         {/* Contact Modal */}
         <ContactFormModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} variant="luxury" isDark={isDark} initialMessage={contactPrefill} />
 

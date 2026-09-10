@@ -526,8 +526,13 @@ export default function Skyline() {
             </div>
           </section>
 
-          {/* Process — shared, the pinned readout rides the HUD grid backdrop */}
-          <section className="relative overflow-hidden px-4 py-12 md:py-16">
+          {/* Process — shared, the pinned readout rides the HUD grid backdrop. `[overflow-x:clip]`, not
+              `overflow-hidden`: `hidden` (either axis) makes this section a scroll container, which hijacked
+              the Process column's `position: sticky` (measured: top tracked the page scroll 1:1, never
+              pinned) even though root already used the safe `[overflow-x:clip]` idiom. The grid backdrop
+              below is `absolute inset-0` — its background-image is already clipped to the section's own box
+              by the box model regardless of `overflow`, so nothing here actually needed containing. */}
+          <section className="relative [overflow-x:clip] px-4 py-12 md:py-16">
             <div className="skyline-grid-bg pointer-events-none absolute inset-0" aria-hidden="true" />
             <div className="relative mx-auto max-w-5xl">
               <Suspense fallback={<Pending />}>

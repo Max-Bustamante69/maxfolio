@@ -156,7 +156,10 @@ function Design1Content() {
       {/* SEO */}
       <SEOHead title={`${c.meta.title} — ${t(self.nameKey)}`} description={c.meta.description} canonical="https://www.maxfolio.dev/brutalist" />
 
-      <div className={`min-h-screen ${bgPrimary} ${textPrimary} font-body overflow-x-hidden transition-colors duration-300`} role="document">
+      {/* `overflow-x:clip` not `overflow-x-hidden`: see Design4.tsx's root wrapper for why `hidden` on either
+          axis breaks descendant `position: sticky` (measured: the Process pinned readout never stuck here
+          either — same 1:1-with-scroll signature). */}
+      <div className={`min-h-screen ${bgPrimary} ${textPrimary} font-body [overflow-x:clip] transition-colors duration-300`} role="document">
         {/* Contact Modal */}
         <ContactFormModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} variant="brutalist" isDark={isDark} initialMessage={contactPrefill} />
 
