@@ -382,9 +382,12 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
   // conversion is illustrative end to end, and the Lighthouse/load-time deltas both subtract a real
   // "after" from an illustrative "before" — so all three carry the same `chipIllustrative` tag; there
   // is no "measured" lift to show here (the sheet's real, unqualified numbers live in the metrics/
-  // commerce/charts blocks below, not this strip). The Lighthouse chip prefers the desktop form (the
-  // owner's spec) and falls back to mobile when only one form cleared the pairing margin above.
-  const lighthouseChipForm = impact?.lighthouse?.desktop ?? impact?.lighthouse?.mobile ?? null
+  // commerce/charts blocks below, not this strip). The Lighthouse chip is gated on `showLighthouseChart`
+  // (both forms clearing the +8pt pairing margin) — never a lone number with no chart behind it, per
+  // the same "no partial pair" call that already hides the paired-bars chart itself (see lhRows above;
+  // caught on Valdo Café, 2026-09-10, where a desktop-only pass produced a "+25 Illustrative" chip with
+  // zero chart or sr-only table backing it). Prefers the desktop form, per the owner's spec.
+  const lighthouseChipForm = showLighthouseChart ? (impact?.lighthouse?.desktop ?? impact?.lighthouse?.mobile ?? null) : null
   const headlineChips = impact
     ? [
         { key: 'conversion', value: impact.conversion.deltaPct, sign: '+' as const, label: il.chipConversionLabel },
