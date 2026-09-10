@@ -13,8 +13,10 @@ const mutedText = (dark: boolean) => (dark ? 'text-[#a1a1a6]' : 'text-[#6e6e73]'
 export const goodText = (dark: boolean) => (dark ? 'text-[#5ee082]' : 'text-[#136329]')
 export const badText = (dark: boolean) => (dark ? 'text-[#ff8a80]' : 'text-[#b42318]')
 
-/** Counts a number up when it mounts; shows the final value at once under reduced motion. */
-export function CountUp({ value, decimals = 0, prefix = '', suffix = '', delay = 0, className = '' }: { value: number; decimals?: number; prefix?: string; suffix?: string; delay?: number; className?: string }) {
+/** Counts a number up when it mounts; shows the final value at once under reduced motion.
+ *  `duration` defaults to 1s (this component's long-standing site-wide behavior — commerce chips,
+ *  telemetry); the Impact block's own draw-ins pass 0.8 explicitly to stay inside its ≤0.8s budget. */
+export function CountUp({ value, decimals = 0, prefix = '', suffix = '', delay = 0, duration = 1, className = '' }: { value: number; decimals?: number; prefix?: string; suffix?: string; delay?: number; duration?: number; className?: string }) {
   const reduced = useReducedMotion()
   const mv = useMotionValue(reduced ? value : 0)
   // toLocaleString (not toFixed) so a four-digit-plus value counts up with the same thousands
@@ -31,9 +33,9 @@ export function CountUp({ value, decimals = 0, prefix = '', suffix = '', delay =
       mv.set(value)
       return
     }
-    const ctrl = animate(mv, value, { duration: 1, delay, ease: EASE })
+    const ctrl = animate(mv, value, { duration, delay, ease: EASE })
     return () => ctrl.stop()
-  }, [value, delay, reduced, mv])
+  }, [value, delay, duration, reduced, mv])
   return <m.span className={className}>{text}</m.span>
 }
 
@@ -404,7 +406,7 @@ export function IndexAreaLine({
     <figure className="m-0">
       <div className="flex items-baseline justify-between gap-2">
         <figcaption className={`text-[11px] leading-tight ${mutedText(dark)}`}>{label}</figcaption>
-        <CountUp value={deltaPct} prefix="+" suffix="%" delay={delay + 0.6} className={`text-xl font-semibold leading-none tabular-nums ${goodText(dark)}`} />
+        <CountUp value={deltaPct} prefix="+" suffix="%" delay={delay + 0.6} duration={0.8} className={`text-xl font-semibold leading-none tabular-nums ${goodText(dark)}`} />
       </div>
       <svg viewBox={`0 0 ${w} ${h}`} className="mt-1.5 h-[62px] w-full" preserveAspectRatio="none" role="img" aria-label={`${label}: ${points[0]} → ${points[n - 1]} (index, base 100)`}>
         <line x1={pad} x2={w - pad} y1={baselineY} y2={baselineY} stroke={dark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)'} strokeWidth={1} strokeDasharray="3 4" />
@@ -456,7 +458,7 @@ function MiniRing({ value, label, delay, dark }: { value: number; label: string;
       mv.set(value)
       return
     }
-    const ctrl = animate(mv, value, { duration: 1, delay, ease: EASE })
+    const ctrl = animate(mv, value, { duration: 0.8, delay, ease: EASE })
     return () => ctrl.stop()
   }, [value, delay, reduced, mv])
   return (
@@ -537,7 +539,7 @@ export function PerfDualRing({
       mvBefore.set(before)
       return
     }
-    const c1 = animate(mvAfter, after, { duration: 1, delay, ease: EASE })
+    const c1 = animate(mvAfter, after, { duration: 0.8, delay, ease: EASE })
     const c2 = animate(mvBefore, before, { duration: 0.8, delay, ease: EASE })
     return () => {
       c1.stop()
@@ -569,7 +571,7 @@ export function PerfDualRing({
           <div className="flex items-baseline gap-1.5">
             <m.p className="text-2xl font-semibold leading-none tabular-nums">{shown}</m.p>
             {delta !== 0 && (
-              <CountUp value={Math.abs(delta)} prefix={delta > 0 ? '+' : '−'} delay={delay + 0.7} className={`text-xs font-semibold tabular-nums ${delta > 0 ? goodText(dark) : badText(dark)}`} />
+              <CountUp value={Math.abs(delta)} prefix={delta > 0 ? '+' : '−'} delay={delay + 0.7} duration={0.8} className={`text-xs font-semibold tabular-nums ${delta > 0 ? goodText(dark) : badText(dark)}`} />
             )}
           </div>
           <p className={`mt-1 text-[11px] leading-tight ${mutedText(dark)}`}>{label}</p>
@@ -662,7 +664,7 @@ export function LoadTimePairedBar({
     <figure className="m-0">
       <div className="flex items-baseline justify-between gap-2">
         <figcaption className={`text-[11px] leading-tight ${mutedText(dark)}`}>{label}</figcaption>
-        <CountUp value={deltaPct} prefix="−" suffix="%" delay={delay + 0.5} className={`text-xs font-semibold tabular-nums ${goodText(dark)}`} />
+        <CountUp value={deltaPct} prefix="−" suffix="%" delay={delay + 0.5} duration={0.8} className={`text-xs font-semibold tabular-nums ${goodText(dark)}`} />
       </div>
       <div className="mt-1.5 space-y-1.5" role="img" aria-label={`${label}: ${beforeLabel} ${beforeSeconds.toFixed(1)}s, ${afterLabel} ${afterSeconds.toFixed(1)}s`}>
         {bars.map((b, j) => (

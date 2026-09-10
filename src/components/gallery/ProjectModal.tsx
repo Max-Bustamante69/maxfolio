@@ -536,7 +536,7 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
                       <div className="mt-3 flex flex-wrap gap-2">
                         {headlineChips.map((c, i) => (
                           <div key={c.key} className={`${tile} flex min-w-[104px] flex-1 basis-[104px] flex-col gap-0.5`}>
-                            <CountUp value={c.value} prefix={c.sign} suffix={c.key === 'lighthouse' ? '' : '%'} delay={0.05 + i * 0.05} className={`text-xl font-semibold leading-none tabular-nums ${goodText(dark)}`} />
+                            <CountUp value={c.value} prefix={c.sign} suffix={c.key === 'lighthouse' ? '' : '%'} delay={0.05 + i * 0.05} duration={0.8} className={`text-xl font-semibold leading-none tabular-nums ${goodText(dark)}`} />
                             <span className="text-[11px] leading-tight">{c.label}</span>
                           </div>
                         ))}

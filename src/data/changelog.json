@@ -1,5 +1,15 @@
 [
   {
+    "hash": "8d1e043",
+    "date": "2026-09-10",
+    "subject": "chore(terminal): regenerated changelog.json"
+  },
+  {
+    "hash": "ce6429e",
+    "date": "2026-09-10",
+    "subject": "feat(sheet): Lighthouse-style Impact block — score rings, before/after dual ring, Core Web Vitals"
+  },
+  {
     "hash": "d6afa55",
     "date": "2026-09-10",
     "subject": "docs(lighthouse): rounds 29-32 row"
@@ -48,15 +58,5 @@
     "hash": "fa87964",
     "date": "2026-09-09",
     "subject": "chore(terminal): regenerated changelog.json"
-  },
-  {
-    "hash": "ca6cbb2",
-    "date": "2026-09-09",
-    "subject": "fix(skills): localize the wall/orbit/rows layout candidates for es/ja"
-  },
-  {
-    "hash": "3e93ca1",
-    "date": "2026-09-09",
-    "subject": "fix(seo): the sitemap lists every theme route (Soft UI, Arcade, Terminal, Skyline were missing)"
   }
 ]
