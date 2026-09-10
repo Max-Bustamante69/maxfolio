@@ -1,5 +1,20 @@
 [
   {
+    "hash": "08222c6",
+    "date": "2026-09-10",
+    "subject": "fix(skills): 44px tap targets for the orbit/ledger filter bar on mobile"
+  },
+  {
+    "hash": "6edeea0",
+    "date": "2026-09-10",
+    "subject": "feat(skills): orbit hover/press previews, real cross-section links, filters"
+  },
+  {
+    "hash": "e570682",
+    "date": "2026-09-10",
+    "subject": "chore(terminal): regenerated changelog.json"
+  },
+  {
     "hash": "1d02678",
     "date": "2026-09-10",
     "subject": "fix(a11y): the orbit dots are toggle buttons in a group, not list items (aria-pressed is not allowed on listitem)"
@@ -43,20 +58,5 @@
     "hash": "ec25a52",
     "date": "2026-09-10",
     "subject": "chore(terminal): regenerated changelog.json"
-  },
-  {
-    "hash": "7be9bcc",
-    "date": "2026-09-10",
-    "subject": "feat(sheet): case-study sheet trimmed to Impact-only, Revenue + Delivery added"
-  },
-  {
-    "hash": "0ffbcd2",
-    "date": "2026-09-10",
-    "subject": "fix(content): correct featured-build problem beat for The Gummy Box"
-  },
-  {
-    "hash": "363ea16",
-    "date": "2026-09-10",
-    "subject": "fix(neo): flatten the leftover raised Design Menu explore tile"
   }
 ]
