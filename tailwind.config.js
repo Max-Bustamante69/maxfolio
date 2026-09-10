@@ -18,6 +18,9 @@ export default {
         // Persona (arcade) theme: Anton display slabs, Rajdhani condensed labels/UI. Body text keeps the system stack.
         'persona-display': ['Anton', 'Archivo Black', 'sans-serif'],
         'persona-label': ['Rajdhani', 'sans-serif'],
+        // Skyline (data-monument) theme: technical grotesk for copy, JetBrains Mono (already loaded
+        // globally, see index.html) carries every real numeral via `font-mono` + `tabular-nums`.
+        'skyline': ['Inter', 'IBM Plex Sans', 'system-ui', 'sans-serif'],
       },
       spacing: {
         'xs': '8px',

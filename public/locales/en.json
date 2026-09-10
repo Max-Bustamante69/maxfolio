@@ -36,7 +36,8 @@
     "shopify": "Shopify",
     "gallery": "Gallery",
     "projects": "Projects",
-    "years": "Years"
+    "years": "Years",
+    "instruments": "Instruments"
   },
   "hero": {
     "greeting": "Hi, I'm",
@@ -129,14 +130,16 @@
       "brutalistEditorial": "Brutalist Editorial",
       "apple": "Apple Clean",
       "neo": "Soft UI",
-      "persona": "Arcade"
+      "persona": "Arcade",
+      "skyline": "Skyline"
     },
     "designSubtitles": {
       "luxuryMinimal": "Elegant & Refined",
       "brutalistEditorial": "Bold & Raw",
       "apple": "Quiet & Precise",
       "neo": "Tactile & Extruded",
-      "persona": "Loud & Kinetic"
+      "persona": "Loud & Kinetic",
+      "skyline": "Data & Monument"
     },
     "whyVersions": "Why five versions?",
     "whyVersionsDesc": "Different aesthetics for different contexts. Same skills, proven versatility."
