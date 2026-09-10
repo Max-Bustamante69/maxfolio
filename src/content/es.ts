@@ -247,6 +247,7 @@ export const es: PortfolioContent = {
         expandRow: 'Ver detalles',
         collapseRow: 'Ocultar detalles',
         drawer: {
+          fleetLabel: 'Toda la flota',
           capturesLabel: 'Dónde se usa',
           rolesLabel: 'Roles con cliente',
           showInIndex: 'Ver en el índice de tiendas',

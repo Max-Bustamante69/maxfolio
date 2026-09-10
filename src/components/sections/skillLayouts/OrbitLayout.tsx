@@ -3,18 +3,25 @@
 // most-used tools stay labeled at rest, so the composition reads without a single interaction. Each
 // ring drifts in a slow, alternating ambient rotation (transform-only CSS, pauses on hover/focus) while
 // its dots counter-rotate so icons/labels stay upright; the whole orbit tilts gently toward the pointer.
-// The center is a quiet, FIXED readout — the six-group fleet totals, never anything else — plus a
-// light tooltip (name + group, text only) that appears above it while a dot is hovered or focused,
-// visible only on devices whose primary input actually hovers (`(hover: hover)`, see `ORBIT_CSS`
-// below) — a mouse convenience, never required. A filter bar above the rings (by group, by which real
-// surface uses a tool, by name) doubles as the ring legend; its state lives in the URL so a filtered
-// view is shareable, and a group with nothing left showing collapses its ring to a hairline.
+// The center is a quiet, FIXED ornament — a small per-theme "MB" mark (`CenterMark`), decorative
+// only — plus a light tooltip (name + group, text only) that appears above it while a dot is hovered
+// or focused, visible only on devices whose primary input actually hovers (`(hover: hover)`, see
+// `ORBIT_CSS` below) — a mouse convenience, never required. A filter bar above the rings (by group,
+// by which real surface uses a tool, by name) doubles as the ring legend; its state lives in the URL
+// so a filtered view is shareable, and a group with nothing left showing collapses its ring to a
+// hairline.
 //
 // 2026-09-10 — "more like modals or drawers... images too... so everything is more organized" (owner
 // feedback on the orbit3 preview). Pressing/Enter-ing a dot now opens `ToolDrawer`, one shared instance
 // for the whole section: a right-side panel (desktop) / bottom sheet (phones) carrying the tool's real
 // capture thumbnails, client-role lines and depth stat — replacing both the old floating "quick look"
-// card and the big center card, neither of which exists anymore. `?tool=<slug>` deep-links it open,
+// card and the big center card, neither of which exists anymore.
+//
+// 2026-09-10 (same day, second pass) — "for the orbit, all the numbers should go into the preview
+// (the drawer), not in that card in the middle; use the middle for something different — a logo or
+// something — that data looks horrible there." The six-group fleet totals that used to sit in the
+// center card moved into `ToolDrawer`'s new fleet-wide strip (shown for every tool, orbit and ledger
+// alike); `CenterMark` fills the vacated center instead. `?tool=<slug>` deep-links the drawer open,
 // history-aware exactly like `ShopifyWork`'s `?store=` (see `useSheetHistory`).
 //
 // Below 1024px it falls back to layout 1 (ledger) — fully legible and keyboard/touch operable on its
@@ -29,9 +36,9 @@ import { useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type
 import { useReducedMotion } from 'framer-motion'
 import { useMediaQuery, useSheetHistory } from '../../../hooks'
 import type { SkillGroupId } from '../../../data/registry'
-import { toolUsageById, fleetLiquidLines, fleetIslandLines, fleetStoreCount, fleetProductCount, type ToolUsage } from '../../../data/skillUsage'
+import { toolUsageById, type ToolUsage } from '../../../data/skillUsage'
 import { toolIcon, monogram, ToolMark } from '../skillIcons'
-import { CountUp } from '../../gallery/charts'
+import { CenterMark } from './CenterMark'
 import { LedgerLayout } from './LedgerLayout'
 import { SkillsFilterBar } from './SkillsFilterBar'
 import { ToolDrawer, DRAWER_ID } from './ToolDrawer'
@@ -106,8 +113,12 @@ const ORBIT_CSS = `
 @media (hover: hover) {
   .mfHoverTip { display: block; }
 }
+@keyframes mfCenterBreathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+.mfCenterBreathe { animation: mfCenterBreathe 8s ease-in-out infinite; will-change: transform; }
+@keyframes mfCenterRingSpin { to { transform: rotate(-360deg); } }
+.mfCenterRing { animation: mfCenterRingSpin 90s linear infinite; will-change: transform; }
 @media (prefers-reduced-motion: reduce) {
-  .mfOrbitRing, .mfOrbitDot { animation: none; }
+  .mfOrbitRing, .mfOrbitDot, .mfCenterBreathe, .mfCenterRing { animation: none; }
 }
 `
 
@@ -365,34 +376,19 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
             })}
           </svg>
 
-          {/* Center readout: the six-group fleet totals, always — never a per-tool card. The only
-              thing that ever changes here is the small hover tooltip floating just above it (mouse
-              only, see `.mfHoverTip` in `ORBIT_CSS`), which repeats nothing more than the tool's name
-              and group — everything else lives in `ToolDrawer` once a dot is actually pressed. */}
-          <div className={`absolute left-1/2 top-1/2 flex h-48 w-48 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-[28px] border p-3 text-center ${skin.line} ${skin.dark ? 'bg-white/[0.04]' : 'bg-white/70'}`}>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-              {[
-                { value: fleetStoreCount, label: sk.depthLabel.stores },
-                { value: fleetProductCount, label: sk.layoutExtra.productsLabel },
-                { value: fleetLiquidLines, label: sk.depthLabel.liquid },
-                { value: fleetIslandLines, label: sk.depthLabel.ts },
-              ].map((stat) => (
-                <div key={stat.label}>
-                  <p className={`text-base font-semibold tabular-nums ${skin.title}`}>
-                    <CountUp value={stat.value} />
-                  </p>
-                  <p className={`text-[7.5px] leading-tight uppercase tracking-wide ${skin.muted}`}>{stat.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* Center ornament: a quiet per-theme "MB" mark — never the fleet totals, which moved into
+              `ToolDrawer`'s own fleet-wide strip (2026-09-10, owner: "that data looks horrible
+              there"). The only thing that ever changes here is the small hover tooltip floating just
+              above it (mouse only, see `.mfHoverTip` in `ORBIT_CSS`), which repeats nothing more than
+              the tool's name and group — everything else lives in `ToolDrawer` once a dot is pressed. */}
+          <CenterMark skin={skin} />
 
           {hoveredToolUsage && !openTool && (
             <div
               aria-hidden="true"
               className="mfHoverTip pointer-events-none absolute left-1/2 top-1/2 z-10 flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-[11px] shadow-[0_6px_18px_rgba(0,0,0,0.14)] transition-opacity duration-150"
               style={{
-                transform: 'translate(-50%, calc(-50% - 7.25rem))',
+                transform: 'translate(-50%, calc(-50% - 5.5rem))',
                 backgroundColor: skin.dark ? 'rgba(11,11,13,0.95)' : 'rgba(255,255,255,0.95)',
               }}
             >

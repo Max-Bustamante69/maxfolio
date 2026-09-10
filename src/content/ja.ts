@@ -247,6 +247,7 @@ export const ja: PortfolioContent = {
         expandRow: '詳細を表示',
         collapseRow: '詳細を隠す',
         drawer: {
+          fleetLabel: 'フリート全体',
           capturesLabel: '導入先',
           rolesLabel: 'クライアント案件',
           showInIndex: 'ストア一覧で見る',

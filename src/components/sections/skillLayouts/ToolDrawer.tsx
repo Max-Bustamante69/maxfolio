@@ -7,12 +7,17 @@
 // here via `sheetTokens` rather than forked. Every link inside (captures, roles, "show in index") goes
 // through the same `src/lib/sectionLinks.ts`/`toolLinks.ts` the old preview card used — nothing new is
 // fabricated, only the presentation changes.
+//
+// 2026-09-10 (second pass) — the orbit's center card ("all the numbers should go into the preview
+// [drawer]... that data looks horrible there") lost its four fleet totals to a new strip here, under
+// the header, shown for every tool regardless of what it links to (`CenterMark` fills the vacated
+// center with a decorative per-theme mark instead — see that component).
 import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, m, useDragControls, useReducedMotion } from 'framer-motion'
 import { useContent, useMediaQuery } from '../../../hooks'
 import type { RoleWorkId, SkillGroupId } from '../../../data/registry'
-import { fleetIslandLines, fleetLiquidLines, type ToolUsage } from '../../../data/skillUsage'
+import { fleetIslandLines, fleetLiquidLines, fleetProductCount, fleetStoreCount, type ToolUsage } from '../../../data/skillUsage'
 import { galleryCapture, toolRoleLines, toolThumbs, type ToolThumb } from '../../../lib/toolLinks'
 import { onCaseStudyVisibleChange, requestProduct, requestRole, requestStore, scrollToSection } from '../../../lib/sectionLinks'
 import { sheetTokens, type Skin } from '../../gallery'
@@ -121,6 +126,31 @@ function DrawerBody({ tool, skin, sk, groupLabel, formatTool, onShowInIndex, onC
             <span className={skin.chip}>{groupLabel[tool.group]}</span>
             <span className={`text-[11px] ${skin.muted}`}>{formatTool(tool)}</span>
           </div>
+        </div>
+      </div>
+
+      {/* Fleet-wide strip (2026-09-10): the four real fleet totals that used to sit in the orbit's
+          center card — moved here per the owner's call ("that data looks horrible there"). Shown for
+          every tool, on both `ToolDrawer` hosts (`OrbitLayout` and `LedgerLayout`), never conditioned
+          on `hasAnyUsage` below — it's fleet-wide, not this tool's own usage. Four columns on the
+          desktop panel, 2×2 on the phone sheet (the `lg:` breakpoint tracks the same 1024px split
+          that decides which host is mounted, so it never needs its own `isDesktop` check here). */}
+      <div className={`mt-5 border-t pt-4 ${skin.line}`}>
+        <p className={`text-[11px] font-semibold uppercase tracking-[0.14em] ${skin.muted}`}>{dr.fleetLabel}</p>
+        <div className="mt-2.5 grid grid-cols-2 gap-x-3 gap-y-3 lg:grid-cols-4">
+          {[
+            { value: fleetStoreCount, label: sk.depthLabel.stores },
+            { value: fleetProductCount, label: sk.layoutExtra.productsLabel },
+            { value: fleetLiquidLines, label: sk.depthLabel.liquid },
+            { value: fleetIslandLines, label: sk.depthLabel.ts },
+          ].map((stat) => (
+            <div key={stat.label}>
+              <p className={`text-base font-semibold tabular-nums ${skin.title}`}>
+                <CountUp value={stat.value} />
+              </p>
+              <p className={`text-[10px] uppercase leading-tight tracking-wide ${skin.muted}`}>{stat.label}</p>
+            </div>
+          ))}
         </div>
       </div>
 

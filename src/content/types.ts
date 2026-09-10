@@ -156,8 +156,9 @@ export interface PortfolioContent {
       layoutExtra: {
         wallFilterLabel: string
         allLabel: string
-        /** Orbit layout only: caption for the center card's at-rest "in-house products" fleet stat
-         *  (the other three at-rest stats reuse `depthLabel.*`, which is already fixed at three keys). */
+        /** Caption for the "in-house products" fleet stat in `ToolDrawer`'s fleet-wide strip (moved
+         *  there 2026-09-10 from the orbit's old center card; the other three stats in that strip
+         *  reuse `depthLabel.*`, which is already fixed at three keys). */
         productsLabel: string
         unpin: string
         toolsSuffix: string
@@ -184,6 +185,10 @@ export interface PortfolioContent {
         /** `ToolDrawer` (2026-09-10) — the right-side/bottom-sheet drawer a dot or ledger row opens,
          *  replacing the orbit's floating quick-look card and its big center card. */
         drawer: {
+          /** Eyebrow above the fleet-wide stat strip (2026-09-10 — moved here from the orbit's old
+           *  center card per the owner's call: "that data looks horrible there"). The four stats
+           *  themselves reuse `depthLabel.*` (stores/liquid/ts) and `layoutExtra.productsLabel`. */
+          fleetLabel: string
           capturesLabel: string // eyebrow above the captures grid ("where it ships")
           rolesLabel: string // eyebrow above the client-role rows
           showInIndex: string // footer link back to the storefront index
