@@ -34,14 +34,14 @@ function DepthStat({ skin, value, text }: DepthStatProps) {
 }
 
 const readInitialLayout = (): { layout: LayoutId; hasParam: boolean } => {
-  if (typeof window === 'undefined') return { layout: 'tiles', hasParam: false }
+  if (typeof window === 'undefined') return { layout: 'orbit', hasParam: false }
   try {
     const params = new URLSearchParams(window.location.search)
-    if (!params.has('skills')) return { layout: 'tiles', hasParam: false }
+    if (!params.has('skills')) return { layout: 'orbit', hasParam: false }
     const v = params.get('skills')
-    return { layout: isLayoutId(v) ? v : 'tiles', hasParam: true }
+    return { layout: isLayoutId(v) ? v : 'orbit', hasParam: true }
   } catch {
-    return { layout: 'tiles', hasParam: false }  }
+    return { layout: 'orbit', hasParam: false }  }
 }
 
 /**

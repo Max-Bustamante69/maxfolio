@@ -300,9 +300,9 @@ export const ja: PortfolioContent = {
       impact: {
         title: 'インパクト',
         conversionLabel: 'コンバージョン(指数化)',
-        conversionRangeNote: '目安の範囲:+10%〜+20%',
+        conversionRangeNote: '目安の範囲:+10%〜+20%(帯の上端)',
         rpvLabel: '訪問者あたり収益(指数化)',
-        rpvRangeNote: '目安の表現',
+        rpvRangeNote: '目安:コンバージョン+16〜20% × 客単価+4〜8%',
         lighthouseLabel: 'Lighthouseパフォーマンス',
         lighthouseMobile: 'モバイル',
         lighthouseDesktop: 'デスクトップ',

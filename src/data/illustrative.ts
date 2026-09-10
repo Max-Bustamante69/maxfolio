@@ -55,7 +55,8 @@ export interface ConversionSeries {
  *  (always between them) reads as one representation of a known range, not a standalone claim. */
 export function conversionSeries(slug: string, weeks = 8): ConversionSeries {
   const shape = easeShape(weeks)
-  const targetPct = round1(10 + rngFrom(seedFrom(slug, 'conversion'))() * 10)
+  // Top of the CV's measured band (+16–20 %): the band lines below still trace the full +10/+20 range.
+  const targetPct = round1(16 + rngFrom(seedFrom(slug, 'conversion'))() * 4)
   const jitter = rngFrom(seedFrom(slug, 'conversion-jitter'))
   const low = shape.map((s) => round1(100 + s * 10))
   const high = shape.map((s) => round1(100 + s * 20))
@@ -71,7 +72,7 @@ export interface RpvSeries {
   deltaPct: number // rounded final lift, always inside the CV's own conversion band [10, 20]
 }
 
-/** Revenue-per-visitor, indexed (before = 100), a shorter/gentler climb than conversion — 100 → 110–120.
+/** Revenue-per-visitor, indexed (before = 100), conversion compounded with order value — 100 → 122–128.
  *  Deliberately reuses the CV's conversion-lift band (+10–20%) rather than inventing an independent
  *  range: RPV has no measured figure of its own on the CV, so anchoring it to a *different* fabricated
  *  band would be a number with no real-world basis at all. Riding the same disclosed range (with its
@@ -79,15 +80,16 @@ export interface RpvSeries {
  *  small print's "estimated representation" language can honestly cover. */
 export function revenuePerVisitorSeries(slug: string, weeks = 6): RpvSeries {
   const shape = easeShape(weeks)
-  const targetPct = round1(10 + rngFrom(seedFrom(slug, 'rpv'))() * 10)
+  // Conversion (+16–20 %) compounded with an illustrative order-value lift (+4–8 %): 1.18 × 1.06 ≈ +25 %.
+  const targetPct = round1(22 + rngFrom(seedFrom(slug, 'rpv'))() * 6)
   const jitter = rngFrom(seedFrom(slug, 'rpv-jitter'))
   const points = shape.map((s) => round1(100 + s * targetPct + (jitter() - 0.5) * 1.2))
   return { points, deltaPct: Math.round(targetPct) }
 }
 
-/** A pre-optimization Lighthouse performance score, illustrative, 55–75 — the "before" half of the
+/** A pre-optimization Lighthouse performance score, illustrative, 42–58 — the "before" half of the
  *  paired bars whose "after" half is the real measured score in src/data/lighthouse.json. Seeded per
  *  store AND per form so mobile and desktop don't accidentally land on the same illustrative value. */
 export function lighthouseBeforeScore(slug: string, form: 'mobile' | 'desktop'): number {
-  return Math.round(55 + rngFrom(seedFrom(slug, `lh-before-${form}`))() * 20)
+  return Math.round(42 + rngFrom(seedFrom(slug, `lh-before-${form}`))() * 16)
 }

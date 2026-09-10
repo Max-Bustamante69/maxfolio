@@ -1,5 +1,10 @@
 [
   {
+    "hash": "c6bdd22",
+    "date": "2026-09-09",
+    "subject": "chore(terminal): regenerated changelog.json"
+  },
+  {
     "hash": "85a69bb",
     "date": "2026-09-09",
     "subject": "fix(sheet): the illustrative Lighthouse baseline only pairs with a real score that clears it by 8 points (no red deltas "
@@ -53,10 +58,5 @@
     "hash": "580a053",
     "date": "2026-09-09",
     "subject": "feat(skills): six alternative \"What I work with\" layouts behind ?skills="
-  },
-  {
-    "hash": "7e396f4",
-    "date": "2026-09-09",
-    "subject": "feat(skyline): add the Skyline data-monument theme (theme 8)"
   }
 ]

@@ -300,9 +300,9 @@ export const en: PortfolioContent = {
       impact: {
         title: 'Impact',
         conversionLabel: 'Conversion, indexed',
-        conversionRangeNote: 'Illustrative range: +10% to +20%',
+        conversionRangeNote: 'Illustrative range: +10% to +20%, shown at the top of the band',
         rpvLabel: 'Revenue per visitor, indexed',
-        rpvRangeNote: 'Illustrative representation',
+        rpvRangeNote: 'Illustrative: conversion +16–20% × order value +4–8%',
         lighthouseLabel: 'Lighthouse performance',
         lighthouseMobile: 'Mobile',
         lighthouseDesktop: 'Desktop',
