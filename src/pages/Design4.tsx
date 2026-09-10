@@ -19,6 +19,7 @@ import {
   Contact,
   Skills,
   Ticker,
+  RevealText,
 } from "../components";
 import { skins } from "../components/gallery";
 import { Years } from "../components/sections/Years";
@@ -237,9 +238,22 @@ function Design4Content() {
         </nav>
 
         <main id="main-content">
-          {/* Hero Section */}
-          <section id="hero" className="md:min-h-[70vh] flex items-center py-16 md:py-20 px-6 md:px-16" aria-labelledby="hero-heading">
-            <div className="max-w-7xl mx-auto w-full">
+          {/* Hero Section — an ink-wash wash behind the copy, scrimmed to the page ground so text stays AA-legible */}
+          <section id="hero" className="relative md:min-h-[70vh] flex items-center py-16 md:py-20 px-6 md:px-16 overflow-hidden" aria-labelledby="hero-heading">
+            <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+              <img
+                src="/art/luxury/ink-wash.webp"
+                alt=""
+                width={1536}
+                height={1024}
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
+                className={`h-full w-full object-cover ${isDark ? "opacity-[0.14]" : "opacity-[0.22]"}`}
+              />
+              <div className={`absolute inset-0 bg-gradient-to-b ${isDark ? "from-deco-navy/40 via-deco-navy/80 to-deco-navy" : "from-luxury-cream/50 via-luxury-cream/85 to-luxury-cream"}`} />
+            </div>
+            <div className="relative max-w-7xl mx-auto w-full">
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-24 items-end">
                 <div className="lg:col-span-8">
                   <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.2 }}>
@@ -255,17 +269,12 @@ function Design4Content() {
                     </div>
 
                     <h1 id="hero-heading" className="font-display text-5xl md:text-7xl lg:text-8xl xl:text-9xl leading-[0.9] tracking-tight mb-6 md:mb-8">
-                      <m.span initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="block">
-                        {registry.personal.firstName}
-                      </m.span>
-                      <m.span
-                        initial={{ opacity: 0, y: 40 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.4 }}
-                        className={`block ${accentCls} italic`}
-                      >
-                        {registry.personal.lastName}
-                      </m.span>
+                      <span className="block">
+                        <RevealText text={registry.personal.firstName} trigger="load" delay={0.2} />
+                      </span>
+                      <span className={`block ${accentCls} italic`}>
+                        <RevealText text={registry.personal.lastName} trigger="load" delay={0.4} />
+                      </span>
                     </h1>
 
                     <m.p
@@ -451,7 +460,7 @@ function Design4Content() {
                           initial={{ opacity: 0, x: 20 }}
                           animate={{ opacity: 1, x: 0 }}
                           exit={{ opacity: 0, x: -20 }}
-                          className={`border ${borderColor} ${isDark ? "bg-deco-navy/30" : "bg-white/5"} p-6 md:p-8`}
+                          className={`border ${borderColor} ${isDark ? "bg-deco-navy/30" : "bg-white/5"} p-6 md:p-8 ${selectedJob.end === null ? "luxury-border-beam" : ""}`}
                         >
                           <div className="flex flex-wrap items-start gap-4 md:gap-6 mb-6 md:mb-8">
                             {selectedJob.logo && (
@@ -603,8 +612,12 @@ function Design4Content() {
             </div>
           </section>
 
-          {/* Manifesto — inverted typographic band */}
-          <Manifesto skin={skin} />
+          {/* Manifesto — inverted typographic band, grounded on the dark-marble texture (scrimmed for AA text contrast) */}
+          <Manifesto
+            skin={skin}
+            bandClassName={`bg-[linear-gradient(rgba(10,10,12,0.6),rgba(10,10,12,0.6)),url('/art/luxury/marble.webp')] bg-cover bg-center ${isDark ? "text-[#f5f5f7]" : "text-[#f5f0e1]"}`}
+            eyebrowClassName={isDark ? "text-deco-gold" : "text-luxury-gold"}
+          />
 
           {/* Skills Section — the ledger + narrative sentences */}
           <section id="skills" className={`py-14 md:py-20 px-6 md:px-16 ${bgPrimary}`}>
