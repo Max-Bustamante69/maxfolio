@@ -3,7 +3,7 @@
 // it in their own `stack` array. A tool that never appears there (internal tooling, editorial-only
 // entries in skillGroups) gets `total: 0` — the sunburst gives those a minimum visible arc and an
 // honest "no fleet count yet" tag instead of a fabricated number (Skills.tsx / SkillsSunburst.tsx).
-import { products, roleWork, skillGroups, stores, type SkillGroupId } from './registry'
+import { products, roleWork, skillGroups, stores, type RoleWorkId, type SkillGroupId } from './registry'
 import { telemetry } from './telemetry'
 
 interface StackEntry {
@@ -64,7 +64,7 @@ const ALIASES: Record<string, RegExp> = {
   'Evaluation suites': /evaluation suite|\beval\b/i,
 }
 
-const matches = (entries: readonly StackEntry[], re: RegExp) => entries.filter((e) => e.stack.some((s) => re.test(s)))
+const matches = <T extends StackEntry>(entries: readonly T[], re: RegExp): T[] => entries.filter((e) => e.stack.some((s) => re.test(s)))
 
 export interface ToolUsage {
   tool: string
@@ -76,15 +76,30 @@ export interface ToolUsage {
   /** Real named client-role deliverables whose stack names this tool. */
   roleWork: number
   total: number
+  /** The actual names/ids behind the counts above — real registry matches, in registry order, for the
+   *  skill panel's "used in" list. Never a curated subset. */
+  storeNames: string[]
+  productNames: string[]
+  roleWorkIds: RoleWorkId[]
 }
 
 export const toolUsage: ToolUsage[] = (Object.keys(skillGroups) as SkillGroupId[]).flatMap((group) =>
   (skillGroups[group] as readonly string[]).map((tool): ToolUsage => {
     const re = ALIASES[tool]
-    const s = re ? matches(stores, re).length : 0
-    const p = re ? matches(products, re).length : 0
-    const r = re ? matches(roleWork, re).length : 0
-    return { tool, group, stores: s, products: p, roleWork: r, total: s + p + r }
+    const matchedStores = re ? matches(stores, re) : []
+    const matchedProducts = re ? matches(products, re) : []
+    const matchedRoleWork = re ? matches(roleWork, re) : []
+    return {
+      tool,
+      group,
+      stores: matchedStores.length,
+      products: matchedProducts.length,
+      roleWork: matchedRoleWork.length,
+      total: matchedStores.length + matchedProducts.length + matchedRoleWork.length,
+      storeNames: matchedStores.map((s) => s.name),
+      productNames: matchedProducts.map((p) => p.name),
+      roleWorkIds: matchedRoleWork.map((w) => w.id),
+    }
   }),
 )
 
@@ -103,6 +118,16 @@ export const storesPerGroup: Record<SkillGroupId, number> = Object.fromEntries(
     return [g, n]
   }),
 ) as Record<SkillGroupId, number>
+
+/** Distinct storefront names behind `storesPerGroup` — real names, not a count, for the skill panel
+ *  when a whole group (not a single tool) is the active selection. */
+export const groupStoreNames: Record<SkillGroupId, string[]> = Object.fromEntries(
+  (Object.keys(skillGroups) as SkillGroupId[]).map((g) => {
+    const res = (skillGroups[g] as readonly string[]).map((t) => ALIASES[t]).filter(Boolean) as RegExp[]
+    const names = stores.filter((s) => res.some((re) => s.stack.some((tag) => re.test(tag)))).map((s) => s.name)
+    return [g, names]
+  }),
+) as Record<SkillGroupId, string[]>
 
 /** Fleet-wide depth: real lines of Liquid and of TypeScript/TSX islands, summed from every store's own
  *  git-derived telemetry (`scripts/store-telemetry.mjs`) — never estimated. */
