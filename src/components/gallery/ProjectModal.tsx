@@ -384,10 +384,15 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
                 {impact && (
                   <>
                     <p className={`mt-6 ${label}`}>{il.title}</p>
+                    {/* Fixed 2-column grid, not flex-wrap: with up to 4 chips (Conversion/Revenue always,
+                        Load time/Delivery conditional) a wrap-based row could leave an odd chip out
+                        stretched to the full row width on its own line — a grid keeps every chip the
+                        same size and settles into an even 2×2 (or a plain 2×1/lone left-aligned cell)
+                        however many of the four are present for this store. */}
                     {headlineChips.length > 0 && (
-                      <div className="mt-3 flex flex-wrap gap-2">
+                      <div className="mt-3 grid grid-cols-2 gap-2">
                         {headlineChips.map((c, i) => (
-                          <div key={c.key} className={`${tile} flex min-w-[104px] flex-1 basis-[104px] flex-col gap-0.5`}>
+                          <div key={c.key} className={`${tile} flex flex-col gap-0.5`}>
                             <CountUp value={c.value} prefix={c.prefix} suffix={c.suffix} delay={0.05 + i * 0.05} duration={0.8} className={`text-xl font-semibold leading-none tabular-nums ${goodText(dark)}`} />
                             <span className="text-[11px] leading-tight">{c.label}</span>
                           </div>
@@ -468,7 +473,13 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
                       </div>
                     )}
 
-                    <div key={`${data.name}-impact-indexed`} className="mt-3 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-4">
+                    {/* Capped at 2 columns, not 4: the sheet is a side panel on desktop, not the full
+                        1440 viewport, so a `lg:` breakpoint (keyed to viewport width) fires while the
+                        panel itself is still only ~450px wide — four columns there crushed a label like
+                        "Order value, indexed" onto three lines pressed against its own numeral. Two
+                        columns gives every indexed line, including the wider "Revenue" tile, the same
+                        room the headline-chip grid above it uses. */}
+                    <div key={`${data.name}-impact-indexed`} className="mt-3 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
                       <div className={tile}>
                         <IndexAreaLine
                           points={impact.conversion.points}

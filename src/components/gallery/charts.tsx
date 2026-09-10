@@ -520,11 +520,20 @@ export function DeliveryPairedBar({
         <figcaption className={`text-[11px] leading-tight ${mutedText(dark)}`}>{label}</figcaption>
         <CountUp value={deltaPct} prefix="−" suffix="%" delay={delay + 0.5} duration={0.8} className={`text-xs font-semibold tabular-nums ${goodText(dark)}`} />
       </div>
-      <div className="mt-1.5 space-y-1.5" role="img" aria-label={`${label}: ${beforeLabel} ${beforeWeeks} ${weekUnit}, ${afterLabel} ${afterWeeks} ${weekUnit}`}>
+      <div className="mt-1.5 space-y-2.5" role="img" aria-label={`${label}: ${beforeLabel} ${beforeWeeks} ${weekUnit}, ${afterLabel} ${afterWeeks} ${weekUnit}`}>
+        {/* Label sits above its own bar (not beside it, in a fixed-width column) so a longer localized
+            phrase — "Esta construcción", "一般的な代理店" — always has the chart's full width to wrap or
+            breathe in, never clipped mid-word the way a fixed w-14 truncate column silently did. */}
         {bars.map((b, j) => (
-          <div key={b.key} className="flex items-center gap-2">
-            <span className={`w-14 shrink-0 truncate text-[10px] uppercase tracking-[0.12em] ${mutedText(dark)}`}>{b.key}</span>
-            <div className={`h-2.5 flex-1 overflow-hidden rounded-full ${dark ? 'bg-white/10' : 'bg-black/[0.06]'}`}>
+          <div key={b.key}>
+            <div className="flex items-baseline justify-between gap-2">
+              <span className={`text-[10px] uppercase tracking-[0.12em] ${mutedText(dark)}`}>{b.key}</span>
+              <span className="shrink-0 text-xs font-semibold tabular-nums">
+                {b.v}
+                {weekUnit}
+              </span>
+            </div>
+            <div className={`mt-1 h-2.5 overflow-hidden rounded-full ${dark ? 'bg-white/10' : 'bg-black/[0.06]'}`}>
               <m.div
                 className="h-full rounded-full"
                 style={{ backgroundColor: b.c }}
@@ -533,10 +542,6 @@ export function DeliveryPairedBar({
                 transition={{ delay: delay + j * 0.12, duration: 0.8, ease: EASE }}
               />
             </div>
-            <span className="w-12 shrink-0 text-right text-xs font-semibold tabular-nums">
-              {b.v}
-              {weekUnit}
-            </span>
           </div>
         ))}
       </div>
