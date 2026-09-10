@@ -23,7 +23,12 @@ const Skills = lazy(() => import('../components/sections/Skills').then((mod) => 
 const Faq = lazy(() => import('../components/sections/Faq').then((mod) => ({ default: mod.Faq })))
 const Contact = lazy(() => import('../components/sections/Contact').then((mod) => ({ default: mod.Contact })))
 
-const Pending = ({ h = 'min-h-[60vh]' }: { h?: string }) => <div className={h} aria-hidden="true" />
+/** Keeps the page height stable while a section's chunk loads. Capped at 40vh: on a slow connection
+ * every one of these chunks starts downloading at mount (they aren't gated behind an
+ * IntersectionObserver), so a scrolling visitor can land on one before it resolves — 60vh read as a
+ * dead end mid-scroll (QA v2, 2026-09-09). 40vh still holds layout for the tallest sections without
+ * manufacturing that much blank space for the short ones. */
+const Pending = ({ h = 'min-h-[40vh]' }: { h?: string }) => <div className={h} aria-hidden="true" />
 
 const EASE = [0.23, 1, 0.32, 1] as const
 
