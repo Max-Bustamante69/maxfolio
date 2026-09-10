@@ -1,4 +1,5 @@
 import type { PortfolioContent } from './types'
+import { designCountWord, designCountWordCapitalized } from './designCount'
 
 export const en: PortfolioContent = {
   meta: {
@@ -170,49 +171,6 @@ export const en: PortfolioContent = {
       currentState: 'current month',
       countUnit: 'active months',
     },
-    skylineHero: {
-      clockLabel: 'Local time — Medellín',
-      scrollLabel: 'Scroll',
-      viewportLabel: 'Viewport',
-      chartCaption: '{n} storefronts and products, by launch year — bar height = commits shipped',
-      tableCaption: 'The same fleet as a table',
-      tableYear: 'Year',
-      tableName: 'Storefront / product',
-      tableCommits: 'Commits',
-      fallbackNote: 'Height = real commit count from git history; 1 unit shown where telemetry is not tracked yet (in-house products, pre-2026 legacy builds).',
-    },
-    instruments: {
-      eyebrow: 'Read off the fleet, not invented',
-      title: 'Three real',
-      titleAccent: 'readouts',
-      lead: 'No score is fabricated here — each ring is a real share or count, pulled from the same registry, git history and live storefront data as the rest of this page.',
-      liveShare: {
-        label: 'Storefronts live vs. in development',
-        source: 'Registry status field, current fleet',
-        tableCaption: 'Fleet status, counted',
-        live: 'Live',
-        dev: 'In development',
-        total: 'Total storefronts',
-      },
-      saleShare: {
-        label: 'Share of catalog on sale, fleet average',
-        source: 'Storefront public data (/products.json), fetched September 2026',
-        tableCaption: 'On-sale share by reachable storefront',
-        counted: 'Storefronts with public catalog data',
-        average: 'Fleet average',
-        highest: 'Highest',
-        lowest: 'Lowest',
-      },
-      busiestWeek: {
-        label: 'Busiest build week, share of all commits',
-        source: 'Git history across every store repo',
-        tableCaption: 'Busiest weeks, fleet-wide',
-        week: 'Week of',
-        commits: 'Commits',
-        shareOfAll: 'Share of all commits',
-        value: '{n} commits the week of {date} — {pct}% of every commit in the fleet\'s history',
-      },
-    },
     projects: { eyebrow: 'The app suite, outside Shopify', title: 'Things I build', titleAccent: 'on my own time', view: 'View project' },
     skills: {
       eyebrow: 'What shipped, not installed',
@@ -276,7 +234,7 @@ export const en: PortfolioContent = {
       location: 'Location',
       elsewhere: 'Elsewhere',
     },
-    explore: { eyebrow: 'Explore', title: 'Same portfolio, four designs', lead: 'Pick the aesthetic you prefer. The content is identical.', viewing: 'Currently viewing' },
+    explore: { eyebrow: 'Explore', title: `Same portfolio, ${designCountWord('en')} designs`, lead: 'Pick the aesthetic you prefer. The content is identical.', viewing: 'Currently viewing' },
     caseStudy: {
       facts: 'Store facts', results: 'Measured results', stack: 'Stack', visit: 'Visit store', prev: 'Previous', next: 'Next', timeline: 'Build window', commits: 'commits', sections: 'custom sections', open: 'Case study', metrics: 'Lighthouse · mobile', perf: 'Performance', a11y: 'Accessibility', bp: 'Best practices', seo: 'SEO', lcp: 'LCP', measured: 'Lab run on the home page, {date}, median of {runs} Lighthouse runs (mobile, simulated throttling).', trail: 'Build trail', trailNote: 'From the store repo\'s git history: {n} commits, {range}. Lines counted over the theme\'s layout, sections, snippets and templates.', perWeek: 'Commits per week', peak: 'Busiest week: {n} commits', codebase: 'Codebase', liquidLines: 'lines of Liquid', islandLines: 'lines of TypeScript', sectionsCount: 'theme sections', weeks: 'weeks', copyLink: 'Copy link', copied: 'Copied',
       commerce: {
@@ -441,7 +399,7 @@ export const en: PortfolioContent = {
     pagui: { tagline: 'OCR onboarding', description: 'Identity registration with OCR for bank clients.' },
     scorrea: { tagline: 'Developer portfolio', description: 'Astro site for a senior software developer.' },
     'dr-hugo': { tagline: 'Cosmetic dentist site', description: 'Services and booking presence for a dental practice.' },
-    maxfolio: { tagline: 'This site', description: 'Four design languages, one content model, three languages.' },
+    maxfolio: { tagline: 'This site', description: `${designCountWordCapitalized('en')} design languages, one content model, three languages.` },
   },
   footer: { tagline: 'Shopify engineering, measured.', services: ['Shopify storefronts', 'Shopify apps', 'CRO & A/B testing', 'Store migrations', 'Performance'], servicesTitle: 'What I do', quickLinks: 'Quick links', rights: 'All rights reserved.', stamp: 'Rebuilt September 2026 · React 19 + Vite · Lighthouse 100/100/100/100 on desktop (local lab run)', backToTop: 'Back to top' },
   location: 'Medellín, Colombia',

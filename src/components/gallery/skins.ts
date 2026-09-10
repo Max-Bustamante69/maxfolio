@@ -2,7 +2,7 @@
 // each experience only decides colors, radii and type.
 import type { CSSProperties } from 'react'
 
-export type FrameStyle = 'apple' | 'luxury' | 'brutalist' | 'neo' | 'persona' | 'terminal' | 'skyline'
+export type FrameStyle = 'apple' | 'luxury' | 'brutalist' | 'neo' | 'persona' | 'terminal'
 
 /** Tokens the vendored house Carousel reads (`--color-control-*`, `--duration-base`). Without them the
  *  controls fall back to currentColor and an invalid transition, so every skin defines the full set. */
@@ -20,9 +20,6 @@ export function carouselTokens(frame: FrameStyle, isDark: boolean): CSSPropertie
     // the CSS custom property `--term-accent` set on `.theme-terminal`, so these controls follow the
     // live toggle instead of freezing whichever color was true at render time.
     terminal: { arrow: 'var(--term-ink)', on: 'var(--term-bg)', dot: 'rgba(220,228,220,0.25)', active: 'var(--term-accent)', brand: 'var(--term-accent)', surface: 'var(--term-bg)' },
-    // Skyline is a fixed dark register (no light mode) — every control token stays a neutral
-    // ice-blue, never the reserved cyan #4fd1ff (that lands only on real numerals/chart fills, per skin.accentBg below).
-    skyline: { arrow: '#c7d2e0', on: '#eaf2fb', dot: 'rgba(199,210,224,0.3)', active: '#eaf2fb', brand: '#7fb0d1', surface: '#141d2e' },
   }[frame]
   return {
     '--color-control-arrow': t.arrow,
@@ -171,27 +168,5 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     divider: 'divide-[var(--term-line)] border-[var(--term-line)]',
     line: 'border-[var(--term-line)]',
     accentBg: 'bg-[var(--term-fill)]',
-  }),
-  // Skyline — the data-monument register. Fixed dark (the `d` toggle is accepted for type parity with
-  // every other skin but ignored: this theme never runs a light mode). The one hard rule enforced right
-  // here: `accent`/`chip`/`badge*` never carry the reserved cyan — those are copy and UI chrome, not
-  // real numbers. Cyan (#4fd1ff) is confined to `accentBg` (the Years unit-chart fill, a real per-year
-  // count) and to explicit `color` props the page hands to Gauge/CountUp for its own real readouts.
-  skyline: () => ({
-    frame: 'skyline',
-    dark: true,
-    card: 'rounded-lg border border-[#e7edf5]/10 bg-[#141d2e]',
-    title: 'font-semibold tracking-tight text-[#eef3f9]',
-    body: 'text-[#c7d2e0]',
-    muted: 'text-[#8d9bb0]',
-    accent: 'text-[#7fb0d1]',
-    chip: 'rounded-[3px] border border-[#e7edf5]/15 px-2.5 py-1 text-[11px] font-mono uppercase tracking-[0.08em] text-[#c7d2e0]',
-    chipOn: 'rounded-[3px] border border-[#eaf2fb] px-2.5 py-1 text-[11px] font-mono uppercase tracking-[0.08em] bg-[#eaf2fb] text-[#0d1420]',
-    badgeLive: 'bg-[#34c759]/15 text-[#5ee082] font-mono uppercase',
-    badgeDev: 'border border-[#ff9f0a] text-[#ffbf4d] font-mono uppercase',
-    rowHover: 'hover:bg-[#e7edf5]/[0.04]',
-    divider: 'divide-[#e7edf5]/10 border-[#e7edf5]/10',
-    line: 'border-[#e7edf5]/10',
-    accentBg: 'bg-[#4fd1ff]',
   }),
 }

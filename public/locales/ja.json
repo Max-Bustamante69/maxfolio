@@ -131,8 +131,7 @@
       "apple": "Apple Clean",
       "neo": "ソフトUI",
       "persona": "アーケード",
-      "terminal": "ターミナル",
-      "skyline": "スカイライン"
+      "terminal": "ターミナル"
     },
     "designSubtitles": {
       "luxuryMinimal": "エレガント＆洗練",
@@ -140,8 +139,7 @@
       "apple": "静かで正確",
       "neo": "触感的で立体的",
       "persona": "ラウド＆キネティック",
-      "terminal": "コンソール＆等幅",
-      "skyline": "データと記念碑"
+      "terminal": "コンソール＆等幅"
     },
     "whyVersions": "なぜ{n}つのデザイン？",
     "whyVersionsDesc": "文脈に合わせた異なる美学。同じスキルで、確かな対応力を。"

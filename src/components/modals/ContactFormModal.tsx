@@ -8,7 +8,7 @@ import { useI18n } from '../../hooks'
 interface ContactFormModalProps {
   isOpen: boolean
   onClose: () => void
-  variant?: 'luxury' | 'brutalist' | 'apple' | 'neo' | 'persona' | 'terminal' | 'skyline'
+  variant?: 'luxury' | 'brutalist' | 'apple' | 'neo' | 'persona' | 'terminal'
   isDark?: boolean
   /** Text placed in the message field when the form opens (e.g. the store URL from the contact section). */
   initialMessage?: string
@@ -180,21 +180,8 @@ export function ContactFormModal({
     btnSecondary: 'border-[var(--term-line)] text-[var(--term-ink)] hover:bg-[var(--term-line)]/30',
   }
 
-  // Skyline variant: HUD panel on the theme's own deep navy, mono field labels, the reserved cyan
-  // reads here as a real state signal (successful send), never as page decoration.
-  const skylineStyles = {
-    bgModal: 'bg-[#141d2e] border border-[#e7edf5]/10 rounded-md',
-    bgInput: 'bg-[#0d1420] border-[#e7edf5]/15 text-[#eef3f9] placeholder:text-[#8d9bb0] focus:border-[#4fd1ff] font-mono text-sm rounded-[3px]',
-    textPrimary: 'text-[#eef3f9]',
-    textSecondary: 'text-[#c7d2e0]',
-    textMuted: 'text-[#8d9bb0]',
-    accent: 'text-[#4fd1ff]',
-    btnPrimary: 'bg-[#4fd1ff] text-[#0d1420] hover:bg-[#7fe0ff] font-mono uppercase tracking-[0.08em] rounded-[3px]',
-    btnSecondary: 'border-[#e7edf5]/20 text-[#c7d2e0] hover:bg-[#e7edf5]/10 font-mono uppercase tracking-[0.08em] rounded-[3px]',
-  }
-
-  const styles = variant === 'apple' ? appleStyles : variant === 'luxury' ? luxuryStyles : variant === 'neo' ? neoStyles : variant === 'persona' ? personaStyles : variant === 'terminal' ? terminalStyles : variant === 'skyline' ? skylineStyles : brutalistStyles
-  const successCircle = variant === 'apple' ? 'bg-[#0071e3]/15' : variant === 'luxury' ? 'bg-deco-gold/20' : variant === 'neo' ? 'bg-[#4453d9]/15' : variant === 'persona' ? (isDark ? 'bg-[#c8102e]/20' : 'bg-[#1c6fb0]/15') : variant === 'terminal' ? 'bg-[var(--term-accent)]/15' : variant === 'skyline' ? 'bg-[#4fd1ff]/15' : 'bg-red-600/20'
+  const styles = variant === 'apple' ? appleStyles : variant === 'luxury' ? luxuryStyles : variant === 'neo' ? neoStyles : variant === 'persona' ? personaStyles : variant === 'terminal' ? terminalStyles : brutalistStyles
+  const successCircle = variant === 'apple' ? 'bg-[#0071e3]/15' : variant === 'luxury' ? 'bg-deco-gold/20' : variant === 'neo' ? 'bg-[#4453d9]/15' : variant === 'persona' ? (isDark ? 'bg-[#c8102e]/20' : 'bg-[#1c6fb0]/15') : variant === 'terminal' ? 'bg-[var(--term-accent)]/15' : 'bg-red-600/20'
 
   return (
     <AnimatePresence>
