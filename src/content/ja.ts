@@ -131,7 +131,7 @@ export const ja: PortfolioContent = {
       nextAria: '次へ',
       railHint: '矢印キーでストーリーを進められます。',
       beats: [
-        { label: '課題', body: '24種のSKUを持つ機能性グミの一覧に、信頼できるボックスビルダーが必要だった: 1箱あたり最大5袋、袋が増えるほど自動で上がる割引——決済時に覚えておくコードは不要。', metric: '割引{ladder}' },
+        { label: '課題', body: '24種のSKUを持つ機能性グミの一覧に、信頼できるボックスビルダーが必要だった: 箱が満たされるほど自動で上がる割引{ladder}——決済時に覚えておくコードは不要。', metric: '割引{ladder}' },
         { label: '計画', body: 'ビルダーをBundlesモジュールに接続し、割引率はShopify Functionで計算して決済時に自動適用。定期購入はTreliで最初から扱う。', metric: 'Bundles → Function' },
         { label: '構築', body: '{commits}コミット、カスタムセクション{sections}個、{range}。', metric: '{commits}コミット・{sections}セクション' },
         { label: '結果', body: '{url}で稼働中——商品{products}点、コレクション{collections}件、{priceRange}——割引{ladder}はどの段階でも崩れない。', metric: '商品{products}点・コレクション{collections}件' },

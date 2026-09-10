@@ -131,7 +131,7 @@ export const en: PortfolioContent = {
       nextAria: 'Next',
       railHint: 'Use the arrow keys to move through the story.',
       beats: [
-        { label: 'The problem', body: 'A 24-SKU catalog of functional gummies needed a box builder shoppers could trust: up to five bags per box, a discount that climbs as it fills — no code to remember at checkout.', metric: '{ladder} ladder' },
+        { label: 'The problem', body: 'A 24-SKU catalog of functional gummies needed a box builder shoppers could trust: a {ladder} ladder that climbs automatically as the box fills — no code to remember at checkout.', metric: '{ladder} ladder' },
         { label: 'The plan', body: 'Wire the builder to the Bundles module, price the ladder through a Shopify Function so it applies itself at checkout, and route recurring orders through Treli from day one.', metric: 'Bundles module → Function' },
         { label: 'The build', body: '{commits} commits and {sections} custom sections, {range}.', metric: '{commits} commits · {sections} sections' },
         { label: 'The result', body: 'Live at {url} — {products} products, {collections} collections, {priceRange} — the {ladder} ladder holds at checkout, every time.', metric: '{products} products · {collections} collections' },

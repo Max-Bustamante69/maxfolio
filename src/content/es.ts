@@ -131,7 +131,7 @@ export const es: PortfolioContent = {
       nextAria: 'Siguiente',
       railHint: 'Usa las flechas del teclado para recorrer la historia.',
       beats: [
-        { label: 'El problema', body: 'Un catálogo de 24 SKU de gomitas funcionales necesitaba un armador de cajas en el que se pudiera confiar: hasta cinco bolsas por caja, un descuento que sube a medida que se llena — sin código que recordar al pagar.', metric: 'Descuento {ladder}' },
+        { label: 'El problema', body: 'Un catálogo de 24 SKU de gomitas funcionales necesitaba un armador de cajas en el que se pudiera confiar: un descuento {ladder} que sube automáticamente a medida que se llena la caja — sin código que recordar al pagar.', metric: 'Descuento {ladder}' },
         { label: 'El plan', body: 'Conectar el armador al módulo de Bundles, calcular el descuento con una Shopify Function para que se aplique solo al pagar, y enrutar las suscripciones por Treli desde el primer día.', metric: 'Bundles → Function' },
         { label: 'La construcción', body: '{commits} commits y {sections} secciones a medida, {range}.', metric: '{commits} commits · {sections} secciones' },
         { label: 'El resultado', body: 'En vivo en {url} — {products} productos, {collections} colecciones, {priceRange} — el descuento {ladder} se mantiene en cada paso.', metric: '{products} productos · {collections} colecciones' },
