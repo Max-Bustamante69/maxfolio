@@ -9,6 +9,11 @@ interface ManifestoProps {
   bandClassName?: string
   /** Overrides the eyebrow's accent color. */
   eyebrowClassName?: string
+  /** Optional full-bleed ground image behind the band, rendered at a low fixed opacity directly onto
+   * the band's own solid color — that solid color is the scrim, so text contrast never depends on a
+   * second computed class (Tailwind can't see a dynamically-built arbitrary-value string at build
+   * time). Decorative only; never the sole carrier of information. */
+  backdropSrc?: string
 }
 
 
@@ -18,7 +23,7 @@ interface ManifestoProps {
  * The band itself rises into view behind a clip-path curtain (bottom edge wipes up, once), so the
  * inversion reads as a physical reveal rather than a plain crossfade; reduced motion skips the wipe.
  */
-export function Manifesto({ skin, bandClassName, eyebrowClassName }: ManifestoProps) {
+export function Manifesto({ skin, bandClassName, eyebrowClassName, backdropSrc }: ManifestoProps) {
   const { strings } = useContent()
   const mf = strings.sections.manifesto
   const band = bandClassName ?? (skin.dark ? 'bg-[#f5f5f7] text-[#1d1d1f]' : 'bg-[#1d1d1f] text-[#f5f5f7]')
@@ -28,10 +33,20 @@ export function Manifesto({ skin, bandClassName, eyebrowClassName }: ManifestoPr
   return (
     <m.section
       aria-label={mf.label}
-      className={`${band} px-4 py-24 md:py-36`}
+      className={`relative overflow-hidden ${band} px-4 py-24 md:py-36`}
       initial={false}
     >
-      <div className="mx-auto max-w-5xl">
+      {backdropSrc && (
+        <img
+          src={backdropSrc}
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+          decoding="async"
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-[0.12]"
+        />
+      )}
+      <div className="relative mx-auto max-w-5xl">
         <p className={`text-[11px] font-semibold uppercase tracking-[0.2em] ${eyebrow}`}>{mf.label}</p>
         <ul className="mt-6 space-y-2 md:space-y-3">
           {mf.lines.map((line, i) => (
