@@ -21,7 +21,7 @@ interface SkillsFilterBarProps {
   onHoverGroup?: (g: SkillGroupId | null) => void
 }
 
-const SURFACE_LABEL: Record<SurfaceId, keyof SkillsStrings['orbit']> = {
+const SURFACE_LABEL: Record<SurfaceId, Exclude<keyof SkillsStrings['orbit'], 'drawer'>> = {
   storefronts: 'surfaceStorefronts',
   products: 'surfaceProducts',
   roles: 'surfaceRoles',

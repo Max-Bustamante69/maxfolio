@@ -33,6 +33,65 @@ export function carouselTokens(frame: FrameStyle, isDark: boolean): CSSPropertie
   } as CSSProperties
 }
 
+export interface SheetTokens {
+  /** Shape classes for the sheet's own panel (radius/border, no color). */
+  panel: string
+  /** Panel background + default text color. */
+  panelBg: string
+  /** Radius for tiles/cards nested inside the sheet. */
+  radius: string
+  /** A full nested tile: `radius` + padding + a faint theme-appropriate fill. */
+  tile: string
+  /** Eyebrow label classes (11px, uppercase, tracked, muted). */
+  label: string
+  /** The sheet's one accent color, as a real hex/var — for inline `style` (SVG strokes, computed charts). */
+  accent: string
+  /** True for the neo skin — the one frame whose sheet controls keep the raised/inset extrusion. */
+  isNeo: boolean
+  /** A round 44px icon-button (prev/next/close), matching the case-study sheet's controls. */
+  navBtn: string
+  /** A pill action button (copy link, close-with-label), same treatment as `navBtn`. */
+  actionBtn: string
+  /** Neo's soft-extrusion box-shadow for `navBtn`/`actionBtn` — `undefined` on every other skin. */
+  neoBtnShadow: { boxShadow: string } | undefined
+}
+
+/** Panel/backdrop/control tokens shared by every full-height sheet (the case-study `ProjectModal` and
+ *  the skills `ToolDrawer`) — one place per theme so a sheet never forks its own reading of "what does
+ *  this skin's overlay look like". Extracted from `ProjectModal`'s original inline computation
+ *  (2026-09-10); that component now calls this too rather than keeping its own copy. */
+export function sheetTokens(skin: Skin): SheetTokens {
+  const dark = skin.dark
+  const isNeo = skin.frame === 'neo'
+  const panel =
+    skin.frame === 'apple' ? 'rounded-[28px]' : skin.frame === 'luxury' ? 'rounded-none' : skin.frame === 'terminal' ? 'rounded-none border border-[var(--term-line)]' : 'rounded-none border-2 border-stone-900'
+  const panelBg = skin.frame === 'terminal' ? 'bg-[var(--term-bg)] text-[var(--term-ink)]' : dark ? 'bg-[#141416] text-[#f5f5f7]' : 'bg-white text-[#1d1d1f]'
+  const radius = skin.frame === 'apple' ? 'rounded-[14px]' : 'rounded-none'
+  // 16 px padding: the Impact block restructure (2026-09-10) set one tile grammar for the sheet and the tool drawer.
+  const tile = `${radius} p-4 ${skin.frame === 'terminal' ? 'bg-[var(--term-line)]/30' : dark ? 'bg-white/5' : 'bg-black/[0.04]'}`
+  const label = `text-[11px] font-semibold uppercase tracking-[0.18em] ${skin.muted}`
+  const accent =
+    skin.frame === 'apple'
+      ? dark
+        ? '#2997ff'
+        : '#0071e3'
+      : skin.frame === 'luxury'
+        ? '#C9A962'
+        : skin.frame === 'terminal'
+          ? 'var(--term-accent)'
+          : skin.frame === 'neo'
+            ? dark
+              ? '#8b93ff'
+              : '#4453d9'
+            : '#dc2626'
+  const navBtn = `press inline-flex h-11 w-11 items-center justify-center rounded-full transition-opacity disabled:pointer-events-none disabled:opacity-25 ${isNeo ? (dark ? 'bg-neo-darkSurfaceRaised' : 'bg-neo-surfaceRaised') : dark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`
+  const actionBtn = `press inline-flex h-11 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 text-xs ${isNeo ? (dark ? 'bg-neo-darkSurfaceRaised' : 'bg-neo-surfaceRaised') : dark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`
+  const neoBtnShadow: { boxShadow: string } | undefined = isNeo
+    ? { boxShadow: dark ? '3px 3px 8px #16181e, -3px -3px 8px #333844' : '3px 3px 8px #b8bcc7, -3px -3px 8px #ffffff' }
+    : undefined
+  return { panel, panelBg, radius, tile, label, accent, isNeo, navBtn, actionBtn, neoBtnShadow }
+}
+
 export interface Skin {
   frame: FrameStyle
   dark: boolean

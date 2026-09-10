@@ -1,5 +1,10 @@
 [
   {
+    "hash": "fefe7e0",
+    "date": "2026-09-10",
+    "subject": "chore(terminal): regenerated changelog.json"
+  },
+  {
     "hash": "c91237f",
     "date": "2026-09-10",
     "subject": "fix(apple): one element per section id — the wrappers around Experience and Skills no longer duplicate the ids the secti"
@@ -53,10 +58,5 @@
     "hash": "64abbce",
     "date": "2026-09-10",
     "subject": "chore(lighthouse): re-measure the whole fleet (2026-09-10, local best-of-3)"
-  },
-  {
-    "hash": "0f3d27f",
-    "date": "2026-09-10",
-    "subject": "fix(router): unknown paths redirect to the default experience (the removed /skyline was a blank shell)"
   }
 ]

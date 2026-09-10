@@ -3,31 +3,38 @@
 // most-used tools stay labeled at rest, so the composition reads without a single interaction. Each
 // ring drifts in a slow, alternating ambient rotation (transform-only CSS, pauses on hover/focus) while
 // its dots counter-rotate so icons/labels stay upright; the whole orbit tilts gently toward the pointer.
-// The center is a real card: the six-group fleet totals at rest, the selected tool's story once one is
-// hovered, focused or pinned — its thumbnails and "used at" lines are real links (see below). Hovering,
-// focusing or pressing a dot also opens a small floating "quick look" card anchored near it, flipping
-// side to stay inside the orbit's own bounding box: the same real thumbnails/links, one hop closer to
-// the ring than the center card. A filter bar above the rings (by group, by which real surface uses a
-// tool, by name) doubles as the ring legend; its state lives in the URL so a filtered view is
-// shareable, and a group with nothing left showing collapses its ring to a hairline. Below 1024px it
-// falls back to layout 1 (ledger) — fully legible and keyboard/touch operable on its own, carrying the
-// same filter bar and the same real links through `SkillPanel` — and so does reduced motion (an orbit
-// is inherently a motion-heavy metaphor even though most of its geometry is static). A compact mobile
-// orbit (three rings, tap to select) was measured and cut: Shopify alone is 13 tools, and even the best
-// pairing puts 20+ tools on a half-ring inside a ~340px container — ~25px of arc per dot, well under a
-// 44px tap target, so nothing short of hiding most of the labels/dots stays legible there. The brief's
-// own escape hatch for this ("if it stays legible — else ledger only") is why ledger covers all of
-// <1024px.
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type FocusEvent, type KeyboardEvent, type MouseEvent as ReactMouseEvent, type PointerEvent } from 'react'
+// The center is a quiet, FIXED readout — the six-group fleet totals, never anything else — plus a
+// light tooltip (name + group, text only) that appears above it while a dot is hovered or focused,
+// visible only on devices whose primary input actually hovers (`(hover: hover)`, see `ORBIT_CSS`
+// below) — a mouse convenience, never required. A filter bar above the rings (by group, by which real
+// surface uses a tool, by name) doubles as the ring legend; its state lives in the URL so a filtered
+// view is shareable, and a group with nothing left showing collapses its ring to a hairline.
+//
+// 2026-09-10 — "more like modals or drawers... images too... so everything is more organized" (owner
+// feedback on the orbit3 preview). Pressing/Enter-ing a dot now opens `ToolDrawer`, one shared instance
+// for the whole section: a right-side panel (desktop) / bottom sheet (phones) carrying the tool's real
+// capture thumbnails, client-role lines and depth stat — replacing both the old floating "quick look"
+// card and the big center card, neither of which exists anymore. `?tool=<slug>` deep-links it open,
+// history-aware exactly like `ShopifyWork`'s `?store=` (see `useSheetHistory`).
+//
+// Below 1024px it falls back to layout 1 (ledger) — fully legible and keyboard/touch operable on its
+// own, carrying the same filter bar and opening the very same `ToolDrawer` (as a bottom sheet) — and so
+// does reduced motion (an orbit is inherently a motion-heavy metaphor even though most of its geometry
+// is static). A compact mobile orbit (three rings, tap to select) was measured and cut: Shopify alone
+// is 13 tools, and even the best pairing puts 20+ tools on a half-ring inside a ~340px container — ~25px
+// of arc per dot, well under a 44px tap target, so nothing short of hiding most of the labels/dots stays
+// legible there. The brief's own escape hatch for this ("if it stays legible — else ledger only") is
+// why ledger covers all of <1024px.
+import { useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from 'react'
 import { useReducedMotion } from 'framer-motion'
-import { useMediaQuery } from '../../../hooks'
+import { useMediaQuery, useSheetHistory } from '../../../hooks'
 import type { SkillGroupId } from '../../../data/registry'
 import { toolUsageById, fleetLiquidLines, fleetIslandLines, fleetStoreCount, fleetProductCount, type ToolUsage } from '../../../data/skillUsage'
 import { toolIcon, monogram, ToolMark } from '../skillIcons'
 import { CountUp } from '../../gallery/charts'
 import { LedgerLayout } from './LedgerLayout'
 import { SkillsFilterBar } from './SkillsFilterBar'
-import { ToolUsageLinks } from './ToolUsageLinks'
+import { ToolDrawer, DRAWER_ID } from './ToolDrawer'
 import { useSkillsFilter } from './useSkillsFilter'
 import type { SkillsLayoutProps } from './types'
 
@@ -83,7 +90,9 @@ const sizeForTotal = (total: number, min: number, max: number) => {
 /** Pure CSS ambient motion: each ring wrapper spins slowly (`--orbit-duration`, set inline per ring);
  *  every dot's inner content counter-spins the same duration the other way so icons/labels stay upright
  *  while their position still orbits. Hovering or focusing a ring — or any dot in it — pauses both, no
- *  React state or per-frame work involved. */
+ *  React state or per-frame work involved. `.mfHoverTip` (the center tooltip) is a hover-affordance
+ *  only: hidden outright on any device whose primary input doesn't actually hover, so a touch visitor
+ *  who focuses a dot via an external keyboard never gets a bubble they can't dismiss with another tap. */
 const ORBIT_CSS = `
 @keyframes mfOrbitCW { to { transform: rotate(360deg); } }
 @keyframes mfOrbitCCW { to { transform: rotate(-360deg); } }
@@ -93,6 +102,10 @@ const ORBIT_CSS = `
 .mfOrbitDot { animation: mfOrbitCCW var(--orbit-duration, 120s) linear infinite; will-change: transform; }
 .mfOrbitRing.mfCCW .mfOrbitDot { animation-name: mfOrbitCW; }
 .mfOrbitRing:hover .mfOrbitDot, .mfOrbitRing:focus-within .mfOrbitDot { animation-play-state: paused; }
+.mfHoverTip { display: none; }
+@media (hover: hover) {
+  .mfHoverTip { display: block; }
+}
 @media (prefers-reduced-motion: reduce) {
   .mfOrbitRing, .mfOrbitDot { animation: none; }
 }
@@ -107,39 +120,26 @@ interface RingSpec {
   startAngle: number
 }
 
-/** The floating preview's anchor: a one-time (event-driven, not per-frame) measurement of the
- *  triggering dot's real screen position relative to the orbit's own bounding box, taken the moment a
- *  dot is hovered/focused/pressed — the ambient ring rotation is paused by CSS at that same moment
- *  (`:hover`/`:focus-within`), so the measured position stays correct for as long as the preview stays
- *  open. `flipX`/`flipY` say which corner of the card to anchor from so it stays inside the orbit's own
- *  box instead of bleeding past its edge. */
-interface PreviewAnchor {
-  left: number
-  top: number
-  flipX: boolean
-  flipY: boolean
-}
-
-const PREVIEW_ID = 'orbit-preview'
-
 export function OrbitLayout({ data }: SkillsLayoutProps) {
   const { skin, sk, groups, groupLabel, toolsByGroup, storesPerGroup, formatTool, formatGroup } = data
   const isDesktop = useMediaQuery('(min-width: 1024px)')
   const reduced = useReducedMotion()
-  const [hovered, setHovered] = useState<string | null>(null)
-  const [locked, setLocked] = useState<string | null>(null)
+  const [hoveredTool, setHoveredTool] = useState<string | null>(null)
+  const [openTool, setOpenTool] = useState<string | null>(null)
   const [hoveredGroup, setHoveredGroup] = useState<SkillGroupId | null>(null)
-  const [previewTool, setPreviewTool] = useState<string | null>(null)
-  const [anchor, setAnchor] = useState<PreviewAnchor | null>(null)
   const tiltRef = useRef<HTMLDivElement>(null)
-  const hideTimer = useRef<number | null>(null)
   const filter = useSkillsFilter(groups)
 
-  const active = hovered ?? locked
-  const pinned = !!locked && locked === active
-  const activeTool = active ? (toolUsageById.get(active) ?? null) : null
-  const emphasizedGroup = hoveredGroup ?? activeTool?.group ?? null
-  const previewToolUsage = previewTool ? (toolUsageById.get(previewTool) ?? null) : null
+  const hoveredToolUsage = hoveredTool ? (toolUsageById.get(hoveredTool) ?? null) : null
+  const openToolUsage = openTool ? (toolUsageById.get(openTool) ?? null) : null
+  const emphasizedGroup = hoveredGroup ?? hoveredToolUsage?.group ?? openToolUsage?.group ?? null
+
+  useSheetHistory(openTool, () => setOpenTool(null), {
+    param: 'tool',
+    open: (slug) => {
+      if (toolUsageById.has(slug)) setOpenTool(slug)
+    },
+  })
 
   // Fewest tools innermost so the busiest group (Shopify, 13 tools) gets the longest ring circumference.
   const ringOrder = useMemo<SkillGroupId[]>(() => [...groups].sort((a, b) => toolsByGroup[a].length - toolsByGroup[b].length), [groups, toolsByGroup])
@@ -159,46 +159,6 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
     return set
   }, [groups, toolsByGroup])
 
-  const cancelHide = () => {
-    if (hideTimer.current !== null) {
-      window.clearTimeout(hideTimer.current)
-      hideTimer.current = null
-    }
-  }
-  // A short grace period, not an instant hide: the pointer has to cross a real gap between the dot and
-  // the floating card next to it, and a hide-on-leave with no grace at all would close the preview
-  // before it ever reaches the thumbnails/links inside.
-  const scheduleHide = () => {
-    cancelHide()
-    hideTimer.current = window.setTimeout(() => {
-      setPreviewTool(null)
-      setAnchor(null)
-    }, 150)
-  }
-  useEffect(() => () => cancelHide(), [])
-
-  const showPreview = (tool: string, el: HTMLElement) => {
-    cancelHide()
-    setPreviewTool(tool)
-    const container = tiltRef.current
-    if (!container) return
-    const cRect = container.getBoundingClientRect()
-    const dRect = el.getBoundingClientRect()
-    const cx = dRect.left + dRect.width / 2 - cRect.left
-    const cy = dRect.top + dRect.height / 2 - cRect.top
-    setAnchor({ left: cx, top: cy, flipX: cx > cRect.width / 2, flipY: cy > cRect.height / 2 })
-  }
-
-  // Focus leaving the orbit entirely (Tab/Shift-Tab past its last/first interactive element) closes
-  // both the hover state and the preview; focus moving to another dot or into the preview's own
-  // thumbnails/links (still inside this container) does not.
-  const onContainerBlurCapture = (e: FocusEvent<HTMLDivElement>) => {
-    const next = e.relatedTarget as Node | null
-    if (next && tiltRef.current?.contains(next)) return
-    setHovered(null)
-    scheduleHide()
-  }
-
   if (!isDesktop || reduced) {
     return <LedgerLayout data={data} />
   }
@@ -211,13 +171,6 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
     ccw: ri % 2 === 1,
     startAngle: ri * 0.4 - Math.PI / 2,
   }))
-
-  const centerDepth =
-    activeTool?.tool === 'Liquid'
-      ? { label: sk.depthLabel.liquid, value: fleetLiquidLines }
-      : activeTool?.tool === 'TypeScript'
-        ? { label: sk.depthLabel.ts, value: fleetIslandLines }
-        : null
 
   const onPointerMove = (e: PointerEvent<HTMLDivElement>) => {
     const el = tiltRef.current
@@ -236,26 +189,16 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
   }
 
   const onDotKeyDown = (tool: string) => (e: KeyboardEvent<HTMLButtonElement>) => {
-    if (e.key === 'Escape') {
-      setLocked((prev) => (prev === tool ? null : prev))
-      setPreviewTool(null)
-      setAnchor(null)
+    if (e.key === 'Escape' && openTool === tool) {
+      setOpenTool(null)
       e.currentTarget.blur()
     }
   }
-
-  const onDotEnter = (tool: string) => (e: ReactMouseEvent<HTMLButtonElement>) => {
-    setHovered(tool)
-    showPreview(tool, e.currentTarget)
-  }
-  const onDotLeave = () => {
-    setHovered(null)
-    scheduleHide()
-  }
-  const onDotFocus = (tool: string) => (e: FocusEvent<HTMLButtonElement>) => {
-    setHovered(tool)
-    showPreview(tool, e.currentTarget)
-  }
+  const onDotEnter = (tool: string) => () => setHoveredTool(tool)
+  const onDotLeave = () => setHoveredTool(null)
+  const onDotFocus = (tool: string) => () => setHoveredTool(tool)
+  const onDotBlur = (tool: string) => () => setHoveredTool((prev) => (prev === tool ? null : prev))
+  const onDotClick = (tool: string) => () => setOpenTool((prev) => (prev === tool ? null : tool))
 
   return (
     <div className="mt-4">
@@ -280,7 +223,6 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
           style={{ transformStyle: 'preserve-3d' } as CSSProperties}
           onPointerMove={onPointerMove}
           onPointerLeave={onPointerLeave}
-          onBlurCapture={onContainerBlurCapture}
         >
           {/* Static rings — inert decoration, never rotates itself. Group-name labels are a SEPARATE
               svg layer painted after (on top of) the rotating dots below: the ambient rotation sweeps
@@ -340,27 +282,26 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
                   const angle = ring.startAngle + (Math.PI * 2 * (ti + 0.5)) / n
                   const cx = 50 + 50 * Math.cos(angle)
                   const cy = 50 + 50 * Math.sin(angle)
-                  const isActive = active === u.tool
-                  const isPressed = locked === u.tool
-                  const isPreviewed = previewTool === u.tool
+                  const isOpen = openTool === u.tool
+                  const isEmphasized = hoveredTool === u.tool || isOpen
                   const labelBelow = Math.sin(angle) >= 0
-                  const showLabel = isActive || alwaysLabeled.has(u.tool)
+                  const showLabel = isEmphasized || alwaysLabeled.has(u.tool)
                   const size = sizeForTotal(u.total, minTotal, maxTotal)
                   const filteredOut = filter.isActive && !filter.matchesTool(u)
-                  const dim = (emphasizedGroup !== null && emphasizedGroup !== u.group && !isActive) || filteredOut
+                  const dim = (emphasizedGroup !== null && emphasizedGroup !== u.group && !isEmphasized) || filteredOut
                   return (
                     <button
                       key={u.tool}
                       type="button"
-                      aria-pressed={isPressed}
-                      aria-expanded={isPreviewed}
-                      aria-controls={PREVIEW_ID}
+                      aria-pressed={isOpen}
+                      aria-expanded={isOpen}
+                      aria-controls={DRAWER_ID}
                       aria-label={`${u.tool} — ${groupLabel[u.group]} — ${formatTool(u)}`}
                       onMouseEnter={onDotEnter(u.tool)}
                       onMouseLeave={onDotLeave}
                       onFocus={onDotFocus(u.tool)}
-                      onBlur={() => setHovered((prev) => (prev === u.tool ? null : prev))}
-                      onClick={() => setLocked((prev) => (prev === u.tool ? null : u.tool))}
+                      onBlur={onDotBlur(u.tool)}
+                      onClick={onDotClick(u.tool)}
                       onKeyDown={onDotKeyDown(u.tool)}
                       tabIndex={filteredOut ? -1 : 0}
                       style={{ left: `${cx}%`, top: `${cy}%` }}
@@ -380,18 +321,18 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
                           deeper (a nested span) so it never has to share the `transform` property with
                           the counter-rotation animation, which would silently drop one of the two. */}
                       <span className="mfOrbitDot relative flex items-center justify-center">
-                        <span className={`flex items-center justify-center transition-transform duration-200 ${isActive ? 'scale-[1.15]' : ''}`}>
+                        <span className={`flex items-center justify-center transition-transform duration-200 ${isEmphasized ? 'scale-[1.15]' : ''}`}>
                           <span
                             style={{ height: size, width: size }}
-                            className={`flex items-center justify-center rounded-full border text-[10px] font-bold transition-colors ${skin.line} ${isActive ? `${skin.accent} ${skin.dark ? 'bg-white/10' : 'bg-black/[0.04]'}` : `${skin.muted} ${skin.dark ? 'bg-black/20' : 'bg-white/70'}`}`}
+                            className={`flex items-center justify-center rounded-full border text-[10px] font-bold transition-colors ${skin.line} ${isEmphasized ? `${skin.accent} ${skin.dark ? 'bg-white/10' : 'bg-black/[0.04]'}` : `${skin.muted} ${skin.dark ? 'bg-black/20' : 'bg-white/70'}`}`}
                           >
                             {toolIcon(u.tool) ? <ToolMark tool={u.tool} className="h-1/2 w-1/2" /> : monogram(u.tool).slice(0, 1)}
                           </span>
                         </span>
                         <span
-                          className={`pointer-events-none absolute z-10 whitespace-nowrap rounded-full px-2 py-0.5 text-[10px] tabular-nums transition-opacity duration-150 ${isActive ? 'opacity-100' : showLabel ? 'opacity-90' : 'opacity-0 group-focus-visible:opacity-100'} ${isActive ? skin.chip : skin.dark ? 'text-white/70' : 'text-black/60'} ${labelBelow ? 'top-full mt-1' : 'bottom-full mb-1'} left-1/2 -translate-x-1/2`}
+                          className={`pointer-events-none absolute z-10 whitespace-nowrap rounded-full px-2 py-0.5 text-[10px] tabular-nums transition-opacity duration-150 ${showLabel ? 'opacity-90' : 'opacity-0 group-focus-visible:opacity-100'} ${isEmphasized ? skin.chip : skin.dark ? 'text-white/70' : 'text-black/60'} ${labelBelow ? 'top-full mt-1' : 'bottom-full mb-1'} left-1/2 -translate-x-1/2`}
                         >
-                          {isActive ? `${u.tool} · ${formatTool(u)}` : u.tool}
+                          {u.tool}
                         </span>
                       </span>
                     </button>
@@ -424,81 +365,42 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
             })}
           </svg>
 
-          {/* Center card: fleet totals at rest, the selected tool's real story once one is active —
-              its thumbnails/"used at" lines are real links (`ToolUsageLinks`), same as the floating
-              preview below. */}
-          <div className={`absolute left-1/2 top-1/2 flex h-48 w-48 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center overflow-y-auto rounded-[28px] border p-3 text-center ${skin.line} ${skin.dark ? 'bg-white/[0.04]' : 'bg-white/70'}`} aria-live="polite">
-            {activeTool ? (
-              <>
-                <span className={`mb-1.5 flex h-8 w-8 items-center justify-center ${skin.accent}`}>
-                  {toolIcon(activeTool.tool) ? <ToolMark tool={activeTool.tool} className="h-5 w-5" /> : monogram(activeTool.tool)}
-                </span>
-                <p className={`px-2 text-[12px] font-semibold leading-tight ${skin.title}`}>{activeTool.tool}</p>
-                <p className={`mt-0.5 text-[9px] uppercase tracking-wide ${skin.muted}`}>{groupLabel[activeTool.group]}</p>
-                <p className={`mt-1.5 px-2 text-[10px] leading-tight ${skin.muted}`}>{formatTool(activeTool)}</p>
-                <div className="mt-1.5">
-                  <ToolUsageLinks tool={activeTool} skin={skin} sk={sk} size="sm" />
+          {/* Center readout: the six-group fleet totals, always — never a per-tool card. The only
+              thing that ever changes here is the small hover tooltip floating just above it (mouse
+              only, see `.mfHoverTip` in `ORBIT_CSS`), which repeats nothing more than the tool's name
+              and group — everything else lives in `ToolDrawer` once a dot is actually pressed. */}
+          <div className={`absolute left-1/2 top-1/2 flex h-48 w-48 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-[28px] border p-3 text-center ${skin.line} ${skin.dark ? 'bg-white/[0.04]' : 'bg-white/70'}`}>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+              {[
+                { value: fleetStoreCount, label: sk.depthLabel.stores },
+                { value: fleetProductCount, label: sk.layoutExtra.productsLabel },
+                { value: fleetLiquidLines, label: sk.depthLabel.liquid },
+                { value: fleetIslandLines, label: sk.depthLabel.ts },
+              ].map((stat) => (
+                <div key={stat.label}>
+                  <p className={`text-base font-semibold tabular-nums ${skin.title}`}>
+                    <CountUp value={stat.value} />
+                  </p>
+                  <p className={`text-[7.5px] leading-tight uppercase tracking-wide ${skin.muted}`}>{stat.label}</p>
                 </div>
-                {centerDepth && (
-                  <div className={`mt-2 border-t pt-1.5 ${skin.line}`}>
-                    <p className={`text-sm font-semibold tabular-nums ${skin.title}`}>
-                      <CountUp value={centerDepth.value} />
-                    </p>
-                    <p className={`text-[8px] uppercase leading-tight tracking-wide ${skin.muted}`}>{centerDepth.label}</p>
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                {[
-                  { value: fleetStoreCount, label: sk.depthLabel.stores },
-                  { value: fleetProductCount, label: sk.layoutExtra.productsLabel },
-                  { value: fleetLiquidLines, label: sk.depthLabel.liquid },
-                  { value: fleetIslandLines, label: sk.depthLabel.ts },
-                ].map((stat) => (
-                  <div key={stat.label}>
-                    <p className={`text-base font-semibold tabular-nums ${skin.title}`}>
-                      <CountUp value={stat.value} />
-                    </p>
-                    <p className={`text-[7.5px] leading-tight uppercase tracking-wide ${skin.muted}`}>{stat.label}</p>
-                  </div>
-                ))}
-              </div>
-            )}
+              ))}
+            </div>
           </div>
 
-          {/* Floating "quick look" preview: a real element (not a native tooltip), anchored near the
-              triggering dot via a one-time position measurement (see `showPreview`), flipping which
-              corner it hangs from so it never bleeds past the orbit's own box. Only mounted while a
-              tool is hovered/focused/pressed — reduced motion never reaches this component at all
-              (early-returns to the ledger above), so the plain opacity/scale transition here is safe
-              without an explicit reduced-motion branch. */}
-          {previewTool && previewToolUsage && anchor && (
+          {hoveredToolUsage && !openTool && (
             <div
-              id={PREVIEW_ID}
-              role="group"
-              aria-label={`${sk.orbit.previewLabel}: ${previewToolUsage.tool}`}
-              onMouseEnter={cancelHide}
-              onMouseLeave={scheduleHide}
-              className={`pointer-events-auto absolute z-20 w-[220px] rounded-2xl border p-3 text-center shadow-[0_12px_32px_rgba(0,0,0,0.18)] transition-[opacity,transform] duration-200 ease-out ${skin.line} ${skin.dark ? 'bg-[#0b0b0d]/95 backdrop-blur' : 'bg-white/95 backdrop-blur'}`}
+              aria-hidden="true"
+              className="mfHoverTip pointer-events-none absolute left-1/2 top-1/2 z-10 flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-[11px] shadow-[0_6px_18px_rgba(0,0,0,0.14)] transition-opacity duration-150"
               style={{
-                left: anchor.left,
-                top: anchor.top,
-                transform: `translate(${anchor.flipX ? 'calc(-100% - 12px)' : '12px'}, ${anchor.flipY ? 'calc(-100% - 12px)' : '12px'})`,
+                transform: 'translate(-50%, calc(-50% - 7.25rem))',
+                backgroundColor: skin.dark ? 'rgba(11,11,13,0.95)' : 'rgba(255,255,255,0.95)',
               }}
             >
-              <p className={`text-[9px] font-semibold uppercase tracking-[0.14em] ${skin.muted}`}>{sk.orbit.previewLabel}</p>
-              <div className="mt-1.5 flex items-center justify-center gap-2">
-                <span className={`flex h-6 w-6 shrink-0 items-center justify-center ${skin.accent}`}>
-                  {toolIcon(previewToolUsage.tool) ? <ToolMark tool={previewToolUsage.tool} className="h-4 w-4" /> : monogram(previewToolUsage.tool)}
-                </span>
-                <p className={`truncate text-[12px] font-semibold ${skin.title}`}>{previewToolUsage.tool}</p>
-              </div>
-              <p className={`mt-0.5 text-[9px] uppercase tracking-wide ${skin.muted}`}>{groupLabel[previewToolUsage.group]}</p>
-              <p className={`mt-1 text-[10px] ${skin.muted}`}>{formatTool(previewToolUsage)}</p>
-              <div className="mt-2">
-                <ToolUsageLinks tool={previewToolUsage} skin={skin} sk={sk} size="sm" />
-              </div>
+              <span className={`flex h-3.5 w-3.5 items-center justify-center ${skin.accent}`}>
+                {toolIcon(hoveredToolUsage.tool) ? <ToolMark tool={hoveredToolUsage.tool} className="h-3.5 w-3.5" /> : monogram(hoveredToolUsage.tool).slice(0, 1)}
+              </span>
+              <span className={`font-semibold ${skin.title}`}>{hoveredToolUsage.tool}</span>
+              <span className={skin.muted}>· {groupLabel[hoveredToolUsage.group]}</span>
             </div>
           )}
         </div>
@@ -510,13 +412,7 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
         </p>
       )}
 
-      {pinned && activeTool && (
-        <p className={`mt-4 text-center text-[11px] ${skin.muted}`}>
-          <button type="button" className={`underline ${skin.accent}`} onClick={() => setLocked(null)}>
-            {sk.layoutExtra.unpin}
-          </button>
-        </p>
-      )}
+      <ToolDrawer skin={skin} sk={sk} groupLabel={groupLabel} formatTool={formatTool} tool={openToolUsage} open={!!openTool} onClose={() => setOpenTool(null)} />
 
       <table className="sr-only">
         <caption>Tools by skill group, with real fleet usage</caption>

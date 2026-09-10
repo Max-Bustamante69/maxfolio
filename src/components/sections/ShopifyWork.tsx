@@ -7,7 +7,7 @@ import { useHoverPreview } from '../gallery/HoverPreview'
 import { lightboxItems, caseStudyFor, caseStudyLabels, ProjectModal, type SectionHeading } from './Gallery'
 import type { StoreEntry, ProductEntry } from '../../data/registry'
 import { conversionSeries } from '../../data/illustrative'
-import { onRequestProduct, onRequestStore, scrollToSection } from '../../lib/sectionLinks'
+import { onRequestProduct, onRequestStore, scrollToSection, setCaseStudyVisible } from '../../lib/sectionLinks'
 
 /** How long a row's accent flash stays visible after the orbit links here — long enough to read as
  *  "this is the one that just opened", short enough to not linger once the shopper has moved on. */
@@ -61,6 +61,13 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
       if (st) setOpenStore(st)
     },
   })
+  // Broadcasts this sheet's own visibility so a caller that opened it from elsewhere on the page (a
+  // capture tile inside the skills orbit's `ToolDrawer`) can hide itself while this sheet is up —
+  // one modal dialog at a time — see `sectionLinks.ts`.
+  useEffect(() => {
+    setCaseStudyVisible(!!openStore)
+    return () => setCaseStudyVisible(false)
+  }, [openStore])
   // Desktop hover: the store's home capture follows the cursor along the row (touch just opens the sheet).
   const preview = useHoverPreview()
 

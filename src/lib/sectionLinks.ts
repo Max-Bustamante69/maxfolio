@@ -24,6 +24,7 @@ const EVENTS = {
   store: 'mf:orbit-open-store',
   product: 'mf:orbit-open-product',
   role: 'mf:orbit-select-role',
+  caseStudyVisible: 'mf:case-study-visible',
 } as const
 
 function dispatch<T>(name: string, detail: T) {
@@ -50,6 +51,16 @@ export const onRequestProduct = (cb: (d: OpenProductRequest) => void) => subscri
 /** Ask Experience to select this role in its rail. */
 export const requestRole = (id: string) => dispatch<SelectRoleRequest>(EVENTS.role, { id })
 export const onRequestRole = (cb: (d: SelectRoleRequest) => void) => subscribe<SelectRoleRequest>(EVENTS.role, cb)
+
+/** Broadcasts whether the real case-study sheet (`ProjectModal`, opened via `requestStore`, including
+ *  from a capture tile inside the skills orbit's `ToolDrawer`) is currently visible — `ShopifyWork` is
+ *  the sole publisher (see its `openStore` effect). `ToolDrawer` is the only subscriber today: a
+ *  capture click leaves the drawer's own `open` state untouched (so the URL's `?tool=` and the
+ *  drawer's history entry never move) and only hides the drawer's panel while the sheet is up, so
+ *  there is ever only one `role="dialog"` mounted — the sheet closing (X, backdrop, Escape or the
+ *  browser's Back button) reveals the very same drawer again with nothing to re-open. */
+export const setCaseStudyVisible = (open: boolean) => dispatch<boolean>(EVENTS.caseStudyVisible, open)
+export const onCaseStudyVisibleChange = (cb: (open: boolean) => void) => subscribe<boolean>(EVENTS.caseStudyVisible, cb)
 
 export function prefersReducedMotion(): boolean {
   if (typeof window === 'undefined' || !window.matchMedia) return false

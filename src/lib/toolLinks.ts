@@ -11,12 +11,14 @@ export interface StoreThumb {
   name: string
   hasCapture: boolean
   status: 'live' | 'dev'
+  year: number
 }
 export interface ProductThumb {
   kind: 'product'
   id: string
   name: string
   hasCapture: boolean
+  year: number
 }
 export type ToolThumb = StoreThumb | ProductThumb
 
@@ -32,18 +34,19 @@ export interface ToolRoleLine {
 /** Up to `max` real store/product thumbnails a tool is used in, stores first — the same order
  *  `formatTool`/the center card already use. Names that no longer resolve to a registry entry (should
  *  never happen — `skillUsage.ts` derives them from the same registry) are dropped rather than
- *  rendered as a dead link. */
+ *  rendered as a dead link. Pass `Infinity` for every real usage (the orbit drawer's captures grid) —
+ *  the default `4` stays for the smaller preview surfaces (`SkillPanel`, `ToolUsageLinks`). */
 export function toolThumbs(tool: ToolUsage, max = 4): ToolThumb[] {
   const storeThumbs: StoreThumb[] = tool.storeNames
     .map((name): StoreThumb | null => {
       const st = stores.find((s) => s.name === name)
-      return st ? { kind: 'store', slug: st.slug, name: st.name, hasCapture: st.gallery, status: st.status } : null
+      return st ? { kind: 'store', slug: st.slug, name: st.name, hasCapture: st.gallery, status: st.status, year: st.year } : null
     })
     .filter((t): t is StoreThumb => t !== null)
   const productThumbs: ProductThumb[] = tool.productNames
     .map((name): ProductThumb | null => {
       const p = products.find((x) => x.name === name)
-      return p ? { kind: 'product', id: p.id, name: p.name, hasCapture: p.gallery } : null
+      return p ? { kind: 'product', id: p.id, name: p.name, hasCapture: p.gallery, year: p.year } : null
     })
     .filter((t): t is ProductThumb => t !== null)
   return [...storeThumbs, ...productThumbs].slice(0, max)

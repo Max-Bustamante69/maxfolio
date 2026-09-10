@@ -179,9 +179,17 @@ export interface PortfolioContent {
         openStore: string // 'Open case study — {name}' — accessible name for a store thumbnail/link
         openProduct: string // 'View product — {name}' — accessible name for a product thumbnail/link
         openRole: string // 'View role — {company}' — accessible name for a role-work line
-        previewLabel: string // eyebrow on the floating quick-look card
         expandRow: string // ledger fallback: tap-to-expand a tool row
         collapseRow: string // ledger fallback: collapse an expanded tool row
+        /** `ToolDrawer` (2026-09-10) — the right-side/bottom-sheet drawer a dot or ledger row opens,
+         *  replacing the orbit's floating quick-look card and its big center card. */
+        drawer: {
+          capturesLabel: string // eyebrow above the captures grid ("where it ships")
+          rolesLabel: string // eyebrow above the client-role rows
+          showInIndex: string // footer link back to the storefront index
+          close: string // close button label/aria-label
+          noCaptures: string // shown when a tool has no linkable store/product at all (rare)
+        }
       }
     }
     contact: SectionHeading & {
