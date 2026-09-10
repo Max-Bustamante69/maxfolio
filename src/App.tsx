@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Navigate, Routes, Route, useLocation } from 'react-router-dom'
 import { lazy, Suspense, useEffect, useRef, type ComponentType } from 'react'
 import { Analytics } from '@vercel/analytics/react'
 import { LazyMotion } from 'framer-motion'
@@ -73,6 +73,8 @@ function App() {
             {/* Legacy routes */}
             <Route path="/1" element={<Design4 />} />
             <Route path="/2" element={<Design1 />} />
+            {/* Unknown paths (e.g. the removed /skyline) land on the default experience instead of a blank shell. */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
         {/* The insights script only exists on Vercel; skipping it elsewhere keeps local audits free of a 404. */}
