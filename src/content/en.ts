@@ -244,9 +244,15 @@ export const en: PortfolioContent = {
         openStore: 'Open case study — {name}',
         openProduct: 'View product — {name}',
         openRole: 'View role — {company}',
-        previewLabel: 'Quick look',
         expandRow: 'Show details',
         collapseRow: 'Hide details',
+        drawer: {
+          capturesLabel: 'Where it ships',
+          rolesLabel: 'Client roles',
+          showInIndex: 'Show in the storefront index',
+          close: 'Close',
+          noCaptures: 'No public captures yet.',
+        },
       },
     },
     contact: {

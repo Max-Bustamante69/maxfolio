@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { AnimatePresence, m, useDragControls, useReducedMotion, useScroll, useSpring } from 'framer-motion'
 import { LaptopFrame, PhoneFrame } from './DeviceFrame'
 import { GlassControls } from './CarouselControls'
-import { carouselTokens, type Skin } from './skins'
+import { carouselTokens, sheetTokens, type Skin } from './skins'
 import type { FrameShots } from './ProjectFrame'
 import { Carousel } from '../../vendor/carousel'
 import { CountUp, CwvStrip, DeliveryPairedBar, goodText, IndexAreaLine, LoadTimePairedBar, PerfDualRing, ScoreRingsRow, SpeedGauge, type CwvData, type RingMetric } from './charts'
@@ -217,36 +217,9 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
       /* clipboard unavailable: the URL bar already carries the link */
     }
   }
-  const panel = skin.frame === 'apple' ? 'rounded-[28px]' : skin.frame === 'luxury' ? 'rounded-none' : skin.frame === 'terminal' ? 'rounded-none border border-[var(--term-line)]' : 'rounded-none border-2 border-stone-900'
-  const panelBg = skin.frame === 'terminal' ? 'bg-[var(--term-bg)] text-[var(--term-ink)]' : dark ? 'bg-[#141416] text-[#f5f5f7]' : 'bg-white text-[#1d1d1f]'
-  const radius = skin.frame === 'apple' ? 'rounded-[14px]' : 'rounded-none'
-  const tile = `${radius} p-3 ${skin.frame === 'terminal' ? 'bg-[var(--term-line)]/30' : dark ? 'bg-white/5' : 'bg-black/[0.04]'}`
-  const label = `text-[11px] font-semibold uppercase tracking-[0.18em] ${skin.muted}`
-  const accent =
-    skin.frame === 'apple'
-      ? dark
-        ? '#2997ff'
-        : '#0071e3'
-      : skin.frame === 'luxury'
-        ? '#C9A962'
-        : skin.frame === 'terminal'
-          ? 'var(--term-accent)'
-          : skin.frame === 'neo'
-            ? dark
-              ? '#8b93ff'
-              : '#4453d9'
-            : '#dc2626'
-
-  // No `.compact-touch` here: these are primary navigation/action controls (not decorative dots),
-  // so they keep the app-wide 44px tap-target floor even though the glyph inside stays small.
-  // Neo: the case-study sheet's close/nav buttons are the one place in this component that keeps
-  // the raised extrusion (restraint pass, 2026-09-10) — everything else in the sheet stays generic.
-  const isNeo = skin.frame === 'neo'
-  const navBtn = `press inline-flex h-11 w-11 items-center justify-center rounded-full transition-opacity disabled:pointer-events-none disabled:opacity-25 ${isNeo ? (dark ? 'bg-neo-darkSurfaceRaised' : 'bg-neo-surfaceRaised') : dark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`
-  const actionBtn = `press inline-flex h-11 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 text-xs ${isNeo ? (dark ? 'bg-neo-darkSurfaceRaised' : 'bg-neo-surfaceRaised') : dark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`
-  const neoBtnShadow: { boxShadow: string } | undefined = isNeo
-    ? { boxShadow: dark ? '3px 3px 8px #16181e, -3px -3px 8px #333844' : '3px 3px 8px #b8bcc7, -3px -3px 8px #ffffff' }
-    : undefined
+  // Panel/backdrop/control tokens shared with the skills section's `ToolDrawer` — see `sheetTokens`
+  // in `./skins` (2026-09-10 extraction, this component's original inline computation moved there).
+  const { panel, panelBg, tile, label, accent, navBtn, actionBtn, neoBtnShadow } = sheetTokens(skin)
 
   // "Impact": conversion, order value, revenue and revenue-per-visitor are illustrative (always
   // present, seeded per store — see src/data/illustrative.ts). Everything else — the score rings, the

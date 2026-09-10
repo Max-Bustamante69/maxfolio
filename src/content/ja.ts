@@ -244,9 +244,15 @@ export const ja: PortfolioContent = {
         openStore: 'ケーススタディを開く — {name}',
         openProduct: 'プロダクトを見る — {name}',
         openRole: '案件を見る — {company}',
-        previewLabel: 'クイックプレビュー',
         expandRow: '詳細を表示',
         collapseRow: '詳細を隠す',
+        drawer: {
+          capturesLabel: '導入先',
+          rolesLabel: 'クライアント案件',
+          showInIndex: 'ストア一覧で見る',
+          close: '閉じる',
+          noCaptures: '公開キャプチャはまだありません。',
+        },
       },
     },
     contact: {
