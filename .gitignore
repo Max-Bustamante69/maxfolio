@@ -54,3 +54,4 @@ public/art/**/*.png
 
 # Source PNGs for generated art — only the converted .webp is committed
 
+# generated art source PNGs (only the converted .webp is committed)

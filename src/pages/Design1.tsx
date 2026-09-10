@@ -290,6 +290,20 @@ function Design1Content() {
             </div>
           </section>
 
+          {/* Torn-collage diagonal strip — a raw editorial cut between the hero and the ticker */}
+          <div className={`relative h-24 md:h-32 overflow-hidden border-t-4 ${borderStrong} ${bgPrimary}`} aria-hidden="true">
+            <img
+              src="/art/brutalist/collage.webp"
+              alt=""
+              width={1280}
+              height={853}
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 h-full w-full object-cover grayscale contrast-125"
+              style={{ clipPath: 'polygon(0 30%, 100% 0, 100% 70%, 0 100%)' }}
+            />
+          </div>
+
           {/* Fleet ticker — two counter-rotating rows, brutalist mono stamp */}
           <div className={`overflow-hidden border-y-4 ${borderStrong} ${bgPrimary} py-5`}>
             <Ticker
@@ -416,7 +430,12 @@ function Design1Content() {
                         initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.4, delay: index * 0.06 }}
-                        className={`border-t ${borderColor} pt-6 grid grid-cols-12 gap-4 group ${isDark ? 'hover:bg-stone-900' : 'hover:bg-stone-50'} -mx-4 px-4 transition-colors`}
+                        onMouseMove={(e) => {
+                          const r = e.currentTarget.getBoundingClientRect()
+                          e.currentTarget.style.setProperty('--spot-x', `${((e.clientX - r.left) / r.width) * 100}%`)
+                          e.currentTarget.style.setProperty('--spot-y', `${((e.clientY - r.top) / r.height) * 100}%`)
+                        }}
+                        className={`brutalist-spotlight-row border-t ${borderColor} pt-6 grid grid-cols-12 gap-4 group ${isDark ? 'hover:bg-stone-900' : 'hover:bg-stone-50'} -mx-4 px-4 transition-colors`}
                       >
                         <div className="col-span-2 lg:col-span-1">
                           <span
@@ -496,8 +515,18 @@ function Design1Content() {
           </section>
 
           {/* Contact Section */}
-          <section id="contact" className={`py-12 md:py-16 border-t-4 ${borderStrong} bg-red-600 text-white`}>
-            <div className="max-w-[1800px] mx-auto px-4 md:px-6">
+          <section id="contact" className={`relative overflow-hidden py-12 md:py-16 border-t-4 ${borderStrong} bg-red-600 text-white`}>
+            <img
+              src="/art/brutalist/spray.webp"
+              alt=""
+              aria-hidden="true"
+              width={1200}
+              height={800}
+              loading="lazy"
+              decoding="async"
+              className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-25 mix-blend-multiply"
+            />
+            <div className="relative max-w-[1800px] mx-auto px-4 md:px-6">
               <Contact
                 skin={{ ...skin, title: 'text-white', body: 'text-red-50', muted: 'text-red-100', accent: 'text-white underline', line: 'border-red-300/40', accentBg: 'bg-stone-900' }}
                 ctaClass="press inline-flex items-center justify-center font-mono text-sm uppercase tracking-wider bg-white text-red-600 px-8 py-4 hover:bg-stone-900 hover:text-white transition-colors"

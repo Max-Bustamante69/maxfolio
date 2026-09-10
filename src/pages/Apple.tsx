@@ -464,9 +464,19 @@ function AppleContent() {
             </div>
           </section>
 
-          {/* Contact — typographic close */}
-          <section id="contact" className={`px-4 py-24 md:py-32 scroll-mt-20 ${surface}`}>
-            <div className="max-w-5xl mx-auto">
+          {/* Contact — typographic close, a mesh gradient at 30% opacity so the last section isn't flat */}
+          <section id="contact" className={`relative overflow-hidden px-4 py-24 md:py-32 scroll-mt-20 ${surface}`}>
+            <img
+              src="/art/apple/mesh.webp"
+              alt=""
+              aria-hidden="true"
+              width={1400}
+              height={933}
+              loading="lazy"
+              decoding="async"
+              className={`pointer-events-none absolute inset-0 h-full w-full object-cover opacity-30 ${isDark ? "mix-blend-screen" : ""}`}
+            />
+            <div className="relative max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Contact skin={skin} ctaClass={`${primaryBtn} px-7`} onContact={openContact} />
               </Suspense>
