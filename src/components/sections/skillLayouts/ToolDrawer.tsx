@@ -7,14 +7,14 @@
 // here via `sheetTokens` rather than forked. Every link inside (captures, roles, "show in index") goes
 // through the same `src/lib/sectionLinks.ts`/`toolLinks.ts` the old preview card used — nothing new is
 // fabricated, only the presentation changes.
-import { useEffect, useRef, type KeyboardEvent as ReactKeyboardEvent } from 'react'
+import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, m, useDragControls, useReducedMotion } from 'framer-motion'
 import { useContent, useMediaQuery } from '../../../hooks'
 import type { RoleWorkId, SkillGroupId } from '../../../data/registry'
 import { fleetIslandLines, fleetLiquidLines, type ToolUsage } from '../../../data/skillUsage'
 import { galleryCapture, toolRoleLines, toolThumbs, type ToolThumb } from '../../../lib/toolLinks'
-import { requestProduct, requestRole, requestStore, scrollToSection } from '../../../lib/sectionLinks'
+import { onCaseStudyVisibleChange, requestProduct, requestRole, requestStore, scrollToSection } from '../../../lib/sectionLinks'
 import { sheetTokens, type Skin } from '../../gallery'
 import { CountUp } from '../../gallery/charts'
 import { monogram, toolIcon, ToolMark } from '../skillIcons'
@@ -203,33 +203,54 @@ export function ToolDrawer({ skin, sk, groupLabel, formatTool, tool, open, onClo
   const closeRef = useRef(onClose)
   closeRef.current = onClose
 
+  // True while the real case-study sheet (`ProjectModal`, opened by a capture tile below) is up. The
+  // drawer's own `open`/`tool` state — and the `?tool=` history entry it made — never changes for
+  // this: only the panel's mount and its own Escape/focus behaviour step aside, so there is ever only
+  // one `role="dialog"` on screen and the sheet closing (any of its own ways to close, including the
+  // browser's Back button) reveals the very same drawer again, nothing re-opened from scratch. The
+  // lazy initializer covers a page loaded straight from a copied `?tool=&store=` link, where the
+  // subscription below would otherwise start a tick too late to catch the very first broadcast.
+  const [suppressed, setSuppressed] = useState(() => typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('store'))
+  useEffect(() => onCaseStudyVisibleChange(setSuppressed), [])
+
   // Focus management: remember what was focused before the drawer opened (the orbit dot / ledger row),
   // move focus into the panel, and give it back on close — never left dangling on a removed trigger.
+  // Deliberately keyed on `open` alone (not `suppressed`): the case-study sheet manages its own body
+  // scroll lock independently, so the drawer's lock must stay put across a suppress/un-suppress cycle
+  // — releasing and re-acquiring it here would fight the sheet's own lock and can leave the page
+  // scrollable while the sheet is still up.
   useEffect(() => {
     if (!open) return
     returnFocusRef.current = document.activeElement
-    const id = window.setTimeout(() => {
-      const first = panelRef.current?.querySelector<HTMLElement>(focusableSelector)
-      ;(first ?? panelRef.current)?.focus()
-    }, 0)
     const prevOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     return () => {
-      window.clearTimeout(id)
       document.body.style.overflow = prevOverflow
       const el = returnFocusRef.current
       if (el instanceof HTMLElement && document.contains(el)) el.focus()
     }
   }, [open])
 
+  // Moves focus into the panel both on a real open and on returning from suppression (the sheet just
+  // closed and this drawer is visible again) — split from the effect above so it never touches the
+  // scroll lock.
   useEffect(() => {
-    if (!open) return
+    if (!open || suppressed) return
+    const id = window.setTimeout(() => {
+      const first = panelRef.current?.querySelector<HTMLElement>(focusableSelector)
+      ;(first ?? panelRef.current)?.focus()
+    }, 0)
+    return () => window.clearTimeout(id)
+  }, [open, suppressed])
+
+  useEffect(() => {
+    if (!open || suppressed) return
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') closeRef.current()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [open])
+  }, [open, suppressed])
 
   const onPanelKeyDown = (e: ReactKeyboardEvent<HTMLDivElement>) => {
     if (e.key !== 'Tab' || !panelRef.current) return
@@ -258,8 +279,18 @@ export function ToolDrawer({ skin, sk, groupLabel, formatTool, tool, open, onClo
   const content = (
     <AnimatePresence>
       {open && tool && (
+        // `inert` (not an AnimatePresence exit) while the case-study sheet is up: this dialog isn't
+        // actually closing — its own `open` state, and the `?tool=` history entry it made, never
+        // change — so it must stay exactly where it is underneath and simply stop being interactive
+        // or visible for the moment. Running it through AnimatePresence's exit/re-enter cycle instead
+        // (conditioning this branch on `!suppressed`) measurably got the exit stuck mid-animation,
+        // permanently: two portalled `AnimatePresence` trees animating in the same commit — this
+        // drawer's exit and the sheet's own entrance — left the drawer's exit callback never firing,
+        // so it never unmounted (confirmed empirically: `role="dialog"` count stayed 2 indefinitely).
         <m.div
-          className={`fixed inset-0 z-[9998] flex ${isDesktop ? 'items-stretch justify-end' : 'items-end justify-center'} bg-black/60`}
+          inert={suppressed || undefined}
+          aria-hidden={suppressed || undefined}
+          className={`fixed inset-0 z-[9998] flex ${isDesktop ? 'items-stretch justify-end' : 'items-end justify-center'} bg-black/60 ${suppressed ? 'invisible' : ''}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

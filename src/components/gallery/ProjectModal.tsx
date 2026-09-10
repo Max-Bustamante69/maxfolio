@@ -196,6 +196,28 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
     }
   }, [open, onClose])
 
+  // Belt-and-suspenders (2026-09-10): `AnimatePresence`'s own exit can fail to actually unmount this
+  // sheet's root when another portalled `AnimatePresence` tree animates in the same window — measured
+  // opening this sheet from a capture tile inside the skills orbit's `ToolDrawer`, then closing it: the
+  // exit transition itself still plays and reaches its target (opacity 0), but the node is left sitting
+  // in the DOM, still focusable and still visible to assistive tech. Force it non-interactive,
+  // unfocusable and hidden from AT the instant `open` goes false, independent of whether the exit
+  // animation's own unmount ever fires; cleared again on a fresh open in case the very same node gets
+  // reused. `rootRef` stays valid through an AnimatePresence exit either way — React only calls a ref's
+  // cleanup once the node actually leaves the tree.
+  const rootRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = rootRef.current
+    if (!el) return
+    if (open) {
+      el.inert = false
+      el.removeAttribute('aria-hidden')
+    } else {
+      el.inert = true
+      el.setAttribute('aria-hidden', 'true')
+    }
+  }, [open])
+
   const dark = skin.dark
   const reduced = useReducedMotion()
   // Scroll-progress hairline for the numbers column: its own scroller, not the page.
@@ -250,6 +272,7 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
     <AnimatePresence>
       {open && data && (
         <m.div
+          ref={rootRef}
           role="dialog"
           aria-modal="true"
           aria-label={data.name}
