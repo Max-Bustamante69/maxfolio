@@ -1,5 +1,20 @@
 [
   {
+    "hash": "1e1a6ac",
+    "date": "2026-09-10",
+    "subject": "fix(orbit): make the Apple center mark visible in dark mode"
+  },
+  {
+    "hash": "eb3efbe",
+    "date": "2026-09-10",
+    "subject": "refactor(orbit): move fleet totals into the drawer, give the center a per-theme mark"
+  },
+  {
+    "hash": "71cb0de",
+    "date": "2026-09-10",
+    "subject": "fix(themes): Terminal's custom properties also live on :root while the theme is mounted (body-portalled sheets and drawe"
+  },
+  {
     "hash": "e025ae0",
     "date": "2026-09-10",
     "subject": "chore(terminal): regenerated changelog.json"
@@ -41,21 +56,6 @@
   },
   {
     "hash": "e570682",
-    "date": "2026-09-10",
-    "subject": "chore(terminal): regenerated changelog.json"
-  },
-  {
-    "hash": "1d02678",
-    "date": "2026-09-10",
-    "subject": "fix(a11y): the orbit dots are toggle buttons in a group, not list items (aria-pressed is not allowed on listitem)"
-  },
-  {
-    "hash": "dae305c",
-    "date": "2026-09-10",
-    "subject": "chore(terminal): regenerated changelog.json"
-  },
-  {
-    "hash": "e8d9514",
     "date": "2026-09-10",
     "subject": "chore(terminal): regenerated changelog.json"
   }
