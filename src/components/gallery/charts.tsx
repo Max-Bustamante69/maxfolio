@@ -17,7 +17,9 @@ export const badText = (dark: boolean) => (dark ? 'text-[#ff8a80]' : 'text-[#b42
 export function CountUp({ value, decimals = 0, prefix = '', suffix = '', delay = 0, className = '' }: { value: number; decimals?: number; prefix?: string; suffix?: string; delay?: number; className?: string }) {
   const reduced = useReducedMotion()
   const mv = useMotionValue(reduced ? value : 0)
-  const text = useTransform(mv, (v) => `${prefix}${v.toFixed(decimals)}${suffix}`)
+  // toLocaleString (not toFixed) so a four-digit-plus value counts up with the same thousands
+  // separator its static fallback string uses (e.g. "10,000+") instead of losing it mid-animation.
+  const text = useTransform(mv, (v) => `${prefix}${v.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}${suffix}`)
   useEffect(() => {
     if (reduced) {
       mv.set(value)
