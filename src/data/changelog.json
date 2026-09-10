@@ -1,5 +1,10 @@
 [
   {
+    "hash": "7be9bcc",
+    "date": "2026-09-10",
+    "subject": "feat(sheet): case-study sheet trimmed to Impact-only, Revenue + Delivery added"
+  },
+  {
     "hash": "1468b5d",
     "date": "2026-09-10",
     "subject": "fix(sheet,apple): the LCP form labels exist in the sheet's label contract; 'One build, in full' leaves the Apple home"
@@ -53,10 +58,5 @@
     "hash": "521533c",
     "date": "2026-09-10",
     "subject": "feat(sheet): richer Impact block — headline chips, order value, load-time pair"
-  },
-  {
-    "hash": "7109356",
-    "date": "2026-09-09",
-    "subject": "feat(skills,sheet): the orbit is the layout for What I work with; illustrative figures sit at the top of the measured ba"
   }
 ]
