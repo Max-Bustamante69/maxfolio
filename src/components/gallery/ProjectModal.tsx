@@ -6,30 +6,28 @@ import { GlassControls } from './CarouselControls'
 import { carouselTokens, type Skin } from './skins'
 import type { FrameShots } from './ProjectFrame'
 import { Carousel } from '../../vendor/carousel'
-import { CountUp, CwvStrip, DeliveryPairedBar, goodText, IndexAreaLine, LoadTimePairedBar, PerfDualRing, ScoreRingsRow, SpeedGauge, type CwvData, type RingMetric } from './charts'
+import { CountUp, goodText, IndexAreaLine, LoadTimePairedBar, PerfDualRing, ScoreRingsRow, type RingMetric } from './charts'
 
 /**
- * "Impact" — the sheet's entire numbers story (2026-09-10): header → captures → tagline/description →
- * Impact → stack → Visit store. Conversion, order value, revenue, revenue per visitor and the dual
- * ring's thin inner "before" arc are illustrative, deterministic per store (seeded by slug, see
- * src/data/illustrative.ts), always present, and anchored to the CV's own measured ranges. `delivery`'s
- * `weeks` is REAL (telemetry.json / the registry's build window); its `referenceWeeks` is an
- * illustrative "typical agency" reference. `rings`, `perfDual.after`, `cwv` and `speed` are REAL
- * (src/data/lighthouse.json) and null piece by piece whenever that store has no measured score for it —
- * the whole chart it feeds is then omitted, never estimated. `loadTime` pairs the real mobile LCP with
- * an illustrative "before" anchor (loadTimeSeries) and is null under the identical condition as `speed`.
+ * "Impact" — the sheet's entire numbers story (2026-09-10 restructure): header → captures →
+ * tagline/description → Impact → stack → Visit store. Conversion, order value, revenue, revenue per
+ * visitor and the dual ring's thin inner "before" arc are illustrative, deterministic per store (seeded
+ * by slug, see src/data/illustrative.ts), always present, and anchored to the CV's own measured ranges.
+ * `rings` and `perfDual.after` are REAL (src/data/lighthouse.json) and null piece by piece whenever
+ * that store has no measured score for it — the whole chart it feeds is then omitted, never estimated.
+ * `loadTime.afterSeconds` is the real DESKTOP lab LCP (mobile only when desktop is missing — the honest
+ * lever for a load-time story that reads well, per the owner's 2026-09-10 call); `beforeSeconds` is an
+ * illustrative anchor off that real number (loadTimeSeries). No dates and no delivery chart anywhere in
+ * this block — see caseStudy.impact.ringsCaption / .loadTimeSource in src/content/*.ts.
  */
 export interface ImpactCharts {
   conversion: { points: number[]; low: number[]; high: number[]; deltaPct: number }
   orderValue: { points: number[]; deltaPct: number }
   revenue: { points: number[]; deltaPct: number } // compounded conversion × order value × organic traffic, illustrative
   rpv: { points: number[]; deltaPct: number }
-  delivery: { weeks: number; referenceWeeks: number; deltaPct: number } | null // weeks REAL, referenceWeeks illustrative
-  rings: { metrics: RingMetric[]; fetchedAt: string } | null // desktop Performance/Accessibility/SEO, ≥50 only
-  perfDual: { before: number; after: number; fetchedAt: string } | null // desktop performance before→after
-  cwv: { data: CwvData; fetchedAt: string } | null // CrUX field data, when the origin has enough real-user traffic
-  speed: { seconds: number; fetchedAt: string; form: 'mobile' | 'desktop' } | null // lab LCP gauge fallback when `cwv` is null
-  loadTime: { beforeSeconds: number; afterSeconds: number; deltaPct: number; fetchedAt: string; form: 'mobile' | 'desktop' } | null
+  rings: { metrics: RingMetric[] } | null // desktop Performance/Accessibility/SEO, ≥50 only, REAL
+  perfDual: { before: number; after: number } | null // desktop performance before→after, REAL "after"
+  loadTime: { beforeSeconds: number; afterSeconds: number; deltaPct: number; form: 'mobile' | 'desktop' } | null // DESKTOP LCP preferred, REAL "after"
 }
 
 export interface CaseStudyData {
@@ -63,32 +61,18 @@ export interface CaseStudyLabels {
     orderValueLabel: string
     revenueLabel: string
     ringsCaption: string
-    ringsCaptionWithDelta: string
+    ringsDelta: string
     before: string
     after: string
     perfDualLabel: string
-    cwvTitle: string
-    cwvLcp: string
-    cwvInp: string
-    cwvCls: string
-    cwvSource: string
-    speedLabel: string
-    speedTarget: string
-    speedSource: string
     disclaimer: string
     infoLabel: string
     infoSentence: string
     chipConversionLabel: string
     chipRevenueLabel: string
     chipLoadTimeLabel: string
-    chipDeliveryLabel: string
-    deliveryWeeksUnit: string
     loadTimeLabel: string
     loadTimeSource: string
-    deliveryLabel: string
-    deliveryBeforeLabel: string
-    deliveryAfterLabel: string
-    deliverySource: string
     formMobile: string
     formDesktop: string
   }
@@ -220,7 +204,9 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
   const panel = skin.frame === 'apple' ? 'rounded-[28px]' : skin.frame === 'luxury' ? 'rounded-none' : skin.frame === 'terminal' ? 'rounded-none border border-[var(--term-line)]' : 'rounded-none border-2 border-stone-900'
   const panelBg = skin.frame === 'terminal' ? 'bg-[var(--term-bg)] text-[var(--term-ink)]' : dark ? 'bg-[#141416] text-[#f5f5f7]' : 'bg-white text-[#1d1d1f]'
   const radius = skin.frame === 'apple' ? 'rounded-[14px]' : 'rounded-none'
-  const tile = `${radius} p-3 ${skin.frame === 'terminal' ? 'bg-[var(--term-line)]/30' : dark ? 'bg-white/5' : 'bg-black/[0.04]'}`
+  // One tile style for the whole Impact block (2026-09-10 restructure): 12–14px radius (skin-driven,
+  // unchanged), 16px padding, every grid in the block at a consistent 12px gap — see the JSX below.
+  const tile = `${radius} p-4 ${skin.frame === 'terminal' ? 'bg-[var(--term-line)]/30' : dark ? 'bg-white/5' : 'bg-black/[0.04]'}`
   const label = `text-[11px] font-semibold uppercase tracking-[0.18em] ${skin.muted}`
   const accent =
     skin.frame === 'apple'
@@ -249,27 +235,22 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
     : undefined
 
   // "Impact": conversion, order value, revenue and revenue-per-visitor are illustrative (always
-  // present, seeded per store — see src/data/illustrative.ts). Everything else — the score rings, the
-  // performance dual ring's real "after" arc, the Core Web Vitals strip, the LCP gauge and the delivery
-  // bar's real weeks — is real, straight from src/data/lighthouse.json / src/data/telemetry.json,
-  // omitted piece by piece whenever that store has no measured value for it.
+  // present, seeded per store — see src/data/illustrative.ts). Everything else — the score rings and
+  // the performance dual ring's real "after" arc, plus the load-time chart's real "after" seconds
+  // (DESKTOP lab LCP, preferred) — is real, straight from src/data/lighthouse.json, omitted piece by
+  // piece whenever that store has no measured value for it. No dates anywhere in this block.
   const il = labels.impact
   const impact = data?.impact
-  const fmtDate = (iso: string) => new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
 
-  // Headline strip: four typographic chips computed from the same `impact` data as the charts below
-  // them, never a separate number — Conversion, Revenue and Delivery are always present (conversion and
-  // revenue are illustrative end to end; delivery's weeks are real); Load time only appears once its
-  // real/illustrative pair exists (same condition as the load-time chart below it). No per-chip tag of
-  // its own — the design's only disclosure is the small print under the whole section (ImpactDisclosure
-  // below). Lighthouse's own delta moved into the score-rings caption (`ringsCaptionWithDelta` below)
-  // per the owner's 2026-09-10 call, so it is no longer a headline chip.
-  const headlineChips = impact
+  // Hero numerals: the block's headline claim, three big numbers side by side — Conversion, Revenue,
+  // Load time (load time only once its real/illustrative pair exists — same condition as the
+  // load-time chart below it). No per-numeral tag of its own — the design's only disclosure is the
+  // small print under the whole section (ImpactDisclosure below).
+  const heroStats = impact
     ? [
         { key: 'conversion', value: impact.conversion.deltaPct, prefix: '+', suffix: '%', label: il.chipConversionLabel },
         { key: 'revenue', value: impact.revenue.deltaPct, prefix: '+', suffix: '%', label: il.chipRevenueLabel },
         impact.loadTime ? { key: 'loadtime', value: impact.loadTime.deltaPct, prefix: '−', suffix: '%', label: il.chipLoadTimeLabel } : null,
-        impact.delivery ? { key: 'delivery', value: impact.delivery.weeks, prefix: '', suffix: il.deliveryWeeksUnit, label: il.chipDeliveryLabel } : null,
       ].filter((c): c is { key: string; value: number; prefix: string; suffix: string; label: string } => !!c)
     : []
 
@@ -388,32 +369,45 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
                 <p className={`${skin.accent} text-sm font-medium`}>{data.tagline}</p>
                 <p className="mt-2 text-sm leading-relaxed">{data.description}</p>
 
-                {/* "Impact": the sheet's entire numbers story (2026-09-10). Fixed order: headline chips
-                    (Conversion, Revenue, Load time, Delivery) → score rings row (caption carries the
-                    Lighthouse before→after delta when it exists) → performance dual ring (+ Core Web
-                    Vitals or the LCP gauge) → the "time to launch" delivery bar → the four indexed lines
-                    (conversion, order value, revenue, revenue per visitor) → the block-level small
-                    print, the sheet's only illustrative disclosure (no per-chip/per-chart tag anywhere
-                    in this block). Score rings, the dual ring's real "after" arc, the CWV strip, the LCP
-                    gauge and the delivery bar's real weeks are real, measured numbers
-                    (src/data/lighthouse.json, src/data/telemetry.json); conversion, order value,
-                    revenue, revenue per visitor, the dual ring's thin inner "before" arc and the
-                    delivery bar's "typical agency" reference are illustrative representations anchored
-                    to the CV's own measured ranges. */}
+                {/* "Impact": the sheet's entire numbers story (2026-09-10 restructure, owner call: no
+                    dates, no delivery chart, figures live below their charts not stacked on top,
+                    load time reads off the real DESKTOP lab LCP). Fixed order: hero numerals
+                    (Conversion, Revenue, Load time — big figures first) → the Lighthouse score rings
+                    (desktop, real, the before→after delta a small badge beside Performance, not in the
+                    caption) → the speed pair (the load-time bars, real desktop LCP, beside the
+                    performance dual ring) → the four indexed lines as a fixed 2×2 grid, each tile's
+                    label on top and its numeral at the bottom under its own chart → the block-level
+                    small print, the sheet's only illustrative disclosure (no per-chip/per-chart tag
+                    anywhere in this block). Score rings and the dual ring's real "after" arc are real,
+                    measured numbers (src/data/lighthouse.json), as is the load-time chart's real "after"
+                    seconds; conversion, order value, revenue, revenue per visitor, the dual ring's thin
+                    inner "before" arc and the load-time chart's illustrative "before" seconds are
+                    illustrative representations anchored to the CV's own measured ranges.
+                    `[container-type:inline-size]` on the wrapper below lets every clamp()ed numeral
+                    scale off the panel's own width (~450–520px desktop, full-width at 390) instead of
+                    the viewport's, so nothing here ever needs a 4-across layout to stay readable. */}
                 {impact && (
-                  <>
-                    <p className={`mt-6 ${label}`}>{il.title}</p>
-                    {/* Fixed 2-column grid, not flex-wrap: with up to 4 chips (Conversion/Revenue always,
-                        Load time/Delivery conditional) a wrap-based row could leave an odd chip out
-                        stretched to the full row width on its own line — a grid keeps every chip the
-                        same size and settles into an even 2×2 (or a plain 2×1/lone left-aligned cell)
-                        however many of the four are present for this store. */}
-                    {headlineChips.length > 0 && (
-                      <div className="mt-3 grid grid-cols-2 gap-2">
-                        {headlineChips.map((c, i) => (
-                          <div key={c.key} className={`${tile} flex flex-col gap-0.5`}>
-                            <CountUp value={c.value} prefix={c.prefix} suffix={c.suffix} delay={0.05 + i * 0.05} duration={0.8} className={`text-xl font-semibold leading-none tabular-nums ${goodText(dark)}`} />
-                            <span className="text-[11px] leading-tight">{c.label}</span>
+                  <div data-testid="impact-block" className="mt-6 [container-type:inline-size]">
+                    <p className={label}>{il.title}</p>
+
+                    {/* Hero numerals: Conversion / Revenue / Load time, side by side (2 or 3 columns
+                        depending on whether this store has a load-time figure). `min-w-0` on each cell
+                        plus a clamp()ed, container-relative font size — not a fixed breakpoint — keeps a
+                        localized "+54%" inside its column at both the ~450px desktop panel and the
+                        full-width 390px sheet. */}
+                    {heroStats.length > 0 && (
+                      <div className="mt-3 grid gap-3" style={{ gridTemplateColumns: `repeat(${heroStats.length}, minmax(0, 1fr))` }}>
+                        {heroStats.map((s, i) => (
+                          <div key={s.key} className={`${tile} flex min-w-0 flex-col items-center gap-1 text-center`}>
+                            <CountUp
+                              value={s.value}
+                              prefix={s.prefix}
+                              suffix={s.suffix}
+                              delay={0.05 + i * 0.05}
+                              duration={0.8}
+                              className={`text-[clamp(28px,6.5cqw,40px)] font-semibold leading-none tabular-nums ${goodText(dark)}`}
+                            />
+                            <span className="text-[11px] font-semibold uppercase leading-tight tracking-[0.1em]">{s.label}</span>
                           </div>
                         ))}
                       </div>
@@ -423,42 +417,21 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
                       <div className={`${tile} mt-3`}>
                         <ScoreRingsRow
                           metrics={impact.rings.metrics}
-                          caption={
-                            impact.perfDual
-                              ? il.ringsCaptionWithDelta.replace('{delta}', String(Math.round(impact.perfDual.after - impact.perfDual.before))).replace('{date}', fmtDate(impact.rings.fetchedAt))
-                              : il.ringsCaption.replace('{date}', fmtDate(impact.rings.fetchedAt))
-                          }
+                          caption={il.ringsCaption}
+                          badges={impact.perfDual ? { perf: il.ringsDelta.replace('{n}', String(Math.round(impact.perfDual.after - impact.perfDual.before))) } : undefined}
                           dark={dark}
-                          delay={0.05}
+                          delay={0.15}
                         />
                       </div>
                     )}
 
-                    {(impact.perfDual || impact.cwv || impact.speed || impact.loadTime || impact.delivery) && (
-                      <div key={`${data.name}-impact-real`} className="mt-3 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
-                        {impact.perfDual && (
-                          <div className={`${tile} ${impact.cwv || impact.speed || impact.loadTime ? '' : 'sm:col-span-2'}`}>
-                            <PerfDualRing before={impact.perfDual.before} after={impact.perfDual.after} label={il.perfDualLabel} beforeLabel={il.before} afterLabel={il.after} dark={dark} delay={0.15} />
-                          </div>
-                        )}
-                        {impact.cwv ? (
-                          <div className={`${tile} ${impact.perfDual ? '' : 'sm:col-span-2'}`}>
-                            <p className={`text-[10px] font-semibold uppercase tracking-[0.16em] ${skin.muted}`}>{il.cwvTitle}</p>
-                            <div className="mt-3">
-                              <CwvStrip data={impact.cwv.data} lcpLabel={il.cwvLcp} inpLabel={il.cwvInp} clsLabel={il.cwvCls} dark={dark} delay={0.25} />
-                            </div>
-                            <p className={`${skin.muted} mt-2 text-[11px] leading-snug`}>{il.cwvSource.replace('{date}', fmtDate(impact.cwv.fetchedAt))}</p>
-                          </div>
-                        ) : (
-                          impact.speed && (
-                            <div className={`${tile} ${impact.perfDual ? '' : 'sm:col-span-2'}`}>
-                              <SpeedGauge seconds={impact.speed.seconds} label={il.speedLabel.replace('{form}', impact.speed.form === 'mobile' ? il.formMobile : il.formDesktop)} targetLabel={il.speedTarget.replace('{n}', '2.5')} dark={dark} delay={0.25} />
-                              <p className={`${skin.muted} mt-2 text-[11px] leading-snug`}>{il.speedSource.replace('{form}', impact.speed.form === 'mobile' ? il.formMobile : il.formDesktop).replace('{date}', fmtDate(impact.speed.fetchedAt))}</p>
-                            </div>
-                          )
-                        )}
+                    {/* Speed pair: the real desktop LCP bars (left) beside the performance dual ring
+                        (right) — the block's one before→after pairing, its illustrative baseline always
+                        anchored next to a real measured number, never standing alone. */}
+                    {(impact.loadTime || impact.perfDual) && (
+                      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                         {impact.loadTime && (
-                          <div className={`${tile} sm:col-span-2`}>
+                          <div className={`${tile} min-w-0 ${impact.perfDual ? '' : 'sm:col-span-2'}`}>
                             <LoadTimePairedBar
                               beforeSeconds={impact.loadTime.beforeSeconds}
                               afterSeconds={impact.loadTime.afterSeconds}
@@ -467,39 +440,25 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
                               afterLabel={il.after}
                               label={il.loadTimeLabel}
                               dark={dark}
-                              delay={0.3}
+                              delay={0.25}
                             />
-                            <p className={`${skin.muted} mt-2 text-[11px] leading-snug`}>{il.loadTimeSource.replace('{form}', impact.loadTime.form === 'mobile' ? il.formMobile : il.formDesktop).replace('{date}', fmtDate(impact.loadTime.fetchedAt))}</p>
+                            <p className={`${skin.muted} mt-2 text-[11px] leading-snug`}>{il.loadTimeSource.replace('{form}', impact.loadTime.form === 'mobile' ? il.formMobile : il.formDesktop)}</p>
                           </div>
                         )}
-                        {impact.delivery && (
-                          <div className={`${tile} sm:col-span-2`}>
-                            <DeliveryPairedBar
-                              beforeWeeks={impact.delivery.referenceWeeks}
-                              afterWeeks={impact.delivery.weeks}
-                              deltaPct={impact.delivery.deltaPct}
-                              beforeLabel={il.deliveryBeforeLabel}
-                              afterLabel={il.deliveryAfterLabel}
-                              label={il.deliveryLabel}
-                              weekUnit={il.deliveryWeeksUnit}
-                              color={accent}
-                              dark={dark}
-                              delay={0.3}
-                            />
-                            <p className={`${skin.muted} mt-2 text-[11px] leading-snug`}>{il.deliverySource}</p>
+                        {impact.perfDual && (
+                          <div className={`${tile} min-w-0 ${impact.loadTime ? '' : 'sm:col-span-2'}`}>
+                            <PerfDualRing before={impact.perfDual.before} after={impact.perfDual.after} label={il.perfDualLabel} beforeLabel={il.before} afterLabel={il.after} dark={dark} delay={0.3} />
                           </div>
                         )}
                       </div>
                     )}
 
-                    {/* Capped at 2 columns, not 4: the sheet is a side panel on desktop, not the full
-                        1440 viewport, so a `lg:` breakpoint (keyed to viewport width) fires while the
-                        panel itself is still only ~450px wide — four columns there crushed a label like
-                        "Order value, indexed" onto three lines pressed against its own numeral. Two
-                        columns gives every indexed line, including the wider "Revenue" tile, the same
-                        room the headline-chip grid above it uses. */}
-                    <div key={`${data.name}-impact-indexed`} className="mt-3 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
-                      <div className={tile}>
+                    {/* The four indexed lines, always a fixed 2×2 grid — never 4 across, never
+                        collapsing to 1 column — each tile: label on top (already reads "…, indexed"),
+                        the area line fixed at 64px so all four line up edge to edge, the numeral LAST at
+                        the bottom in the display face so it never competes with the chart above it. */}
+                    <div className="mt-3 grid grid-cols-2 gap-3">
+                      <div className={`${tile} min-w-0`}>
                         <IndexAreaLine
                           points={impact.conversion.points}
                           band={{ low: impact.conversion.low, high: impact.conversion.high }}
@@ -510,21 +469,21 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
                           delay={0.35}
                         />
                       </div>
-                      <div className={tile}>
+                      <div className={`${tile} min-w-0`}>
                         <IndexAreaLine points={impact.orderValue.points} label={il.orderValueLabel} deltaPct={impact.orderValue.deltaPct} color={accent} dark={dark} delay={0.4} />
                       </div>
                       {/* Revenue: the compounded headline figure, right next to revenue per visitor — a
                           bigger numeral than its neighbors (`big`) since it's the block's summary claim. */}
-                      <div className={tile}>
+                      <div className={`${tile} min-w-0`}>
                         <IndexAreaLine points={impact.revenue.points} label={il.revenueLabel} deltaPct={impact.revenue.deltaPct} color={accent} dark={dark} delay={0.45} big />
                       </div>
-                      <div className={tile}>
+                      <div className={`${tile} min-w-0`}>
                         <IndexAreaLine points={impact.rpv.points} label={il.rpvLabel} deltaPct={impact.rpv.deltaPct} color={accent} dark={dark} delay={0.5} />
                       </div>
                     </div>
 
                     <ImpactDisclosure key={data.name} disclaimer={il.disclaimer} infoLabel={il.infoLabel} infoSentence={il.infoSentence} dark={dark} />
-                  </>
+                  </div>
                 )}
 
               <p className={`mt-6 ${label}`}>{labels.stack}</p>

@@ -7,8 +7,8 @@ import { Carousel } from '../../vendor/carousel'
 import type { StoreEntry } from '../../data/registry'
 import { telemetry } from '../../data/telemetry'
 import { commerce } from '../../data/commerce'
-import { pickCommerceLine, weeksFor } from '../../data/commerceLines'
-import { conversionSeries, deliveryReferenceWeeks, lighthouseBeforeScore, loadTimeSeries, orderValueSeries, revenuePerVisitorSeries, revenueSeries } from '../../data/illustrative'
+import { pickCommerceLine } from '../../data/commerceLines'
+import { conversionSeries, lighthouseBeforeScore, loadTimeSeries, orderValueSeries, revenuePerVisitorSeries, revenueSeries } from '../../data/illustrative'
 import lighthouseJson from '../../data/lighthouse.json'
 import type { PortfolioContent } from '../../content/types'
 import type { ImpactCharts } from '../gallery/ProjectModal'
@@ -46,14 +46,13 @@ function lighthouseFor(slug: string): LighthouseStoreEntry | undefined {
 }
 
 /** "Impact" block data: conversion, order value, revenue and revenue-per-visitor are always-present
- *  illustrative representations (see src/data/illustrative.ts). `delivery`'s weeks figure is REAL
- *  (telemetry/registry, via commerceLines.weeksFor); its "typical agency" reference is illustrative.
- *  Everything else is real, read straight from src/data/lighthouse.json — null piece by piece whenever
- *  that store has no measured value for it, never backfilled with an estimate: `rings` (desktop
- *  Performance/Accessibility/SEO, Best Practices always omitted, any sub-50 score omitted rather than
- *  shown red), `perfDual.after` (the dual ring's real outer arc — `.before` is the one illustrative
- *  figure here), `cwv` (CrUX field data, only when the origin has enough real-user traffic) and `speed`
- *  (the lab LCP gauge fallback when `cwv` is null). */
+ *  illustrative representations (see src/data/illustrative.ts). Everything else is real, read straight
+ *  from src/data/lighthouse.json — null piece by piece whenever that store has no measured value for
+ *  it, never backfilled with an estimate: `rings` (desktop Performance/Accessibility/SEO, Best
+ *  Practices always omitted, any sub-50 score omitted rather than shown red), `perfDual.after` (the
+ *  dual ring's real outer arc — `.before` is the one illustrative figure here) and `loadTime.afterSeconds`
+ *  (the real lab LCP — see the DESKTOP-first preference below). No dates anywhere in this block per the
+ *  owner's 2026-09-10 call (captions read "measured", never "measured {date}"). */
 function impactFor(st: StoreEntry, ringLabels: { perf: string; a11y: string; seo: string }): ImpactCharts {
   const lh = lighthouseFor(st.slug)
   const desktop = lh?.desktop ?? null
@@ -66,7 +65,7 @@ function impactFor(st: StoreEntry, ringLabels: { perf: string; a11y: string; seo
       { key: 'a11y', label: ringLabels.a11y, value: desktop.a11y },
       { key: 'seo', label: ringLabels.seo, value: desktop.seo },
     ].filter((m) => m.value >= 50)
-    return metrics.length > 0 ? { metrics, fetchedAt: lh.fetchedAt } : null
+    return metrics.length > 0 ? { metrics } : null
   })()
 
   // Performance dual ring: illustrative baseline vs. the real desktop score (mobile if no desktop
@@ -75,35 +74,21 @@ function impactFor(st: StoreEntry, ringLabels: { perf: string; a11y: string; seo
   const perfForm = desktop ?? mobile
   const perfFormName: 'mobile' | 'desktop' = desktop ? 'desktop' : 'mobile'
   const perfBefore = perfForm ? lighthouseBeforeScore(st.slug, perfFormName) : null
-  const perfDual: ImpactCharts['perfDual'] = perfForm && perfBefore !== null && lh && perfForm.perf >= perfBefore + 8 ? { before: perfBefore, after: perfForm.perf, fetchedAt: lh.fetchedAt } : null
+  const perfDual: ImpactCharts['perfDual'] = perfForm && perfBefore !== null && lh && perfForm.perf >= perfBefore + 8 ? { before: perfBefore, after: perfForm.perf } : null
 
-  // Core Web Vitals field data — prefer mobile (CrUX's traffic volume skews mobile); fall back to
-  // desktop's field data when mobile has none. Every one of the three metrics must be present, or the
-  // sheet falls back to the lab LCP gauge instead of showing a partial strip.
-  const field = mobile?.field ?? desktop?.field ?? null
-  const cwv: ImpactCharts['cwv'] = field && field.p75Lcp != null && field.p75Inp != null && field.p75Cls != null && lh ? { data: { lcp: field.p75Lcp, inp: field.p75Inp, cls: field.p75Cls }, fetchedAt: lh.fetchedAt } : null
-
-  // The lab LCP shown is the better-measured form: mobile while it is at most 4 s (the 'needs improvement' ceiling),
-  // otherwise desktop, labeled as such — a poor mobile lab LCP is a real number, but it is not the number this
-  // block exists to show, and desktop is just as real.
-  const lcpForm: 'mobile' | 'desktop' = mobile?.lcp != null && (mobile.lcp <= 4 || desktop?.lcp == null) ? 'mobile' : 'desktop'
-  const lcpValue = lcpForm === 'mobile' ? mobile?.lcp ?? null : desktop?.lcp ?? null
-  const speed = !cwv && lcpValue != null && lh ? { seconds: lcpValue, fetchedAt: lh.fetchedAt, form: lcpForm } : null
-  const loadTime = lcpValue != null && lh ? { ...loadTimeSeries(st.slug, lcpValue), fetchedAt: lh.fetchedAt, form: lcpForm } : null
+  // Load time: the DESKTOP lab LCP is the honest, real lever — 0.8–1.6s across this fleet, vastly
+  // better-reading than mobile's real-world LCP — so it is preferred outright per the owner's
+  // 2026-09-10 call ("reduce the load times more so they read better"). Mobile only stands in when a
+  // store has no desktop measurement at all.
+  const lcpForm: 'mobile' | 'desktop' = desktop?.lcp != null ? 'desktop' : 'mobile'
+  const lcpValue = lcpForm === 'desktop' ? desktop?.lcp ?? null : mobile?.lcp ?? null
+  const loadTime: ImpactCharts['loadTime'] = lcpValue != null && lh ? { ...loadTimeSeries(st.slug, lcpValue), form: lcpForm } : null
 
   const conversion = conversionSeries(st.slug)
   const orderValue = orderValueSeries(st.slug)
   const revenue = revenueSeries(st.slug, conversion.deltaPct, orderValue.deltaPct)
 
-  // Delivery: real weeks (telemetry.json git history, or the registry's build-window fallback — see
-  // commerceLines.weeksFor) against an illustrative "typical agency" reference (14–18 weeks, seeded).
-  // Every real fleet build lands well inside that reference, so the pair is omitted only in the
-  // defensive case a store's real weeks would somehow meet or exceed it (never observed on this fleet).
-  const realWeeks = weeksFor(st, telemetry[st.slug])
-  const referenceWeeks = deliveryReferenceWeeks(st.slug)
-  const delivery: ImpactCharts['delivery'] = referenceWeeks > realWeeks ? { weeks: realWeeks, referenceWeeks, deltaPct: Math.round(((referenceWeeks - realWeeks) / referenceWeeks) * 100) } : null
-
-  return { conversion, orderValue, revenue, rpv: revenuePerVisitorSeries(st.slug), delivery, rings, perfDual, cwv, speed, loadTime }
+  return { conversion, orderValue, revenue, rpv: revenuePerVisitorSeries(st.slug), rings, perfDual, loadTime }
 }
 
 export type SectionHeading = (eyebrow: string, title: string, accent: string, lead?: string) => ReactNode
