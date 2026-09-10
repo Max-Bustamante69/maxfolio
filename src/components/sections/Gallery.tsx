@@ -12,7 +12,14 @@ import { conversionSeries, lighthouseBeforeScore, loadTimeSeries, orderValueSeri
 import lighthouseJson from '../../data/lighthouse.json'
 import type { PortfolioContent } from '../../content/types'
 import type { ImpactCharts } from '../gallery/ProjectModal'
+import type { RingMetric } from '../gallery/charts'
 
+interface LighthouseFieldEntry {
+  p75Lcp: number | null // seconds
+  p75Inp: number | null // ms
+  p75Cls: number | null
+  passes: boolean
+}
 interface LighthouseFormEntry {
   perf: number
   a11y: number
@@ -22,9 +29,11 @@ interface LighthouseFormEntry {
   tbt: number | null
   cls: number | null
   finalUrl: string
+  field: LighthouseFieldEntry | null // CrUX real-user data — null unless the origin has enough traffic
 }
 interface LighthouseStoreEntry {
   fetchedAt: string
+  source: string // 'PageSpeed Insights' | 'local, best of 3' | a ' + ' join of both (mixed forms)
   mobile: LighthouseFormEntry | null
   desktop: LighthouseFormEntry | null
 }
@@ -37,23 +46,45 @@ function lighthouseFor(slug: string): LighthouseStoreEntry | undefined {
 }
 
 /** "Impact" block data: conversion, order value and revenue-per-visitor are always-present
- *  illustrative representations (see src/data/illustrative.ts); Lighthouse "after", the LCP gauge and
- *  the load-time pair's "after" are real, read straight from src/data/lighthouse.json — null piece by
- *  piece whenever that store has no measured score for it, never backfilled with an estimate. */
-function impactFor(st: StoreEntry): ImpactCharts {
+ *  illustrative representations (see src/data/illustrative.ts). Everything else is real, read straight
+ *  from src/data/lighthouse.json — null piece by piece whenever that store has no measured value for
+ *  it, never backfilled with an estimate: `rings` (desktop Performance/Accessibility/SEO, Best
+ *  Practices always omitted, any sub-50 score omitted rather than shown red), `perfDual.after` (the
+ *  dual ring's real outer arc — `.before` is the one illustrative figure here), `cwv` (CrUX field data,
+ *  only when the origin has enough real-user traffic) and `speed` (the lab LCP gauge fallback when
+ *  `cwv` is null). */
+function impactFor(st: StoreEntry, ringLabels: { perf: string; a11y: string; seo: string }): ImpactCharts {
   const lh = lighthouseFor(st.slug)
-  const lighthouse = lh
-    ? {
-        fetchedAt: lh.fetchedAt,
-        // The illustrative baseline is only shown when the real score clears it by a margin: a measured 62
-        // next to an illustrative 64 read as a red -2 (seen on NOS, 2026-09-10). Below that, no pair.
-        mobile: lh.mobile && lh.mobile.perf >= lighthouseBeforeScore(st.slug, 'mobile') + 8 ? { before: lighthouseBeforeScore(st.slug, 'mobile'), after: lh.mobile.perf } : null,
-        desktop: lh.desktop && lh.desktop.perf >= lighthouseBeforeScore(st.slug, 'desktop') + 8 ? { before: lighthouseBeforeScore(st.slug, 'desktop'), after: lh.desktop.perf } : null,
-      }
-    : null
-  const speed = lh?.mobile?.lcp != null ? { seconds: lh.mobile.lcp, fetchedAt: lh.fetchedAt } : null
-  const loadTime = lh?.mobile?.lcp != null ? { ...loadTimeSeries(st.slug, lh.mobile.lcp), fetchedAt: lh.fetchedAt } : null
-  return { conversion: conversionSeries(st.slug), orderValue: orderValueSeries(st.slug), rpv: revenuePerVisitorSeries(st.slug), lighthouse, speed, loadTime }
+  const desktop = lh?.desktop ?? null
+  const mobile = lh?.mobile ?? null
+
+  const rings: ImpactCharts['rings'] = (() => {
+    if (!desktop || !lh) return null
+    const metrics: RingMetric[] = [
+      { key: 'perf', label: ringLabels.perf, value: desktop.perf },
+      { key: 'a11y', label: ringLabels.a11y, value: desktop.a11y },
+      { key: 'seo', label: ringLabels.seo, value: desktop.seo },
+    ].filter((m) => m.value >= 50)
+    return metrics.length > 0 ? { metrics, fetchedAt: lh.fetchedAt } : null
+  })()
+
+  // Performance dual ring: illustrative baseline vs. the real desktop score (mobile if no desktop
+  // measurement), gated on the same +8pt pairing margin the sheet has always used so a measured score
+  // never reads as a false decline against its own illustrative anchor (seen on NOS, 2026-09-10).
+  const perfForm = desktop ?? mobile
+  const perfFormName: 'mobile' | 'desktop' = desktop ? 'desktop' : 'mobile'
+  const perfBefore = perfForm ? lighthouseBeforeScore(st.slug, perfFormName) : null
+  const perfDual: ImpactCharts['perfDual'] = perfForm && perfBefore !== null && lh && perfForm.perf >= perfBefore + 8 ? { before: perfBefore, after: perfForm.perf, fetchedAt: lh.fetchedAt } : null
+
+  // Core Web Vitals field data — prefer mobile (CrUX's traffic volume skews mobile); fall back to
+  // desktop's field data when mobile has none. Every one of the three metrics must be present, or the
+  // sheet falls back to the lab LCP gauge instead of showing a partial strip.
+  const field = mobile?.field ?? desktop?.field ?? null
+  const cwv: ImpactCharts['cwv'] = field && field.p75Lcp != null && field.p75Inp != null && field.p75Cls != null && lh ? { data: { lcp: field.p75Lcp, inp: field.p75Inp, cls: field.p75Cls }, fetchedAt: lh.fetchedAt } : null
+
+  const speed = !cwv && mobile?.lcp != null && lh ? { seconds: mobile.lcp, fetchedAt: lh.fetchedAt } : null
+  const loadTime = mobile?.lcp != null && lh ? { ...loadTimeSeries(st.slug, mobile.lcp), fetchedAt: lh.fetchedAt } : null
+  return { conversion: conversionSeries(st.slug), orderValue: orderValueSeries(st.slug), rpv: revenuePerVisitorSeries(st.slug), rings, perfDual, cwv, speed, loadTime }
 }
 
 // Computed once at module scope: registry/commerce/telemetry are static build-time data, so every
@@ -199,7 +230,7 @@ export function caseStudyFor(
           ? { min: commerceEntry.priceMin, max: commerceEntry.priceMax, median: commerceEntry.currency ? (FLEET_MEDIANS.priceMidByCurrency[commerceEntry.currency] ?? null) : null, currency: commerceEntry.currency }
           : null,
       fetchedAt: isLiveCommerce(commerceEntry) ? commerceEntry.fetchedAt : null,
-      impact: impactFor(st),
+      impact: impactFor(st, { perf: cs.perf, a11y: cs.a11y, seo: cs.seo }),
     },
   }
 }

@@ -369,7 +369,6 @@ export function IndexAreaLine({
   band,
   label,
   deltaPct,
-  rangeNote,
   color,
   dark,
   delay = 0,
@@ -378,7 +377,6 @@ export function IndexAreaLine({
   band?: { low: number[]; high: number[] }
   label: string
   deltaPct: number
-  rangeNote?: string
   delay?: number
 } & Palette) {
   const reduced = useReducedMotion()
@@ -406,7 +404,7 @@ export function IndexAreaLine({
     <figure className="m-0">
       <div className="flex items-baseline justify-between gap-2">
         <figcaption className={`text-[11px] leading-tight ${mutedText(dark)}`}>{label}</figcaption>
-        <CountUp value={deltaPct} prefix="+" suffix="%" delay={delay + 0.6} className={`text-sm font-semibold tabular-nums ${goodText(dark)}`} />
+        <CountUp value={deltaPct} prefix="+" suffix="%" delay={delay + 0.6} className={`text-xl font-semibold leading-none tabular-nums ${goodText(dark)}`} />
       </div>
       <svg viewBox={`0 0 ${w} ${h}`} className="mt-1.5 h-[62px] w-full" preserveAspectRatio="none" role="img" aria-label={`${label}: ${points[0]} → ${points[n - 1]} (index, base 100)`}>
         <line x1={pad} x2={w - pad} y1={baselineY} y2={baselineY} stroke={dark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)'} strokeWidth={1} strokeDasharray="3 4" />
@@ -427,87 +425,213 @@ export function IndexAreaLine({
         <m.circle
           cx={x(n - 1)}
           cy={y(points[n - 1])}
-          r={3}
+          r={3.5}
           fill={color}
           initial={reduced ? false : { scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: delay + 0.8, duration: 0.3, ease: EASE }}
         />
       </svg>
-      {rangeNote && <p className={`mt-1 text-[11px] leading-tight ${mutedText(dark)}`}>{rangeNote}</p>}
       <SrTable caption={label} rows={points.map((v, i) => [`W${i + 1}`, String(v)] as [string, string])} />
     </figure>
   )
 }
 
-export interface LighthousePairRow {
-  key: string
-  label: string
-  before: number // illustrative
-  after: number // REAL — src/data/lighthouse.json
+/** Lighthouse's own bands: 90+ green, 50–89 orange, below red — the single source both the score
+ *  rings row and the performance dual ring color by by, so a real 90+ reads exactly the same wherever
+ *  it appears in the sheet. */
+export const scoreColor = (score: number) => (score >= 90 ? '#34c759' : score >= 50 ? '#ff9f0a' : '#ff3b30')
+
+const RINGS_R = 20
+const RINGS_C = 2 * Math.PI * RINGS_R
+
+/** A single small Lighthouse-style ring inside ScoreRingsRow — count-up numeral, band-colored arc. */
+function MiniRing({ value, label, delay, dark }: { value: number; label: string; delay: number; dark: boolean }) {
+  const reduced = useReducedMotion()
+  const mv = useMotionValue(reduced ? value : 0)
+  const shown = useTransform(mv, (v) => Math.round(v))
+  const dash = useTransform(mv, (v) => RINGS_C - (Math.max(0, Math.min(100, v)) / 100) * RINGS_C)
+  useEffect(() => {
+    if (reduced) {
+      mv.set(value)
+      return
+    }
+    const ctrl = animate(mv, value, { duration: 1, delay, ease: EASE })
+    return () => ctrl.stop()
+  }, [value, delay, reduced, mv])
+  return (
+    <div className="flex items-center gap-2.5">
+      <svg viewBox="0 0 48 48" className="h-11 w-11 shrink-0" aria-hidden="true">
+        <circle cx="24" cy="24" r={RINGS_R} fill="none" strokeWidth="4.5" stroke={dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'} />
+        <m.circle cx="24" cy="24" r={RINGS_R} fill="none" strokeWidth="4.5" strokeLinecap="round" stroke={scoreColor(value)} strokeDasharray={RINGS_C} style={{ strokeDashoffset: dash }} transform="rotate(-90 24 24)" />
+      </svg>
+      <div className="min-w-0">
+        <m.p className="text-lg font-semibold leading-none tabular-nums" aria-label={`${label}: ${value}`}>
+          {shown}
+        </m.p>
+        <p className={`mt-0.5 text-[10px] leading-tight ${mutedText(dark)}`}>{label}</p>
+      </div>
+    </div>
+  )
 }
 
-/** Lighthouse's own bands: 90+ green, 50–89 orange, below red — same thresholds ProjectModal's
- *  ScoreRing uses for the sheet's real metrics block, applied here to the (real) "after" bar only. */
-const scoreColor = (score: number) => (score >= 90 ? '#34c759' : score >= 50 ? '#ff9f0a' : '#ff3b30')
+export interface RingMetric {
+  key: string
+  label: string
+  value: number
+}
 
-/** Paired before/after bars, one row per form (mobile, desktop): "before" is the illustrative anchor,
- *  muted like every other illustrative bar in this file; "after" is the real measured score, colored
- *  by Lighthouse's own bands so a real 90+ reads exactly like the sheet's other real metrics. */
-export function LighthousePairedBars({ rows, beforeLabel, afterLabel, dark, delay = 0 }: { rows: LighthousePairRow[]; beforeLabel: string; afterLabel: string; dark: boolean; delay?: number }) {
-  const reduced = useReducedMotion()
-  if (rows.length === 0) return null
+/** Score-rings row — Performance, Accessibility, SEO (whatever the caller passes; Best Practices and
+ *  any sub-50 score are filtered out upstream), one small animated ring each, real measured values. */
+export function ScoreRingsRow({ metrics, caption, dark, delay = 0 }: { metrics: RingMetric[]; caption?: string; dark: boolean; delay?: number }) {
+  if (metrics.length === 0) return null
   return (
-    <figure className="m-0 space-y-3">
-      {rows.map((r, i) => {
-        const delta = Math.round(r.after - r.before)
-        const bars = [
-          { key: beforeLabel, v: r.before, c: dark ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.16)' },
-          { key: afterLabel, v: r.after, c: scoreColor(r.after) },
-        ]
-        return (
-          <div key={r.key}>
-            <div className="flex items-baseline justify-between gap-2">
-              <figcaption className={`text-[11px] leading-tight ${mutedText(dark)}`}>{r.label}</figcaption>
-              {delta !== 0 && <CountUp value={Math.abs(delta)} prefix={delta > 0 ? '+' : '−'} delay={delay + i * 0.15 + 0.5} className={`text-xs font-semibold tabular-nums ${delta > 0 ? goodText(dark) : badText(dark)}`} />}
-            </div>
-            <div className="mt-1.5 space-y-1.5" role="img" aria-label={`${r.label}: ${beforeLabel} ${r.before}, ${afterLabel} ${r.after}`}>
-              {bars.map((b, j) => (
-                <div key={b.key} className="flex items-center gap-2">
-                  <span className={`w-14 shrink-0 text-[10px] uppercase tracking-[0.12em] ${mutedText(dark)}`}>{b.key}</span>
-                  <div className={`h-2.5 flex-1 overflow-hidden rounded-full ${dark ? 'bg-white/10' : 'bg-black/[0.06]'}`}>
-                    <m.div
-                      className="h-full rounded-full"
-                      style={{ backgroundColor: b.c }}
-                      initial={reduced ? false : { width: 0 }}
-                      animate={{ width: `${Math.max(2, (b.v / 100) * 100)}%` }}
-                      transition={{ delay: delay + i * 0.15 + j * 0.12, duration: 0.8, ease: EASE }}
-                    />
-                  </div>
-                  <span className="w-8 shrink-0 text-right text-xs font-semibold tabular-nums">{Math.round(b.v)}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )
-      })}
-      <SrTable
-        caption={`${beforeLabel} / ${afterLabel}`}
-        rows={rows.flatMap((r) => [
-          [`${r.label} — ${beforeLabel}`, String(r.before)],
-          [`${r.label} — ${afterLabel}`, String(r.after)],
-        ] as [string, string][])}
-      />
+    <figure className="m-0">
+      <div className="flex flex-wrap gap-x-5 gap-y-3" role="img" aria-label={metrics.map((m) => `${m.label}: ${m.value}`).join(', ')}>
+        {metrics.map((m, i) => (
+          <MiniRing key={m.key} value={m.value} label={m.label} delay={delay + i * 0.1} dark={dark} />
+        ))}
+      </div>
+      {caption && <p className={`mt-2 text-[11px] leading-snug ${mutedText(dark)}`}>{caption}</p>}
+      <SrTable caption={caption ?? 'Score rings'} rows={metrics.map((m) => [m.label, String(m.value)] as [string, string])} />
     </figure>
   )
 }
 
+const DUAL_OUTER_R = 26
+const DUAL_INNER_R = 18
+const DUAL_OUTER_C = 2 * Math.PI * DUAL_OUTER_R
+const DUAL_INNER_C = 2 * Math.PI * DUAL_INNER_R
+
+/**
+ * Performance, before → after: a thin inner arc (the illustrative pre-optimization baseline) inside a
+ * bold outer arc (the real measured score, band-colored), replacing the old paired bars. Both arcs
+ * draw in together; the numeral is the real "after" score with the delta counting up beside it.
+ */
+export function PerfDualRing({
+  before,
+  after,
+  label,
+  beforeLabel,
+  afterLabel,
+  dark,
+  delay = 0,
+}: {
+  before: number
+  after: number
+  label: string
+  beforeLabel: string
+  afterLabel: string
+  dark: boolean
+  delay?: number
+}) {
+  const reduced = useReducedMotion()
+  const mvAfter = useMotionValue(reduced ? after : 0)
+  const mvBefore = useMotionValue(reduced ? before : 0)
+  const shown = useTransform(mvAfter, (v) => Math.round(v))
+  const dashOuter = useTransform(mvAfter, (v) => DUAL_OUTER_C - (Math.max(0, Math.min(100, v)) / 100) * DUAL_OUTER_C)
+  const dashInner = useTransform(mvBefore, (v) => DUAL_INNER_C - (Math.max(0, Math.min(100, v)) / 100) * DUAL_INNER_C)
+  useEffect(() => {
+    if (reduced) {
+      mvAfter.set(after)
+      mvBefore.set(before)
+      return
+    }
+    const c1 = animate(mvAfter, after, { duration: 1, delay, ease: EASE })
+    const c2 = animate(mvBefore, before, { duration: 0.8, delay, ease: EASE })
+    return () => {
+      c1.stop()
+      c2.stop()
+    }
+  }, [after, before, delay, reduced, mvAfter, mvBefore])
+  const delta = Math.round(after - before)
+  return (
+    <figure className="m-0" role="img" aria-label={`${label}: ${beforeLabel} ${before}, ${afterLabel} ${after}`}>
+      <div className="flex items-center gap-4">
+        <svg viewBox="0 0 64 64" className="h-16 w-16 shrink-0" aria-hidden="true">
+          <circle cx="32" cy="32" r={DUAL_OUTER_R} fill="none" strokeWidth="5" stroke={dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'} />
+          <m.circle cx="32" cy="32" r={DUAL_OUTER_R} fill="none" strokeWidth="5" strokeLinecap="round" stroke={scoreColor(after)} strokeDasharray={DUAL_OUTER_C} style={{ strokeDashoffset: dashOuter }} transform="rotate(-90 32 32)" />
+          <circle cx="32" cy="32" r={DUAL_INNER_R} fill="none" strokeWidth="3" stroke={dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'} />
+          <m.circle
+            cx="32"
+            cy="32"
+            r={DUAL_INNER_R}
+            fill="none"
+            strokeWidth="3"
+            strokeLinecap="round"
+            stroke={dark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.32)'}
+            strokeDasharray={DUAL_INNER_C}
+            style={{ strokeDashoffset: dashInner }}
+            transform="rotate(-90 32 32)"
+          />
+        </svg>
+        <div className="min-w-0">
+          <div className="flex items-baseline gap-1.5">
+            <m.p className="text-2xl font-semibold leading-none tabular-nums">{shown}</m.p>
+            {delta !== 0 && (
+              <CountUp value={Math.abs(delta)} prefix={delta > 0 ? '+' : '−'} delay={delay + 0.7} className={`text-xs font-semibold tabular-nums ${delta > 0 ? goodText(dark) : badText(dark)}`} />
+            )}
+          </div>
+          <p className={`mt-1 text-[11px] leading-tight ${mutedText(dark)}`}>{label}</p>
+          <p className={`text-[10px] leading-tight ${mutedText(dark)}`}>
+            {beforeLabel} {Math.round(before)} → {afterLabel} {Math.round(after)}
+          </p>
+        </div>
+      </div>
+      <SrTable caption={label} rows={[[beforeLabel, String(before)], [afterLabel, String(after)]]} />
+    </figure>
+  )
+}
+
+/** Core Web Vitals thresholds (Google's own): LCP good ≤2.5s/poor >4s, INP good ≤200ms/poor >500ms,
+ *  CLS good ≤0.1/poor >0.25 — the same bands the "passes Core Web Vitals" field-data flag is built on. */
+const cwvColor = (metric: 'lcp' | 'inp' | 'cls', v: number) =>
+  metric === 'lcp' ? (v <= 2.5 ? '#34c759' : v <= 4 ? '#ff9f0a' : '#ff3b30') : metric === 'inp' ? (v <= 200 ? '#34c759' : v <= 500 ? '#ff9f0a' : '#ff3b30') : v <= 0.1 ? '#34c759' : v <= 0.25 ? '#ff9f0a' : '#ff3b30'
+
+export interface CwvData {
+  lcp: number // seconds, p75
+  inp: number // ms, p75
+  cls: number // p75
+}
+
+/** Three real-user (CrUX field data) pills — p75 LCP / INP / CLS — colored by the same thresholds the
+ *  "passes Core Web Vitals" flag uses. Shown only when the store's origin has enough real-user traffic
+ *  for CrUX to report; falls back to the lab LCP gauge (SpeedGauge) otherwise. */
+export function CwvStrip({ data, lcpLabel, inpLabel, clsLabel, dark, delay = 0 }: { data: CwvData; lcpLabel: string; inpLabel: string; clsLabel: string; dark: boolean; delay?: number }) {
+  const reduced = useReducedMotion()
+  const pills = [
+    { key: 'lcp', label: lcpLabel, display: `${data.lcp.toFixed(1)}s`, color: cwvColor('lcp', data.lcp) },
+    { key: 'inp', label: inpLabel, display: `${Math.round(data.inp)}ms`, color: cwvColor('inp', data.inp) },
+    { key: 'cls', label: clsLabel, display: data.cls.toFixed(2), color: cwvColor('cls', data.cls) },
+  ]
+  return (
+    <div className="flex flex-wrap gap-2" role="img" aria-label={pills.map((p) => `${p.label}: ${p.display}`).join(', ')}>
+      {pills.map((p, i) => (
+        <m.div
+          key={p.key}
+          className={`min-w-[84px] flex-1 rounded-full px-3 py-2 ${dark ? 'bg-white/5' : 'bg-black/[0.04]'}`}
+          initial={reduced ? false : { opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: delay + i * 0.08, duration: 0.4, ease: EASE }}
+        >
+          <div className="flex items-center gap-1.5">
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: p.color }} aria-hidden="true" />
+            <span className={`text-[10px] font-semibold uppercase tracking-[0.1em] ${mutedText(dark)}`}>{p.label}</span>
+          </div>
+          <p className="mt-0.5 text-sm font-semibold tabular-nums">{p.display}</p>
+        </m.div>
+      ))}
+      <SrTable caption={[lcpLabel, inpLabel, clsLabel].join(' / ')} rows={pills.map((p) => [p.label, p.display] as [string, string])} />
+    </div>
+  )
+}
+
 /** Paired before/after bars for a REAL seconds measurement (mobile LCP): "before" is the illustrative
- *  anchor (src/data/illustrative.ts loadTimeSeries — the real "after" divided by a seeded 30–40%),
+ *  anchor (src/data/illustrative.ts loadTimeSeries — the real "after" divided by a seeded 38–40%),
  *  muted like every other illustrative bar in this file; "after" is the real measured LCP, colored by
  *  the same good/needs-improvement/poor LCP bands SpeedGauge uses below it. The domain is
- *  0..max(before,after)×1.08 (not a fixed 0–100 like LighthousePairedBars) since these are seconds,
- *  not scores, and the illustrative "before" can run well past any fixed ceiling on a slow store. */
+ *  0..max(before,after)×1.08 (not a fixed 0–100 like the score rings) since these are seconds, not
+ *  scores, and the illustrative "before" can run well past any fixed ceiling on a slow store. */
 export function LoadTimePairedBar({
   beforeSeconds,
   afterSeconds,

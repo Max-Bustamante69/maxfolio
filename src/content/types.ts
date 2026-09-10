@@ -198,44 +198,44 @@ export interface PortfolioContent {
       facts: string; results: string; stack: string; visit: string; prev: string; next: string; timeline: string; commits: string; sections: string; open: string; metrics: string; perf: string; a11y: string; bp: string; seo: string; lcp: string; measured: string; trail: string; trailNote: string; perWeek: string; peak: string; codebase: string; liquidLines: string; islandLines: string; sectionsCount: string; weeks: string; copyLink: string; copied: string
       commerce: CommerceLabels
       /**
-       * The sheet's "Impact" block, shown ABOVE "By the numbers": conversion + revenue-per-visitor
-       * are illustrative (deterministic per store, see src/data/illustrative.ts) and anchored to the
-       * real ranges on the CV; Lighthouse "after" and the LCP gauge are REAL (src/data/lighthouse.json).
-       * `disclaimer` and `infoSentence` are fixed, owner-approved copy — do not paraphrase them.
+       * The sheet's "Impact" block, shown ABOVE "By the numbers", fixed layout order (2026-09-10):
+       * headline chips → score rings row → performance dual ring (+ Core Web Vitals or the LCP gauge)
+       * → the three indexed lines (conversion, order value, revenue per visitor) → the block-level
+       * small print. Conversion, order value, revenue per visitor and the dual ring's thin inner
+       * "before" arc are illustrative (deterministic per store, see src/data/illustrative.ts) and
+       * anchored to the real ranges on the CV; the score rings, the dual ring's real "after" arc, the
+       * Core Web Vitals strip and the LCP gauge are REAL (src/data/lighthouse.json). No per-chip or
+       * per-chart illustrative tag anywhere in this block — `disclaimer` (the block-level small print)
+       * is the sheet's only disclosure. `disclaimer` and `infoSentence` are fixed, owner-approved
+       * copy — do not paraphrase them.
        */
       impact: {
         title: string // "Impact" — the block heading
-        conversionLabel: string // "Conversion, indexed" — line chart label
-        conversionRangeNote: string // "Illustrative range: +10% to +20%" — under the conversion chart
-        rpvLabel: string // "Revenue per visitor, indexed" — line chart label
-        rpvRangeNote: string // "Illustrative representation" — under the RPV chart, right next to its
-        // own headline number so it never reads as a measured KPI in isolation (mirrors conversionRangeNote)
-        lighthouseLabel: string // "Lighthouse performance" — paired-bars block heading
-        lighthouseMobile: string
-        lighthouseDesktop: string
-        before: string // paired-bars row label — illustrative
-        after: string // paired-bars row label — REAL
-        lighthouseSource: string // 'Before: illustrative baseline, not measured. After: measured mobile +
-        // desktop Lighthouse performance, {date}.' — labels BOTH halves of the paired bars, immediately
-        // under that same chart (not just the shared block-level disclaimer further down)
-        speedLabel: string // "Mobile LCP, measured" — gauge label
+        conversionLabel: string // "Conversion, indexed" — indexed-line label
+        rpvLabel: string // "Revenue per visitor, indexed" — indexed-line label
+        orderValueLabel: string // "Order value, indexed" — indexed-line label
+        ringsCaption: string // 'Desktop · measured {date}.' — under the score rings row
+        before: string // dual-ring / load-time-pair label — illustrative
+        after: string // dual-ring / load-time-pair label — REAL
+        perfDualLabel: string // "Performance" — the dual ring's own label
+        cwvTitle: string // "Core Web Vitals" — strip heading
+        cwvLcp: string // "LCP" — pill label
+        cwvInp: string // "INP" — pill label
+        cwvCls: string // "CLS" — pill label
+        cwvSource: string // 'Real-user field data (CrUX), {date}.' — under the CWV strip
+        speedLabel: string // "Mobile LCP, measured" — lab gauge label (CWV-strip fallback)
         speedTarget: string // '≤{n}s — the "good" LCP threshold'
         speedSource: string // 'Measured Lighthouse LCP (mobile), {date}.'
         disclaimer: string // the required small-print line, verbatim, EN/ES/JA
         infoLabel: string // aria-label for the info-affordance button (aria-expanded)
         infoSentence: string // one sentence: ranges come from measured client work 2023–2026
-        // Headline strip (three chips above the chart grid) + the two added charts (order value,
-        // load time). Every headline delta pairs a real "after" with an illustrative "before" (or,
-        // for conversion, is illustrative end to end) — so all three chips carry the same
-        // `chipIllustrative` tag, never a "measured" one; see ProjectModal's headline-chip block.
+        // Headline strip: three chips above the chart grid, computed from the same data as the charts
+        // below them, no per-chip tag of their own (see ProjectModal's headline-chip block).
         chipConversionLabel: string // "Conversion" — headline chip label
         chipLoadTimeLabel: string // "Load time" — headline chip label
         chipLighthouseLabel: string // "Lighthouse" — headline chip label
-        chipIllustrative: string // "Illustrative" — the small tag on every headline chip
-        orderValueLabel: string // "Order value, indexed" — line-chart label, sits beside Conversion
-        orderValueRangeNote: string // "Illustrative: bundles and discount ladders"
         loadTimeLabel: string // "Load time" — paired-bar chart heading (distinct from the LCP gauge)
-        loadTimeSource: string // 'Before: illustrative baseline · After: measured LCP, {date}.'
+        loadTimeSource: string // 'Before: baseline · After: measured LCP, {date}.'
       }
       /** The sheet's "visualized" charts block — every number traces to commerce.json (storefront
        *  public data), telemetry.json (git history) or a hand-verified registry fact. */

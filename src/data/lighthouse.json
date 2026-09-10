@@ -1,48 +1,54 @@
 {
   "the-gummy-box": {
-    "fetchedAt": "2026-09-10T03:46:25.752Z",
+    "fetchedAt": "2026-09-10T07:31:46.826Z",
+    "source": "local, best of 3",
     "mobile": {
-      "perf": 62,
+      "perf": 77,
       "a11y": 100,
       "bp": 54,
       "seo": 100,
-      "lcp": 3.33,
-      "tbt": 769.9999999999995,
+      "lcp": 2.91,
+      "tbt": 548.4999999999991,
       "cls": 0.01680357780886609,
-      "finalUrl": "https://thegummyboxwellness.com/"
+      "finalUrl": "https://thegummyboxwellness.com/",
+      "field": null
     },
     "desktop": {
-      "perf": 98,
+      "perf": 99,
       "a11y": 100,
       "bp": 54,
       "seo": 100,
-      "lcp": 0.89,
-      "tbt": 44.5,
+      "lcp": 0.86,
+      "tbt": 31,
       "cls": 0.0001764786358462481,
-      "finalUrl": "https://thegummyboxwellness.com/"
+      "finalUrl": "https://thegummyboxwellness.com/",
+      "field": null
     }
   },
   "nos-cafe": {
-    "fetchedAt": "2026-09-10T03:48:50.037Z",
+    "fetchedAt": "2026-09-10T07:34:54.812Z",
+    "source": "local, best of 3",
     "mobile": {
-      "perf": 62,
+      "perf": 56,
       "a11y": 100,
       "bp": 77,
       "seo": 100,
-      "lcp": 3.87,
-      "tbt": 594.5,
+      "lcp": 5.29,
+      "tbt": 610.5,
       "cls": 0.001113601149555598,
-      "finalUrl": "https://cafesnos.com/"
+      "finalUrl": "https://cafesnos.com/",
+      "field": null
     },
     "desktop": {
-      "perf": 94,
+      "perf": 92,
       "a11y": 100,
       "bp": 77,
       "seo": 100,
-      "lcp": 1.03,
-      "tbt": 32,
-      "cls": 0.001234778040451799,
-      "finalUrl": "https://cafesnos.com/"
+      "lcp": 1,
+      "tbt": 32.5,
+      "cls": 0,
+      "finalUrl": "https://cafesnos.com/",
+      "field": null
     }
   },
   "millennio": {
@@ -92,26 +98,29 @@
     }
   },
   "nalua": {
-    "fetchedAt": "2026-09-10T03:51:37.336Z",
+    "fetchedAt": "2026-09-10T07:38:13.380Z",
+    "source": "local, best of 3",
     "mobile": {
-      "perf": 61,
+      "perf": 76,
       "a11y": 93,
       "bp": 77,
       "seo": 92,
-      "lcp": 5.07,
-      "tbt": 566,
-      "cls": 0.0004235386348436284,
-      "finalUrl": "https://naluaskincare.co/"
+      "lcp": 3.71,
+      "tbt": 392,
+      "cls": 0.0004048531068358213,
+      "finalUrl": "https://naluaskincare.co/",
+      "field": null
     },
     "desktop": {
-      "perf": 96,
+      "perf": 97,
       "a11y": 91,
       "bp": 77,
       "seo": 92,
-      "lcp": 0.96,
-      "tbt": 77.5,
+      "lcp": 0.95,
+      "tbt": 55.5,
       "cls": 0.002939463451828503,
-      "finalUrl": "https://naluaskincare.co/"
+      "finalUrl": "https://naluaskincare.co/",
+      "field": null
     }
   },
   "sebum": {
@@ -138,49 +147,55 @@
     }
   },
   "valdo-cafe": {
-    "fetchedAt": "2026-09-10T03:53:53.223Z",
+    "fetchedAt": "2026-09-10T07:41:22.633Z",
+    "source": "local, best of 3",
     "mobile": {
-      "perf": 19,
+      "perf": 13,
       "a11y": 96,
       "bp": 73,
       "seo": 100,
-      "lcp": 7.86,
-      "tbt": 960.7420000000002,
-      "cls": 1.3205030808514029,
-      "finalUrl": "https://valdocafe.co/"
+      "lcp": 9.89,
+      "tbt": 1799.999999999999,
+      "cls": 1.281696191953984,
+      "finalUrl": "https://valdocafe.co/",
+      "field": null
     },
     "desktop": {
-      "perf": 76,
+      "perf": 56,
       "a11y": 94,
       "bp": 73,
       "seo": 100,
-      "lcp": 1.66,
-      "tbt": 303.4999999999999,
-      "cls": 0.08389513108614233,
-      "finalUrl": "https://valdocafe.co/"
+      "lcp": 1.58,
+      "tbt": 299,
+      "cls": 0.9778460258010819,
+      "finalUrl": "https://valdocafe.co/",
+      "field": null
     }
   },
   "factores-2x2": {
-    "fetchedAt": "2026-09-10T03:54:38.774Z",
+    "fetchedAt": "2026-09-10T07:43:55.934Z",
+    "source": "local, best of 3",
     "mobile": {
       "perf": 69,
       "a11y": 100,
       "bp": 58,
       "seo": 100,
-      "lcp": 3.78,
-      "tbt": 657,
-      "cls": 0.013823882179082439,
-      "finalUrl": "https://factoresdetransferenciaacc.com.co/"
+      "lcp": 3.7,
+      "tbt": 708.5,
+      "cls": 0.0034272255038555427,
+      "finalUrl": "https://factoresdetransferenciaacc.com.co/",
+      "field": null
     },
     "desktop": {
       "perf": 99,
       "a11y": 100,
       "bp": 58,
       "seo": 100,
-      "lcp": 0.8,
-      "tbt": 17,
-      "cls": 0.00021200420278434464,
-      "finalUrl": "https://factoresdetransferenciaacc.com.co/"
+      "lcp": 0.81,
+      "tbt": 73.50000000000023,
+      "cls": 0.000998099963882322,
+      "finalUrl": "https://factoresdetransferenciaacc.com.co/",
+      "field": null
     }
   },
   "pixxiesx": {
@@ -276,26 +291,29 @@
     }
   },
   "peluna": {
-    "fetchedAt": "2026-09-10T03:59:25.438Z",
+    "fetchedAt": "2026-09-10T07:46:57.968Z",
+    "source": "local, best of 3",
     "mobile": {
-      "perf": 75,
+      "perf": 70,
       "a11y": 93,
       "bp": 73,
       "seo": 100,
-      "lcp": 5.16,
-      "tbt": 264.5,
+      "lcp": 4.83,
+      "tbt": 415,
       "cls": 0,
-      "finalUrl": "https://pelunapets.com/"
+      "finalUrl": "https://pelunapets.com/",
+      "field": null
     },
     "desktop": {
-      "perf": 99,
+      "perf": 98,
       "a11y": 93,
       "bp": 73,
       "seo": 100,
-      "lcp": 0.93,
-      "tbt": 33.5,
+      "lcp": 1.06,
+      "tbt": 27,
       "cls": 0.0001557669217566018,
-      "finalUrl": "https://pelunapets.com/"
+      "finalUrl": "https://pelunapets.com/",
+      "field": null
     }
   },
   "en-amor-a-dos": {

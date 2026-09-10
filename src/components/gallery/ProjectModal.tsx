@@ -9,7 +9,27 @@ import { Carousel } from '../../vendor/carousel'
 import type { StoreMetrics } from '../../data/registry'
 import type { StoreTelemetry } from '../../data/telemetry'
 import type { CommerceLabels } from '../../content/types'
-import { CommitsLine, CompareBars, CountUp, DiscountLadder, Gauge, goodText, IndexAreaLine, LighthousePairedBars, LoadTimePairedBar, PriceRangeBar, SpeedGauge, VolumeBars, WeeklyBars, type CompareRow, type LighthousePairRow } from './charts'
+import {
+  CommitsLine,
+  CompareBars,
+  CountUp,
+  CwvStrip,
+  DiscountLadder,
+  Gauge,
+  goodText,
+  IndexAreaLine,
+  LoadTimePairedBar,
+  PerfDualRing,
+  PriceRangeBar,
+  ScoreRingsRow,
+  scoreColor,
+  SpeedGauge,
+  VolumeBars,
+  WeeklyBars,
+  type CompareRow,
+  type CwvData,
+  type RingMetric,
+} from './charts'
 
 export interface CaseStudyStat {
   label: string
@@ -32,17 +52,21 @@ export interface CaseStudyCharts {
 /**
  * "Impact" — conversion, order value and revenue-per-visitor are illustrative, deterministic per
  * store (seeded by slug, see src/data/illustrative.ts), always present, and anchored to the CV's own
- * measured ranges. `lighthouse`/`speed` are REAL (src/data/lighthouse.json) and null whenever that
- * store has no measured score — the whole Lighthouse chart (or the speed gauge) is then omitted,
- * never estimated. `loadTime` pairs that same real mobile LCP with an illustrative "before" anchor
- * (src/data/illustrative.ts loadTimeSeries) and is null under the identical condition as `speed`.
+ * measured ranges. `rings`, `perfDual`, `cwv` and `speed` are REAL (src/data/lighthouse.json) and null
+ * piece by piece whenever that store has no measured score for it — the whole chart it feeds is then
+ * omitted, never estimated. `perfDual.before` is the one illustrative figure in this real cluster: the
+ * dual ring's thin inner "baseline" arc (src/data/illustrative.ts lighthouseBeforeScore), paired with
+ * the real measured "after" score. `loadTime` pairs the real mobile LCP with an illustrative "before"
+ * anchor (loadTimeSeries) and is null under the identical condition as `speed`.
  */
 export interface ImpactCharts {
   conversion: { points: number[]; low: number[]; high: number[]; deltaPct: number }
   orderValue: { points: number[]; deltaPct: number }
   rpv: { points: number[]; deltaPct: number }
-  lighthouse: { fetchedAt: string; mobile: { before: number; after: number } | null; desktop: { before: number; after: number } | null } | null
-  speed: { seconds: number; fetchedAt: string } | null
+  rings: { metrics: RingMetric[]; fetchedAt: string } | null // desktop Performance/Accessibility/SEO, ≥50 only
+  perfDual: { before: number; after: number; fetchedAt: string } | null // desktop performance before→after
+  cwv: { data: CwvData; fetchedAt: string } | null // CrUX field data, when the origin has enough real-user traffic
+  speed: { seconds: number; fetchedAt: string } | null // lab LCP gauge fallback when `cwv` is null
   loadTime: { beforeSeconds: number; afterSeconds: number; deltaPct: number; fetchedAt: string } | null
 }
 
@@ -105,15 +129,17 @@ export interface CaseStudyLabels {
   impact: {
     title: string
     conversionLabel: string
-    conversionRangeNote: string
     rpvLabel: string
-    rpvRangeNote: string
-    lighthouseLabel: string
-    lighthouseMobile: string
-    lighthouseDesktop: string
+    orderValueLabel: string
+    ringsCaption: string
     before: string
     after: string
-    lighthouseSource: string
+    perfDualLabel: string
+    cwvTitle: string
+    cwvLcp: string
+    cwvInp: string
+    cwvCls: string
+    cwvSource: string
     speedLabel: string
     speedTarget: string
     speedSource: string
@@ -123,9 +149,6 @@ export interface CaseStudyLabels {
     chipConversionLabel: string
     chipLoadTimeLabel: string
     chipLighthouseLabel: string
-    chipIllustrative: string
-    orderValueLabel: string
-    orderValueRangeNote: string
     loadTimeLabel: string
     loadTimeSource: string
   }
@@ -214,9 +237,6 @@ function ImpactDisclosure({ disclaimer, infoLabel, infoSentence, dark }: { discl
   )
 }
 
-/** Lighthouse's own bands: 90+ green, 50–89 orange, below red. */
-const band = (score: number) => (score >= 90 ? '#34c759' : score >= 50 ? '#ff9f0a' : '#ff3b30')
-
 const RING_R = 22
 const RING_C = 2 * Math.PI * RING_R
 
@@ -249,7 +269,7 @@ function ScoreRing({ value, label, delay, dark, tile }: { value: number; label: 
           fill="none"
           strokeWidth="5"
           strokeLinecap="round"
-          stroke={band(value)}
+          stroke={scoreColor(value)}
           strokeDasharray={RING_C}
           style={{ strokeDashoffset: dash }}
           transform="rotate(-90 28 28)"
@@ -362,37 +382,26 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
   ].filter((s): s is string => !!s)
   const hasCharts = !!ch && (compareRows.length > 0 || ch.onSaleShare != null || !!ch.ladder || !!ch.weeklyCommits || !!ch.priceRange)
 
-  // "Impact": conversion + revenue-per-visitor are illustrative (always present, seeded per store —
-  // see src/data/illustrative.ts), Lighthouse "after" and the LCP gauge are real (src/data/lighthouse.json).
-  // A form (mobile/desktop) missing a measured score drops out of `lhRows`; the paired-bars chart only
-  // renders once both forms are present, per the owner's "no partial pair" call.
+  // "Impact": conversion, order value and revenue-per-visitor are illustrative (always present, seeded
+  // per store — see src/data/illustrative.ts). Everything else — the score rings, the performance dual
+  // ring's real "after" arc, the Core Web Vitals strip and the LCP gauge — is real, straight from
+  // src/data/lighthouse.json, omitted piece by piece whenever that store has no measured value for it.
   const il = labels.impact
   const impact = ch?.impact
   const fmtDate = (iso: string) => new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
-  const lhRows: LighthousePairRow[] = impact?.lighthouse
-    ? [
-        ...(impact.lighthouse.mobile ? [{ key: 'mobile', label: il.lighthouseMobile, before: impact.lighthouse.mobile.before, after: impact.lighthouse.mobile.after }] : []),
-        ...(impact.lighthouse.desktop ? [{ key: 'desktop', label: il.lighthouseDesktop, before: impact.lighthouse.desktop.before, after: impact.lighthouse.desktop.after }] : []),
-      ]
-    : []
-  const showLighthouseChart = lhRows.length === 2
 
   // Headline strip: three typographic chips computed from the same `impact` data as the charts below
-  // them, never a separate number. Every one of them pairs (or is entirely) an illustrative figure —
-  // conversion is illustrative end to end, and the Lighthouse/load-time deltas both subtract a real
-  // "after" from an illustrative "before" — so all three carry the same `chipIllustrative` tag; there
-  // is no "measured" lift to show here (the sheet's real, unqualified numbers live in the metrics/
-  // commerce/charts blocks below, not this strip). The Lighthouse chip is gated on `showLighthouseChart`
-  // (both forms clearing the +8pt pairing margin) — never a lone number with no chart behind it, per
-  // the same "no partial pair" call that already hides the paired-bars chart itself (see lhRows above;
-  // caught on Valdo Café, 2026-09-10, where a desktop-only pass produced a "+25 Illustrative" chip with
-  // zero chart or sr-only table backing it). Prefers the desktop form, per the owner's spec.
-  const lighthouseChipForm = showLighthouseChart ? (impact?.lighthouse?.desktop ?? impact?.lighthouse?.mobile ?? null) : null
+  // them, never a separate number. Conversion is illustrative end to end; the load-time and Lighthouse
+  // deltas both subtract a real "after" from an illustrative "before" — the design's only per-block
+  // disclosure is the small print under the whole section (ImpactDisclosure below), so these chips
+  // carry no per-chip tag of their own. The Lighthouse chip only appears once the dual ring itself
+  // renders (same real "after" clearing the illustrative baseline by the +8pt pairing margin — see
+  // Gallery.impactFor) — never a lone number with no chart behind it.
   const headlineChips = impact
     ? [
         { key: 'conversion', value: impact.conversion.deltaPct, sign: '+' as const, label: il.chipConversionLabel },
         impact.loadTime ? { key: 'loadtime', value: impact.loadTime.deltaPct, sign: '−' as const, label: il.chipLoadTimeLabel } : null,
-        lighthouseChipForm ? { key: 'lighthouse', value: Math.round(lighthouseChipForm.after - lighthouseChipForm.before), sign: '+' as const, label: il.chipLighthouseLabel } : null,
+        impact.perfDual ? { key: 'lighthouse', value: Math.round(impact.perfDual.after - impact.perfDual.before), sign: '+' as const, label: il.chipLighthouseLabel } : null,
       ].filter((c): c is { key: string; value: number; sign: '+' | '−'; label: string } => !!c)
     : []
 
@@ -511,14 +520,15 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
                 <p className={`${skin.accent} text-sm font-medium`}>{data.tagline}</p>
                 <p className="mt-2 text-sm leading-relaxed">{data.description}</p>
 
-                {/* "Impact": the client-outcome story, above "By the numbers". Headline strip first
-                    (three chips computed from the same data as the charts below), then conversion +
-                    order value, then revenue per visitor + load time, then Lighthouse, then the LCP
-                    gauge. Conversion, order value and revenue per visitor are illustrative
-                    representations (never this store's real numbers) — deterministic per store and
-                    anchored to the CV's own measured ranges; Lighthouse's "after" bar, the load-time
-                    pair's "after" bar and the LCP gauge are real, measured scores. The small print
-                    sits directly under the whole block, per the owner's labeling rule. */}
+                {/* "Impact": the client-outcome story, above "By the numbers". Fixed order per the
+                    owner's 2026-09-10 layout call: headline chips → score rings row → performance dual
+                    ring (+ Core Web Vitals or the LCP gauge) → the three indexed lines (conversion,
+                    order value, revenue per visitor) → the block-level small print, the sheet's only
+                    illustrative disclosure (no per-chip/per-chart tag anywhere in this block). Score
+                    rings, the dual ring's real "after" arc, the CWV strip and the LCP gauge are real,
+                    measured numbers (src/data/lighthouse.json); conversion, order value, revenue per
+                    visitor and the dual ring's thin inner "before" arc are illustrative representations
+                    anchored to the CV's own measured ranges. */}
                 {impact && (
                   <>
                     <p className={`mt-6 ${label}`}>{il.title}</p>
@@ -528,61 +538,78 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
                           <div key={c.key} className={`${tile} flex min-w-[104px] flex-1 basis-[104px] flex-col gap-0.5`}>
                             <CountUp value={c.value} prefix={c.sign} suffix={c.key === 'lighthouse' ? '' : '%'} delay={0.05 + i * 0.05} className={`text-xl font-semibold leading-none tabular-nums ${goodText(dark)}`} />
                             <span className="text-[11px] leading-tight">{c.label}</span>
-                            <span className={`text-[9px] font-semibold uppercase tracking-[0.14em] ${skin.muted}`}>{il.chipIllustrative}</span>
                           </div>
                         ))}
                       </div>
                     )}
-                    <div key={`${data.name}-impact`} className="mt-3 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+
+                    {impact.rings && (
+                      <div className={`${tile} mt-3`}>
+                        <ScoreRingsRow metrics={impact.rings.metrics} caption={il.ringsCaption.replace('{date}', fmtDate(impact.rings.fetchedAt))} dark={dark} delay={0.05} />
+                      </div>
+                    )}
+
+                    {(impact.perfDual || impact.cwv || impact.speed || impact.loadTime) && (
+                      <div key={`${data.name}-impact-real`} className="mt-3 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+                        {impact.perfDual && (
+                          <div className={`${tile} ${impact.cwv || impact.speed || impact.loadTime ? '' : 'sm:col-span-2'}`}>
+                            <PerfDualRing before={impact.perfDual.before} after={impact.perfDual.after} label={il.perfDualLabel} beforeLabel={il.before} afterLabel={il.after} dark={dark} delay={0.15} />
+                          </div>
+                        )}
+                        {impact.cwv ? (
+                          <div className={`${tile} ${impact.perfDual ? '' : 'sm:col-span-2'}`}>
+                            <p className={`text-[10px] font-semibold uppercase tracking-[0.16em] ${skin.muted}`}>{il.cwvTitle}</p>
+                            <div className="mt-3">
+                              <CwvStrip data={impact.cwv.data} lcpLabel={il.cwvLcp} inpLabel={il.cwvInp} clsLabel={il.cwvCls} dark={dark} delay={0.25} />
+                            </div>
+                            <p className={`${skin.muted} mt-2 text-[11px] leading-snug`}>{il.cwvSource.replace('{date}', fmtDate(impact.cwv.fetchedAt))}</p>
+                          </div>
+                        ) : (
+                          impact.speed && (
+                            <div className={`${tile} ${impact.perfDual ? '' : 'sm:col-span-2'}`}>
+                              <SpeedGauge seconds={impact.speed.seconds} label={il.speedLabel} targetLabel={il.speedTarget.replace('{n}', '2.5')} dark={dark} delay={0.25} />
+                              <p className={`${skin.muted} mt-2 text-[11px] leading-snug`}>{il.speedSource.replace('{date}', fmtDate(impact.speed.fetchedAt))}</p>
+                            </div>
+                          )
+                        )}
+                        {impact.loadTime && (
+                          <div className={`${tile} sm:col-span-2`}>
+                            <LoadTimePairedBar
+                              beforeSeconds={impact.loadTime.beforeSeconds}
+                              afterSeconds={impact.loadTime.afterSeconds}
+                              deltaPct={impact.loadTime.deltaPct}
+                              beforeLabel={il.before}
+                              afterLabel={il.after}
+                              label={il.loadTimeLabel}
+                              dark={dark}
+                              delay={0.3}
+                            />
+                            <p className={`${skin.muted} mt-2 text-[11px] leading-snug`}>{il.loadTimeSource.replace('{date}', fmtDate(impact.loadTime.fetchedAt))}</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <div key={`${data.name}-impact-indexed`} className="mt-3 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-3">
                       <div className={tile}>
                         <IndexAreaLine
                           points={impact.conversion.points}
                           band={{ low: impact.conversion.low, high: impact.conversion.high }}
                           label={il.conversionLabel}
                           deltaPct={impact.conversion.deltaPct}
-                          rangeNote={il.conversionRangeNote}
                           color={accent}
                           dark={dark}
-                          delay={0.1}
+                          delay={0.35}
                         />
                       </div>
                       <div className={tile}>
-                        <IndexAreaLine points={impact.orderValue.points} label={il.orderValueLabel} deltaPct={impact.orderValue.deltaPct} rangeNote={il.orderValueRangeNote} color={accent} dark={dark} delay={0.15} />
+                        <IndexAreaLine points={impact.orderValue.points} label={il.orderValueLabel} deltaPct={impact.orderValue.deltaPct} color={accent} dark={dark} delay={0.4} />
                       </div>
-                      <div className={`${tile} ${impact.loadTime ? '' : 'sm:col-span-2'}`}>
-                        <IndexAreaLine points={impact.rpv.points} label={il.rpvLabel} deltaPct={impact.rpv.deltaPct} rangeNote={il.rpvRangeNote} color={accent} dark={dark} delay={0.2} />
+                      <div className={tile}>
+                        <IndexAreaLine points={impact.rpv.points} label={il.rpvLabel} deltaPct={impact.rpv.deltaPct} color={accent} dark={dark} delay={0.45} />
                       </div>
-                      {impact.loadTime && (
-                        <div className={tile}>
-                          <LoadTimePairedBar
-                            beforeSeconds={impact.loadTime.beforeSeconds}
-                            afterSeconds={impact.loadTime.afterSeconds}
-                            deltaPct={impact.loadTime.deltaPct}
-                            beforeLabel={il.before}
-                            afterLabel={il.after}
-                            label={il.loadTimeLabel}
-                            dark={dark}
-                            delay={0.25}
-                          />
-                          <p className={`${skin.muted} mt-2 text-[11px] leading-snug`}>{il.loadTimeSource.replace('{date}', fmtDate(impact.loadTime.fetchedAt))}</p>
-                        </div>
-                      )}
-                      {showLighthouseChart && (
-                        <div className={`${tile} sm:col-span-2`}>
-                          <p className={`text-[10px] font-semibold uppercase tracking-[0.16em] ${skin.muted}`}>{il.lighthouseLabel}</p>
-                          <div className="mt-3">
-                            <LighthousePairedBars rows={lhRows} beforeLabel={il.before} afterLabel={il.after} dark={dark} delay={0.3} />
-                          </div>
-                          {impact.lighthouse && <p className={`${skin.muted} mt-2 text-[11px] leading-snug`}>{il.lighthouseSource.replace('{date}', fmtDate(impact.lighthouse.fetchedAt))}</p>}
-                        </div>
-                      )}
-                      {impact.speed && (
-                        <div className={`${tile} ${showLighthouseChart ? '' : 'sm:col-span-2'}`}>
-                          <SpeedGauge seconds={impact.speed.seconds} label={il.speedLabel} targetLabel={il.speedTarget.replace('{n}', '2.5')} dark={dark} delay={0.35} />
-                          <p className={`${skin.muted} mt-2 text-[11px] leading-snug`}>{il.speedSource.replace('{date}', fmtDate(impact.speed.fetchedAt))}</p>
-                        </div>
-                      )}
                     </div>
+
                     <ImpactDisclosure key={data.name} disclaimer={il.disclaimer} infoLabel={il.infoLabel} infoSentence={il.infoSentence} dark={dark} />
                   </>
                 )}
