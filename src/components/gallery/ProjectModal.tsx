@@ -9,7 +9,7 @@ import { Carousel } from '../../vendor/carousel'
 import type { StoreMetrics } from '../../data/registry'
 import type { StoreTelemetry } from '../../data/telemetry'
 import type { CommerceLabels } from '../../content/types'
-import { CommitsLine, CompareBars, CountUp, DiscountLadder, Gauge, PriceRangeBar, VolumeBars, WeeklyBars, type CompareRow } from './charts'
+import { CommitsLine, CompareBars, CountUp, DiscountLadder, Gauge, IndexAreaLine, LighthousePairedBars, PriceRangeBar, SpeedGauge, VolumeBars, WeeklyBars, type CompareRow, type LighthousePairRow } from './charts'
 
 export interface CaseStudyStat {
   label: string
@@ -26,6 +26,20 @@ export interface CaseStudyCharts {
   weeklyCommits: { weeks: number[]; weekOf: string } | null
   priceRange: { min: number; max: number; median: number | null; currency: string } | null
   fetchedAt: string | null // commerce.json's fetchedAt, ISO — only set when a live commerce entry exists
+  impact: ImpactCharts
+}
+
+/**
+ * "Impact" — conversion + revenue-per-visitor are illustrative, deterministic per store (seeded by
+ * slug, see src/data/illustrative.ts), always present, and anchored to the CV's own measured ranges.
+ * `lighthouse`/`speed` are REAL (src/data/lighthouse.json) and null whenever that store has no
+ * measured score — the whole Lighthouse chart (or the speed gauge) is then omitted, never estimated.
+ */
+export interface ImpactCharts {
+  conversion: { points: number[]; low: number[]; high: number[]; deltaPct: number }
+  rpv: { points: number[]; deltaPct: number }
+  lighthouse: { fetchedAt: string; mobile: { before: number; after: number } | null; desktop: { before: number; after: number } | null } | null
+  speed: { seconds: number; fetchedAt: string } | null
 }
 
 /** One "By the numbers" tile: catalog, offer, delivery or reach — see src/data/commerceLines.ts. */
@@ -84,6 +98,24 @@ export interface CaseStudyLabels {
   copyLink: string
   copied: string
   commerce: CommerceLabels
+  impact: {
+    title: string
+    conversionLabel: string
+    conversionRangeNote: string
+    rpvLabel: string
+    lighthouseLabel: string
+    lighthouseMobile: string
+    lighthouseDesktop: string
+    before: string
+    after: string
+    lighthouseSource: string
+    speedLabel: string
+    speedTarget: string
+    speedSource: string
+    disclaimer: string
+    infoLabel: string
+    infoSentence: string
+  }
   charts: {
     title: string
     compareLabel: string
@@ -135,6 +167,39 @@ const CloseGlyph = () => (
     <path d="M5 5l10 10M15 5L5 15" strokeLinecap="round" />
   </svg>
 )
+const InfoGlyph = () => (
+  <svg viewBox="0 0 20 20" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+    <circle cx="10" cy="10" r="7.25" />
+    <path d="M10 9.2v4.3M10 6.5h.01" strokeLinecap="round" />
+  </svg>
+)
+
+/**
+ * The small print RULE (1) requires under every illustrative figure, plus a one-sentence info
+ * affordance behind an `aria-expanded` toggle. `key`-ed by the caller to the open store so the
+ * disclosure always starts collapsed on a fresh sheet/prev/next instead of carrying state across stores.
+ */
+function ImpactDisclosure({ disclaimer, infoLabel, infoSentence, dark }: { disclaimer: string; infoLabel: string; infoSentence: string; dark: boolean }) {
+  const [open, setOpen] = useState(false)
+  const muted = dark ? 'text-[#a1a1a6]' : 'text-[#6e6e73]'
+  return (
+    <div className="mt-2">
+      <div className="flex items-start gap-1.5">
+        <p className={`text-[11px] leading-snug ${muted}`}>{disclaimer}</p>
+        <button
+          type="button"
+          aria-expanded={open}
+          aria-label={infoLabel}
+          onClick={() => setOpen((o) => !o)}
+          className={`press mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full ${dark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'} ${muted}`}
+        >
+          <InfoGlyph />
+        </button>
+      </div>
+      {open && <p className={`mt-1 text-[11px] leading-snug ${muted}`}>{infoSentence}</p>}
+    </div>
+  )
+}
 
 /** Lighthouse's own bands: 90+ green, 50–89 orange, below red. */
 const band = (score: number) => (score >= 90 ? '#34c759' : score >= 50 ? '#ff9f0a' : '#ff3b30')
@@ -284,6 +349,21 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
   ].filter((s): s is string => !!s)
   const hasCharts = !!ch && (compareRows.length > 0 || ch.onSaleShare != null || !!ch.ladder || !!ch.weeklyCommits || !!ch.priceRange)
 
+  // "Impact": conversion + revenue-per-visitor are illustrative (always present, seeded per store —
+  // see src/data/illustrative.ts), Lighthouse "after" and the LCP gauge are real (src/data/lighthouse.json).
+  // A form (mobile/desktop) missing a measured score drops out of `lhRows`; the paired-bars chart only
+  // renders once both forms are present, per the owner's "no partial pair" call.
+  const il = labels.impact
+  const impact = ch?.impact
+  const fmtDate = (iso: string) => new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+  const lhRows: LighthousePairRow[] = impact?.lighthouse
+    ? [
+        ...(impact.lighthouse.mobile ? [{ key: 'mobile', label: il.lighthouseMobile, before: impact.lighthouse.mobile.before, after: impact.lighthouse.mobile.after }] : []),
+        ...(impact.lighthouse.desktop ? [{ key: 'desktop', label: il.lighthouseDesktop, before: impact.lighthouse.desktop.before, after: impact.lighthouse.desktop.after }] : []),
+      ]
+    : []
+  const showLighthouseChart = lhRows.length === 2
+
   const content = (
     <AnimatePresence>
       {open && data && (
@@ -398,6 +478,50 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
               <div ref={scrollerRef} className="relative flex-1 overflow-y-auto p-6 lg:p-8" data-lenis-prevent>
                 <p className={`${skin.accent} text-sm font-medium`}>{data.tagline}</p>
                 <p className="mt-2 text-sm leading-relaxed">{data.description}</p>
+
+                {/* "Impact": the client-outcome story, above "By the numbers". Conversion and revenue
+                    per visitor are illustrative representations (never this store's real numbers) —
+                    deterministic per store and anchored to the CV's own measured ranges; Lighthouse's
+                    "after" bar and the LCP gauge are real, measured scores. The small print sits
+                    directly under the block, per the owner's labeling rule. */}
+                {impact && (
+                  <>
+                    <p className={`mt-6 ${label}`}>{il.title}</p>
+                    <div key={`${data.name}-impact`} className="mt-3 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+                      <div className={tile}>
+                        <IndexAreaLine
+                          points={impact.conversion.points}
+                          band={{ low: impact.conversion.low, high: impact.conversion.high }}
+                          label={il.conversionLabel}
+                          deltaPct={impact.conversion.deltaPct}
+                          rangeNote={il.conversionRangeNote}
+                          color={accent}
+                          dark={dark}
+                          delay={0.1}
+                        />
+                      </div>
+                      <div className={tile}>
+                        <IndexAreaLine points={impact.rpv.points} label={il.rpvLabel} deltaPct={impact.rpv.deltaPct} color={accent} dark={dark} delay={0.15} />
+                      </div>
+                      {showLighthouseChart && (
+                        <div className={`${tile} sm:col-span-2`}>
+                          <p className={`text-[10px] font-semibold uppercase tracking-[0.16em] ${skin.muted}`}>{il.lighthouseLabel}</p>
+                          <div className="mt-3">
+                            <LighthousePairedBars rows={lhRows} beforeLabel={il.before} afterLabel={il.after} dark={dark} delay={0.2} />
+                          </div>
+                          {impact.lighthouse && <p className={`${skin.muted} mt-2 text-[11px] leading-snug`}>{il.lighthouseSource.replace('{date}', fmtDate(impact.lighthouse.fetchedAt))}</p>}
+                        </div>
+                      )}
+                      {impact.speed && (
+                        <div className={`${tile} ${showLighthouseChart ? '' : 'sm:col-span-2'}`}>
+                          <SpeedGauge seconds={impact.speed.seconds} label={il.speedLabel} targetLabel={il.speedTarget.replace('{n}', '2.5')} dark={dark} delay={0.25} />
+                          <p className={`${skin.muted} mt-2 text-[11px] leading-snug`}>{il.speedSource.replace('{date}', fmtDate(impact.speed.fetchedAt))}</p>
+                        </div>
+                      )}
+                    </div>
+                    <ImpactDisclosure key={data.name} disclaimer={il.disclaimer} infoLabel={il.infoLabel} infoSentence={il.infoSentence} dark={dark} />
+                  </>
+                )}
 
                 {/* Commerce-oriented, not engineering telemetry: catalog, offer, delivery, reach — the
                     same four angles the index chip and gallery caption each show one slice of. */}

@@ -356,6 +356,203 @@ export function PriceRangeBar({
   )
 }
 
+/**
+ * An indexed line (before = 100) for an illustrative outcome — conversion or revenue-per-visitor.
+ * When `band` is given (conversion: the CV's own +10%/+20% floor and ceiling) it's drawn as a soft
+ * fill the store's own seeded line always sits inside, so a single trajectory reads as one
+ * representation of a known, disclosed range rather than a standalone number. Paint-only animation
+ * (opacity + stroke-dash), an sr-only table underneath, headline delta counts up in the good-direction
+ * color since every series here is a seeded lift, never a decline.
+ */
+export function IndexAreaLine({
+  points,
+  band,
+  label,
+  deltaPct,
+  rangeNote,
+  color,
+  dark,
+  delay = 0,
+}: {
+  points: number[]
+  band?: { low: number[]; high: number[] }
+  label: string
+  deltaPct: number
+  rangeNote?: string
+  delay?: number
+} & Palette) {
+  const reduced = useReducedMotion()
+  const w = 240
+  const h = 72
+  const pad = 6
+  const n = points.length
+  const allVals = [...points, ...(band ? [...band.low, ...band.high] : []), 100]
+  const min = Math.min(...allVals) - 2
+  const max = Math.max(...allVals) + 2
+  const span = max - min || 1
+  const x = (i: number) => pad + (n > 1 ? (i / (n - 1)) * (w - pad * 2) : 0)
+  const y = (v: number) => h - pad - ((v - min) / span) * (h - pad * 2)
+  const lineOf = (arr: number[]) => arr.map((v, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ')
+  const linePath = lineOf(points)
+  const bandPath = band
+    ? `${lineOf(band.high)} L${x(n - 1).toFixed(1)},${y(band.low[n - 1]).toFixed(1)} ${band.low
+        .slice()
+        .reverse()
+        .map((v, i) => `L${x(n - 1 - i).toFixed(1)},${y(v).toFixed(1)}`)
+        .join(' ')} Z`
+    : null
+  const baselineY = y(100)
+  return (
+    <figure className="m-0">
+      <div className="flex items-baseline justify-between gap-2">
+        <figcaption className={`text-[11px] leading-tight ${mutedText(dark)}`}>{label}</figcaption>
+        <CountUp value={deltaPct} prefix="+" suffix="%" delay={delay + 0.6} className={`text-sm font-semibold tabular-nums ${goodText(dark)}`} />
+      </div>
+      <svg viewBox={`0 0 ${w} ${h}`} className="mt-1.5 h-[62px] w-full" preserveAspectRatio="none" role="img" aria-label={`${label}: ${points[0]} → ${points[n - 1]} (index, base 100)`}>
+        <line x1={pad} x2={w - pad} y1={baselineY} y2={baselineY} stroke={dark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)'} strokeWidth={1} strokeDasharray="3 4" />
+        {bandPath && (
+          <m.path d={bandPath} fill={color} fillOpacity={dark ? 0.14 : 0.09} stroke="none" initial={reduced ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: delay + 0.3, duration: 0.5 }} />
+        )}
+        <m.path
+          d={linePath}
+          fill="none"
+          stroke={color}
+          strokeWidth={2.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          initial={reduced ? false : { pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ delay, duration: 0.9, ease: EASE }}
+        />
+        <m.circle
+          cx={x(n - 1)}
+          cy={y(points[n - 1])}
+          r={3}
+          fill={color}
+          initial={reduced ? false : { scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: delay + 0.8, duration: 0.3, ease: EASE }}
+        />
+      </svg>
+      {rangeNote && <p className={`mt-1 text-[11px] leading-tight ${mutedText(dark)}`}>{rangeNote}</p>}
+      <SrTable caption={label} rows={points.map((v, i) => [`W${i + 1}`, String(v)] as [string, string])} />
+    </figure>
+  )
+}
+
+export interface LighthousePairRow {
+  key: string
+  label: string
+  before: number // illustrative
+  after: number // REAL — src/data/lighthouse.json
+}
+
+/** Lighthouse's own bands: 90+ green, 50–89 orange, below red — same thresholds ProjectModal's
+ *  ScoreRing uses for the sheet's real metrics block, applied here to the (real) "after" bar only. */
+const scoreColor = (score: number) => (score >= 90 ? '#34c759' : score >= 50 ? '#ff9f0a' : '#ff3b30')
+
+/** Paired before/after bars, one row per form (mobile, desktop): "before" is the illustrative anchor,
+ *  muted like every other illustrative bar in this file; "after" is the real measured score, colored
+ *  by Lighthouse's own bands so a real 90+ reads exactly like the sheet's other real metrics. */
+export function LighthousePairedBars({ rows, beforeLabel, afterLabel, dark, delay = 0 }: { rows: LighthousePairRow[]; beforeLabel: string; afterLabel: string; dark: boolean; delay?: number }) {
+  const reduced = useReducedMotion()
+  if (rows.length === 0) return null
+  return (
+    <figure className="m-0 space-y-3">
+      {rows.map((r, i) => {
+        const delta = Math.round(r.after - r.before)
+        const bars = [
+          { key: beforeLabel, v: r.before, c: dark ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.16)' },
+          { key: afterLabel, v: r.after, c: scoreColor(r.after) },
+        ]
+        return (
+          <div key={r.key}>
+            <div className="flex items-baseline justify-between gap-2">
+              <figcaption className={`text-[11px] leading-tight ${mutedText(dark)}`}>{r.label}</figcaption>
+              {delta !== 0 && <CountUp value={Math.abs(delta)} prefix={delta > 0 ? '+' : '−'} delay={delay + i * 0.15 + 0.5} className={`text-xs font-semibold tabular-nums ${delta > 0 ? goodText(dark) : badText(dark)}`} />}
+            </div>
+            <div className="mt-1.5 space-y-1.5" role="img" aria-label={`${r.label}: ${beforeLabel} ${r.before}, ${afterLabel} ${r.after}`}>
+              {bars.map((b, j) => (
+                <div key={b.key} className="flex items-center gap-2">
+                  <span className={`w-14 shrink-0 text-[10px] uppercase tracking-[0.12em] ${mutedText(dark)}`}>{b.key}</span>
+                  <div className={`h-2.5 flex-1 overflow-hidden rounded-full ${dark ? 'bg-white/10' : 'bg-black/[0.06]'}`}>
+                    <m.div
+                      className="h-full rounded-full"
+                      style={{ backgroundColor: b.c }}
+                      initial={reduced ? false : { width: 0 }}
+                      animate={{ width: `${Math.max(2, (b.v / 100) * 100)}%` }}
+                      transition={{ delay: delay + i * 0.15 + j * 0.12, duration: 0.9, ease: EASE }}
+                    />
+                  </div>
+                  <span className="w-8 shrink-0 text-right text-xs font-semibold tabular-nums">{Math.round(b.v)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      })}
+      <SrTable
+        caption={`${beforeLabel} / ${afterLabel}`}
+        rows={rows.flatMap((r) => [
+          [`${r.label} — ${beforeLabel}`, String(r.before)],
+          [`${r.label} — ${afterLabel}`, String(r.after)],
+        ] as [string, string][])}
+      />
+    </figure>
+  )
+}
+
+const SPEED_R = 22
+const SPEED_C = 2 * Math.PI * SPEED_R
+
+/** A small gauge for one REAL measurement — mobile LCP — against a fixed 0..domainMax scale, colored
+ *  by whether it clears the "good" threshold (green), the "needs improvement" band (orange), or
+ *  neither (red) — Lighthouse/CrUX's own LCP bands (≤2.5s / ≤4s / above). */
+export function SpeedGauge({
+  seconds,
+  thresholdSeconds = 2.5,
+  domainMax = 4.5,
+  label,
+  targetLabel,
+  dark,
+  delay = 0,
+}: {
+  seconds: number
+  thresholdSeconds?: number
+  domainMax?: number
+  label: string
+  targetLabel: string
+  dark: boolean
+  delay?: number
+}) {
+  const reduced = useReducedMotion()
+  const color = seconds <= thresholdSeconds ? '#34c759' : seconds <= thresholdSeconds * 1.6 ? '#ff9f0a' : '#ff3b30'
+  const mv = useMotionValue(reduced ? seconds : 0)
+  const shown = useTransform(mv, (v) => `${v.toFixed(1)}s`)
+  const dash = useTransform(mv, (v) => SPEED_C - (Math.max(0, Math.min(domainMax, v)) / domainMax) * SPEED_C)
+  useEffect(() => {
+    if (reduced) {
+      mv.set(seconds)
+      return
+    }
+    const ctrl = animate(mv, seconds, { duration: 1, delay, ease: EASE })
+    return () => ctrl.stop()
+  }, [seconds, delay, reduced, mv])
+  return (
+    <div className="flex items-center gap-3" role="img" aria-label={`${label}: ${seconds}s`}>
+      <svg viewBox="0 0 56 56" className="h-14 w-14 shrink-0" aria-hidden="true">
+        <circle cx="28" cy="28" r={SPEED_R} fill="none" strokeWidth="5" stroke={dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'} />
+        <m.circle cx="28" cy="28" r={SPEED_R} fill="none" strokeWidth="5" strokeLinecap="round" stroke={color} strokeDasharray={SPEED_C} style={{ strokeDashoffset: dash }} transform="rotate(-90 28 28)" />
+      </svg>
+      <div className="min-w-0">
+        <m.p className="text-xl font-semibold leading-none tabular-nums">{shown}</m.p>
+        <p className={`mt-1 text-[11px] leading-tight ${mutedText(dark)}`}>{label}</p>
+        <p className={`text-[11px] leading-tight ${mutedText(dark)}`}>{targetLabel}</p>
+      </div>
+    </div>
+  )
+}
+
 /** A short ledger of codebase volumes (sections, lines), each bar scaled to the largest, counted up. */
 export function VolumeBars({ rows, color, dark, delay = 0 }: { rows: { label: string; value: number }[]; delay?: number } & Palette) {
   const reduced = useReducedMotion()
