@@ -458,7 +458,7 @@ function ArcadeMenu({
           </m.button>
         )
       })}
-      <p className={`mt-6 px-4 md:px-7 font-persona-label text-[10px] md:text-xs uppercase tracking-[0.25em] ${muted}`}>
+      <p className={`mt-6 px-4 md:px-7 font-persona-label text-[9px] sm:text-[10px] md:text-xs uppercase tracking-[0.1em] sm:tracking-[0.25em] ${muted}`}>
         <span className={accentCls}>↑↓</span> select · <span className={accentCls}>↵</span> confirm · tap to jump
       </p>
     </nav>
@@ -929,10 +929,9 @@ function PersonaContent() {
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.4, times: [0, 0.7, 1], ease: EASE, delay: 0.08 }}
           >
-            {title}
+            {title} {accent && <RansomText text={accent} className={muted} intensity={0.6} />}
           </m.span>
-        </span>{' '}
-        {accent && <RansomText text={accent} className={muted} intensity={0.6} />}
+        </span>
       </h2>
       {lead && <p className={`${muted} text-lg md:text-xl mt-5 max-w-2xl leading-relaxed font-sf`}>{lead}</p>}
     </CardIn>
