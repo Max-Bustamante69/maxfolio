@@ -93,8 +93,13 @@
 .persona-skew-selector {
   clip-path: polygon(0 0, 100% 0, 92% 100%, 0 100%);
 }
+/* Fixed-pixel skew, not a percentage: a percentage clip takes 10% of the chip's own width off each
+   side, which is a harmless few px on a short badge but slices real glyphs off a long chip's label
+   (measured on the home hero's "open for consulting" / "based in Medellín" chips — round 23 regression,
+   invisible until a long enough string exposed it). A constant inset keeps the same skewed silhouette
+   at every length. */
 .skew-chip {
-  clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
 }
 
 /* ---------- Angled corner-cut small card frame (used by the persona Skin's `card`) ---------- */
@@ -321,6 +326,10 @@
   }
   .persona-drift {
     animation: none !important;
+  }
+  .persona-slash-reveal {
+    animation: none !important;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%) !important;
   }
   [data-parallax] {
     transform: none !important;
