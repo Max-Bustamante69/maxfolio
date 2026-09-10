@@ -17,7 +17,15 @@ export const badText = (dark: boolean) => (dark ? 'text-[#ff8a80]' : 'text-[#b42
 export function CountUp({ value, decimals = 0, prefix = '', suffix = '', delay = 0, className = '' }: { value: number; decimals?: number; prefix?: string; suffix?: string; delay?: number; className?: string }) {
   const reduced = useReducedMotion()
   const mv = useMotionValue(reduced ? value : 0)
-  const text = useTransform(mv, (v) => `${prefix}${v.toFixed(decimals)}${suffix}`)
+  // toLocaleString (not toFixed) so a four-digit-plus value counts up with the same thousands
+  // separator its static fallback string uses (e.g. "10,000+") instead of losing it mid-animation.
+  // Locale is pinned to 'en-US', not `undefined`: the registry's own fact strings ("10,000+",
+  // "$45k/yr") are always written in that comma-grouped format regardless of the site's active
+  // language, so a viewer whose OS/browser locale groups digits differently (es-CO and many others
+  // render 10000 as "10.000") would otherwise see the animated end-state mismatch the static
+  // fallback that renders before the count-up's viewport observer fires (verified: this machine's
+  // own `undefined` locale already prints "10.000", 2026-09-09 review pass).
+  const text = useTransform(mv, (v) => `${prefix}${v.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}${suffix}`)
   useEffect(() => {
     if (reduced) {
       mv.set(value)

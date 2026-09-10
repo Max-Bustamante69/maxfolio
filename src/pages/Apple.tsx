@@ -13,18 +13,17 @@ import { useDynamicFavicon, useI18n, useContent } from '../hooks'
 import { defaultDesign, otherDesigns, MENU } from '../data/designs'
 
 // Below the fold, each section arrives as its own chunk so the hero paints off a smaller bundle.
-const BuildTimeline = lazy(() => import('../components/sections/BuildTimeline').then((mod) => ({ default: mod.BuildTimeline })))
+const Chapters = lazy(() => import('../components/sections/Chapters').then((mod) => ({ default: mod.Chapters })))
 const Process = lazy(() => import('../components/sections/Process').then((mod) => ({ default: mod.Process })))
 const ShopifyWork = lazy(() => import('../components/sections/ShopifyWork').then((mod) => ({ default: mod.ShopifyWork })))
-const FleetMap = lazy(() => import('../components/sections/FleetMap').then((mod) => ({ default: mod.FleetMap })))
 const Gallery = lazy(() => import('../components/sections/Gallery').then((mod) => ({ default: mod.Gallery })))
+const FeaturedBuild = lazy(() => import('../components/sections/FeaturedBuild').then((mod) => ({ default: mod.FeaturedBuild })))
 const Manifesto = lazy(() => import('../components/sections/Manifesto').then((mod) => ({ default: mod.Manifesto })))
 const Projects = lazy(() => import('../components/sections/Projects').then((mod) => ({ default: mod.Projects })))
 const Skills = lazy(() => import('../components/sections/Skills').then((mod) => ({ default: mod.Skills })))
-const StackByYear = lazy(() => import('../components/sections/StackByYear').then((mod) => ({ default: mod.StackByYear })))
+const ReviewChecklist = lazy(() => import('../components/sections/ReviewChecklist').then((mod) => ({ default: mod.ReviewChecklist })))
 const Faq = lazy(() => import('../components/sections/Faq').then((mod) => ({ default: mod.Faq })))
 const Contact = lazy(() => import('../components/sections/Contact').then((mod) => ({ default: mod.Contact })))
-const BuildHeatmap = lazy(() => import('../components/sections/BuildHeatmap').then((mod) => ({ default: mod.BuildHeatmap })))
 const CareerSubway = lazy(() => import('../components/sections/CareerSubway').then((mod) => ({ default: mod.CareerSubway })))
 
 /** Keeps the page height stable while a section's chunk loads. Capped at 40vh: on a slow connection
@@ -305,13 +304,10 @@ function AppleContent() {
             </div>
           </section>
 
-          {/* Stat band — numerals on hairlines, then the fleet's build activity as a second row */}
+          {/* Stat band — six real numerals, each with a one-line source on hover/tap */}
           <section className="px-4 pb-14 md:pb-20">
             <div className="max-w-5xl mx-auto">
               <StatBand skin={skin} />
-              <Suspense fallback={<Pending h="min-h-[8vh]" />}>
-                <BuildHeatmap skin={skin} />
-              </Suspense>
             </div>
           </section>
 
@@ -377,13 +373,13 @@ function AppleContent() {
             </div>
           </section>
 
-          {/* Year by year — a Gantt ribbon (BuildTimeline), not the shared Years.tsx: employer lanes,
-              storefront builds stacked by year, products/side projects as dots. content-visibility:auto
-              was tried and reverted here — see docs/seo.md "content-visibility" for the measured instability. */}
+          {/* Chapters — a horizontal scroll-snap rail of five year cards, not the shared Years.tsx
+              editorial list or the old Gantt ribbon. content-visibility:auto was tried and reverted
+              here — see docs/seo.md "content-visibility" for the measured instability. */}
           <section className="px-4 py-14 md:py-20 scroll-mt-20">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
-                <BuildTimeline skin={skin} heading={Heading} />
+                <Chapters skin={skin} heading={Heading} />
               </Suspense>
             </div>
           </section>
@@ -406,20 +402,20 @@ function AppleContent() {
             </div>
           </section>
 
-          {/* Fleet map — the same 18 stores, grouped by industry as a dot matrix */}
-          <section className={`px-4 py-14 md:py-20 ${surface}`}>
-            <div className="max-w-5xl mx-auto">
-              <Suspense fallback={<Pending />}>
-                <FleetMap skin={skin} heading={Heading} />
-              </Suspense>
-            </div>
-          </section>
-
           {/* Gallery — media carousel. content-visibility:auto tried and reverted — docs/seo.md. */}
           <section id="gallery" className={`px-4 py-14 md:py-20 scroll-mt-20 ${surface}`}>
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Gallery skin={skin} heading={Heading} />
+              </Suspense>
+            </div>
+          </section>
+
+          {/* Featured build — one storefront (NOS Café), followed through four real beats */}
+          <section className="px-4 py-14 md:py-20 scroll-mt-20">
+            <div className="max-w-5xl mx-auto">
+              <Suspense fallback={<Pending h="min-h-[60vh]" />}>
+                <FeaturedBuild skin={skin} heading={Heading} />
               </Suspense>
             </div>
           </section>
@@ -450,11 +446,11 @@ function AppleContent() {
             </div>
           </section>
 
-          {/* Stack by year — the same tools, ranked as a bump chart */}
+          {/* Review checklist — what the free review's Playwright harness actually checks */}
           <section className="px-4 py-14 md:py-20">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
-                <StackByYear skin={skin} heading={Heading} />
+                <ReviewChecklist skin={skin} heading={Heading} onCta={() => openContact()} />
               </Suspense>
             </div>
           </section>

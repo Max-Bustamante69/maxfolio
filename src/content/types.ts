@@ -46,6 +46,8 @@ export interface PortfolioContent {
     ctaCv: string
   }
   stats: Record<StatId, string>
+  /** One honest provenance line per stat band figure, shown on hover/tap so nothing reads as a boast without a source. */
+  statSources: Record<StatId, string>
   sections: {
     experience: SectionHeading & { achievements: string; technologies: string; visit: string }
     shopify: SectionHeading & { lead: string; tabStores: string; tabProducts: string; legacyLabel: string; visit: string; showAll: string; showLess: string; filterAll: string; filters: Record<string, string> }
@@ -66,27 +68,33 @@ export interface PortfolioContent {
       mobile: string
     }
     now: { label: string; live: string; dev: string; band: string; local: string }
-    statBand: { label: string; asOf: string }
-    buildHeatmap: { label: string; headline: string; legendLow: string; legendHigh: string; cellAria: string; half1: string; half2: string }
-    stackByYear: SectionHeading & { lead: string; rankAria: string; countUnit: string }
-    fleetMap: SectionHeading & { lead: string; filterAll: string }
+    statBand: { label: string; asOf: string; sourceLabel: string }
     careerSubway: SectionHeading & { lead: string; toggleShow: string; toggleHide: string; transferLabel: string; rowAria: string }
     process: SectionHeading & { problemLabel: string; problem: string; fixLabel: string; fix: string; stepOf: string; deliverableLabel: string; steps: { title: string; body: string; deliverable: string }[] }
     testimonials: SectionHeading
     faq: SectionHeading & { items: { q: string; a: string }[] }
     manifesto: { label: string; lines: string[] }
     years: SectionHeading & { lead: string; roles: string; shipped: string; work: string; products: string; side: string; more: string; count: string; perYear: string; eras: Record<string, string> }
-    /** Apple's Years replacement: a Gantt ribbon (new BuildTimeline.tsx), not the shared Years.tsx. */
-    buildTimeline: SectionHeading & {
+    /** Apple's Years replacement: a horizontal scroll-snap rail of year cards (Chapters.tsx). */
+    chapters: SectionHeading & {
       lead: string
-      employers: string
-      storefronts: string
-      products: string
-      personal: string
-      current: string
-      roleAria: string // '{title} at {company}, {period}'
-      buildAria: string // '{name}, built {period}'
-      dotAria: string // '{name}, {year}'
+      chapterOf: string // '{n} / {total}'
+      prevAria: string
+      nextAria: string
+      highlightsLabel: string
+    }
+    /** Apple's new sticky scrollytelling section for one storefront build (FeaturedBuild.tsx). */
+    featuredBuild: SectionHeading & {
+      lead: string
+      visit: string
+      beats: { label: string; body: string }[] // problem -> plan -> build -> result, in order; {placeholders} filled from the registry
+    }
+    /** Apple's new section listing what the Playwright QA harness actually checks (ReviewChecklist.tsx). */
+    reviewChecklist: SectionHeading & {
+      lead: string
+      countLabel: string // '{n}+ automated checks'
+      cta: string
+      groups: { label: string; items: string[] }[]
     }
     /** Luxury's Years intro: the unit chart re-narrated as one composed sentence per year. */
     fiveLines: {
