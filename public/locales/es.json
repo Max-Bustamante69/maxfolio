@@ -141,7 +141,7 @@
       "persona": "Ruidoso y cinético",
       "skyline": "Dato y monumento"
     },
-    "whyVersions": "¿Por qué cinco versiones?",
+    "whyVersions": "¿Por qué {n} versiones?",
     "whyVersionsDesc": "Distintas estéticas para distintos contextos. Las mismas habilidades, versatilidad probada."
   },
   "contactModal": {

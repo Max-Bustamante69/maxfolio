@@ -141,7 +141,7 @@
       "persona": "Loud & Kinetic",
       "skyline": "Data & Monument"
     },
-    "whyVersions": "Why five versions?",
+    "whyVersions": "Why {n} versions?",
     "whyVersionsDesc": "Different aesthetics for different contexts. Same skills, proven versatility."
   },
   "contactModal": {

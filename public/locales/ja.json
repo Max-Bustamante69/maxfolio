@@ -141,7 +141,7 @@
       "persona": "ラウド＆キネティック",
       "skyline": "データと記念碑"
     },
-    "whyVersions": "なぜ5つのデザイン？",
+    "whyVersions": "なぜ{n}つのデザイン？",
     "whyVersionsDesc": "文脈に合わせた異なる美学。同じスキルで、確かな対応力を。"
   },
   "contactModal": {
