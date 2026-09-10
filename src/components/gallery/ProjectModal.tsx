@@ -9,11 +9,23 @@ import { Carousel } from '../../vendor/carousel'
 import type { StoreMetrics } from '../../data/registry'
 import type { StoreTelemetry } from '../../data/telemetry'
 import type { CommerceLabels } from '../../content/types'
-import { CountUp, VolumeBars, WeeklyBars } from './charts'
+import { CommitsLine, CompareBars, CountUp, DiscountLadder, Gauge, PriceRangeBar, VolumeBars, WeeklyBars, type CompareRow } from './charts'
 
 export interface CaseStudyStat {
   label: string
   value: string
+}
+
+/** Every number here traces to commerce.json (storefront public data), telemetry.json (git history)
+ *  or a hand-verified registry fact — see ProjectModal's "Visualized" block. A field is omitted
+ *  upstream (Gallery.caseStudyFor) whenever the real data behind it doesn't exist for this store. */
+export interface CaseStudyCharts {
+  compare: CompareRow[] // vs. fleet median: only metrics with a real fleet median
+  onSaleShare: number | null // 0..1, share of variants with a real compare-at markdown
+  ladder: number[] | null // parsed from the registry's `ladder` fact, e.g. [10, 20]
+  weeklyCommits: { weeks: number[]; weekOf: string } | null
+  priceRange: { min: number; max: number; median: number | null; currency: string } | null
+  fetchedAt: string | null // commerce.json's fetchedAt, ISO — only set when a live commerce entry exists
 }
 
 /** One "By the numbers" tile: catalog, offer, delivery or reach — see src/data/commerceLines.ts. */
@@ -37,6 +49,7 @@ export interface CaseStudyData {
   results: CaseStudyStat[] // measured business outcomes; hidden when empty
   stack: string[]
   shots: FrameShots
+  charts: CaseStudyCharts
 }
 
 export interface CaseStudyLabels {
@@ -71,6 +84,23 @@ export interface CaseStudyLabels {
   copyLink: string
   copied: string
   commerce: CommerceLabels
+  charts: {
+    title: string
+    compareLabel: string
+    thisStore: string
+    fleetMedian: string
+    weeksMetric: string
+    productsMetric: string
+    priceMetric: string
+    saleShare: string
+    ladder: string
+    priceBand: string
+    min: string
+    max: string
+    sourceStorefront: string
+    sourceGit: string
+    sourceFacts: string
+  }
 }
 
 interface ProjectModalProps {
@@ -79,9 +109,32 @@ interface ProjectModalProps {
   skin: Skin
   labels: CaseStudyLabels
   onClose: () => void
+  /** Prev/next inside the sheet, cycling through the same ordered list the caller's index shows.
+   *  Omitted (or a list of ≤1) hides the nav controls and disarms the arrow keys. */
+  onPrev?: () => void
+  onNext?: () => void
+  /** For the price-band chart's currency formatting (Intl.NumberFormat). */
+  intlLocale: string
 }
 
 const EASE = [0.23, 1, 0.32, 1] as const
+
+/** Small header glyphs — same stroke language as the collapsed-trail disclosure chevron below. */
+const ChevronGlyph = ({ dir }: { dir: 1 | -1 }) => (
+  <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <path d={dir < 0 ? 'M12 5l-6 5 6 5' : 'M8 5l6 5-6 5'} strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+)
+const LinkGlyph = () => (
+  <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+    <path d="M8.5 11.5l3-3M7 13l-1.7 1.7a2.6 2.6 0 01-3.7-3.7L3.3 9.3M12.7 7.7L14.5 6a2.6 2.6 0 013.7 3.7L16.5 11.3" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+)
+const CloseGlyph = () => (
+  <svg viewBox="0 0 20 20" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+    <path d="M5 5l10 10M15 5L5 15" strokeLinecap="round" />
+  </svg>
+)
 
 /** Lighthouse's own bands: 90+ green, 50–89 orange, below red. */
 const band = (score: number) => (score >= 90 ? '#34c759' : score >= 50 ? '#ff9f0a' : '#ff3b30')
@@ -139,7 +192,7 @@ function ScoreRing({ value, label, delay, dark, tile }: { value: number; label: 
  * Metrics first (Lighthouse, then any measured outcome), store facts second, the engineering trail
  * last as a footnote. The carousel is enclosed, one slide at a time, glass controls on every viewport.
  */
-export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModalProps) {
+export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext, intlLocale }: ProjectModalProps) {
   const slides = data
     ? [
         { key: 'hd', kind: 'desktop' as const, src: data.shots.homeDesktop, label: `${labels.home} · ${labels.desktop}` },
@@ -149,10 +202,19 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
       ]
     : []
 
+  // Keep the latest prev/next in refs so the one keydown listener attached for the sheet's whole
+  // open lifetime always calls the current handlers (the caller's ordered list may reflow underneath).
+  const prevRef = useRef(onPrev)
+  const nextRef = useRef(onNext)
+  prevRef.current = onPrev
+  nextRef.current = onNext
+
   useEffect(() => {
     if (!open) return
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
+      else if (e.key === 'ArrowLeft') prevRef.current?.()
+      else if (e.key === 'ArrowRight') nextRef.current?.()
     }
     window.addEventListener('keydown', onKey)
     const prev = document.body.style.overflow
@@ -199,6 +261,26 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
         { key: 'seo', label: labels.seo, value: data.metrics.seo },
       ]
     : []
+
+  const navBtn = `press compact-touch inline-flex h-8 w-8 items-center justify-center rounded-full transition-opacity disabled:pointer-events-none disabled:opacity-25 ${dark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`
+  const actionBtn = `press compact-touch inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-xs ${dark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`
+
+  // "Visualized" charts, built once per open store from `data.charts` (real numbers only — see
+  // Gallery.caseStudyFor, which omits any field the underlying data doesn't actually have).
+  const ch = data?.charts
+  const cl = labels.charts
+  const compareRows =
+    ch?.compare.map((r) => ({
+      ...r,
+      label: r.key === 'weeks' ? cl.weeksMetric : r.key === 'products' ? cl.productsMetric : cl.priceMetric,
+    })) ?? []
+  const fetchedDate = ch?.fetchedAt ? new Date(ch.fetchedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : null
+  const chartSources = [
+    (ch?.compare.length || ch?.onSaleShare != null || ch?.priceRange) && fetchedDate ? cl.sourceStorefront.replace('{date}', fetchedDate) : null,
+    ch?.weeklyCommits ? cl.sourceGit : null,
+    ch?.ladder ? cl.sourceFacts : null,
+  ].filter((s): s is string => !!s)
+  const hasCharts = !!ch && (compareRows.length > 0 || ch.onSaleShare != null || !!ch.ladder || !!ch.weeklyCommits || !!ch.priceRange)
 
   const content = (
     <AnimatePresence>
@@ -268,50 +350,120 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
             </div>
 
             {/* numbers */}
-            {/* Lenis's own wheel listener lives on `window` and drives page scroll; with the body locked
-                (overflow: hidden, above) while this sheet is open, a plain wheel gesture here would be
-                captured by Lenis and try to scroll a page that cannot move — dead-ending the sheet's own
-                scroll under a mouse wheel (touch was never affected: Lenis's `syncTouch` defaults off, so
-                touch scroll here was always native). `data-lenis-prevent` opts this scroller out so the
-                wheel reaches its native `overflow-y-auto` behavior instead. */}
-            <div ref={scrollerRef} className="relative flex-1 overflow-y-auto p-6 lg:p-8" data-lenis-prevent>
-              {!reduced && (
-                <m.div
-                  aria-hidden="true"
-                  className="sticky top-0 z-10 -mx-6 -mt-6 h-[2px] origin-left lg:-mx-8 lg:-mt-8"
-                  style={{ scaleX: readProgress, backgroundColor: accent }}
-                />
-              )}
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h3 className={`${skin.title} text-2xl`}>{data.name}</h3>
-                  <p className={`${skin.muted} mt-1 text-xs`}>{data.meta}</p>
+            <div className="relative flex min-h-0 flex-1 flex-col">
+              {/* Two-row header: name + status on top, meta + prev/next + actions beneath. It sits
+                  outside the scroller below (a plain flex sibling, `shrink-0`) so it never scrolls
+                  with the content — simpler and more robust than `position: sticky` inside the pane. */}
+              <header className={`relative shrink-0 border-b px-6 py-6 lg:px-8 ${dark ? 'border-white/10' : 'border-black/10'}`}>
+                <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                  <h3 className={`${skin.title} min-w-0 truncate text-2xl md:text-3xl`}>{data.name}</h3>
+                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] ${data.badge.className}`}>{data.badge.text}</span>
                 </div>
-                <div className="flex shrink-0 items-center gap-1.5">
-                  <button type="button" onClick={copyLink} className={`press compact-touch rounded-full px-3 py-1.5 text-xs ${dark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`} aria-live="polite">
-                    {copied ? labels.copied : labels.copyLink}
-                  </button>
-                  <button type="button" onClick={onClose} className={`press compact-touch rounded-full px-3 py-1.5 text-xs ${dark ? 'bg-white/10 hover:bg-white/20' : 'bg-black/5 hover:bg-black/10'}`}>
-                    {labels.close}
-                  </button>
-                </div>
-              </div>
-              <span className={`mt-3 inline-block rounded-full px-2 py-0.5 text-[10px] ${data.badge.className}`}>{data.badge.text}</span>
-              <p className={`${skin.accent} mt-4 text-sm font-medium`}>{data.tagline}</p>
-              <p className="mt-2 text-sm leading-relaxed">{data.description}</p>
-
-              {/* Commerce-oriented, not engineering telemetry: catalog, offer, delivery, reach — the
-                  same four angles the index chip and gallery caption each show one slice of. */}
-              <p className={`mt-6 ${label}`}>{labels.commerce.title}</p>
-              <div className="mt-2 grid grid-cols-2 gap-2">
-                {data.commerceTiles.map((t) => (
-                  <div key={t.label} className={tile}>
-                    <p className={`text-[10px] font-semibold uppercase tracking-[0.16em] ${skin.muted}`}>{t.label}</p>
-                    <p className="mt-1 text-[13px] font-medium leading-snug">{t.value}</p>
-                    {t.deltas.length > 0 && <p className={`mt-1 text-[11px] leading-tight ${skin.muted}`}>{t.deltas.join(' · ')}</p>}
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2.5">
+                  <p className={`${skin.muted} text-xs`}>{data.meta}</p>
+                  <div className="flex shrink-0 flex-wrap items-center gap-3">
+                    {(onPrev || onNext) && (
+                      <div className="flex items-center gap-1.5" role="group" aria-label={`${labels.prev} / ${labels.next}`}>
+                        <button type="button" onClick={onPrev} disabled={!onPrev} aria-label={labels.prev} className={navBtn}>
+                          <ChevronGlyph dir={-1} />
+                        </button>
+                        <button type="button" onClick={onNext} disabled={!onNext} aria-label={labels.next} className={navBtn}>
+                          <ChevronGlyph dir={1} />
+                        </button>
+                      </div>
+                    )}
+                    <button type="button" onClick={copyLink} className={actionBtn} aria-live="polite">
+                      <LinkGlyph />
+                      <span className="hidden sm:inline">{copied ? labels.copied : labels.copyLink}</span>
+                    </button>
+                    <button type="button" onClick={onClose} className={actionBtn}>
+                      <CloseGlyph />
+                      <span className="hidden sm:inline">{labels.close}</span>
+                    </button>
                   </div>
-                ))}
-              </div>
+                </div>
+                {!reduced && (
+                  <m.div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[2px] origin-left" style={{ scaleX: readProgress, backgroundColor: accent }} />
+                )}
+              </header>
+
+              {/* Lenis's own wheel listener lives on `window` and drives page scroll; with the body locked
+                  (overflow: hidden, above) while this sheet is open, a plain wheel gesture here would be
+                  captured by Lenis and try to scroll a page that cannot move — dead-ending the sheet's own
+                  scroll under a mouse wheel (touch was never affected: Lenis's `syncTouch` defaults off, so
+                  touch scroll here was always native). `data-lenis-prevent` opts this scroller out so the
+                  wheel reaches its native `overflow-y-auto` behavior instead. */}
+              <div ref={scrollerRef} className="relative flex-1 overflow-y-auto p-6 lg:p-8" data-lenis-prevent>
+                <p className={`${skin.accent} text-sm font-medium`}>{data.tagline}</p>
+                <p className="mt-2 text-sm leading-relaxed">{data.description}</p>
+
+                {/* Commerce-oriented, not engineering telemetry: catalog, offer, delivery, reach — the
+                    same four angles the index chip and gallery caption each show one slice of. */}
+                <p className={`mt-6 ${label}`}>{labels.commerce.title}</p>
+                <div className="mt-2 grid grid-cols-2 gap-2">
+                  {data.commerceTiles.map((t) => (
+                    <div key={t.label} className={tile}>
+                      <p className={`text-[10px] font-semibold uppercase tracking-[0.16em] ${skin.muted}`}>{t.label}</p>
+                      <p className="mt-1 text-[13px] font-medium leading-snug">{t.value}</p>
+                      {t.deltas.length > 0 && <p className={`mt-1 text-[11px] leading-tight ${skin.muted}`}>{t.deltas.join(' · ')}</p>}
+                    </div>
+                  ))}
+                </div>
+
+                {/* "Visualized": the same commerce/telemetry numbers above, drawn as charts. Every
+                    number traces to a real source (storefront public data, git history, or a
+                    hand-verified registry fact) — nothing here is a conversion/AOV figure, which the
+                    owner does not have measured for these stores. Omitted piece by piece when a store
+                    doesn't have that particular real number (see Gallery.caseStudyFor). */}
+                {hasCharts && (
+                  <>
+                    <p className={`mt-6 ${label}`}>{cl.title}</p>
+                    <div className="mt-3 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+                      {compareRows.length > 0 && (
+                        <div className={`${tile} sm:col-span-2`}>
+                          <p className={`text-[10px] font-semibold uppercase tracking-[0.16em] ${skin.muted}`}>{cl.compareLabel}</p>
+                          <div className="mt-3">
+                            <CompareBars rows={compareRows} thisLabel={cl.thisStore} fleetLabel={cl.fleetMedian} color={accent} dark={dark} delay={0.1} />
+                          </div>
+                        </div>
+                      )}
+                      {ch!.onSaleShare != null && (
+                        <div className={tile}>
+                          <Gauge value={ch!.onSaleShare * 100} label={cl.saleShare} color={accent} dark={dark} delay={0.15} />
+                        </div>
+                      )}
+                      {ch!.ladder && (
+                        <div className={tile}>
+                          <DiscountLadder steps={ch!.ladder} label={cl.ladder} color={accent} dark={dark} delay={0.15} />
+                        </div>
+                      )}
+                      {ch!.weeklyCommits && (
+                        <div className={tile}>
+                          <CommitsLine weeks={ch!.weeklyCommits.weeks} caption={labels.perWeek} peakLabel={labels.peak.replace('{n}', String(Math.max(...ch!.weeklyCommits.weeks)))} color={accent} dark={dark} delay={0.15} />
+                        </div>
+                      )}
+                      {ch!.priceRange && (
+                        <div className={`${tile} ${ch!.weeklyCommits || ch!.ladder || ch!.onSaleShare != null ? '' : 'sm:col-span-2'}`}>
+                          <PriceRangeBar
+                            min={ch!.priceRange.min}
+                            max={ch!.priceRange.max}
+                            median={ch!.priceRange.median}
+                            currency={ch!.priceRange.currency}
+                            intlLocale={intlLocale}
+                            minLabel={cl.min}
+                            maxLabel={cl.max}
+                            medianLabel={cl.fleetMedian}
+                            label={cl.priceBand}
+                            color={accent}
+                            dark={dark}
+                            delay={0.2}
+                          />
+                        </div>
+                      )}
+                    </div>
+                    {chartSources.length > 0 && <p className={`${skin.muted} mt-2 text-[11px] leading-snug`}>{chartSources.join(' · ')}</p>}
+                  </>
+                )}
 
               {data.metrics && (
                 <>
@@ -411,6 +563,7 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
                   </div>
                 </details>
               )}
+              </div>
             </div>
           </m.div>
         </m.div>

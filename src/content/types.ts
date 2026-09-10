@@ -158,6 +158,25 @@ export interface PortfolioContent {
     caseStudy: {
       facts: string; results: string; stack: string; visit: string; prev: string; next: string; timeline: string; commits: string; sections: string; open: string; metrics: string; perf: string; a11y: string; bp: string; seo: string; lcp: string; measured: string; trail: string; trailNote: string; perWeek: string; peak: string; codebase: string; liquidLines: string; islandLines: string; sectionsCount: string; weeks: string; copyLink: string; copied: string
       commerce: CommerceLabels
+      /** The sheet's "visualized" charts block — every number traces to commerce.json (storefront
+       *  public data), telemetry.json (git history) or a hand-verified registry fact. */
+      charts: {
+        title: string // section heading above the chart grid, e.g. "Visualized"
+        compareLabel: string // "vs. fleet median" — the compare-bars block's own sub-heading
+        thisStore: string // legend: this store's bar
+        fleetMedian: string // legend: the fleet median bar / tick
+        weeksMetric: string // "Delivery" row label
+        productsMetric: string // "Catalog size" row label
+        priceMetric: string // "Price midpoint" row label
+        saleShare: string // gauge label: "Share of catalog on sale"
+        ladder: string // discount-ladder chart label
+        priceBand: string // price range bar label
+        min: string
+        max: string
+        sourceStorefront: string // 'Storefront public data, fetched {date}'
+        sourceGit: string // 'Git commit history'
+        sourceFacts: string // 'Registry facts'
+      }
     }
   }
   badges: { live: string; dev: string; current: string; completed: string; roles: Record<StoreRole, string> }

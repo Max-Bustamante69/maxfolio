@@ -1,13 +1,13 @@
 import { lazy, Suspense, useMemo, useState, type ReactNode } from 'react'
 import { m } from 'framer-motion'
 import { useContent, useSheetHistory } from '../../hooks'
-import { ProjectFrame, GlassControls, carouselTokens, type Skin, type FrameShots, type LightboxItem, type CaseStudyData } from '../gallery'
+import { ProjectFrame, GlassControls, carouselTokens, type Skin, type FrameShots, type LightboxItem, type CaseStudyData, type CompareRow } from '../gallery'
 import type { CaseStudyLabels } from '../gallery/ProjectModal'
 import { Carousel } from '../../vendor/carousel'
 import { metrics, stores as allStores, type StoreEntry } from '../../data/registry'
 import { telemetry } from '../../data/telemetry'
 import { commerce, isLiveCommerce } from '../../data/commerce'
-import { computeFleetMedians, lineForAngle, pickCommerceLine, vsFleetPctChip, vsFleetWeeksChip, weeksFor } from '../../data/commerceLines'
+import { computeFleetMedians, formatMoney, lineForAngle, pickCommerceLine, vsFleetPctChip, vsFleetWeeksChip, weeksFor } from '../../data/commerceLines'
 import type { PortfolioContent } from '../../content/types'
 
 // Computed once at module scope: registry/commerce/telemetry are static build-time data, so every
@@ -53,7 +53,16 @@ export const caseStudyLabels = (strings: PortfolioContent): CaseStudyLabels => {
     trail: cs.trail, trailNote: cs.trailNote, perWeek: cs.perWeek, peak: cs.peak, codebase: cs.codebase, liquidLines: cs.liquidLines, islandLines: cs.islandLines, sectionsCount: cs.sectionsCount, commits: cs.commits, weeks: cs.weeks,
     copyLink: cs.copyLink, copied: cs.copied,
     commerce: cs.commerce,
+    charts: cs.charts,
   }
+}
+
+/** Parses the registry's `ladder` fact ("10% → 20%") into ascending numbers for the discount-ladder
+ *  chart. Returns null for anything that doesn't look like a real percentage ladder. */
+function parseLadder(value: string | undefined): number[] | null {
+  if (!value) return null
+  const nums = [...value.matchAll(/(\d+(?:\.\d+)?)\s*%/g)].map((m) => Number(m[1]))
+  return nums.length >= 2 ? nums : null
 }
 
 /** Builds the case-study sheet data for a store from the registry + the active locale. */
@@ -98,6 +107,26 @@ export function caseStudyFor(
     { label: cm.reachLabel, value: lineForAngle('reach', ctx) ?? cm.unavailable, deltas: [] },
   ]
 
+  // The "Visualized" charts block: every field traces to a real source and is left out entirely
+  // when that source doesn't have a real number for this store — never a placeholder or estimate.
+  const tel = telemetry[st.slug]
+  const compare: CompareRow[] = []
+  if (FLEET_MEDIANS.weeks != null) {
+    const value = weeksFor(st, tel)
+    compare.push({ key: 'weeks', label: '', storeValue: value, fleetValue: FLEET_MEDIANS.weeks, displayStore: `${value} ${cs.weeks}`, displayFleet: `${Math.round(FLEET_MEDIANS.weeks)} ${cs.weeks}` })
+  }
+  if (isLiveCommerce(commerceEntry) && FLEET_MEDIANS.products != null) {
+    compare.push({ key: 'products', label: '', storeValue: commerceEntry.products, fleetValue: FLEET_MEDIANS.products, displayStore: String(commerceEntry.products), displayFleet: String(Math.round(FLEET_MEDIANS.products)) })
+  }
+  if (isLiveCommerce(commerceEntry) && commerceEntry.currency && priceMid !== null) {
+    const fleetPriceMid = FLEET_MEDIANS.priceMidByCurrency[commerceEntry.currency]
+    if (fleetPriceMid != null) {
+      const fmt = (n: number) => formatMoney(n, commerceEntry.currency as string, intlLocale)
+      compare.push({ key: 'price', label: '', storeValue: priceMid, fleetValue: fleetPriceMid, displayStore: fmt(priceMid), displayFleet: fmt(fleetPriceMid) })
+    }
+  }
+  const ladderFact = st.facts.find((f) => f.id === 'ladder')
+
   // Client-facing sheet: the engineering trail (commits, custom sections) stays in the registry but collapsed at the bottom.
   return {
     name: st.name,
@@ -113,6 +142,17 @@ export function caseStudyFor(
     results,
     stack: st.stack,
     shots: shotsFor(st.slug, st.gallery),
+    charts: {
+      compare,
+      onSaleShare: isLiveCommerce(commerceEntry) ? commerceEntry.onSaleShare : null,
+      ladder: parseLadder(ladderFact?.value),
+      weeklyCommits: tel ? { weeks: tel.weeks, weekOf: tel.weekOf } : null,
+      priceRange:
+        isLiveCommerce(commerceEntry) && commerceEntry.priceMin !== null && commerceEntry.priceMax !== null && commerceEntry.currency
+          ? { min: commerceEntry.priceMin, max: commerceEntry.priceMax, median: commerceEntry.currency ? (FLEET_MEDIANS.priceMidByCurrency[commerceEntry.currency] ?? null) : null, currency: commerceEntry.currency }
+          : null,
+      fetchedAt: isLiveCommerce(commerceEntry) ? commerceEntry.fetchedAt : null,
+    },
   }
 }
 
@@ -146,6 +186,14 @@ export function Gallery({ skin, heading }: GalleryProps) {
   )
   const open = openSlug ? registry.stores.find((s) => s.slug === openSlug) : null
   const chip = (active: boolean) => `${active ? skin.chipOn : skin.chip} compact-touch transition-colors`
+
+  // Prev/Next inside the sheet cycle through `items` — the same ordered, filtered list this view
+  // shows — wrapping at the ends. Disabled (undefined) with 0-1 items or when the open slug fell out
+  // of `items` (a filter changed underneath the open sheet).
+  const openIndex = open ? items.findIndex((s) => s.slug === open.slug) : -1
+  const canNavigate = items.length > 1 && openIndex !== -1
+  const goPrev = canNavigate ? () => setOpenSlug(items[(openIndex - 1 + items.length) % items.length].slug) : undefined
+  const goNext = canNavigate ? () => setOpenSlug(items[(openIndex + 1) % items.length].slug) : undefined
 
   // A different angle than the index chip's (offset 2 of 4) so the same store reads two distinct,
   // still-honest commerce facts across the two surfaces instead of repeating one line everywhere.
@@ -266,6 +314,9 @@ export function Gallery({ skin, heading }: GalleryProps) {
             skin={skin}
             labels={caseStudyLabels(strings)}
             onClose={() => setOpenSlug(null)}
+            onPrev={goPrev}
+            onNext={goNext}
+            intlLocale={intlLocale}
           />
         </Suspense>
       )}

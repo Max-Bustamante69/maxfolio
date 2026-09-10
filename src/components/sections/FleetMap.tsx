@@ -56,6 +56,12 @@ export function FleetMap({ skin, heading }: FleetMapProps) {
 
   const chipFor = (on: boolean) => `${on ? skin.chipOn : skin.chip} compact-touch transition-colors`
 
+  // Prev/Next inside the sheet cycle through `visible` (the current role filter's dots) — wrapping.
+  const openIndex = openStore ? visible.findIndex((s) => s.slug === openStore.slug) : -1
+  const canNavigate = visible.length > 1 && openIndex !== -1
+  const goPrev = canNavigate ? () => setOpenStore(visible[(openIndex - 1 + visible.length) % visible.length]) : undefined
+  const goNext = canNavigate ? () => setOpenStore(visible[(openIndex + 1) % visible.length]) : undefined
+
   return (
     <section id="fleet-map" className="scroll-mt-20">
       {heading(fm.eyebrow, fm.title, fm.titleAccent, fm.lead)}
@@ -130,6 +136,9 @@ export function FleetMap({ skin, heading }: FleetMapProps) {
             skin={skin}
             labels={caseStudyLabels(strings)}
             onClose={() => setOpenStore(null)}
+            onPrev={goPrev}
+            onNext={goNext}
+            intlLocale={intlLocale}
           />
         </Suspense>
       )}
