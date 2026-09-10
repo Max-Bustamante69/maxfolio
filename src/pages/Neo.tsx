@@ -4,7 +4,7 @@ import { ThemeProvider, useTheme } from '../context/ThemeContext'
 import { useLanguage, supportedLocales } from '../context/LanguageContext'
 import '../styles/neo.css'
 // Direct imports (not the component barrels) so the main chunk carries only what this route needs.
-import { SEOHead, TransitionLink, ThemeToggle, Magnetic, RevealText, Ticker } from '../components/common'
+import { SEOHead, TransitionLink, ThemeToggle, Magnetic, RevealText, Ticker, ScrollObject } from '../components/common'
 import { ContactFormModal } from '../components/modals'
 import { StatBand } from '../components/sections/StatBand'
 import { Experience } from '../components/sections/Experience'
@@ -319,7 +319,7 @@ function NeoContent() {
 
         <main id="main-content" className="pt-24">
           {/* Hero — §2.8.1: flat headline, one xl raised panel aside, accent-fill CTA */}
-          <section id="hero" className="px-4 pb-16 md:pb-24 scroll-mt-24" aria-labelledby="hero-heading">
+          <section id="hero" data-scroll-object-track className="px-4 pb-16 md:pb-24 scroll-mt-24" aria-labelledby="hero-heading">
             <div className="max-w-5xl mx-auto grid gap-10 lg:grid-cols-12 lg:gap-14 items-center">
               <div className="lg:col-span-7">
                 <p className={`text-sm font-bold ${accent}`}>{c.hero.eyebrow}</p>
@@ -357,6 +357,8 @@ function NeoContent() {
                     decoding="async"
                     className={`pointer-events-none absolute inset-0 h-full w-full object-cover ${isDark ? "opacity-[0.07]" : "opacity-[0.14]"}`}
                   />
+                  {/* Matte pale blob, desktop+motion-ok+in-view only — idles and drifts with scroll behind the readout tiles. */}
+                  <ScrollObject variant="softui" className="opacity-70" />
                   <div className="relative">
                     <p className={`text-[11px] font-bold uppercase tracking-[0.2em] ${muted}`}>{c.sections.now.label}</p>
                     <div className="mt-3 flex items-center gap-2">
@@ -483,7 +485,7 @@ function NeoContent() {
 
           {/* Manifesto — §2.8.10: always the dark palette variant, regardless of the page toggle */}
           <Suspense fallback={<Pending h="min-h-[40vh]" />}>
-            <Manifesto skin={skin} bandClassName={manifestoBand} eyebrowClassName={manifestoEyebrow} />
+            <Manifesto skin={skin} bandClassName={manifestoBand} eyebrowClassName={manifestoEyebrow} backdropSrc="/art/softui/clay-spheres.webp" />
           </Suspense>
 
           {/* Projects — index list */}
@@ -513,9 +515,17 @@ function NeoContent() {
             </div>
           </section>
 
-          {/* Contact — §2.8.12: recessed field, the boldest accent-fill CTA on the page */}
-          <section id="contact" className="px-4 py-14 md:py-20 scroll-mt-24">
-            <div className="max-w-5xl mx-auto">
+          {/* Contact — §2.8.12: recessed field, the boldest accent-fill CTA on the page; a whisper of the rounded-grid ground beneath it */}
+          <section id="contact" className="relative overflow-hidden px-4 py-14 md:py-20 scroll-mt-24">
+            <img
+              src="/art/softui/rounded-grid.webp"
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+              decoding="async"
+              className={`pointer-events-none absolute inset-0 h-full w-full object-cover ${isDark ? "opacity-[0.05]" : "opacity-[0.08]"}`}
+            />
+            <div className="relative max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Contact skin={skin} ctaClass={`${primaryBtn} !px-7`} onContact={openContact} fieldClassName={contactField} />
               </Suspense>
