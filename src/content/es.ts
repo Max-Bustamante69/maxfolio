@@ -19,20 +19,22 @@ export const es: PortfolioContent = {
     ctaCv: 'Descargar CV',
   },
   stats: {
-    storefronts: 'Tiendas Shopify',
-    tests: 'Pruebas automatizadas',
-    conversion: 'Aumento de conversión, tiendas Shopify',
-    savings: 'Ahorrados al año, migración de CMS empresarial',
-    subscriptions: 'Suscripciones en una integración de cobro recurrente en vivo',
-    contacts: 'Contactos en una plataforma de newsletters empresarial',
+    lighthouse: 'Rendimiento Lighthouse tras optimizar',
+    loadTime: 'Tiempo de carga, tiendas Shopify',
+    conversion: 'Conversión, tiendas Shopify',
+    organic: 'Tráfico orgánico tras el SEO técnico',
+    storefronts: 'Tiendas Shopify entregadas',
+    tests: 'Chequeos automáticos del harness de QA',
+
   },
   statSources: {
+    lighthouse: 'Frontend Developer, RH, 2024–2025 (migración de CMS enterprise)',
+    loadTime: 'Frontend Developer (Shopify), Digitdeck, 2023–2024',
+    conversion: 'Frontend Developer (Shopify), Digitdeck, 2023–2024',
+    organic: 'Frontend Developer (Shopify), Digitdeck, 2023–2024',
     storefronts: 'Tiendas Digitdeck, 2024–2026',
     tests: 'Suite de apps Digitdeck, 2026',
-    conversion: 'Frontend Developer (Shopify), Digitdeck, 2023–2024',
-    savings: 'Frontend Developer, RH, 2024–2025',
-    subscriptions: 'CTO & Shopify Technical Lead, Digitdeck, 2026',
-    contacts: 'Full Stack Developer, ABI Data, 2025',
+
   },
   sections: {
     experience: { eyebrow: 'Cada rol, en orden', title: 'Dónde pasó', titleAccent: 'el trabajo', achievements: 'Qué se entregó', technologies: 'Stack', visit: 'Visitar sitio' },
@@ -104,7 +106,7 @@ export const es: PortfolioContent = {
     manifesto: { label: 'Lo que no cambia', lines: ['Leer los números antes que el código.', 'Desplegar desde git, nunca desde el editor.', 'Probar la tienda completa, no una página.', 'Entregar las llaves.'] },
     testimonials: { eyebrow: 'En sus palabras', title: 'Lo que dicen', titleAccent: 'los clientes' },
     now: { label: 'Ahora', live: '{n} tiendas en vivo', dev: '{n} en construcción', band: 'Tiendas entregadas', local: 'Medellín · {time} hora local' },
-    statBand: { label: 'El trabajo, en números', asOf: 'Septiembre de 2026', sourceLabel: 'Fuente' },
+    statBand: { label: 'El trabajo, en números', asOf: 'Septiembre de 2026', sourceLabel: 'Fuente', note: 'Rangos medidos en tiendas de clientes; las cifras exactas por tienda se mantienen confidenciales.' },
     careerSubway: { eyebrow: 'Mapa de carrera', title: 'Los roles,', titleAccent: 'en una sola línea', lead: 'Seis años como mapa de metro: una línea por empleador, un transbordo donde dos roles se cruzaron.', toggleShow: 'Ver como mapa', toggleHide: 'Ocultar el mapa', transferLabel: 'Cruce', rowAria: '{company}: {period}' },
     years: { eyebrow: 'Un bloque por año, sin relleno', title: 'Cinco años,', titleAccent: 'una sola dirección', lead: 'De componentes React en 2022 a una flota de tiendas Shopify y la plataforma detrás. Cada línea sale de los mismos registros que el resto del sitio.', roles: 'Roles', shipped: 'Tiendas', work: 'Proyectos con clientes', products: 'Productos', side: 'En mi tiempo', more: '+{n} más', count: '{n} tiendas', perYear: 'Trabajo entregado cuya construcción tocó el año', eras: { '2022': 'React y Salesforce', '2023': 'Primeras tiendas Shopify', '2024': 'Front enterprise, luego CTO', '2025': 'CTO y builds por contrato', '2026': 'La flota y la plataforma' } },
     chapters: {

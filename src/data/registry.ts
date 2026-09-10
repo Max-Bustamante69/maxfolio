@@ -252,16 +252,17 @@ export const personalProjects: PersonalProject[] = [
   { id: 'maxfolio', name: 'Maxfolio', url: 'https://www.maxfolio.dev/', repo: 'https://github.com/Max-Bustamante69/maxfolio', year: 2026, stack: ['React 19', 'Vite', 'Tailwind', 'framer-motion'] },
 ]
 
-export type StatId = 'storefronts' | 'tests' | 'conversion' | 'savings' | 'subscriptions' | 'contacts'
+export type StatId = 'lighthouse' | 'loadTime' | 'conversion' | 'organic' | 'storefronts' | 'tests'
 
 /** Every figure here traces to a CV bullet or the registry — never an inflated CRO/AOV number. */
 export const stats: { id: StatId; value: string }[] = [
+  // Optimization first: this is the selling point. Every value is a CV bullet (experience[].metrics above).
+  { id: 'lighthouse', value: '70→95+' },
+  { id: 'loadTime', value: '-30–40%' },
+  { id: 'conversion', value: '+10–20%' },
+  { id: 'organic', value: '+20%' },
   { id: 'storefronts', value: '18+' },
   { id: 'tests', value: '800+' },
-  { id: 'conversion', value: '+10–20%' },
-  { id: 'savings', value: '$45k/yr' },
-  { id: 'subscriptions', value: '581' },
-  { id: 'contacts', value: '10,000+' },
 ]
 
 export const skillGroups = {

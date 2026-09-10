@@ -68,7 +68,7 @@ export interface PortfolioContent {
       mobile: string
     }
     now: { label: string; live: string; dev: string; band: string; local: string }
-    statBand: { label: string; asOf: string; sourceLabel: string }
+    statBand: { label: string; asOf: string; sourceLabel: string; note: string }
     careerSubway: SectionHeading & { lead: string; toggleShow: string; toggleHide: string; transferLabel: string; rowAria: string }
     process: SectionHeading & { problemLabel: string; problem: string; fixLabel: string; fix: string; stepOf: string; deliverableLabel: string; steps: { title: string; body: string; deliverable: string }[] }
     testimonials: SectionHeading

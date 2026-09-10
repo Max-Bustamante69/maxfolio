@@ -50,7 +50,8 @@ export function Chapters({ skin, heading }: ChaptersProps) {
   const c = strings.sections.chapters
   const y = strings.sections.years
   const highlights = useHighlights()
-  const years = timeline // ascending, 2022 -> 2026
+  // Newest first: the current year is the most important card, the rail moves back in time.
+  const years = [...timeline].reverse()
   const total = years.length
   const [active, setActive] = useState(0)
   const railRef = useRef<HTMLDivElement>(null)

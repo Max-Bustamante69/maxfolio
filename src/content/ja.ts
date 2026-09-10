@@ -19,20 +19,22 @@ export const ja: PortfolioContent = {
     ctaCv: 'CVをダウンロード',
   },
   stats: {
-    storefronts: 'Shopifyストア',
-    tests: '自動テスト',
-    conversion: 'コンバージョン向上、Shopifyストア',
-    savings: '年間削減額、エンタープライズCMS移行',
-    subscriptions: '本番稼働中の定期課金連携でのサブスク数',
-    contacts: 'エンタープライズ・ニュースレター基盤の連絡先数',
+    lighthouse: '最適化後のLighthouseパフォーマンス',
+    loadTime: '読み込み時間（Shopifyストア）',
+    conversion: 'コンバージョン向上（Shopifyストア）',
+    organic: 'テクニカルSEO後のオーガニック流入',
+    storefronts: '納品したShopifyストア',
+    tests: 'QAハーネスの自動チェック',
+
   },
   statSources: {
-    storefronts: 'Digitdeckのストア、2024〜2026年',
-    tests: 'Digitdeckのアプリ群、2026年',
-    conversion: 'Frontend Developer（Shopify）、Digitdeck、2023〜2024年',
-    savings: 'Frontend Developer、RH、2024〜2025年',
-    subscriptions: 'CTO & Shopify Technical Lead、Digitdeck、2026年',
-    contacts: 'Full Stack Developer、ABI Data、2025年',
+    lighthouse: 'Frontend Developer, RH, 2024–2025（エンタープライズCMS移行）',
+    loadTime: 'Frontend Developer (Shopify), Digitdeck, 2023–2024',
+    conversion: 'Frontend Developer (Shopify), Digitdeck, 2023–2024',
+    organic: 'Frontend Developer (Shopify), Digitdeck, 2023–2024',
+    storefronts: 'Digitdeckのストア, 2024–2026',
+    tests: 'Digitdeckアプリスイート, 2026',
+
   },
   sections: {
     experience: { eyebrow: 'すべての役割を、順番通りに', title: '仕事をしてきた', titleAccent: '場所', achievements: '成果', technologies: '技術スタック', visit: 'サイトを見る' },
@@ -104,7 +106,7 @@ export const ja: PortfolioContent = {
     manifesto: { label: '変わらないこと', lines: ['コードより先に、数字を読む。', 'エディタからではなく、gitから出荷する。', '1ページではなく、ストア全体をテストする。', '鍵を渡して終える。'] },
     testimonials: { eyebrow: 'お客様の声', title: 'クライアントの', titleAccent: '言葉' },
     now: { label: '現在', live: '公開中のストア {n}', dev: '構築中 {n}', band: '納品したストア', local: 'メデジン・現地時間 {time}' },
-    statBand: { label: '仕事を数字で', asOf: '2026年9月時点', sourceLabel: '出典' },
+    statBand: { label: '仕事を数字で', asOf: '2026年9月時点', sourceLabel: '出典', note: 'クライアントストアで測定した範囲です。店舗ごとの正確な数値は非公開です。' },
     careerSubway: { eyebrow: 'キャリアマップ', title: '役割を、', titleAccent: '一本の路線に', lead: '6年間を路線図として: 雇用主ごとに一本の線、二つの役割が重なった場所に乗り換え。', toggleShow: '地図で見る', toggleHide: '地図を隠す', transferLabel: '重複', rowAria: '{company}: {period}' },
     years: { eyebrow: '1年に1ブロック、水増しなし', title: '5年間、', titleAccent: 'ひとつの方向へ', lead: '2022年のReactコンポーネントから、Shopifyストア群とその裏側のプラットフォームまで。各行はサイト全体と同じ記録から生成しています。', roles: '役割', shipped: 'ストア', work: 'クライアント案件', products: 'プロダクト', side: '個人プロジェクト', more: '+{n}件', count: 'ストア {n}', perYear: '構築がその年に及んだ納品物の数', eras: { '2022': 'ReactとSalesforce', '2023': '最初のShopifyストア', '2024': 'エンタープライズのフロント、そしてCTO', '2025': 'CTOと契約案件', '2026': 'ストア群とプラットフォーム' } },
     chapters: {

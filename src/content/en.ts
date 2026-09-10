@@ -19,20 +19,22 @@ export const en: PortfolioContent = {
     ctaCv: 'Download CV',
   },
   stats: {
-    storefronts: 'Shopify storefronts',
-    tests: 'Automated tests',
+    lighthouse: 'Lighthouse performance, after optimization',
+    loadTime: 'Load time, Shopify storefronts',
     conversion: 'Conversion lift, Shopify storefronts',
-    savings: 'Saved per year, enterprise CMS migration',
-    subscriptions: 'Subscriptions on a live recurring-billing integration',
-    contacts: 'Contacts on an enterprise newsletter platform',
+    organic: 'Organic traffic, after technical SEO',
+    storefronts: 'Shopify storefronts shipped',
+    tests: 'Automated checks in the QA harness',
+
   },
   statSources: {
+    lighthouse: 'Frontend Developer, RH, 2024–2025 (enterprise CMS migration)',
+    loadTime: 'Frontend Developer (Shopify), Digitdeck, 2023–2024',
+    conversion: 'Frontend Developer (Shopify), Digitdeck, 2023–2024',
+    organic: 'Frontend Developer (Shopify), Digitdeck, 2023–2024',
     storefronts: 'Digitdeck storefronts, 2024–2026',
     tests: 'Digitdeck app suite, 2026',
-    conversion: 'Frontend Developer (Shopify), Digitdeck, 2023–2024',
-    savings: 'Frontend Developer, RH, 2024–2025',
-    subscriptions: 'CTO & Shopify Technical Lead, Digitdeck, 2026',
-    contacts: 'Full Stack Developer, ABI Data, 2025',
+
   },
   sections: {
     experience: { eyebrow: 'Every role, in order', title: 'Where the work', titleAccent: 'happened', achievements: 'What shipped', technologies: 'Stack', visit: 'Visit website' },
@@ -104,7 +106,7 @@ export const en: PortfolioContent = {
     manifesto: { label: 'What doesn\'t change', lines: ['Read the numbers before the code.', 'Ship from git, never from the editor.', 'Test the whole store, not one page.', 'Hand over the keys.'] },
     testimonials: { eyebrow: 'In their words', title: 'What clients', titleAccent: 'say' },
     now: { label: 'Now', live: '{n} storefronts live', dev: '{n} in development', band: 'Storefronts shipped', local: 'Medellín · {time} local' },
-    statBand: { label: 'The work, in numbers', asOf: 'September 2026', sourceLabel: 'Source' },
+    statBand: { label: 'The work, in numbers', asOf: 'September 2026', sourceLabel: 'Source', note: 'Measured ranges across client storefronts; exact per-store figures stay confidential.' },
     careerSubway: { eyebrow: 'Career map', title: 'The roles,', titleAccent: 'on one line', lead: 'Six years as a subway map: one line per employer, a transfer where two roles overlapped.', toggleShow: 'View as a map', toggleHide: 'Hide the map', transferLabel: 'Overlap', rowAria: '{company}: {period}' },
     years: { eyebrow: 'One block per year, nothing padded', title: 'Five years,', titleAccent: 'one direction', lead: 'From React components in 2022 to a fleet of Shopify stores and the platform behind them. Every line is derived from the same records as the rest of the site.', roles: 'Roles', shipped: 'Storefronts', work: 'Client projects', products: 'Products', side: 'On my own time', more: '+{n} more', count: '{n} storefronts', perYear: 'Shipped work whose build touched the year', eras: { '2022': 'React and Salesforce', '2023': 'First Shopify storefronts', '2024': 'Enterprise front end, then CTO', '2025': 'CTO and contract builds', '2026': 'The fleet and the platform' } },
     chapters: {
