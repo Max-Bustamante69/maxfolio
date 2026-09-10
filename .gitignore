@@ -47,3 +47,7 @@ docs/linkedin/2026-09-job-shortlist*
 docs/linkedin/2026-09-warm-contacts*
 
 .vercel
+
+# Source PNGs for generated art — only the converted .webp is committed
+public/art/**/*.png
+
