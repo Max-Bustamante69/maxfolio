@@ -1,5 +1,10 @@
 [
   {
+    "hash": "6e92af0",
+    "date": "2026-09-10",
+    "subject": "fix(sheet): cap Impact block draw-ins at the 0.8s motion budget"
+  },
+  {
     "hash": "8d1e043",
     "date": "2026-09-10",
     "subject": "chore(terminal): regenerated changelog.json"
@@ -53,10 +58,5 @@
     "hash": "5bbf811",
     "date": "2026-09-09",
     "subject": "fix(sheet): label the Impact block's illustrative charts individually, fix draw-in timing and the info-button tap target"
-  },
-  {
-    "hash": "fa87964",
-    "date": "2026-09-09",
-    "subject": "chore(terminal): regenerated changelog.json"
   }
 ]
