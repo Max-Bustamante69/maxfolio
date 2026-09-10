@@ -25,9 +25,15 @@ const DOT_MIN = 26
 const DOT_MAX = 40
 
 // Ring radii in viewBox units (0–100, center 50/50) — one ring per group, fewest tools innermost so
-// the busiest group (Shopify, 13 tools) gets the longest circumference. Durations (seconds/turn) stay
-// in the 90–150s band the brief calls for; direction alternates ring to ring.
-const RADII = [19, 25.5, 32, 38.5, 45, 51.5]
+// the busiest group (Shopify, 13 tools) gets the longest circumference. The viewBox spans 0–100, so a
+// circle centered on (50,50) only stays fully inside it up to r=50, and a ring's own text (riding the
+// path via textPath) extends further still — its ascent reaches above the guide arc by roughly the
+// font size. The original outermost value (51.5) put the busiest ring's own stroke AND its group-name
+// label past the SVG's default `overflow: hidden` edge; "SHOPIFY" measured fully invisible (its text
+// rect sat entirely above the svg's own rect). Capped at 46, which leaves the label's ascent (~2.3
+// units of font-size) comfortable room inside the 50-unit bound. Durations (seconds/turn) stay in the
+// 90–150s band the brief calls for; direction alternates ring to ring.
+const RADII = [19, 24.4, 29.8, 35.2, 40.6, 46]
 const DURATIONS = [90, 102, 114, 126, 138, 150]
 
 // A full-circle path can't center text AT its own start point (SVG text can't wrap past the end of a
@@ -181,7 +187,14 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
 
       <div className="relative mx-auto aspect-square w-full max-w-[680px] overflow-visible [perspective:1400px]">
         <div ref={tiltRef} className="absolute inset-0" style={{ transformStyle: 'preserve-3d' } as CSSProperties} onPointerMove={onPointerMove} onPointerLeave={onPointerLeave}>
-          {/* Static rings + arc labels — inert decoration, never rotates itself. */}
+          {/* Static rings — inert decoration, never rotates itself. Group-name labels are a SEPARATE
+              svg layer painted after (on top of) the rotating dots below: the ambient rotation sweeps
+              every dot through the label's fixed 12-o'clock position over the course of its cycle, so
+              a label that merely sat *underneath* the dot layer in paint order would go fully or
+              partly unreadable for part of every rotation on any ring with more than a couple of tools
+              — measured on this ring set, that's most of them. The guide path a label's text rides
+              still lives here; <textPath href> resolves by id across the whole document, not just its
+              own <svg>, so the second layer can reference it. */}
           <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full" aria-hidden="true">
             {ringSpecs.map((ring) => {
               const bright = emphasizedGroup === ring.group
@@ -199,24 +212,9 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
                 />
               )
             })}
-            {ringSpecs.map((ring) => {
-              const bright = emphasizedGroup === ring.group
-              const dim = emphasizedGroup !== null && !bright
-              const pathId = `mf-orbit-arc-${ring.group}`
-              return (
-                <g key={`label-${ring.group}`}>
-                  <path id={pathId} d={textArcPath(ring.radius)} fill="none" opacity="0" />
-                  <text
-                    className={`select-none text-[2.3px] font-semibold uppercase transition-opacity duration-300 ${dim ? 'opacity-20' : bright ? 'opacity-100' : 'opacity-70'} ${bright ? `${skin.accent} fill-current` : skin.dark ? 'fill-white/55' : 'fill-black/50'}`}
-                    style={{ letterSpacing: '0.08em' }}
-                  >
-                    <textPath href={`#${pathId}`} startOffset={arcStartOffset(groupLabel[ring.group], ring.radius)}>
-                      {groupLabel[ring.group]}
-                    </textPath>
-                  </text>
-                </g>
-              )
-            })}
+            {ringSpecs.map((ring) => (
+              <path key={`guide-${ring.group}`} id={`mf-orbit-arc-${ring.group}`} d={textArcPath(ring.radius)} fill="none" opacity="0" />
+            ))}
           </svg>
 
           {/* Rotating dot layer — one wrapper per ring, transform-only ambient spin. */}
@@ -300,6 +298,27 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
               </div>
             ))}
           </div>
+
+          {/* Group-name arc labels — a layer of their own, painted after (on top of) the rotating
+              dots above so a label stays fully legible through the moment a dot orbits behind it,
+              instead of the dot winning paint order and eating a letter or two out of the name. */}
+          <svg viewBox="0 0 100 100" className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true">
+            {ringSpecs.map((ring) => {
+              const bright = emphasizedGroup === ring.group
+              const dim = emphasizedGroup !== null && !bright
+              return (
+                <text
+                  key={`label-${ring.group}`}
+                  className={`select-none text-[2.3px] font-semibold uppercase transition-opacity duration-300 ${dim ? 'opacity-20' : 'opacity-100'} ${bright ? `${skin.accent} fill-current` : skin.dark ? 'fill-white/65' : 'fill-black/60'}`}
+                  style={{ letterSpacing: '0.08em' }}
+                >
+                  <textPath href={`#mf-orbit-arc-${ring.group}`} startOffset={arcStartOffset(groupLabel[ring.group], ring.radius)}>
+                    {groupLabel[ring.group]}
+                  </textPath>
+                </text>
+              )
+            })}
+          </svg>
 
           {/* Center card: fleet totals at rest, the selected tool's real story once one is active. */}
           <div className={`absolute left-1/2 top-1/2 flex h-44 w-44 -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-[28px] border p-3 text-center ${skin.line} ${skin.dark ? 'bg-white/[0.04]' : 'bg-white/70'}`} aria-live="polite">
