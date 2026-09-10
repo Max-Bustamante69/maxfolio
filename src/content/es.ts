@@ -204,6 +204,13 @@ export const es: PortfolioContent = {
         pinned: 'Fijado',
         hint: 'Haz clic o presiona Enter para fijarlo — Esc lo libera.',
       },
+      layoutExtra: {
+        wallFilterLabel: 'Filtrar el muro por grupo',
+        allLabel: 'Todo',
+        hoverRing: 'Pasa el cursor sobre un anillo',
+        unpin: 'Desfijar',
+        toolsSuffix: 'herramientas',
+      },
     },
     contact: {
       eyebrow: 'Diagnóstico primero, gratis, 20 minutos',

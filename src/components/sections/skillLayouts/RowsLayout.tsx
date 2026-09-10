@@ -34,7 +34,7 @@ export function RowsLayout({ data }: SkillsLayoutProps) {
               <Ticker
                 variant="stock-ticker"
                 duration={duration}
-                label={`${groupLabel[g]} tools`}
+                label={`${groupLabel[g]} ${sk.layoutExtra.toolsSuffix}`}
                 items={toolsByGroup[g]}
                 keyOf={(u: ToolUsage) => u.tool}
                 itemClassName="shrink-0 pr-2.5"

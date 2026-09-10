@@ -9,7 +9,7 @@ import { toolIcon, monogram, ToolMark } from '../skillIcons'
 import type { SkillsLayoutProps } from './types'
 
 export function WallLayout({ data }: SkillsLayoutProps) {
-  const { skin, groups, groupLabel, toolsByGroup, allTools, formatTool, formatGroup, storesPerGroup } = data
+  const { skin, sk, groups, groupLabel, toolsByGroup, allTools, formatTool, formatGroup, storesPerGroup } = data
   const [filter, setFilter] = useState<SkillGroupId | null>(null)
   const [hovered, setHovered] = useState<string | null>(null)
   const [locked, setLocked] = useState<string | null>(null)
@@ -21,9 +21,9 @@ export function WallLayout({ data }: SkillsLayoutProps) {
 
   return (
     <div className="mt-2">
-      <div className="-mx-4 flex flex-wrap gap-2 overflow-x-auto px-4 pb-1 no-scrollbar md:mx-0 md:px-0" role="tablist" aria-label="Filter the wall by group">
+      <div className="-mx-4 flex flex-wrap gap-2 overflow-x-auto px-4 pb-1 no-scrollbar md:mx-0 md:px-0" role="tablist" aria-label={sk.layoutExtra.wallFilterLabel}>
         <button type="button" role="tab" aria-selected={filter === null} onClick={() => setFilter(null)} className={`shrink-0 whitespace-nowrap transition-colors ${filter === null ? skin.chipOn : skin.chip}`}>
-          All · {allTools.length}
+          {sk.layoutExtra.allLabel} · {allTools.length}
         </button>
         {groups.map((g) => (
           <button

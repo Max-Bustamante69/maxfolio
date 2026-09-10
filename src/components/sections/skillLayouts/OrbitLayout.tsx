@@ -16,7 +16,7 @@ import type { SkillsLayoutProps } from './types'
 const TAU = Math.PI * 2
 
 export function OrbitLayout({ data }: SkillsLayoutProps) {
-  const { skin, groups, groupLabel, toolsByGroup, formatTool } = data
+  const { skin, sk, groups, groupLabel, toolsByGroup, formatTool } = data
   const isDesktop = useMediaQuery('(min-width: 1024px)')
   const reduced = useReducedMotion()
   const [hovered, setHovered] = useState<string | null>(null)
@@ -92,7 +92,7 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
                 <p className={`mt-0.5 px-2 text-[9px] leading-tight ${skin.muted}`}>{formatTool(activeTool)}</p>
               </>
             ) : (
-              <p className={`px-3 text-[10px] leading-snug ${skin.muted}`}>Hover a ring</p>
+              <p className={`px-3 text-[10px] leading-snug ${skin.muted}`}>{sk.layoutExtra.hoverRing}</p>
             )}
           </div>
         </div>
@@ -109,7 +109,7 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
       {pinned && activeTool && (
         <p className={`mt-2 text-center text-[11px] ${skin.muted}`}>
           <button type="button" className={`underline ${skin.accent}`} onClick={() => setLocked(null)}>
-            Unpin
+            {sk.layoutExtra.unpin}
           </button>
         </p>
       )}
