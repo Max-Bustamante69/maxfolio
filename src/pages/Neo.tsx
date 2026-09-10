@@ -570,7 +570,13 @@ function NeoContent() {
                     </div>
                   </TransitionLink>
                 ))}
-                <TransitionLink to={MENU.route} transitionColor="#171717" transitionAccent="#ffffff" transitionLabel={t(MENU.labelKey)} className="neo-raised neo-md neo-interactive block !rounded-[22px] overflow-hidden">
+                <TransitionLink
+                  to={MENU.route}
+                  transitionColor="#171717"
+                  transitionAccent="#ffffff"
+                  transitionLabel={t(MENU.labelKey)}
+                  className={`border neo-interactive block !rounded-[22px] overflow-hidden ${isDark ? 'border-white/10' : 'border-black/[0.08]'}`}
+                >
                   <div className="h-28 overflow-hidden bg-black/80 flex items-center justify-center text-white text-xs font-semibold">{t(MENU.labelKey)}</div>
                   <div className="p-4">
                     <p className="font-bold text-sm">{t(MENU.labelKey)}</p>
