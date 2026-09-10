@@ -146,6 +146,18 @@ function tileTone(skin: Skin): TileTone {
         title: skin.title,
         chip: skin.chip,
       }
+    case 'skyline':
+      return {
+        base: 'rounded-[3px] border border-[#e7edf5]/10 bg-[#141d2e]',
+        onBase: 'border-[#4fd1ff]/50 bg-[#1b2740]',
+        pinnedRing: 'ring-1 ring-[#4fd1ff]/60',
+        icon: 'bg-[#0d1420] text-[#8d9bb0]',
+        iconOn: 'bg-[#0d1420] text-[#4fd1ff]',
+        title: 'text-[#eef3f9]',
+        // The one deliberate break: the usage chip IS real fleet data, so it carries the reserved
+        // cyan — every other tile surface here stays a neutral navy/ice-blue (see skins.ts's split).
+        chip: 'font-mono bg-[#4fd1ff]/15 text-[#4fd1ff]',
+      }
   }
 }
 

@@ -230,7 +230,7 @@ function HomeContent() {
         >
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
             <div className="max-w-sm">
-              <p className={`text-xs uppercase tracking-[0.2em] ${textMuted} mb-2`}>{t('menuPage.whyVersions')}</p>
+              <p className={`text-xs uppercase tracking-[0.2em] ${textMuted} mb-2`}>{t('menuPage.whyVersions').replace('{n}', String(designs.length))}</p>
               <p className={`text-sm ${textSecondary}`}>{t('menuPage.whyVersionsDesc')}</p>
             </div>
             <TransitionLink

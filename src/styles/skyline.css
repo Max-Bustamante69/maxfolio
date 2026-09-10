@@ -1,0 +1,70 @@
+/**
+ * Skyline — the "data-monument" theme tokens and utilities.
+ * Imported ONLY by src/pages/Skyline.tsx. Scoped under .theme-skyline so nothing leaks into the
+ * other themes. Fixed dark register (no light mode): deep navy/graphite ground, technical grotesk
+ * for copy, JetBrains Mono (already loaded globally, see index.html) for every real numeral, and
+ * exactly one reserved accent — cyan — confined to real numbers and real-data chart fills. See
+ * src/components/gallery/skins.ts for where that split is enforced in code.
+ */
+
+.theme-skyline {
+  --sky-bg: #0d1420;
+  --sky-surface: #141d2e;
+  --sky-surface-raised: #1b2740;
+  --sky-ink: #eef3f9;
+  --sky-ink-muted: #8d9bb0;
+  --sky-line: rgba(231, 237, 245, 0.1);
+  /* Decorative/UI accent — links, active tabs, focus rings. Deliberately NOT the reserved cyan. */
+  --sky-ui-accent: #7fb0d1;
+  /* The reserved accent: real numerals and real-data chart fills only. */
+  --sky-data-accent: #4fd1ff;
+  color-scheme: dark;
+  background: var(--sky-bg);
+  color: var(--sky-ink);
+}
+
+/* A faint blueprint/graph-paper ground — decoration, kept under 5% opacity so it never competes
+   with real content or reads as a fabricated data grid. */
+.skyline-grid-bg {
+  background-image:
+    linear-gradient(var(--sky-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--sky-line) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: -1px -1px;
+  opacity: 0.5;
+}
+
+/* HUD corner readouts over the hero — small mono chips, low-emphasis border, real live values only
+   (clock, scroll %, viewport). Never a decorative counter. */
+.skyline-hud {
+  font-variant-numeric: tabular-nums;
+  border: 1px solid var(--sky-line);
+  background: rgba(13, 20, 32, 0.6);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 3px;
+}
+
+.theme-skyline ::selection {
+  background: var(--sky-data-accent);
+  color: var(--sky-bg);
+}
+
+.theme-skyline :focus-visible {
+  outline: 2px solid var(--sky-data-accent);
+  outline-offset: 2px;
+}
+
+/* Buttons/press feedback — transform-only, respects reduced motion via the global rule below. */
+.skyline-press {
+  transition: transform 150ms ease, border-color 150ms ease, background-color 150ms ease;
+}
+.skyline-press:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skyline-press:active {
+    transform: none;
+  }
+}

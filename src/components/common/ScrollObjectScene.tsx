@@ -1,11 +1,13 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
-import type { ScrollObjectVariant } from './ScrollObject'
+import type { ScrollObjectVariant, SkylineBarDatum } from './ScrollObject'
 
 interface Props {
   variant: ScrollObjectVariant
   /** Whether the object is currently in view — the render loop pauses entirely (no rAF churn) when false. */
   active: boolean
+  /** 'skyline' only: the real per-bar layout to instance. */
+  data?: SkylineBarDatum[]
 }
 
 /** Cheap deterministic 3-lobe value noise (no external noise library) used only to displace the
@@ -15,8 +17,37 @@ function fakeNoise3(x: number, y: number, z: number) {
   return (Math.sin(x * 2.1 + y * 1.3) + Math.sin(y * 1.7 + z * 2.3) + Math.sin(z * 1.9 + x * 1.1)) / 3
 }
 
-function buildGeometryAndMaterial(variant: ScrollObjectVariant): { mesh: THREE.Object3D; extras: THREE.Object3D[] } {
+function buildGeometryAndMaterial(variant: ScrollObjectVariant, data?: SkylineBarDatum[]): { mesh: THREE.Object3D; extras: THREE.Object3D[] } {
   const extras: THREE.Object3D[] = []
+
+  if (variant === 'skyline') {
+    const bars = data && data.length > 0 ? data : [{ x: 0, z: 0, height: 1, peak: true }]
+    const geo = new THREE.BoxGeometry(0.42, 1, 0.42)
+    // Flat graphite/navy body — the reserved cyan lands only on the one real-data instance color set below.
+    const mat = new THREE.MeshStandardMaterial({ color: 0x2a3448, roughness: 0.6, metalness: 0.25, flatShading: true })
+    const mesh = new THREE.InstancedMesh(geo, mat, bars.length)
+    mesh.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(bars.length * 3), 3)
+    const dummy = new THREE.Object3D()
+    const navy = new THREE.Color(0x3c4a68)
+    const cyan = new THREE.Color(0x4fd1ff)
+    bars.forEach((b, i) => {
+      const h = Math.max(0.12, b.height)
+      dummy.position.set(b.x, h / 2 - 1.25, b.z)
+      dummy.scale.set(1, h, 1)
+      dummy.updateMatrix()
+      mesh.setMatrixAt(i, dummy.matrix)
+      mesh.setColorAt(i, b.peak ? cyan : navy)
+    })
+    mesh.instanceMatrix.needsUpdate = true
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
+    const groundGeo = new THREE.PlaneGeometry(7, 5)
+    const groundMat = new THREE.MeshStandardMaterial({ color: 0x0d1420, roughness: 1, metalness: 0 })
+    const ground = new THREE.Mesh(groundGeo, groundMat)
+    ground.rotation.x = -Math.PI / 2
+    ground.position.y = -1.25
+    extras.push(ground)
+    return { mesh, extras }
+  }
 
   if (variant === 'luxury') {
     const geo = new THREE.TorusKnotGeometry(1.05, 0.32, 180, 24)
@@ -69,7 +100,7 @@ function disposeObject(obj: THREE.Object3D) {
 
 const FRAME_INTERVAL = 1000 / 60 // cap ≤60fps
 
-export default function ScrollObjectScene({ variant, active }: Props) {
+export default function ScrollObjectScene({ variant, active, data }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const activeRef = useRef(active)
   activeRef.current = active
@@ -103,7 +134,10 @@ export default function ScrollObjectScene({ variant, active }: Props) {
 
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(35, width / height, 0.1, 100)
-    camera.position.set(0, 0, 6)
+    // Skyline's bars spread across a wider x/z grid than the other themes' single centered object,
+    // so its camera sits back and slightly above to keep every year's cluster in frame.
+    if (variant === 'skyline') camera.position.set(0, 1.3, 9)
+    else camera.position.set(0, 0, 6)
 
     const key = new THREE.DirectionalLight(0xffffff, 1.3)
     key.position.set(3, 4, 5)
@@ -113,7 +147,7 @@ export default function ScrollObjectScene({ variant, active }: Props) {
     scene.add(fill)
     scene.add(new THREE.AmbientLight(0xffffff, variant === 'brutalist' ? 0.45 : 0.65))
 
-    const { mesh, extras } = buildGeometryAndMaterial(variant)
+    const { mesh, extras } = buildGeometryAndMaterial(variant, data)
     scene.add(mesh)
     extras.forEach((e) => scene.add(e))
 
@@ -154,9 +188,22 @@ export default function ScrollObjectScene({ variant, active }: Props) {
       if (now - lastFrameTime < FRAME_INTERVAL) return
       lastFrameTime = now
       const t = clock.getElapsedTime()
-      mesh.rotation.y = scrollProgress * Math.PI * 2 + t * 0.08 + pointerX * MAX_ROT_FROM_POINTER
-      mesh.rotation.x = scrollProgress * Math.PI * 0.55 + Math.sin(t * 0.3) * 0.05 + pointerY * MAX_ROT_FROM_POINTER
-      mesh.position.y = Math.sin(scrollProgress * Math.PI) * 0.15 - scrollProgress * 0.25
+      if (variant === 'skyline') {
+        // Scroll orbits the CAMERA slowly around the fixed skyline (the bars themselves stay put,
+        // like walking past real buildings); the pointer only tilts the whole block ±6°.
+        const angle = (scrollProgress - 0.5) * (Math.PI / 2.2)
+        const radius = 9
+        camera.position.x = Math.sin(angle) * radius
+        camera.position.z = Math.cos(angle) * radius
+        camera.position.y = 1.3 + Math.sin(t * 0.15) * 0.08
+        camera.lookAt(0, -0.2, 0)
+        mesh.rotation.x = pointerY * MAX_ROT_FROM_POINTER
+        mesh.rotation.y = pointerX * MAX_ROT_FROM_POINTER
+      } else {
+        mesh.rotation.y = scrollProgress * Math.PI * 2 + t * 0.08 + pointerX * MAX_ROT_FROM_POINTER
+        mesh.rotation.x = scrollProgress * Math.PI * 0.55 + Math.sin(t * 0.3) * 0.05 + pointerY * MAX_ROT_FROM_POINTER
+        mesh.position.y = Math.sin(scrollProgress * Math.PI) * 0.15 - scrollProgress * 0.25
+      }
       renderer.render(scene, camera)
     }
     startRef.current = () => { if (!raf && activeRef.current) raf = requestAnimationFrame(animate) }

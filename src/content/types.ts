@@ -114,6 +114,27 @@ export interface PortfolioContent {
       currentState: string
       countUnit: string // 'active months' / 'meses activos' / '稼働月'
     }
+    /** Skyline's hero HUD: the corner readouts and the SVG+table twin of the 3D fleet bar chart
+     *  (the twin is what mobile, reduced motion and assistive tech get — see hero.tsx / Skyline.tsx). */
+    skylineHero: {
+      clockLabel: string
+      scrollLabel: string
+      viewportLabel: string
+      chartCaption: string // '{n} storefronts and products, by launch year — bar height = commits shipped'
+      tableCaption: string
+      tableYear: string
+      tableName: string
+      tableCommits: string
+      fallbackNote: string // discloses the "1 unit" fallback for items without commit telemetry
+    }
+    /** Skyline's new section: three honest gauges read off the fleet's own real records, each with
+     *  its source line and a backing <table> — never a fabricated score. */
+    instruments: SectionHeading & {
+      lead: string
+      liveShare: { label: string; source: string; tableCaption: string; live: string; dev: string; total: string }
+      saleShare: { label: string; source: string; tableCaption: string; counted: string; average: string; highest: string; lowest: string }
+      busiestWeek: { label: string; source: string; tableCaption: string; week: string; commits: string; shareOfAll: string; value: string }
+    }
     projects: SectionHeading & { view: string }
     skills: SectionHeading & {
       groups: Record<SkillGroupId, string>

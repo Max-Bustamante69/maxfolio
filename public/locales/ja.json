@@ -36,7 +36,8 @@
     "shopify": "Shopify",
     "gallery": "ギャラリー",
     "projects": "プロジェクト",
-    "years": "沿革"
+    "years": "沿革",
+    "instruments": "計器"
   },
   "hero": {
     "greeting": "こんにちは、私は",
@@ -130,7 +131,8 @@
       "apple": "Apple Clean",
       "neo": "ソフトUI",
       "persona": "アーケード",
-      "terminal": "ターミナル"
+      "terminal": "ターミナル",
+      "skyline": "スカイライン"
     },
     "designSubtitles": {
       "luxuryMinimal": "エレガント＆洗練",
@@ -138,9 +140,10 @@
       "apple": "静かで正確",
       "neo": "触感的で立体的",
       "persona": "ラウド＆キネティック",
-      "terminal": "コンソール＆等幅"
+      "terminal": "コンソール＆等幅",
+      "skyline": "データと記念碑"
     },
-    "whyVersions": "なぜ5つのデザイン？",
+    "whyVersions": "なぜ{n}つのデザイン？",
     "whyVersionsDesc": "文脈に合わせた異なる美学。同じスキルで、確かな対応力を。"
   },
   "contactModal": {

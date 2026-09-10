@@ -2,13 +2,23 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { useReducedMotion } from 'framer-motion'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 
-export type ScrollObjectVariant = 'luxury' | 'brutalist' | 'softui'
+export type ScrollObjectVariant = 'luxury' | 'brutalist' | 'softui' | 'skyline'
+
+/** One instanced bar for the Skyline hero: real fleet data, never decoration. */
+export interface SkylineBarDatum {
+  x: number
+  z: number
+  height: number
+  peak: boolean
+}
 
 const Scene = lazy(() => import('./ScrollObjectScene'))
 
 interface ScrollObjectProps {
   variant: ScrollObjectVariant
   className?: string
+  /** 'skyline' only: the real per-bar layout (position + normalized height) to instance. */
+  data?: SkylineBarDatum[]
 }
 
 /**
@@ -20,7 +30,7 @@ interface ScrollObjectProps {
  * never downloads unless every gate above passes, so mobile/reduced-motion visitors pay zero bytes
  * for it.
  */
-export function ScrollObject({ variant, className = '' }: ScrollObjectProps) {
+export function ScrollObject({ variant, className = '', data }: ScrollObjectProps) {
   const wrapRef = useRef<HTMLDivElement>(null)
   const [everVisible, setEverVisible] = useState(false)
   const [inView, setInView] = useState(false)
@@ -56,7 +66,7 @@ export function ScrollObject({ variant, className = '' }: ScrollObjectProps) {
     >
       {enabled && everVisible && (
         <Suspense fallback={null}>
-          <Scene variant={variant} active={inView} />
+          <Scene variant={variant} active={inView} data={data} />
         </Suspense>
       )}
     </div>

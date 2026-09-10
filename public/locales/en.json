@@ -36,7 +36,8 @@
     "shopify": "Shopify",
     "gallery": "Gallery",
     "projects": "Projects",
-    "years": "Years"
+    "years": "Years",
+    "instruments": "Instruments"
   },
   "hero": {
     "greeting": "Hi, I'm",
@@ -130,7 +131,8 @@
       "apple": "Apple Clean",
       "neo": "Soft UI",
       "persona": "Arcade",
-      "terminal": "Terminal"
+      "terminal": "Terminal",
+      "skyline": "Skyline"
     },
     "designSubtitles": {
       "luxuryMinimal": "Elegant & Refined",
@@ -138,9 +140,10 @@
       "apple": "Quiet & Precise",
       "neo": "Tactile & Extruded",
       "persona": "Loud & Kinetic",
-      "terminal": "Console & Monospace"
+      "terminal": "Console & Monospace",
+      "skyline": "Data & Monument"
     },
-    "whyVersions": "Why five versions?",
+    "whyVersions": "Why {n} versions?",
     "whyVersionsDesc": "Different aesthetics for different contexts. Same skills, proven versatility."
   },
   "contactModal": {

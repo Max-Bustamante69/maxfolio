@@ -110,6 +110,19 @@ function panelTone(skin: Skin): PanelTone {
         line: skin.line,
         iconWrap: 'bg-[var(--term-line)]/40 text-[var(--term-accent)]',
       }
+    case 'skyline':
+      return {
+        className: 'rounded-md border border-[#e7edf5]/10 bg-[#0d1420]',
+        title: 'font-semibold text-[#eef3f9]',
+        body: 'text-[#c7d2e0]',
+        muted: 'text-[#8d9bb0]',
+        // The pinned tool's real usage count is the one place this panel's accent is the reserved
+        // cyan — every other panel here reuses `skin.accent`, which stays a neutral ice-blue.
+        accent: 'text-[#4fd1ff]',
+        chip: skin.chip,
+        line: skin.line,
+        iconWrap: 'bg-[#4fd1ff]/10 text-[#4fd1ff]',
+      }
   }
 }
 
