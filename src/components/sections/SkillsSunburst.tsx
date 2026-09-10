@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, type KeyboardEvent } from 'react'
 import { m, useReducedMotion } from 'framer-motion'
 import { useContent } from '../../hooks'
 import type { Skin } from '../gallery'
@@ -9,12 +9,26 @@ const EASE = [0.23, 1, 0.32, 1] as const
 
 export type SunburstSelection = { level: 'group'; group: SkillGroupId } | { level: 'tool'; group: SkillGroupId; tool: string } | null
 
+/** Structural equality for the two nullable selections — used to tell "hovering the locked arc" from
+ *  "hovering a different one" and to toggle a lock off when the same arc is clicked/Entered again. */
+export function sameSel(a: SunburstSelection, b: SunburstSelection): boolean {
+  if (!a || !b) return a === b
+  if (a.level !== b.level || a.group !== b.group) return false
+  return a.level === 'tool' && b.level === 'tool' ? a.tool === b.tool : true
+}
+
 interface SkillsSunburstProps {
   skin: Skin
   groups: SkillGroupId[]
   groupLabel: Record<SkillGroupId, string>
-  active: SunburstSelection
-  onSelect: (sel: SunburstSelection) => void
+  /** Transient — mouse/focus is over this arc right now (or null). */
+  hovered: SunburstSelection
+  /** Persistent — this arc was clicked/Entered and stays selected until toggled off or Esc. */
+  locked: SunburstSelection
+  onHover: (sel: SunburstSelection) => void
+  onHoverEnd: () => void
+  onToggleLock: (sel: SunburstSelection) => void
+  onUnlock: () => void
   /** Locale-formatted, ready-to-print strings — Skills.tsx owns the wording, this component only lays out arcs. */
   format: {
     tool: (u: ToolUsage) => string
@@ -89,17 +103,33 @@ function arcStyle(frame: Skin['frame']) {
   }
 }
 
+/** Enter/Space activates the arc like a click (SVG elements get no native button semantics);
+ *  Escape releases a lock from wherever focus currently sits. */
+function arcKeyDownHandler(onToggle: () => void, onEscape: () => void) {
+  return (e: KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      onToggle()
+    } else if (e.key === 'Escape') {
+      onEscape()
+    }
+  }
+}
+
 /**
  * Center = the person, ring 1 = the six skill groups, ring 2 = every named tool inside them — arc
  * length is a real usage weight (stores + products + named client-role deliverables that list the
  * tool), floored to a visible minimum for the tools we own but haven't logged a fleet count for yet.
  * Precomputed once from `skillUsage.ts` (no charting runtime); arcs draw themselves in on scroll and
- * every arc is a real, keyboard-reachable control.
+ * every arc is a real, keyboard-reachable control with two selection states: hover/focus previews,
+ * click/Enter locks (persists after the pointer leaves — the panel above stays on the pinned tool),
+ * Escape releases the lock.
  */
-export function SkillsSunburst({ skin, groups, groupLabel, active, onSelect, format }: SkillsSunburstProps) {
+export function SkillsSunburst({ skin, groups, groupLabel, hovered, locked, onHover, onHoverEnd, onToggleLock, onUnlock, format }: SkillsSunburstProps) {
   const reduced = useReducedMotion()
   const { registry } = useContent()
   const style = arcStyle(skin.frame)
+  const active = hovered ?? locked
 
   const byGroup = useMemo(() => {
     const map = new Map<SkillGroupId, ToolUsage[]>()
@@ -129,7 +159,9 @@ export function SkillsSunburst({ skin, groups, groupLabel, active, onSelect, for
 
   const isGroupActive = (g: SkillGroupId) => active?.group === g
   const isToolActive = (g: SkillGroupId, tool: string) => active?.level === 'tool' && active.group === g && active.tool === tool
-  const dim = (on: boolean) => (active ? (on ? 'opacity-100' : 'opacity-[0.32]') : 'opacity-100')
+  // Idle→hovered used to drop to 32% opacity; the brief asks for a lighter 60% so labels never dip
+  // below AA even mid-hover.
+  const dim = (on: boolean) => (active ? (on ? 'opacity-100' : 'opacity-60') : 'opacity-100')
   // Luxury's idle ring is a soft gold tint of its own accent rather than a neutral gray (arcStyle §baseTint).
   const idleClass = style.baseTint ? `${skin.accent} opacity-45` : skin.muted
 
@@ -148,30 +180,40 @@ export function SkillsSunburst({ skin, groups, groupLabel, active, onSelect, for
           {/* ring 1 — groups */}
           {ring1.map((seg) => {
             const on = isGroupActive(seg.group)
+            const sel: SunburstSelection = { level: 'group', group: seg.group }
+            const isLocked = sameSel(locked, sel)
             const arcLen = ((seg.end - seg.start) / 360) * 2 * Math.PI * R1
             const mid = (seg.start + seg.end) / 2
             const labelPos = polar(CX, CY, R1, mid)
             const flip = mid > 90 && mid < 270
             const g = storesPerGroup[seg.group]
             const groupLine = `${groupLabel[seg.group]} — ${format.group(g)}`
+            const haloOffset = style.w1 / 2 + 5
+            const keyDown = arcKeyDownHandler(
+              () => onToggleLock(sel),
+              () => onUnlock(),
+            )
             return (
               <g key={seg.group}>
+                {isLocked && <path d={arcPath(R1 + haloOffset, seg.start, seg.end)} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap={style.cap} className={`${skin.title} pointer-events-none`} aria-hidden="true" />}
                 <m.path
                   d={arcPath(R1, seg.start, seg.end)}
                   fill="none"
-                  strokeWidth={style.w1}
+                  strokeWidth={on ? style.w1 + 6 : style.w1}
                   strokeLinecap={style.cap}
-                  className={`${on ? skin.accentBg.replace('bg-', 'stroke-') : idleClass} ${dim(on)} cursor-pointer transition-opacity duration-200`}
+                  className={`${on ? skin.accentBg.replace('bg-', 'stroke-') : idleClass} ${dim(on)} cursor-pointer transition-[opacity,stroke-width] duration-200`}
                   stroke="currentColor"
                   style={on && style.glow ? { filter: 'drop-shadow(0 0 6px currentColor)' } : undefined}
                   tabIndex={0}
                   role="button"
                   aria-label={groupLine}
-                  onMouseEnter={() => onSelect({ level: 'group', group: seg.group })}
-                  onMouseLeave={() => onSelect(null)}
-                  onFocus={() => onSelect({ level: 'group', group: seg.group })}
-                  onBlur={() => onSelect(null)}
-                  onClick={() => onSelect(active?.level === 'group' && active.group === seg.group ? null : { level: 'group', group: seg.group })}
+                  aria-pressed={isLocked}
+                  onMouseEnter={() => onHover(sel)}
+                  onMouseLeave={onHoverEnd}
+                  onFocus={() => onHover(sel)}
+                  onBlur={onHoverEnd}
+                  onClick={() => onToggleLock(sel)}
+                  onKeyDown={keyDown}
                   initial={reduced ? false : { pathLength: 0 }}
                   whileInView={{ pathLength: 1 }}
                   viewport={{ once: true, margin: '-40px' }}
@@ -187,7 +229,7 @@ export function SkillsSunburst({ skin, groups, groupLabel, active, onSelect, for
                     dominantBaseline="middle"
                     transform={`rotate(${flip ? mid + 180 : mid}, ${labelPos.x}, ${labelPos.y})`}
                     className={`${skin.body} ${style.labelClass} pointer-events-none`}
-                    style={{ fontSize: 10, fill: 'currentColor', fontWeight: 600, letterSpacing: '0.03em' }}
+                    style={{ fontSize: 11, fill: 'currentColor', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}
                     aria-hidden="true"
                   >
                     {groupLabel[seg.group]}
@@ -200,34 +242,45 @@ export function SkillsSunburst({ skin, groups, groupLabel, active, onSelect, for
           {/* ring 2 — tools */}
           {ring2.map((seg) => {
             const u = seg.usage
+            const sel: SunburstSelection = { level: 'tool', group: seg.group, tool: u.tool }
             const on = isToolActive(seg.group, u.tool) || (active?.level === 'group' && active.group === seg.group)
             const solo = isToolActive(seg.group, u.tool)
+            const isLocked = sameSel(locked, sel)
             const toolLine = `${u.tool} — ${format.tool(u)}`
+            const haloOffset = style.w2 / 2 + 5
+            const keyDown = arcKeyDownHandler(
+              () => onToggleLock(sel),
+              () => onUnlock(),
+            )
             return (
-              <m.path
-                key={`${seg.group}-${u.tool}`}
-                d={arcPath(R2, seg.start, seg.end)}
-                fill="none"
-                strokeWidth={style.w2}
-                strokeLinecap={style.cap}
-                stroke="currentColor"
-                className={`${solo ? skin.accentBg.replace('bg-', 'stroke-') : on ? skin.accent : idleClass} ${dim(on)} cursor-pointer transition-opacity duration-200`}
-                style={solo && style.glow ? { filter: 'drop-shadow(0 0 5px currentColor)' } : undefined}
-                tabIndex={0}
-                role="button"
-                aria-label={toolLine}
-                onMouseEnter={() => onSelect({ level: 'tool', group: seg.group, tool: u.tool })}
-                onMouseLeave={() => onSelect(null)}
-                onFocus={() => onSelect({ level: 'tool', group: seg.group, tool: u.tool })}
-                onBlur={() => onSelect(null)}
-                onClick={() => onSelect(solo ? null : { level: 'tool', group: seg.group, tool: u.tool })}
-                initial={reduced ? false : { pathLength: 0 }}
-                whileInView={{ pathLength: 1 }}
-                viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.7, delay: 0.15, ease: EASE }}
-              >
-                <title>{toolLine}</title>
-              </m.path>
+              <g key={`${seg.group}-${u.tool}`}>
+                {isLocked && <path d={arcPath(R2 + haloOffset, seg.start, seg.end)} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap={style.cap} className={`${skin.title} pointer-events-none`} aria-hidden="true" />}
+                <m.path
+                  d={arcPath(R2, seg.start, seg.end)}
+                  fill="none"
+                  strokeWidth={solo ? style.w2 + 6 : style.w2}
+                  strokeLinecap={style.cap}
+                  stroke="currentColor"
+                  className={`${solo ? skin.accentBg.replace('bg-', 'stroke-') : on ? skin.accent : idleClass} ${dim(on)} cursor-pointer transition-[opacity,stroke-width] duration-200`}
+                  style={solo && style.glow ? { filter: 'drop-shadow(0 0 5px currentColor)' } : undefined}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={toolLine}
+                  aria-pressed={isLocked}
+                  onMouseEnter={() => onHover(sel)}
+                  onMouseLeave={onHoverEnd}
+                  onFocus={() => onHover(sel)}
+                  onBlur={onHoverEnd}
+                  onClick={() => onToggleLock(sel)}
+                  onKeyDown={keyDown}
+                  initial={reduced ? false : { pathLength: 0 }}
+                  whileInView={{ pathLength: 1 }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ duration: 0.7, delay: 0.15, ease: EASE }}
+                >
+                  <title>{toolLine}</title>
+                </m.path>
+              </g>
             )
           })}
         </svg>
