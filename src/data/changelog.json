@@ -1,5 +1,10 @@
 [
   {
+    "hash": "ec25a52",
+    "date": "2026-09-10",
+    "subject": "chore(terminal): regenerated changelog.json"
+  },
+  {
     "hash": "0ffbcd2",
     "date": "2026-09-10",
     "subject": "fix(content): correct featured-build problem beat for The Gummy Box"
@@ -53,10 +58,5 @@
     "hash": "0debd8d",
     "date": "2026-09-10",
     "subject": "fix(sheet): the LCP gauge and load-time pair show the better-measured form (desktop, labeled, when the mobile lab LCP is"
-  },
-  {
-    "hash": "c68a2a3",
-    "date": "2026-09-10",
-    "subject": "chore(terminal): regenerated changelog.json"
   }
 ]
