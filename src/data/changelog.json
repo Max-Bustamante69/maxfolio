@@ -1,8 +1,18 @@
 [
   {
+    "hash": "c91237f",
+    "date": "2026-09-10",
+    "subject": "fix(apple): one element per section id — the wrappers around Experience and Skills no longer duplicate the ids the secti"
+  },
+  {
     "hash": "08222c6",
     "date": "2026-09-10",
     "subject": "fix(skills): 44px tap targets for the orbit/ledger filter bar on mobile"
+  },
+  {
+    "hash": "e250d3c",
+    "date": "2026-09-10",
+    "subject": "refactor(gallery): restructure the case-study Impact block layout"
   },
   {
     "hash": "6edeea0",
@@ -48,15 +58,5 @@
     "hash": "0f3d27f",
     "date": "2026-09-10",
     "subject": "fix(router): unknown paths redirect to the default experience (the removed /skyline was a blank shell)"
-  },
-  {
-    "hash": "eaa338e",
-    "date": "2026-09-10",
-    "subject": "feat(skills,orbit): make the orbit a real centerpiece"
-  },
-  {
-    "hash": "ec25a52",
-    "date": "2026-09-10",
-    "subject": "chore(terminal): regenerated changelog.json"
   }
 ]
