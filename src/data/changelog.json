@@ -1,8 +1,43 @@
 [
   {
+    "hash": "e8d9514",
+    "date": "2026-09-10",
+    "subject": "chore(terminal): regenerated changelog.json"
+  },
+  {
+    "hash": "d6907a5",
+    "date": "2026-09-10",
+    "subject": "fix(sheet): stop clipping the delivery bar's row labels, un-crowd the Impact grids"
+  },
+  {
+    "hash": "68e06c2",
+    "date": "2026-09-10",
+    "subject": "fix(orbit): stop dots eating ring labels, unclip the Shopify ring"
+  },
+  {
+    "hash": "64abbce",
+    "date": "2026-09-10",
+    "subject": "chore(lighthouse): re-measure the whole fleet (2026-09-10, local best-of-3)"
+  },
+  {
+    "hash": "0f3d27f",
+    "date": "2026-09-10",
+    "subject": "fix(router): unknown paths redirect to the default experience (the removed /skyline was a blank shell)"
+  },
+  {
+    "hash": "eaa338e",
+    "date": "2026-09-10",
+    "subject": "feat(skills,orbit): make the orbit a real centerpiece"
+  },
+  {
     "hash": "ec25a52",
     "date": "2026-09-10",
     "subject": "chore(terminal): regenerated changelog.json"
+  },
+  {
+    "hash": "7be9bcc",
+    "date": "2026-09-10",
+    "subject": "feat(sheet): case-study sheet trimmed to Impact-only, Revenue + Delivery added"
   },
   {
     "hash": "0ffbcd2",
@@ -23,40 +58,5 @@
     "hash": "244b16c",
     "date": "2026-09-10",
     "subject": "docs(research): awwwards portfolio pages 10-12 + personal lens, and the library index refreshed (all references tagged)"
-  },
-  {
-    "hash": "0898873",
-    "date": "2026-09-10",
-    "subject": "feat(apple): retarget featured build to The Gummy Box, four selectable variants"
-  },
-  {
-    "hash": "d5a0696",
-    "date": "2026-09-10",
-    "subject": "style(neo): restraint pass — flatten Soft UI to a few deliberate raised controls"
-  },
-  {
-    "hash": "d83185b",
-    "date": "2026-09-10",
-    "subject": "chore(process): regenerated changelog.json"
-  },
-  {
-    "hash": "e727d08",
-    "date": "2026-09-10",
-    "subject": "fix(process): un-hide root/section overflow so the pinned readout sticks"
-  },
-  {
-    "hash": "62360cd",
-    "date": "2026-09-10",
-    "subject": "docs(research): wider inspiration sweep — awwwards pages 7-9, style families A/B, other galleries, 222 more Dribbble sho"
-  },
-  {
-    "hash": "1468b5d",
-    "date": "2026-09-10",
-    "subject": "fix(sheet,apple): the LCP form labels exist in the sheet's label contract; 'One build, in full' leaves the Apple home"
-  },
-  {
-    "hash": "0debd8d",
-    "date": "2026-09-10",
-    "subject": "fix(sheet): the LCP gauge and load-time pair show the better-measured form (desktop, labeled, when the mobile lab LCP is"
   }
 ]
