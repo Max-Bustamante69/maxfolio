@@ -1,5 +1,20 @@
 [
   {
+    "hash": "9a55132",
+    "date": "2026-09-10",
+    "subject": "fix(sheet): gate the Lighthouse headline chip on the same pairing guard as its chart"
+  },
+  {
+    "hash": "521533c",
+    "date": "2026-09-10",
+    "subject": "feat(sheet): richer Impact block — headline chips, order value, load-time pair"
+  },
+  {
+    "hash": "7109356",
+    "date": "2026-09-09",
+    "subject": "feat(skills,sheet): the orbit is the layout for What I work with; illustrative figures sit at the top of the measured ba"
+  },
+  {
     "hash": "c6bdd22",
     "date": "2026-09-09",
     "subject": "chore(terminal): regenerated changelog.json"
@@ -43,20 +58,5 @@
     "hash": "17f2a85",
     "date": "2026-09-09",
     "subject": "fix(menu): make the design-count copy track the real total"
-  },
-  {
-    "hash": "bf667ae",
-    "date": "2026-09-09",
-    "subject": "feat(sheet): Impact block returns illustrative + real charts, small print included"
-  },
-  {
-    "hash": "ccda2cd",
-    "date": "2026-09-09",
-    "subject": "feat(terminal): add Terminal theme, the engineer-for-engineers register"
-  },
-  {
-    "hash": "580a053",
-    "date": "2026-09-09",
-    "subject": "feat(skills): six alternative \"What I work with\" layouts behind ?skills="
   }
 ]
