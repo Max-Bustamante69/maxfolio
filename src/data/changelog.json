@@ -1,5 +1,15 @@
 [
   {
+    "hash": "bcc13dd",
+    "date": "2026-09-10",
+    "subject": "fix(skills): one dialog at a time when a capture opens the case-study sheet"
+  },
+  {
+    "hash": "336709e",
+    "date": "2026-09-10",
+    "subject": "feat(skills): replace the orbit's hover preview with a real ToolDrawer"
+  },
+  {
     "hash": "fefe7e0",
     "date": "2026-09-10",
     "subject": "chore(terminal): regenerated changelog.json"
@@ -48,15 +58,5 @@
     "hash": "d6907a5",
     "date": "2026-09-10",
     "subject": "fix(sheet): stop clipping the delivery bar's row labels, un-crowd the Impact grids"
-  },
-  {
-    "hash": "68e06c2",
-    "date": "2026-09-10",
-    "subject": "fix(orbit): stop dots eating ring labels, unclip the Shopify ring"
-  },
-  {
-    "hash": "64abbce",
-    "date": "2026-09-10",
-    "subject": "chore(lighthouse): re-measure the whole fleet (2026-09-10, local best-of-3)"
   }
 ]
