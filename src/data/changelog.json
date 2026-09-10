@@ -1,5 +1,50 @@
 [
   {
+    "hash": "0ffbcd2",
+    "date": "2026-09-10",
+    "subject": "fix(content): correct featured-build problem beat for The Gummy Box"
+  },
+  {
+    "hash": "363ea16",
+    "date": "2026-09-10",
+    "subject": "fix(neo): flatten the leftover raised Design Menu explore tile"
+  },
+  {
+    "hash": "b3728e2",
+    "date": "2026-09-10",
+    "subject": "chore(themes): remove Skyline theme, derive design-count copy from designs.ts"
+  },
+  {
+    "hash": "244b16c",
+    "date": "2026-09-10",
+    "subject": "docs(research): awwwards portfolio pages 10-12 + personal lens, and the library index refreshed (all references tagged)"
+  },
+  {
+    "hash": "0898873",
+    "date": "2026-09-10",
+    "subject": "feat(apple): retarget featured build to The Gummy Box, four selectable variants"
+  },
+  {
+    "hash": "d5a0696",
+    "date": "2026-09-10",
+    "subject": "style(neo): restraint pass — flatten Soft UI to a few deliberate raised controls"
+  },
+  {
+    "hash": "d83185b",
+    "date": "2026-09-10",
+    "subject": "chore(process): regenerated changelog.json"
+  },
+  {
+    "hash": "e727d08",
+    "date": "2026-09-10",
+    "subject": "fix(process): un-hide root/section overflow so the pinned readout sticks"
+  },
+  {
+    "hash": "62360cd",
+    "date": "2026-09-10",
+    "subject": "docs(research): wider inspiration sweep — awwwards pages 7-9, style families A/B, other galleries, 222 more Dribbble sho"
+  },
+  {
     "hash": "1468b5d",
     "date": "2026-09-10",
     "subject": "fix(sheet,apple): the LCP form labels exist in the sheet's label contract; 'One build, in full' leaves the Apple home"
@@ -13,50 +58,5 @@
     "hash": "c68a2a3",
     "date": "2026-09-10",
     "subject": "chore(terminal): regenerated changelog.json"
-  },
-  {
-    "hash": "c83ab77",
-    "date": "2026-09-10",
-    "subject": "chore(terminal): regenerated changelog.json"
-  },
-  {
-    "hash": "6e92af0",
-    "date": "2026-09-10",
-    "subject": "fix(sheet): cap Impact block draw-ins at the 0.8s motion budget"
-  },
-  {
-    "hash": "8d1e043",
-    "date": "2026-09-10",
-    "subject": "chore(terminal): regenerated changelog.json"
-  },
-  {
-    "hash": "ce6429e",
-    "date": "2026-09-10",
-    "subject": "feat(sheet): Lighthouse-style Impact block — score rings, before/after dual ring, Core Web Vitals"
-  },
-  {
-    "hash": "d6afa55",
-    "date": "2026-09-10",
-    "subject": "docs(lighthouse): rounds 29-32 row"
-  },
-  {
-    "hash": "80de0a0",
-    "date": "2026-09-10",
-    "subject": "chore(terminal): regenerated changelog.json"
-  },
-  {
-    "hash": "9a55132",
-    "date": "2026-09-10",
-    "subject": "fix(sheet): gate the Lighthouse headline chip on the same pairing guard as its chart"
-  },
-  {
-    "hash": "521533c",
-    "date": "2026-09-10",
-    "subject": "feat(sheet): richer Impact block — headline chips, order value, load-time pair"
-  },
-  {
-    "hash": "7109356",
-    "date": "2026-09-09",
-    "subject": "feat(skills,sheet): the orbit is the layout for What I work with; illustrative figures sit at the top of the measured ba"
   }
 ]
