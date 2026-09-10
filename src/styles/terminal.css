@@ -1,0 +1,126 @@
+/**
+ * Terminal — the engineer-for-engineers register. One always-dark ground, one phosphor accent
+ * (green by default, amber via a real toggle persisted in localStorage — see useAccent() in
+ * Terminal.tsx), monospace throughout. Scoped under .theme-terminal so nothing leaks into the
+ * other themes, same convention as neo.css.
+ */
+
+.theme-terminal {
+  --term-bg: #0a0d0a;
+  --term-panel: #0d100d;
+  --term-line: #1d251d;
+  /* Off-white body text — measured ~15.8:1 on --term-bg, comfortably clears AA at any size. */
+  --term-ink: #dce4dc;
+  /* Measured ~7.1:1 on --term-bg — clears AA for the 11px labels/captions it is used on. */
+  --term-muted: #93a293;
+  /* One desaturated red, only for "not live yet" / warn states (badgeDev) — never the hero accent. */
+  --term-warn: #d98a7a;
+  color-scheme: dark;
+  background: var(--term-bg);
+  color: var(--term-ink);
+}
+
+/* The phosphor accent — bright, for text/borders/icons on the near-black ground (measured
+   ~14.9:1 for green, ~11.8:1 for amber on --term-bg). `--term-fill` is a darker tone in the same
+   hue used only where a shared section hardcodes white text on top of `accentBg` (Contact's step
+   badges, Projects' hover monogram) — white on the bright accent fails AA, white on this fill
+   clears it (~4.6:1). */
+.theme-terminal {
+  --term-accent: #39ff88;
+  --term-fill: #157347;
+}
+.theme-terminal[data-accent='amber'] {
+  --term-accent: #ffb000;
+  --term-fill: #8a5a00;
+}
+
+.theme-terminal,
+.theme-terminal input,
+.theme-terminal button,
+.theme-terminal textarea {
+  font-family: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+}
+
+/* Shared sections (Contact, Manifesto, Process, Skills, Years) use Apple's `.font-sf` utility for a
+   few headings — scoped override so this theme reads monospace end to end without touching those
+   files. Same pattern as Neo's own scoped classes. */
+.theme-terminal .font-sf,
+.theme-terminal .font-display {
+  font-family: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
+}
+
+.theme-terminal, .theme-terminal * {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Dot-grid / graph-paper ground — CSS only, no image. Two layers: a fine dot lattice and a
+   coarser hairline grid, both far too faint to fight body text. */
+.term-grid-bg {
+  background-color: var(--term-bg);
+  background-image:
+    radial-gradient(var(--term-line) 1px, transparent 1px),
+    linear-gradient(var(--term-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--term-line) 1px, transparent 1px);
+  background-size: 16px 16px, 128px 128px, 128px 128px;
+  background-position: 0 0, 0 0, 0 0;
+}
+
+/* Hairline scanline wash — decorative only, a whisper of CRT texture behind the hero, never over text. */
+.term-scanlines {
+  background-image: repeating-linear-gradient(to bottom, rgba(220, 228, 220, 0.025) 0px, rgba(220, 228, 220, 0.025) 1px, transparent 1px, transparent 3px);
+}
+
+/* Boot sequence — every line's full text is always in the DOM (see Terminal.tsx); a per-line
+   `clip-path` transition (set inline, not here) reveals each line left to right in a stepped,
+   typewriter-like motion, so nothing is ever re-typed via innerHTML. */
+.term-boot-line {
+  display: block;
+}
+
+.term-cursor {
+  display: inline-block;
+  width: 0.55em;
+  height: 1em;
+  background: var(--term-accent);
+  vertical-align: text-bottom;
+  margin-left: 0.15em;
+}
+.term-cursor.blink {
+  animation: term-blink 1s step-end infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .term-cursor.blink {
+    animation: none;
+    opacity: 1;
+  }
+}
+@keyframes term-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* Bracket nav: idle brackets are muted, the active section's bracket + dot light up in the accent. */
+.term-bracket {
+  color: var(--term-muted);
+}
+.term-bracket[data-active='true'] {
+  color: var(--term-accent);
+}
+
+/* ASCII logotype — decorative, aria-hidden; a plain <pre> so it never reflows under a variable-width fallback. */
+.term-ascii {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  color: var(--term-accent);
+  line-height: 1.05;
+  white-space: pre;
+}
+
+/* Selection + focus rings read as the phosphor accent, not the browser default blue. */
+.theme-terminal ::selection {
+  background: var(--term-accent);
+  color: var(--term-bg);
+}
+.theme-terminal :focus-visible {
+  outline: 2px solid var(--term-accent);
+  outline-offset: 2px;
+}

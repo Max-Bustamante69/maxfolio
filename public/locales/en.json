@@ -129,14 +129,16 @@
       "brutalistEditorial": "Brutalist Editorial",
       "apple": "Apple Clean",
       "neo": "Soft UI",
-      "persona": "Arcade"
+      "persona": "Arcade",
+      "terminal": "Terminal"
     },
     "designSubtitles": {
       "luxuryMinimal": "Elegant & Refined",
       "brutalistEditorial": "Bold & Raw",
       "apple": "Quiet & Precise",
       "neo": "Tactile & Extruded",
-      "persona": "Loud & Kinetic"
+      "persona": "Loud & Kinetic",
+      "terminal": "Console & Monospace"
     },
     "whyVersions": "Why five versions?",
     "whyVersionsDesc": "Different aesthetics for different contexts. Same skills, proven versatility."

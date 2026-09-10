@@ -2,7 +2,7 @@
 // each experience only decides colors, radii and type.
 import type { CSSProperties } from 'react'
 
-export type FrameStyle = 'apple' | 'luxury' | 'brutalist' | 'neo' | 'persona'
+export type FrameStyle = 'apple' | 'luxury' | 'brutalist' | 'neo' | 'persona' | 'terminal'
 
 /** Tokens the vendored house Carousel reads (`--color-control-*`, `--duration-base`). Without them the
  *  controls fall back to currentColor and an invalid transition, so every skin defines the full set. */
@@ -16,6 +16,10 @@ export function carouselTokens(frame: FrameStyle, isDark: boolean): CSSPropertie
     persona: isDark
       ? { arrow: '#c8102e', on: '#f5f2ee', dot: 'rgba(245,242,238,0.3)', active: '#c8102e', brand: '#c8102e', surface: '#111013' }
       : { arrow: '#1c6fb0', on: '#0a0f1a', dot: 'rgba(10,15,26,0.25)', active: '#1c6fb0', brand: '#1c6fb0', surface: '#eef3f7' },
+    // Terminal is a single always-dark register; the reactive phosphor accent (green/amber) lives in
+    // the CSS custom property `--term-accent` set on `.theme-terminal`, so these controls follow the
+    // live toggle instead of freezing whichever color was true at render time.
+    terminal: { arrow: 'var(--term-ink)', on: 'var(--term-bg)', dot: 'rgba(220,228,220,0.25)', active: 'var(--term-accent)', brand: 'var(--term-accent)', surface: 'var(--term-bg)' },
   }[frame]
   return {
     '--color-control-arrow': t.arrow,
@@ -140,5 +144,29 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     divider: d ? 'divide-[#f5f2ee]/10 border-[#f5f2ee]/10' : 'divide-[#0a0f1a]/10 border-[#0a0f1a]/10',
     line: d ? 'border-[#f5f2ee]/10' : 'border-[#0a0f1a]/10',
     accentBg: d ? 'bg-[#c8102e]' : 'bg-[#1c6fb0]',
+  }),
+  // Terminal ("engineer-for-engineers"): a single always-dark register, so `d` is ignored — every
+  // color reads from the `--term-*` custom properties defined in terminal.css, which is what lets
+  // the green/amber accent toggle (persisted in localStorage) update the whole page without a
+  // React re-render. `accentBg` intentionally points at the darker `--term-fill` token, not the
+  // bright `--term-accent` used for text/borders: shared sections (Contact's step badges,
+  // Projects' hover monogram) hardcode `text-white` on top of it, and white-on-bright-phosphor-green
+  // fails AA — the darker fill keeps the same hue family while staying readable under white text.
+  terminal: () => ({
+    frame: 'terminal',
+    dark: true,
+    card: 'border border-[var(--term-line)] bg-[var(--term-panel)]',
+    title: 'font-mono font-semibold text-[var(--term-ink)]',
+    body: 'font-mono text-[var(--term-ink)]',
+    muted: 'font-mono text-[var(--term-muted)]',
+    accent: 'font-mono text-[var(--term-accent)]',
+    chip: 'font-mono text-[11px] px-2 py-1 border border-[var(--term-line)] text-[var(--term-muted)]',
+    chipOn: 'font-mono text-[11px] px-2 py-1 border border-[var(--term-accent)] text-[var(--term-accent)]',
+    badgeLive: 'font-mono uppercase text-[10px] border border-[var(--term-accent)] text-[var(--term-accent)]',
+    badgeDev: 'font-mono uppercase text-[10px] border border-[var(--term-warn)] text-[var(--term-warn)]',
+    rowHover: 'hover:bg-[var(--term-accent)]/[0.06]',
+    divider: 'divide-[var(--term-line)] border-[var(--term-line)]',
+    line: 'border-[var(--term-line)]',
+    accentBg: 'bg-[var(--term-fill)]',
   }),
 }

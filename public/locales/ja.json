@@ -129,14 +129,16 @@
       "brutalistEditorial": "ブルータリスト・エディトリアル",
       "apple": "Apple Clean",
       "neo": "ソフトUI",
-      "persona": "アーケード"
+      "persona": "アーケード",
+      "terminal": "ターミナル"
     },
     "designSubtitles": {
       "luxuryMinimal": "エレガント＆洗練",
       "brutalistEditorial": "大胆で生っぽい",
       "apple": "静かで正確",
       "neo": "触感的で立体的",
-      "persona": "ラウド＆キネティック"
+      "persona": "ラウド＆キネティック",
+      "terminal": "コンソール＆等幅"
     },
     "whyVersions": "なぜ5つのデザイン？",
     "whyVersionsDesc": "文脈に合わせた異なる美学。同じスキルで、確かな対応力を。"

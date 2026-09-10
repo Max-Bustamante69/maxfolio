@@ -1,0 +1,62 @@
+[
+  {
+    "hash": "ccda2cd",
+    "date": "2026-09-09",
+    "subject": "feat(terminal): add Terminal theme, the engineer-for-engineers register"
+  },
+  {
+    "hash": "4a9a240",
+    "date": "2026-09-09",
+    "subject": "fix(3d,sheet): the scroll object's render loop sleeps while off-screen; the sheet's charts redraw per store on prev/next"
+  },
+  {
+    "hash": "a52bdc8",
+    "date": "2026-09-09",
+    "subject": "fix(art3d): drop negative viewport margins from touched pages' reveal helpers"
+  },
+  {
+    "hash": "d90d685",
+    "date": "2026-09-09",
+    "subject": "fix(charts): pin CountUp's number formatting to en-US"
+  },
+  {
+    "hash": "d3ac7c5",
+    "date": "2026-09-09",
+    "subject": "feat(skills): replace the skills sunburst with a real tool-tile grid"
+  },
+  {
+    "hash": "20325a7",
+    "date": "2026-09-09",
+    "subject": "fix(sheet): restore tap-target floor and fix invisible discount-ladder bars"
+  },
+  {
+    "hash": "a1c28de",
+    "date": "2026-09-09",
+    "subject": "feat(art3d): generated section grounds + scroll-velocity device tilt"
+  },
+  {
+    "hash": "96530d3",
+    "date": "2026-09-09",
+    "subject": "feat(art3d): procedural three.js scroll object for Luxury/Brutalist/Soft UI"
+  },
+  {
+    "hash": "77cf9c6",
+    "date": "2026-09-09",
+    "subject": "feat(apple): honest stat band, chapters rail, featured build, review checklist"
+  },
+  {
+    "hash": "a6a5d63",
+    "date": "2026-09-09",
+    "subject": "feat(sheet): two-row header, real-data charts, and prev/next navigation"
+  },
+  {
+    "hash": "40b2d45",
+    "date": "2026-09-09",
+    "subject": "docs(research): inspiration sweep 4 — awwwards portfolio pages 1-6, Dribbble, 3D-on-scroll, data-rich portfolios, sectio"
+  },
+  {
+    "hash": "5003035",
+    "date": "2026-09-09",
+    "subject": "fix(scroll): native scrolling everywhere; the Manifesto band is never hidden behind a reveal"
+  }
+]

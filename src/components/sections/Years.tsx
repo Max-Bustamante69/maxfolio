@@ -11,8 +11,9 @@ interface YearsProps {
   heading: SectionHeading
   /** 'rows' (default, Arcade/Persona): the unit chart + editorial rows/scrubber, unchanged.
    *  'lines' (Luxury): the unit chart stays, each year's era line becomes a composed sentence.
-   *  'strip' (Brutalist): the unit chart is replaced by a 60-month calendar grid. */
-  variant?: 'rows' | 'lines' | 'strip'
+   *  'strip' (Brutalist): the unit chart is replaced by a 60-month calendar grid.
+   *  'ascii' (Terminal): the unit chart is replaced by literal block-character bars (████░░░░). */
+  variant?: 'rows' | 'lines' | 'strip' | 'ascii'
   /** Soft UI (Neo): the unit chart's tiles render with the raised/inset depth treatment instead of flat fills. */
   depth?: boolean
 }
@@ -222,6 +223,62 @@ export function Years({ skin, heading, variant = 'rows', depth = false }: YearsP
     )
   }
 
+  /** Terminal's replacement for the unit chart: each year's real total, drawn as a literal
+   *  block-character bar (█ filled / ░ empty against the busiest year) — a `df -h`-style readout
+   *  instead of styled divs. A `<table>` twin (same pattern as PerYear/YearStrip) carries the same
+   *  numbers for assistive tech, since the bar string itself is `aria-hidden`. */
+  const ASCII_WIDTH = 20
+  const AsciiBars = () => (
+    <figure className="m-0 mb-10 max-w-xl font-mono md:mb-14">
+      <figcaption className={label}>{y.perYear}</figcaption>
+      <div
+        className="mt-3 space-y-1.5"
+        role="img"
+        aria-label={timeline.map((e) => `${e.year}: ${workTotal(e)} (${WORK_KINDS.filter((k) => workCount(e, k) > 0).map((k) => `${kindLabel[k]} ${workCount(e, k)}`).join(', ')})`).join('; ')}
+      >
+        {timeline.map((e, i) => {
+          const total = workTotal(e)
+          const filled = maxTotal > 0 ? Math.round((total / maxTotal) * ASCII_WIDTH) : 0
+          return (
+            <m.div
+              key={e.year}
+              className="flex items-center gap-3 text-sm"
+              initial={reduced ? false : { opacity: 0, x: -8 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.1 }}
+              transition={{ duration: 0.35, delay: 0.06 * i, ease: EASE }}
+            >
+              <span className={`w-11 shrink-0 tabular-nums ${skin.muted}`}>{e.year}</span>
+              <span className={`${skin.accent} tracking-[-0.05em]`} aria-hidden="true">
+                {'█'.repeat(filled)}
+                <span className={skin.muted}>{'░'.repeat(ASCII_WIDTH - filled)}</span>
+              </span>
+              <span className="shrink-0 tabular-nums">{total}</span>
+            </m.div>
+          )
+        })}
+      </div>
+      {/* `sr-only` on the wrapper — see StackByYear for why the table itself never gets it directly. */}
+      <div className="sr-only">
+        <table>
+          <caption>{y.perYear}</caption>
+          <tbody>
+            {timeline.map((e) => (
+              <tr key={e.year}>
+                <th scope="row">{e.year}</th>
+                {WORK_KINDS.filter((k) => workCount(e, k) > 0).map((k) => (
+                  <td key={k}>
+                    {kindLabel[k]}: {workCount(e, k)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </figure>
+  )
+
   const Body = ({ entry }: { entry: YearEntry }) => (
     <div className="space-y-6">
       {entry.positions.length > 0 && (
@@ -280,7 +337,7 @@ export function Years({ skin, heading, variant = 'rows', depth = false }: YearsP
   return (
     <section id="years" className="scroll-mt-20">
       {heading(y.eyebrow, y.title, y.titleAccent, y.lead)}
-      {variant === 'strip' ? <YearStrip /> : <PerYear />}
+      {variant === 'strip' ? <YearStrip /> : variant === 'ascii' ? <AsciiBars /> : <PerYear />}
 
       {wide ? (
         <ol className={`border-t ${skin.line}`}>
