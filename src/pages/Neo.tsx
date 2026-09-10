@@ -36,7 +36,7 @@ const Reveal = ({ children, delay = 0, className = '' }: { children: ReactNode; 
   <m.div
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: '-60px' }}
+    viewport={{ once: true, amount: 0.1 }}
     transition={{ duration: 0.6, delay, ease: EASE }}
     className={className}
   >
@@ -50,7 +50,7 @@ const Reveal = ({ children, delay = 0, className = '' }: { children: ReactNode; 
 const OdometerValue = ({ value }: { value: string }) => {
   const reduced = useReducedMotion()
   const ref = useRef<HTMLSpanElement>(null)
-  const inView = useInView(ref, { once: true, margin: '-40px' })
+  const inView = useInView(ref, { once: true, amount: 0.1 })
   const match = value.match(/^(\d+)(.*)$/)
   if (!match) return <span>{value}</span>
   const [, digitsStr, suffix] = match
