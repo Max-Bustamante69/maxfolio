@@ -168,6 +168,7 @@ export const en: PortfolioContent = {
         triLiquid: 'Lines of Liquid, across the fleet',
         triTs: 'Lines of TypeScript, across the fleet',
         triStoresDefault: '{n} stores in the fleet',
+        depthLabel: 'Depth',
       },
     },
     contact: {

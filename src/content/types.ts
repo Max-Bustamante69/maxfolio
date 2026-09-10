@@ -127,6 +127,7 @@ export interface PortfolioContent {
         triLiquid: string
         triTs: string
         triStoresDefault: string
+        depthLabel: string
       }
     }
     contact: SectionHeading & {

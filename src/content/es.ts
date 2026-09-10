@@ -168,6 +168,7 @@ export const es: PortfolioContent = {
         triLiquid: 'Líneas de Liquid en toda la flota',
         triTs: 'Líneas de TypeScript en toda la flota',
         triStoresDefault: '{n} tiendas en la flota',
+        depthLabel: 'Profundidad',
       },
     },
     contact: {
