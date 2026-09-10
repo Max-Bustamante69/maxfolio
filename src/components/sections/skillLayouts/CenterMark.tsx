@@ -81,9 +81,14 @@ function markFor(skin: Skin): MarkSpec {
       }
     case 'apple':
     default:
+      // Always a white disc, exactly like `LogoSelectorApple`'s own nav mark — including in dark mode,
+      // where the section's own surface (`bg-apple-darkSurface`, #1d1d1f) is the same color a near-black
+      // disc would have used, so a dark-on-dark fill here would render with zero contrast against its
+      // own background (measured: 0 border, 0 shadow, identical RGB). White reuses the nav's real
+      // treatment and stays visible in both modes; only the shadow is light-only, same as the nav mark.
       return {
-        discClass: `h-[120px] w-[120px] rounded-full ${dark ? 'bg-[#1d1d1f]' : 'bg-white shadow-[0_4px_20px_rgba(0,0,0,0.10)]'}`,
-        textClass: `font-sf text-[15px] font-semibold tracking-tight ${dark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'}`,
+        discClass: `h-[120px] w-[120px] rounded-full bg-white ${dark ? '' : 'shadow-[0_4px_20px_rgba(0,0,0,0.10)]'}`,
+        textClass: `font-sf text-[15px] font-semibold tracking-tight ${dark ? 'text-black' : 'text-[#1d1d1f]'}`,
         ringClass: dark ? 'stroke-white/15' : 'stroke-black/12',
         content: 'MB',
       }
