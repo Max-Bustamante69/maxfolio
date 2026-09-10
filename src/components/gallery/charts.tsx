@@ -502,6 +502,72 @@ export function LighthousePairedBars({ rows, beforeLabel, afterLabel, dark, dela
   )
 }
 
+/** Paired before/after bars for a REAL seconds measurement (mobile LCP): "before" is the illustrative
+ *  anchor (src/data/illustrative.ts loadTimeSeries — the real "after" divided by a seeded 30–40%),
+ *  muted like every other illustrative bar in this file; "after" is the real measured LCP, colored by
+ *  the same good/needs-improvement/poor LCP bands SpeedGauge uses below it. The domain is
+ *  0..max(before,after)×1.08 (not a fixed 0–100 like LighthousePairedBars) since these are seconds,
+ *  not scores, and the illustrative "before" can run well past any fixed ceiling on a slow store. */
+export function LoadTimePairedBar({
+  beforeSeconds,
+  afterSeconds,
+  deltaPct,
+  beforeLabel,
+  afterLabel,
+  label,
+  dark,
+  delay = 0,
+}: {
+  beforeSeconds: number
+  afterSeconds: number
+  deltaPct: number // positive: the illustrative % reduction from before to after, shown as "−N%"
+  beforeLabel: string
+  afterLabel: string
+  label: string
+  dark: boolean
+  delay?: number
+}) {
+  const reduced = useReducedMotion()
+  const domainMax = Math.max(beforeSeconds, afterSeconds, 0.1) * 1.08
+  const color = afterSeconds <= 2.5 ? '#34c759' : afterSeconds <= 4 ? '#ff9f0a' : '#ff3b30'
+  const bars = [
+    { key: beforeLabel, v: beforeSeconds, c: dark ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.16)' },
+    { key: afterLabel, v: afterSeconds, c: color },
+  ]
+  return (
+    <figure className="m-0">
+      <div className="flex items-baseline justify-between gap-2">
+        <figcaption className={`text-[11px] leading-tight ${mutedText(dark)}`}>{label}</figcaption>
+        <CountUp value={deltaPct} prefix="−" suffix="%" delay={delay + 0.5} className={`text-xs font-semibold tabular-nums ${goodText(dark)}`} />
+      </div>
+      <div className="mt-1.5 space-y-1.5" role="img" aria-label={`${label}: ${beforeLabel} ${beforeSeconds.toFixed(1)}s, ${afterLabel} ${afterSeconds.toFixed(1)}s`}>
+        {bars.map((b, j) => (
+          <div key={b.key} className="flex items-center gap-2">
+            <span className={`w-14 shrink-0 text-[10px] uppercase tracking-[0.12em] ${mutedText(dark)}`}>{b.key}</span>
+            <div className={`h-2.5 flex-1 overflow-hidden rounded-full ${dark ? 'bg-white/10' : 'bg-black/[0.06]'}`}>
+              <m.div
+                className="h-full rounded-full"
+                style={{ backgroundColor: b.c }}
+                initial={reduced ? false : { width: 0 }}
+                animate={{ width: `${Math.max(2, (b.v / domainMax) * 100)}%` }}
+                transition={{ delay: delay + j * 0.12, duration: 0.8, ease: EASE }}
+              />
+            </div>
+            <span className="w-10 shrink-0 text-right text-xs font-semibold tabular-nums">{b.v.toFixed(1)}s</span>
+          </div>
+        ))}
+      </div>
+      <SrTable
+        caption={label}
+        rows={[
+          [beforeLabel, `${beforeSeconds.toFixed(1)}s`],
+          [afterLabel, `${afterSeconds.toFixed(1)}s`],
+        ]}
+      />
+    </figure>
+  )
+}
+
 const SPEED_R = 22
 const SPEED_C = 2 * Math.PI * SPEED_R
 

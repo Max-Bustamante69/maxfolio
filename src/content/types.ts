@@ -224,6 +224,18 @@ export interface PortfolioContent {
         disclaimer: string // the required small-print line, verbatim, EN/ES/JA
         infoLabel: string // aria-label for the info-affordance button (aria-expanded)
         infoSentence: string // one sentence: ranges come from measured client work 2023–2026
+        // Headline strip (three chips above the chart grid) + the two added charts (order value,
+        // load time). Every headline delta pairs a real "after" with an illustrative "before" (or,
+        // for conversion, is illustrative end to end) — so all three chips carry the same
+        // `chipIllustrative` tag, never a "measured" one; see ProjectModal's headline-chip block.
+        chipConversionLabel: string // "Conversion" — headline chip label
+        chipLoadTimeLabel: string // "Load time" — headline chip label
+        chipLighthouseLabel: string // "Lighthouse" — headline chip label
+        chipIllustrative: string // "Illustrative" — the small tag on every headline chip
+        orderValueLabel: string // "Order value, indexed" — line-chart label, sits beside Conversion
+        orderValueRangeNote: string // "Illustrative: bundles and discount ladders"
+        loadTimeLabel: string // "Load time" — paired-bar chart heading (distinct from the LCP gauge)
+        loadTimeSource: string // 'Before: illustrative baseline · After: measured LCP, {date}.'
       }
       /** The sheet's "visualized" charts block — every number traces to commerce.json (storefront
        *  public data), telemetry.json (git history) or a hand-verified registry fact. */

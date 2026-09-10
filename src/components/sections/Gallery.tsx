@@ -8,7 +8,7 @@ import { metrics, stores as allStores, type StoreEntry } from '../../data/regist
 import { telemetry } from '../../data/telemetry'
 import { commerce, isLiveCommerce } from '../../data/commerce'
 import { computeFleetMedians, formatMoney, lineForAngle, pickCommerceLine, vsFleetPctChip, vsFleetWeeksChip, weeksFor } from '../../data/commerceLines'
-import { conversionSeries, lighthouseBeforeScore, revenuePerVisitorSeries } from '../../data/illustrative'
+import { conversionSeries, lighthouseBeforeScore, loadTimeSeries, orderValueSeries, revenuePerVisitorSeries } from '../../data/illustrative'
 import lighthouseJson from '../../data/lighthouse.json'
 import type { PortfolioContent } from '../../content/types'
 import type { ImpactCharts } from '../gallery/ProjectModal'
@@ -36,10 +36,10 @@ function lighthouseFor(slug: string): LighthouseStoreEntry | undefined {
   return entry && typeof entry === 'object' && 'fetchedAt' in entry ? (entry as LighthouseStoreEntry) : undefined
 }
 
-/** "Impact" block data: conversion + revenue-per-visitor are always-present illustrative
- *  representations (see src/data/illustrative.ts); Lighthouse "after" and the LCP gauge are real,
- *  read straight from src/data/lighthouse.json — null piece by piece whenever that store has no
- *  measured score for it, never backfilled with an estimate. */
+/** "Impact" block data: conversion, order value and revenue-per-visitor are always-present
+ *  illustrative representations (see src/data/illustrative.ts); Lighthouse "after", the LCP gauge and
+ *  the load-time pair's "after" are real, read straight from src/data/lighthouse.json — null piece by
+ *  piece whenever that store has no measured score for it, never backfilled with an estimate. */
 function impactFor(st: StoreEntry): ImpactCharts {
   const lh = lighthouseFor(st.slug)
   const lighthouse = lh
@@ -52,7 +52,8 @@ function impactFor(st: StoreEntry): ImpactCharts {
       }
     : null
   const speed = lh?.mobile?.lcp != null ? { seconds: lh.mobile.lcp, fetchedAt: lh.fetchedAt } : null
-  return { conversion: conversionSeries(st.slug), rpv: revenuePerVisitorSeries(st.slug), lighthouse, speed }
+  const loadTime = lh?.mobile?.lcp != null ? { ...loadTimeSeries(st.slug, lh.mobile.lcp), fetchedAt: lh.fetchedAt } : null
+  return { conversion: conversionSeries(st.slug), orderValue: orderValueSeries(st.slug), rpv: revenuePerVisitorSeries(st.slug), lighthouse, speed, loadTime }
 }
 
 // Computed once at module scope: registry/commerce/telemetry are static build-time data, so every

@@ -8,6 +8,12 @@
 // returns may be shown without the small-print disclosure the owner wrote for exactly this purpose
 // (see caseStudy.impact.disclaimer in src/content/*.ts). Real numbers (commerce.json, telemetry.json,
 // src/data/lighthouse.json) never pass through this file.
+//
+// Generators: conversionSeries + revenuePerVisitorSeries + orderValueSeries (all illustrative, index
+// base 100) and lighthouseBeforeScore (illustrative Lighthouse baseline) never take a real number as
+// input. loadTimeSeries is the one exception worth flagging: it takes a REAL mobile LCP in and returns
+// an illustrative "before" alongside it — the real "after" leg of Gallery.impactFor's load-time pair —
+// so its illustrative half stays honestly anchored to a real measurement rather than a second guess.
 
 /** FNV-1a-ish string hash → 32-bit seed. Same family as commerceLines.angleForSlug, just salted per use
  *  so two illustrative series for the same store don't accidentally share a phase. */
@@ -92,4 +98,36 @@ export function revenuePerVisitorSeries(slug: string, weeks = 6): RpvSeries {
  *  store AND per form so mobile and desktop don't accidentally land on the same illustrative value. */
 export function lighthouseBeforeScore(slug: string, form: 'mobile' | 'desktop'): number {
   return Math.round(42 + rngFrom(seedFrom(slug, `lh-before-${form}`))() * 16)
+}
+
+export interface OrderValueSeries {
+  points: number[] // indexed (before = 100), illustrative
+  deltaPct: number // rounded final lift, always inside [4, 8]
+}
+
+/** Order-value slope, indexed (before = 100), illustrative, 100 → 104–108 — the second leg of the
+ *  "conversion × order value = revenue per visitor" story next to it in the sheet. Reuses the same
+ *  +4–8% order-value component `revenuePerVisitorSeries` already assumes (see its header comment)
+ *  rather than inventing an independent band, with its own seed so the two lines don't move in lockstep. */
+export function orderValueSeries(slug: string, weeks = 6): OrderValueSeries {
+  const shape = easeShape(weeks)
+  const targetPct = round1(4 + rngFrom(seedFrom(slug, 'order-value'))() * 4)
+  const jitter = rngFrom(seedFrom(slug, 'order-value-jitter'))
+  const points = shape.map((s) => round1(100 + s * targetPct + (jitter() - 0.5) * 0.8))
+  return { points, deltaPct: Math.round(targetPct) }
+}
+
+export interface LoadTimeSeries {
+  beforeSeconds: number // illustrative anchor: afterSeconds ÷ (1 − r)
+  afterSeconds: number // the real measured mobile LCP, rounded to 1 decimal
+  deltaPct: number // rounded r×100, always inside [30, 40] — the CV's measured −30–40% range
+}
+
+/** Illustrative "before" load time paired with a REAL "after": `afterSeconds` is the store's actual
+ *  measured mobile LCP (src/data/lighthouse.json — never fabricated), and `beforeSeconds` divides it
+ *  by (1 − r) with r seeded per store in 0.30–0.40, the CV's own measured −30–40% load-time-reduction
+ *  range. Callers only call this when a real LCP exists; there is no "before" without a real "after". */
+export function loadTimeSeries(slug: string, afterSeconds: number): LoadTimeSeries {
+  const r = 0.3 + rngFrom(seedFrom(slug, 'loadtime-r'))() * 0.1
+  return { beforeSeconds: round1(afterSeconds / (1 - r)), afterSeconds: round1(afterSeconds), deltaPct: Math.round(r * 100) }
 }
