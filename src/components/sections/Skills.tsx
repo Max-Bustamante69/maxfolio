@@ -3,7 +3,8 @@ import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { useContent, useMediaQuery } from '../../hooks'
 import { Ticker } from '../common'
 import type { SkillGroupId } from '../../data/registry'
-import { toolUsage, storesPerGroup, fleetLiquidLines, fleetIslandLines, fleetStoreCount, type ToolUsage } from '../../data/skillUsage'
+import { toolUsage, storesPerGroup, storeNamesByTool, fleetLiquidLines, fleetIslandLines, fleetStoreCount, type ToolUsage } from '../../data/skillUsage'
+import { personaArt } from '../../data/personaArt'
 import { CountUp } from '../gallery/charts'
 import type { Skin } from '../gallery'
 import type { SectionHeading } from './Gallery'
@@ -157,21 +158,25 @@ function TriStat({ sk, skin, active, groupLabel }: TriStatProps) {
       : active?.level === 'group'
         ? formatGroup(sk, storesPerGroup[active.group])
         : sk.sunburst.triStoresDefault.replace('{n}', String(fleetStoreCount))
+  // Persona/Arcade gets its own comic device on these three numbers: a thick-bordered tilted panel
+  // per cell, alternating tilt direction (never a plain grid line like the other four themes).
+  const persona = skin.frame === 'persona'
+  const cell = (i: number) => (persona ? `persona-num-panel px-2 py-3 ${i === 1 ? '' : i === 0 ? '-rotate-2' : 'rotate-2'}` : '')
   return (
-    <div className={`mt-7 grid grid-cols-3 gap-3 border-t pt-5 text-center ${skin.line}`}>
-      <div>
+    <div className={`mt-7 grid grid-cols-3 ${persona ? 'gap-2.5' : 'gap-3 border-t pt-5'} text-center ${persona ? '' : skin.line}`}>
+      <div className={cell(0)}>
         <p className={`text-lg font-semibold tabular-nums ${skin.title}`}>
           <CountUp value={fleetLiquidLines} />
         </p>
         <p className={`mt-1 text-[10px] uppercase leading-tight tracking-wide ${skin.muted}`}>{sk.sunburst.triLiquid}</p>
       </div>
-      <div>
+      <div className={cell(1)}>
         <p className={`text-lg font-semibold tabular-nums ${skin.title}`}>
           <CountUp value={fleetIslandLines} />
         </p>
         <p className={`mt-1 text-[10px] uppercase leading-tight tracking-wide ${skin.muted}`}>{sk.sunburst.triTs}</p>
       </div>
-      <div>
+      <div className={cell(2)}>
         <p className={`text-sm font-semibold leading-tight ${skin.title}`}>{dynamicLabel}</p>
         {active && <p className={`mt-1 text-[10px] uppercase leading-tight tracking-wide ${skin.muted}`}>{groupLabel[active.group]}</p>}
       </div>
@@ -184,11 +189,14 @@ interface RingLegendProps {
   skin: Skin
   groups: SkillGroupId[]
   groupLabel: Record<SkillGroupId, string>
+  /** Persona only: tapping/focusing a chip drives the same `active` selection the sunburst/panel use. */
+  onToolSelect?: (g: SkillGroupId, tool: string) => void
+  active?: SunburstSelection
 }
 
 /** Mobile substitute for the SVG: one horizontally scrollable row of group capsules, each carrying
  *  its own tools as small real-count chips — the ring legend the brief calls for, touch-sized. */
-function RingLegend({ sk, skin, groups, groupLabel }: RingLegendProps) {
+function RingLegend({ sk, skin, groups, groupLabel, onToolSelect, active }: RingLegendProps) {
   return (
     <div>
       <p className={label(skin)}>{sk.sunburst.legendLabel}</p>
@@ -202,17 +210,82 @@ function RingLegend({ sk, skin, groups, groupLabel }: RingLegendProps) {
                 <span className={`${skin.muted} text-[11px] tabular-nums`}>{formatGroup(sk, storesPerGroup[g])}</span>
               </div>
               <div className="mt-3 flex flex-wrap gap-1.5">
-                {groupTools.map((u) => (
-                  <span key={u.tool} className={u.total > 0 ? skin.chipOn : skin.chip} title={`${u.tool} — ${formatTool(sk, u)}`}>
-                    {u.tool}
-                    {u.total > 0 ? <span className="ml-1 tabular-nums opacity-80">{u.total}</span> : null}
-                  </span>
-                ))}
+                {groupTools.map((u) =>
+                  onToolSelect ? (
+                    <button
+                      key={u.tool}
+                      type="button"
+                      onClick={() => onToolSelect(g, u.tool)}
+                      onFocus={() => onToolSelect(g, u.tool)}
+                      className={`${u.total > 0 ? skin.chipOn : skin.chip} ${active?.level === 'tool' && active.tool === u.tool ? 'ring-2 ring-current' : ''}`}
+                      title={`${u.tool} — ${formatTool(sk, u)}`}
+                    >
+                      {u.tool}
+                      {u.total > 0 ? <span className="ml-1 tabular-nums opacity-80">{u.total}</span> : null}
+                    </button>
+                  ) : (
+                    <span key={u.tool} className={u.total > 0 ? skin.chipOn : skin.chip} title={`${u.tool} — ${formatTool(sk, u)}`}>
+                      {u.tool}
+                      {u.total > 0 ? <span className="ml-1 tabular-nums opacity-80">{u.total}</span> : null}
+                    </span>
+                  ),
+                )}
               </div>
             </div>
           )
         })}
       </div>
+    </div>
+  )
+}
+
+interface PersonaSkillPanelProps {
+  sk: SkillsStrings
+  skin: Skin
+  active: SunburstSelection
+  groupLabel: Record<SkillGroupId, string>
+}
+
+/** Arcade/Persona-only "selected skill" panel: a slanted ink panel with the Skills-screen comic art
+ *  behind it, naming whichever tool or group is hovered/focused/tapped on the sunburst (desktop) or
+ *  the ring legend (phones) — the tool's display name, its group, its real fleet usage (and which
+ *  stores, by name, from `skillUsage.ts`), and a depth stat in the theme's own thick-bordered number
+ *  panel. Idle, it shows the fleet-wide caption instead of an empty box. */
+function PersonaSkillPanel({ sk, skin, active, groupLabel }: PersonaSkillPanelProps) {
+  const art = useMemo(() => personaArt('skills', skin.dark), [skin.dark])
+  const tool = active?.level === 'tool' ? toolUsage.find((u) => u.group === active.group && u.tool === active.tool) : undefined
+  const storeNames = tool ? storeNamesByTool[tool.tool] ?? [] : []
+  const scrim = skin.dark ? 'rgba(17,16,19,0.88)' : 'rgba(238,243,247,0.9)'
+
+  return (
+    <div
+      className={`persona-torn relative overflow-hidden border-2 p-5 md:p-6 ${skin.dark ? 'border-[#c8102e]/40' : 'border-[#1c6fb0]/35'}`}
+      style={{ backgroundImage: `linear-gradient(${scrim},${scrim}), url(${art})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+    >
+      <p className={label(skin)}>{sk.sunburst.legendLabel}</p>
+      {tool ? (
+        <div className="mt-3">
+          <p className={`font-persona-display text-2xl uppercase leading-tight md:text-3xl ${skin.title}`} style={{ fontStyle: 'oblique 6deg' }}>
+            {tool.tool}
+          </p>
+          <p className={`mt-1 text-xs font-semibold uppercase tracking-[0.15em] ${skin.accent}`}>{groupLabel[tool.group]}</p>
+          <p className={`mt-3 text-sm ${skin.body}`}>{formatTool(sk, tool)}</p>
+          {storeNames.length > 0 && <p className={`mt-1.5 text-xs leading-relaxed ${skin.muted}`}>{storeNames.join(' · ')}</p>}
+          <div className="persona-num-panel mt-4 inline-flex items-baseline gap-2 px-3 py-1.5">
+            <span className={`text-xl font-semibold tabular-nums ${skin.title}`}>{tool.total}</span>
+            <span className={`text-[10px] uppercase tracking-wide ${skin.muted}`}>{sk.sunburst.depthLabel}</span>
+          </div>
+        </div>
+      ) : active?.level === 'group' ? (
+        <div className="mt-3">
+          <p className={`font-persona-display text-2xl uppercase leading-tight md:text-3xl ${skin.title}`} style={{ fontStyle: 'oblique 6deg' }}>
+            {groupLabel[active.group]}
+          </p>
+          <p className={`mt-3 text-sm ${skin.body}`}>{formatGroup(sk, storesPerGroup[active.group])}</p>
+        </div>
+      ) : (
+        <p className={`mt-3 text-sm ${skin.muted}`}>{sk.sunburst.caption}</p>
+      )}
     </div>
   )
 }
@@ -279,6 +352,11 @@ export function Skills({ skin, heading, trackClassName }: SkillsProps) {
               format={{ tool: (u) => formatTool(sk, u), group: (n) => formatGroup(sk, n), caption: sk.sunburst.caption }}
             />
             <TriStat sk={sk} skin={skin} active={active} groupLabel={groupLabel} />
+            {skin.frame === 'persona' && (
+              <div className="mt-6">
+                <PersonaSkillPanel sk={sk} skin={skin} active={active} groupLabel={groupLabel} />
+              </div>
+            )}
           </div>
           <div className="lg:col-span-7">
             <div className="space-y-7 md:space-y-8">
@@ -302,7 +380,12 @@ export function Skills({ skin, heading, trackClassName }: SkillsProps) {
         </div>
       ) : (
         <div>
-          <RingLegend sk={sk} skin={skin} groups={groups} groupLabel={groupLabel} />
+          <RingLegend sk={sk} skin={skin} groups={groups} groupLabel={groupLabel} onToolSelect={skin.frame === 'persona' ? setToolActive : undefined} active={active} />
+          {skin.frame === 'persona' && (
+            <div className="mt-5">
+              <PersonaSkillPanel sk={sk} skin={skin} active={active} groupLabel={groupLabel} />
+            </div>
+          )}
           <div className="mt-10">
             <Ledger sk={sk} skin={skin} track={track} reduced={reduced} usage={usage} storesCount={registry.stores.length} />
           </div>

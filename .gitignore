@@ -50,3 +50,7 @@ docs/linkedin/2026-09-warm-contacts*
 
 # generated art sources (multi-MB PNGs); only the .webp derivatives are tracked
 public/art/**/*.png
+
+
+# Source PNGs for generated art — only the converted .webp is committed
+

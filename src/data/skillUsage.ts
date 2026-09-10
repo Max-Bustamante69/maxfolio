@@ -64,7 +64,7 @@ const ALIASES: Record<string, RegExp> = {
   'Evaluation suites': /evaluation suite|\beval\b/i,
 }
 
-const matches = (entries: readonly StackEntry[], re: RegExp) => entries.filter((e) => e.stack.some((s) => re.test(s)))
+const matches = <T extends StackEntry>(entries: readonly T[], re: RegExp): T[] => entries.filter((e) => e.stack.some((s) => re.test(s)))
 
 export interface ToolUsage {
   tool: string
@@ -89,6 +89,16 @@ export const toolUsage: ToolUsage[] = (Object.keys(skillGroups) as SkillGroupId[
 )
 
 export const toolUsageById = new Map(toolUsage.map((u) => [u.tool, u]))
+
+/** Real storefront names (not just a count) that list a given tool in their own `stack` — for any UI
+ *  that wants to name the fleet rather than just count it. Empty array, never invented, for a tool
+ *  with no alias or no matching store. */
+export const storeNamesByTool: Record<string, string[]> = Object.fromEntries(
+  toolUsage.map((u) => {
+    const re = ALIASES[u.tool]
+    return [u.tool, re ? matches(stores, re).map((s) => s.name) : []]
+  }),
+)
 
 /** Real usage summed per group — the honest weight for the sunburst's ring 1. */
 export const groupUsage: Record<SkillGroupId, number> = Object.fromEntries(

@@ -168,6 +168,7 @@ export const ja: PortfolioContent = {
         triLiquid: '全店舗のLiquid行数',
         triTs: '全店舗のTypeScript行数',
         triStoresDefault: 'フリート全体で{n}店舗',
+        depthLabel: '深さ',
       },
     },
     contact: {
