@@ -1,13 +1,22 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { useContent } from '../../hooks'
 import { ProjectFrame, type Skin } from '../gallery'
 import { shotsFor } from './Gallery'
 import type { ProductEntry } from '../../data/registry'
 
+/** A real link into this rail from elsewhere on the page (the orbit skill layout, see
+ *  src/lib/sectionLinks.ts): which product to select. `nonce` changes on every request, including a
+ *  repeat request for the same id already selected, so the effect below always re-applies it. */
+export interface ProductSelectRequest {
+  id: string
+  nonce: number
+}
+
 interface ProductsProps {
   skin: Skin
   onOpen: (p: ProductEntry) => void
+  select?: ProductSelectRequest | null
 }
 
 const EASE = [0.23, 1, 0.32, 1] as const
@@ -17,13 +26,20 @@ const EASE = [0.23, 1, 0.32, 1] as const
  * on phones), one editorial panel on the right with the capture, the description and the stack as
  * a line of text — the same shape as Experience, so the page reads as one system, not five tiles.
  */
-export function Products({ skin, onOpen }: ProductsProps) {
+export function Products({ skin, onOpen, select }: ProductsProps) {
   const { strings, registry } = useContent()
   const reduced = useReducedMotion()
   const s = strings.sections.shopify
   const g = strings.sections.gallery
   const [current, setCurrent] = useState(registry.products[0])
   const c = strings.products[current.id]
+
+  useEffect(() => {
+    if (!select) return
+    const p = registry.products.find((x) => x.id === select.id)
+    if (p) setCurrent(p)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [select?.id, select?.nonce])
 
   return (
     <div className="grid gap-8 lg:grid-cols-12 lg:gap-12">
