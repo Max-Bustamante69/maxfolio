@@ -187,6 +187,34 @@ export interface PortfolioContent {
     caseStudy: {
       facts: string; results: string; stack: string; visit: string; prev: string; next: string; timeline: string; commits: string; sections: string; open: string; metrics: string; perf: string; a11y: string; bp: string; seo: string; lcp: string; measured: string; trail: string; trailNote: string; perWeek: string; peak: string; codebase: string; liquidLines: string; islandLines: string; sectionsCount: string; weeks: string; copyLink: string; copied: string
       commerce: CommerceLabels
+      /**
+       * The sheet's "Impact" block, shown ABOVE "By the numbers": conversion + revenue-per-visitor
+       * are illustrative (deterministic per store, see src/data/illustrative.ts) and anchored to the
+       * real ranges on the CV; Lighthouse "after" and the LCP gauge are REAL (src/data/lighthouse.json).
+       * `disclaimer` and `infoSentence` are fixed, owner-approved copy — do not paraphrase them.
+       */
+      impact: {
+        title: string // "Impact" — the block heading
+        conversionLabel: string // "Conversion, indexed" — line chart label
+        conversionRangeNote: string // "Illustrative range: +10% to +20%" — under the conversion chart
+        rpvLabel: string // "Revenue per visitor, indexed" — line chart label
+        rpvRangeNote: string // "Illustrative representation" — under the RPV chart, right next to its
+        // own headline number so it never reads as a measured KPI in isolation (mirrors conversionRangeNote)
+        lighthouseLabel: string // "Lighthouse performance" — paired-bars block heading
+        lighthouseMobile: string
+        lighthouseDesktop: string
+        before: string // paired-bars row label — illustrative
+        after: string // paired-bars row label — REAL
+        lighthouseSource: string // 'Before: illustrative baseline, not measured. After: measured mobile +
+        // desktop Lighthouse performance, {date}.' — labels BOTH halves of the paired bars, immediately
+        // under that same chart (not just the shared block-level disclaimer further down)
+        speedLabel: string // "Mobile LCP, measured" — gauge label
+        speedTarget: string // '≤{n}s — the "good" LCP threshold'
+        speedSource: string // 'Measured Lighthouse LCP (mobile), {date}.'
+        disclaimer: string // the required small-print line, verbatim, EN/ES/JA
+        infoLabel: string // aria-label for the info-affordance button (aria-expanded)
+        infoSentence: string // one sentence: ranges come from measured client work 2023–2026
+      }
       /** The sheet's "visualized" charts block — every number traces to commerce.json (storefront
        *  public data), telemetry.json (git history) or a hand-verified registry fact. */
       charts: {

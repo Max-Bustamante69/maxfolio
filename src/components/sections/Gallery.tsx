@@ -8,7 +8,50 @@ import { metrics, stores as allStores, type StoreEntry } from '../../data/regist
 import { telemetry } from '../../data/telemetry'
 import { commerce, isLiveCommerce } from '../../data/commerce'
 import { computeFleetMedians, formatMoney, lineForAngle, pickCommerceLine, vsFleetPctChip, vsFleetWeeksChip, weeksFor } from '../../data/commerceLines'
+import { conversionSeries, lighthouseBeforeScore, revenuePerVisitorSeries } from '../../data/illustrative'
+import lighthouseJson from '../../data/lighthouse.json'
 import type { PortfolioContent } from '../../content/types'
+import type { ImpactCharts } from '../gallery/ProjectModal'
+
+interface LighthouseFormEntry {
+  perf: number
+  a11y: number
+  bp: number
+  seo: number
+  lcp: number | null
+  tbt: number | null
+  cls: number | null
+  finalUrl: string
+}
+interface LighthouseStoreEntry {
+  fetchedAt: string
+  mobile: LighthouseFormEntry | null
+  desktop: LighthouseFormEntry | null
+}
+// `_skipped` is a diagnostics-only sibling key scripts/store-lighthouse.mjs writes alongside the
+// per-store entries — never a store slug, so it's dropped by the `mobile`/`desktop` shape check below.
+const LIGHTHOUSE = lighthouseJson as unknown as Record<string, LighthouseStoreEntry | unknown>
+function lighthouseFor(slug: string): LighthouseStoreEntry | undefined {
+  const entry = LIGHTHOUSE[slug]
+  return entry && typeof entry === 'object' && 'fetchedAt' in entry ? (entry as LighthouseStoreEntry) : undefined
+}
+
+/** "Impact" block data: conversion + revenue-per-visitor are always-present illustrative
+ *  representations (see src/data/illustrative.ts); Lighthouse "after" and the LCP gauge are real,
+ *  read straight from src/data/lighthouse.json — null piece by piece whenever that store has no
+ *  measured score for it, never backfilled with an estimate. */
+function impactFor(st: StoreEntry): ImpactCharts {
+  const lh = lighthouseFor(st.slug)
+  const lighthouse = lh
+    ? {
+        fetchedAt: lh.fetchedAt,
+        mobile: lh.mobile ? { before: lighthouseBeforeScore(st.slug, 'mobile'), after: lh.mobile.perf } : null,
+        desktop: lh.desktop ? { before: lighthouseBeforeScore(st.slug, 'desktop'), after: lh.desktop.perf } : null,
+      }
+    : null
+  const speed = lh?.mobile?.lcp != null ? { seconds: lh.mobile.lcp, fetchedAt: lh.fetchedAt } : null
+  return { conversion: conversionSeries(st.slug), rpv: revenuePerVisitorSeries(st.slug), lighthouse, speed }
+}
 
 // Computed once at module scope: registry/commerce/telemetry are static build-time data, so every
 // open sheet compares against the same real fleet snapshot rather than re-deriving it per render.
@@ -53,6 +96,7 @@ export const caseStudyLabels = (strings: PortfolioContent): CaseStudyLabels => {
     trail: cs.trail, trailNote: cs.trailNote, perWeek: cs.perWeek, peak: cs.peak, codebase: cs.codebase, liquidLines: cs.liquidLines, islandLines: cs.islandLines, sectionsCount: cs.sectionsCount, commits: cs.commits, weeks: cs.weeks,
     copyLink: cs.copyLink, copied: cs.copied,
     commerce: cs.commerce,
+    impact: cs.impact,
     charts: cs.charts,
   }
 }
@@ -152,6 +196,7 @@ export function caseStudyFor(
           ? { min: commerceEntry.priceMin, max: commerceEntry.priceMax, median: commerceEntry.currency ? (FLEET_MEDIANS.priceMidByCurrency[commerceEntry.currency] ?? null) : null, currency: commerceEntry.currency }
           : null,
       fetchedAt: isLiveCommerce(commerceEntry) ? commerceEntry.fetchedAt : null,
+      impact: impactFor(st),
     },
   }
 }
