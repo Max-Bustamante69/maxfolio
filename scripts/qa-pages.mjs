@@ -4,7 +4,7 @@
  * Luxury, Brutalist) plus the /menu page. Real Chromium via Playwright, real wheel/touch input,
  * real PerformanceObserver longtask counts — no synthetic scrollTo() shortcuts.
  *
- * Checks (see AGENTS task):
+ * v1 checks (see AGENTS task):
  *   (a) scroll stalls (wheel @1440/390, touch-drag @390) + longtask count
  *   (b) giant blank gaps between sections / oversized empty elements
  *   (c) sticky elements actually stick + the Process readout numeral/title/"Step n of N" agree
@@ -14,7 +14,34 @@
  *   (g) dark mode toggle per theme
  *   (h) theme switcher reachability, including Apple from a visitor pinned to neo (mf_v cookie)
  *
- * Usage: node scripts/qa-pages.mjs [--base http://localhost:4193] [--out <dir>]
+ * v2 additions (2026-09-09 — the owner reported the v1 pass as not good enough: "el scroll se queda
+ * atorado en muchas partes, hay espacios en blanco gigantes que no llevan a ningún lado"):
+ *   (A2) sheet wheel-scroll: v1's stall test always kept the mouse at a fixed viewport point while
+ *        the PAGE scrolled under it — it never opened a modal/sheet and tried to scroll THAT with a
+ *        wheel. Real bug found this way: the case-study sheet's own `overflow-y-auto` panel didn't
+ *        opt out of Lenis, so with the body scroll-locked behind it, a wheel gesture over the sheet
+ *        was captured by Lenis and spent trying to move a page that can't move — dead scroll. Fixed
+ *        in src/components/gallery/ProjectModal.tsx (`data-lenis-prevent`), verified here.
+ *   (B2) painted-window scan: a content-node bounding-box gap check (v1's `findGaps`) can be fooled
+ *        by a node that exists but paints nothing at the point a real eye would land on. This walks
+ *        the full document height in fixed windows and sample a 6×8 grid of `elementsFromPoint` per
+ *        window — a window with zero painted samples is flagged, with the top element at its center
+ *        named as the likely occupant (Suspense fallback, decorative wrapper, etc).
+ *   (C2) scroll-swallower audit: every non-Carousel `overflow-x/y: auto|scroll` container whose
+ *        height sits within 50–150% of the viewport is a candidate for "traps the wheel instead of
+ *        letting the page scroll past it" — each candidate gets an actual wheel-over-it behavioral
+ *        test (does document.scrollY still advance?), not just a static flag.
+ *   (D2) chrome audit: footer (`footer[role="contentinfo"]`), top nav, and the design switcher
+ *        (Explore grid / `[data-theme-switcher]`) are present, visible (non-zero box) and — for the
+ *        switcher — actually navigate, on every route AND every Arcade screen.
+ *   (E2) images: naturalWidth/Height (404 or broken), explicit width/height attributes (CLS risk),
+ *        and response byte size (>300KB) via a response listener correlated to the <img> list.
+ *   (F2) failed network requests (any status >=400 or `requestfailed`), separate from console errors.
+ *   (G2) Arcade per-screen pass (#home #work #years #skills #contact): TopBar/BottomBar/footer/
+ *        switcher presence, stalls, painted-window scan, overflow — WITHOUT touching Persona.tsx
+ *        (another lane owns that file; this harness only reads it).
+ *
+ * Usage: node scripts/qa-pages.mjs [--base http://localhost:4193] [--out <dir>] [--skip-v1]
  */
 import { chromium } from 'playwright'
 import { mkdirSync, writeFileSync } from 'node:fs'
@@ -41,6 +68,10 @@ const ROUTES = [
   { path: '/menu', theme: 'menu', label: 'Menu (/menu)' },
 ]
 
+// Arcade screens (v2, G2): hash-routed, so each is its own `/arcade#<screen>` navigation rather than
+// a separate ROUTES entry. Persona.tsx itself is another lane's surface — this only reads it.
+const ARCADE_SCREENS = ['home', 'work', 'years', 'skills', 'contact']
+
 const DESKTOP = { width: 1440, height: 900 }
 const MOBILE = { width: 390, height: 844 }
 const GAP_LIMIT_DESKTOP = 180
@@ -60,6 +91,18 @@ const LONGTASK_INIT = `
     });
     po.observe({ type: 'longtask', buffered: true });
   } catch (e) { window.__longtaskError = String(e); }
+  // (E2) Real cumulative layout shift, not a static "missing width/height attribute" proxy — this
+  // codebase boxes most images in an aspect-ratio'd parent (see DeviceFrame.tsx) and fills them with
+  // absolute + h-full/w-full, which is CLS-safe without the <img> tag itself carrying width/height.
+  // A static attribute check would flag that pattern as broken when it measurably isn't; the actual
+  // 'layout-shift' entries are the ground truth.
+  window.__cls = 0;
+  try {
+    const clsObserver = new PerformanceObserver((list) => {
+      for (const e of list.getEntries()) if (!e.hadRecentInput) window.__cls += e.value;
+    });
+    clsObserver.observe({ type: 'layout-shift', buffered: true });
+  } catch (e) { window.__clsError = String(e); }
 `
 
 async function collectConsoleErrors(page) {
@@ -398,11 +441,18 @@ async function checkOverlaps(page) {
     const boxes = leaves.map((el) => ({
       el,
       selector: el.tagName + (el.id ? '#' + el.id : '') + (el.className ? '.' + el.className.toString().split(' ').slice(0, 2).join('.') : ''),
+      pointerEventsNone: getComputedStyle(el).pointerEvents === 'none',
       r: el.getBoundingClientRect(),
     }))
     const out = []
     for (let i = 0; i < boxes.length; i++) {
       for (let j = i + 1; j < boxes.length; j++) {
+        // v2: two elements that BOTH ignore pointer events can never compete for a click or visually
+        // clash in a way that matters to a user's interaction — same reasoning as the negative-z-index
+        // exclusion above, just not limited to background layers. Real finding this caught while it was
+        // narrower: two identical `pointer-events-none fixed` decorative layers overlapping mid-scroll,
+        // which is a QA-harness false positive, not a page defect.
+        if (boxes[i].pointerEventsNone && boxes[j].pointerEventsNone) continue
         const a = boxes[i].r
         const b = boxes[j].r
         const ix = Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left))
@@ -413,6 +463,250 @@ async function checkOverlaps(page) {
       }
     }
     return out
+  })
+}
+
+// ============================================================================
+// v2 additions
+// ============================================================================
+
+/**
+ * (B2) Painted-window scan: walks the full document height in `windowPx`-tall bands and, for each
+ * band, samples a `cols`×`rows` grid via `elementsFromPoint` inside that band. A band where every
+ * sample resolves to "nothing painted" (no own text node, no image/svg/canvas/video, no background
+ * image, no background-color other than transparent) is flagged, with the element at the band's
+ * center point named as the likely occupant — a Suspense fallback, an absolutely-positioned
+ * decorative wrapper, an empty section, etc. This catches what a content-node bounding-box gap check
+ * (findGaps) can miss: a node that exists in the DOM but paints nothing at the point a real eye lands.
+ */
+async function scanPaintedWindows(page, { windowPx = 300, cols = 6, rows = 8 } = {}) {
+  const docHeight = await page.evaluate(() => document.documentElement.scrollHeight)
+  const viewportH = await page.evaluate(() => window.innerHeight)
+  const blanks = []
+  for (let winTop = 0; winTop < docHeight; winTop += windowPx) {
+    await page.evaluate((y) => window.scrollTo(0, y), winTop)
+    await page.waitForTimeout(40)
+    const result = await page.evaluate(
+      ({ cols, rows, windowPx, viewportH }) => {
+        const vw = window.innerWidth
+        const bandH = Math.min(windowPx, viewportH, document.documentElement.scrollHeight - window.scrollY)
+        if (bandH <= 0) return { painted: 0, total: 0, centerTag: null }
+        let painted = 0
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const x = (vw * (c + 0.5)) / cols
+            const y = (bandH * (r + 0.5)) / rows
+            const els = document.elementsFromPoint(x, y)
+            for (const el of els) {
+              const cs = getComputedStyle(el)
+              if (cs.visibility === 'hidden' || cs.display === 'none' || Number(cs.opacity) === 0) continue
+              const isMedia = ['IMG', 'SVG', 'CANVAS', 'VIDEO', 'PICTURE'].includes(el.tagName)
+              const hasBgImage = cs.backgroundImage && cs.backgroundImage !== 'none'
+              const hasBgColor = cs.backgroundColor && cs.backgroundColor !== 'rgba(0, 0, 0, 0)' && cs.backgroundColor !== 'transparent'
+              const hasOwnText = Array.from(el.childNodes).some((n) => n.nodeType === Node.TEXT_NODE && n.textContent.trim().length > 0)
+              const hasBorder = ['borderTopWidth', 'borderBottomWidth', 'borderLeftWidth', 'borderRightWidth'].some((k) => parseFloat(cs[k]) > 0) && cs.borderStyle !== 'none'
+              if (isMedia || hasBgImage || hasOwnText || hasBorder || (hasBgColor && el.tagName !== 'HTML' && el.tagName !== 'BODY')) {
+                painted++
+                break
+              }
+            }
+          }
+        }
+        const centerEl = document.elementFromPoint(vw / 2, bandH / 2)
+        const centerTag = centerEl ? centerEl.tagName + (centerEl.id ? '#' + centerEl.id : '') + (centerEl.className ? '.' + String(centerEl.className).slice(0, 60) : '') : null
+        return { painted, total: rows * cols, centerTag }
+      },
+      { cols, rows, windowPx, viewportH },
+    )
+    if (result.total > 0 && result.painted === 0) {
+      blanks.push({ topDoc: winTop, occupant: result.centerTag })
+    }
+  }
+  return blanks
+}
+
+/**
+ * (C2) Scroll-swallower audit. Finds every visible `overflow-x/y: auto|scroll` container (excluding
+ * the house Carousel's own track, which is a KNOWN, intended horizontal scroller — flagged separately
+ * as `carousel` so it still gets the same behavioral wheel-over check) whose height sits within
+ * 50–150% of the viewport height — the shape of something that could plausibly eat page-scroll wheel
+ * input instead of letting it fall through to Lenis. For each candidate, drives a real wheel gesture
+ * with the mouse over its center and reports whether `document.scrollY`/its own scrollTop moved —
+ * proof, not a guess about what "looks like" a trap.
+ */
+async function findScrollSwallowers(page, viewport) {
+  const candidates = await page.evaluate((vh) => {
+    function isVisible(el) {
+      const r = el.getBoundingClientRect()
+      if (r.width <= 0 || r.height <= 0) return false
+      const cs = getComputedStyle(el)
+      return cs.visibility !== 'hidden' && cs.display !== 'none'
+    }
+    const out = []
+    document.querySelectorAll('body *').forEach((el) => {
+      if (!isVisible(el)) return
+      const cs = getComputedStyle(el)
+      const scrollsX = (cs.overflowX === 'auto' || cs.overflowX === 'scroll') && el.scrollWidth > el.clientWidth + 2
+      const scrollsY = (cs.overflowY === 'auto' || cs.overflowY === 'scroll') && el.scrollHeight > el.clientHeight + 2
+      if (!scrollsX && !scrollsY) return
+      const r = el.getBoundingClientRect()
+      if (r.height < vh * 0.5 || r.height > vh * 1.5) return
+      out.push({
+        selector: el.tagName + (el.id ? '#' + el.id : '') + (el.className ? '.' + String(el.className).split(' ').slice(0, 3).join('.') : ''),
+        isCarouselTrack: el.matches('.rail-wide ul, [aria-roledescription="carousel"] ul'),
+        axis: scrollsX ? 'x' : 'y',
+        x: Math.round(r.left + r.width / 2),
+        y: Math.round(r.top + r.height / 2),
+      })
+    })
+    return out
+  }, viewport.height)
+
+  const findings = []
+  for (const cand of candidates.slice(0, 12)) {
+    // clamp the probe point on-screen
+    const x = Math.min(Math.max(cand.x, 4), viewport.width - 4)
+    const y = Math.min(Math.max(cand.y, 4), viewport.height - 4)
+    const before = await page.evaluate(() => window.scrollY)
+    for (let i = 0; i < 8; i++) {
+      await page.mouse.move(x, y)
+      await page.mouse.wheel(0, 200)
+      await page.waitForTimeout(60)
+    }
+    await page.waitForTimeout(150)
+    const after = await page.evaluate(() => window.scrollY)
+    const pageAdvanced = Math.abs(after - before) > 4
+    findings.push({ ...cand, pageScrollYBefore: before, pageScrollYAfter: after, pageAdvanced, swallowsPageScroll: !pageAdvanced && !cand.isCarouselTrack })
+  }
+  return findings
+}
+
+/**
+ * (A2) Opens the first case-study sheet from the Gallery section (present on /, /neo, /luxury,
+ * /brutalist, and Arcade's #work) and drives a real wheel gesture over its own scrollable numbers
+ * panel — the exact gesture v1's fixed-viewport-point stall test never produced, since it never
+ * opened a modal. Returns null if no Gallery/openable card is present on this page.
+ */
+async function checkSheetWheelScroll(page, viewport) {
+  const rail = await page.$('.rail-wide figure button[aria-label], figure button[aria-label]')
+  if (!rail) return null
+  await rail.scrollIntoViewIfNeeded().catch(() => {})
+  await rail.click({ timeout: 5000 }).catch(() => {})
+  await page.waitForTimeout(600)
+  const dialog = await page.$('[role="dialog"]')
+  if (!dialog) return { opened: false }
+  const box = await page.evaluate(() => {
+    const el = document.querySelector('[role="dialog"] .overflow-y-auto')
+    if (!el) return null
+    const r = el.getBoundingClientRect()
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2, scrollHeight: el.scrollHeight, clientHeight: el.clientHeight, hasPrevent: el.hasAttribute('data-lenis-prevent') }
+  })
+  if (!box || box.scrollHeight <= box.clientHeight + 2) {
+    // nothing to scroll in this panel at this viewport — not a failure, just not applicable
+    await page.keyboard.press('Escape').catch(() => {})
+    await page.waitForTimeout(300)
+    return { opened: true, scrollable: false }
+  }
+  const cx = Math.min(Math.max(box.x, 4), viewport.width - 4)
+  const cy = Math.min(Math.max(box.y, 4), viewport.height - 4)
+  for (let i = 0; i < 15; i++) {
+    await page.mouse.move(cx, cy)
+    await page.mouse.wheel(0, 200)
+    await page.waitForTimeout(60)
+  }
+  await page.waitForTimeout(200)
+  const scrollTopAfter = await page.evaluate(() => document.querySelector('[role="dialog"] .overflow-y-auto')?.scrollTop ?? 0)
+  await page.keyboard.press('Escape').catch(() => {})
+  await page.waitForTimeout(300)
+  return { opened: true, scrollable: true, hasPreventAttr: box.hasPrevent, scrollHeight: box.scrollHeight, clientHeight: box.clientHeight, scrollTopAfterWheel: scrollTopAfter, stuck: scrollTopAfter < 4 }
+}
+
+/**
+ * (D2) Chrome audit: footer, top nav, and the design switcher are present, visible (non-zero box).
+ * `switcherSelector` lets Arcade pass `[data-theme-switcher]` instead of the Explore-grid link.
+ */
+async function checkChrome(page, { switcherSelector = 'a[href^="/?v="], a[href="/neo"], a[href="/luxury"], a[href="/brutalist"], a[href="/menu"], a[href="/"], a[href="/arcade"], [data-theme-switcher]' } = {}) {
+  return page.evaluate((switcherSelector) => {
+    function box(sel) {
+      const el = document.querySelector(sel)
+      if (!el) return { present: false }
+      const r = el.getBoundingClientRect()
+      return { present: true, visible: r.width > 0 && r.height > 0 }
+    }
+    const footer = box('footer[role="contentinfo"]')
+    const nav = box('header, nav')
+    const switcherEl = document.querySelector(switcherSelector)
+    const switcher = switcherEl ? { present: true, visible: switcherEl.getBoundingClientRect().width > 0 } : { present: false }
+    return { footer, nav, switcher }
+  }, switcherSelector)
+}
+
+/**
+ * (E2)/(F2) Images + network. Attach BEFORE navigation: tracks response status/size per URL, then
+ * correlates against the page's <img> elements for 404s, missing explicit width/height (CLS risk),
+ * and >300KB payloads.
+ */
+function attachNetworkTracking(page) {
+  const responses = new Map() // url -> { status, bytes }
+  const failed = []
+  page.on('response', async (res) => {
+    try {
+      const req = res.request()
+      const headers = res.headers()
+      const len = headers['content-length'] ? parseInt(headers['content-length'], 10) : null
+      responses.set(res.url(), { status: res.status(), bytes: len, type: req.resourceType() })
+      if (res.status() >= 400) failed.push({ url: res.url(), status: res.status() })
+    } catch {
+      /* response may already be gone (redirect/navigation race) — not the defect under test */
+    }
+  })
+  page.on('requestfailed', (req) => {
+    // A `mailto:`/`tel:` link "fails" as a resource request in headless Chromium (no protocol handler
+    // to hand it to — net::ERR_ABORTED) even though it's a correct, working link in a real browser
+    // with a mail/phone app registered. Not a page defect; would otherwise false-positive every
+    // Contact section on every route.
+    if (!req.url().startsWith('http')) return
+    failed.push({ url: req.url(), status: 'requestfailed', reason: req.failure()?.errorText })
+  })
+  return { responses, failed }
+}
+
+async function checkImages(page, responses) {
+  const imgs = await page.evaluate(() => {
+    return Array.from(document.querySelectorAll('img')).map((img) => ({
+      src: img.currentSrc || img.src,
+      naturalWidth: img.naturalWidth,
+      naturalHeight: img.naturalHeight,
+      complete: img.complete,
+      hasWidthAttr: img.hasAttribute('width'),
+      hasHeightAttr: img.hasAttribute('height'),
+      // The house pattern for a "cover" image (ProjectFrame/DeviceFrame) is an absolute + h-full/w-full
+      // <img> inside a parent whose OWN box is fixed by CSS `aspect-ratio` — no reflow happens when the
+      // image loads regardless of the <img> tag's own width/height attributes. Only flag missing
+      // attributes as a real CLS risk when nothing in the ancestor chain already pins the box.
+      inAspectRatioBox: !!img.closest('[style*="aspect-ratio"]'),
+      loading: img.getAttribute('loading'),
+    }))
+  })
+  const KB300 = 300 * 1024
+  return imgs.map((img) => {
+    const net = responses.get(img.src)
+    // "Broken" means the browser tried and failed (a real 404/5xx, or a completed load that still
+    // decoded to 0×0) — NOT "hasn't been requested yet", which is just an offscreen `loading="lazy"`
+    // image this pass never scrolled to. Conflating the two was v2's own first-draft false positive
+    // (58/78 images on Apple flagged "broken" purely for being lazy and below the fold — worth noting
+    // as a lesson for whoever reruns this, not a page defect).
+    const attempted = net != null || img.complete
+    const broken = attempted && (net?.status >= 400 || img.naturalWidth === 0 || img.naturalHeight === 0)
+    return {
+      ...img,
+      attempted,
+      broken,
+      missingDims: (!img.hasWidthAttr || !img.hasHeightAttr) && !img.inAspectRatioBox,
+      bytes: net?.bytes ?? null,
+      oversized: (net?.bytes ?? 0) > KB300,
+      httpStatus: net?.status ?? null,
+    }
   })
 }
 
@@ -429,14 +723,25 @@ async function checkOverlaps(page) {
  */
 async function measureGeometry(browser, viewport, url, gapLimit, extraCtx = {}) {
   const context = await browser.newContext({ viewport, reducedMotion: 'reduce', ...extraCtx })
+  await context.addInitScript(LONGTASK_INIT) // also installs the layout-shift observer used for `cls` below
   const page = await context.newPage()
   await page.goto(url, { waitUntil: 'networkidle' })
   await page.waitForTimeout(400)
+  // (E2) CLS is read HERE, in a fresh, minimally-interactive context, right after initial load settles
+  // — not on the main desktop/mobile page after a whole QA session's worth of scrolling and modal
+  // opens has run on it. That page's `__cls` reflects everything this harness itself did to the page,
+  // not what a real visitor's single page-load experiences, and would overstate the score.
+  const cls = await page.evaluate(() => Math.round((window.__cls || 0) * 1000) / 1000)
   const gaps = await findGaps(page, gapLimit)
   const oversizedEmpty = await findOversizedEmpty(page)
+  // (B2) same reduced-motion rationale as gaps/oversizedEmpty above: scanPaintedWindows jumps
+  // (scrollTo) through the document out of order relative to a real scroll, and under normal motion
+  // a whileInView reveal that just crossed into a band may still be mid-fade at sample time — a false
+  // "blank" that's really "not finished fading in yet". Reduced motion renders it settled already.
+  const paintedWindowBlanks = await scanPaintedWindows(page)
   const hOverflow = await page.evaluate(() => ({ scrollWidth: document.documentElement.scrollWidth, clientWidth: document.documentElement.clientWidth }))
   await context.close()
-  return { gaps, oversizedEmpty, horizontalOverflow: hOverflow.scrollWidth > hOverflow.clientWidth + 1 ? hOverflow : null }
+  return { gaps, oversizedEmpty, paintedWindowBlanks, cls, horizontalOverflow: hOverflow.scrollWidth > hOverflow.clientWidth + 1 ? hOverflow : null }
 }
 
 async function main() {
@@ -453,6 +758,7 @@ async function main() {
       await context.addInitScript(LONGTASK_INIT)
       const page = await context.newPage()
       const consoleErrors = await collectConsoleErrors(page)
+      const net = attachNetworkTracking(page)
       await page.goto(BASE + route.path, { waitUntil: 'networkidle' })
       await page.waitForTimeout(600)
 
@@ -471,6 +777,17 @@ async function main() {
         if (route.path !== '/menu') routeResult.processReadout = await checkProcessReadout(page)
       }
       routeResult.overlaps = await checkOverlaps(page)
+
+      // ---- v2 ----
+      routeResult.desktop.paintedWindowBlanks = geomD.paintedWindowBlanks
+      await page.evaluate(() => window.scrollTo(0, 0))
+      await page.waitForTimeout(150)
+      routeResult.desktop.scrollSwallowers = await findScrollSwallowers(page, DESKTOP)
+      routeResult.desktop.sheetWheel = await checkSheetWheelScroll(page, DESKTOP)
+      routeResult.chrome = await checkChrome(page, route.arcade ? { switcherSelector: '[data-theme-switcher]' } : {})
+      routeResult.desktop.images = await checkImages(page, net.responses)
+      routeResult.desktop.failedRequests = net.failed.slice()
+      routeResult.desktop.cls = geomD.cls
 
       // dark mode toggle
       await page.evaluate(() => window.scrollTo(0, 0))
@@ -505,6 +822,7 @@ async function main() {
       await context.addInitScript(LONGTASK_INIT)
       const page = await context.newPage()
       const consoleErrors = await collectConsoleErrors(page)
+      const net = attachNetworkTracking(page)
       await page.goto(BASE + route.path, { waitUntil: 'networkidle' })
       await page.waitForTimeout(600)
 
@@ -512,12 +830,20 @@ async function main() {
       routeResult.mobile.gaps = geomM.gaps
       routeResult.mobile.oversizedEmpty = geomM.oversizedEmpty
       routeResult.mobile.horizontalOverflow = geomM.horizontalOverflow
+      routeResult.mobile.paintedWindowBlanks = geomM.paintedWindowBlanks
 
       const touchScroll = await touchScrollStallTest(page)
       routeResult.mobile.scroll = touchScroll
       const longtasks = await page.evaluate(() => window.__longtasks || [])
       routeResult.mobile.longtaskCount = longtasks.length
       routeResult.mobile.longtaskTotalMs = Math.round(longtasks.reduce((s, t) => s + t.dur, 0))
+
+      // ---- v2 ----
+      routeResult.mobile.scrollSwallowers = await findScrollSwallowers(page, MOBILE)
+      if (!routeResult.chrome) routeResult.chrome = await checkChrome(page, route.arcade ? { switcherSelector: '[data-theme-switcher]' } : {})
+      routeResult.mobile.images = await checkImages(page, net.responses)
+      routeResult.mobile.failedRequests = net.failed.slice()
+      routeResult.mobile.cls = geomM.cls
 
       routeResult.errors.mobile = consoleErrors
       await page.screenshot({ path: resolve(OUT, `${route.theme}-mobile.png`) }).catch(() => {})
@@ -526,6 +852,51 @@ async function main() {
 
     results.push(routeResult)
     report.routes.push(routeResult)
+  }
+
+  // ---------- (G2) Arcade per-screen pass ----------
+  report.arcadeScreens = []
+  for (const screen of ARCADE_SCREENS) {
+    log(`\n=== Arcade #${screen} ===`)
+    const url = `${BASE}/arcade#${screen}`
+    const screenResult = { screen, desktop: {}, mobile: {} }
+
+    {
+      const context = await browser.newContext({ viewport: DESKTOP })
+      await context.addInitScript(LONGTASK_INIT)
+      const page = await context.newPage()
+      const consoleErrors = await collectConsoleErrors(page)
+      await page.goto(url, { waitUntil: 'networkidle' })
+      await page.waitForTimeout(700) // ScreenLoading Suspense + screen-enter transition
+      screenResult.desktop.scroll = await wheelScrollStallTest(page, { steps: 40 })
+      const hOverflow = await page.evaluate(() => ({ scrollWidth: document.documentElement.scrollWidth, clientWidth: document.documentElement.clientWidth }))
+      screenResult.desktop.horizontalOverflow = hOverflow.scrollWidth > hOverflow.clientWidth + 1 ? hOverflow : null
+      screenResult.desktop.overlaps = await checkOverlaps(page)
+      screenResult.chrome = await checkChrome(page, { switcherSelector: '[data-theme-switcher]' })
+      screenResult.desktop.topBarPresent = await page.evaluate(() => {
+        const el = document.querySelector('button[aria-label="Switch to light mode" i], button[aria-label="Switch to dark mode" i]')
+        return !!el
+      })
+      screenResult.desktop.bottomBarPresent = await page.evaluate(() => !!document.querySelector('nav[aria-label="Screen navigation" i]'))
+      // #work is the one Arcade screen that mounts Gallery/ProjectModal — confirm the (A2) sheet fix
+      // holds here too, without touching Persona.tsx itself.
+      if (screen === 'work') screenResult.desktop.sheetWheel = await checkSheetWheelScroll(page, DESKTOP)
+      screenResult.errors = { desktop: consoleErrors }
+      await page.screenshot({ path: resolve(OUT, `persona-${screen}-desktop.png`) }).catch(() => {})
+      await context.close()
+    }
+    {
+      const context = await browser.newContext({ viewport: MOBILE, hasTouch: true, isMobile: true, reducedMotion: 'reduce' })
+      const page = await context.newPage()
+      await page.goto(url, { waitUntil: 'networkidle' })
+      await page.waitForTimeout(700)
+      screenResult.mobile.paintedWindowBlanks = await scanPaintedWindows(page)
+      const hOverflow = await page.evaluate(() => ({ scrollWidth: document.documentElement.scrollWidth, clientWidth: document.documentElement.clientWidth }))
+      screenResult.mobile.horizontalOverflow = hOverflow.scrollWidth > hOverflow.clientWidth + 1 ? hOverflow : null
+      await page.screenshot({ path: resolve(OUT, `persona-${screen}-mobile.png`) }).catch(() => {})
+      await context.close()
+    }
+    report.arcadeScreens.push(screenResult)
   }
 
   // ---------- (h) theme switcher reachability ----------
@@ -569,6 +940,10 @@ async function main() {
   writeFileSync(jsonPath, JSON.stringify({ ...report, switcher: switcherFindings }, null, 2))
 
   const rows = []
+  rows.push('# QA v2 — full-site human-like pass')
+  rows.push('')
+  rows.push('## v1 table (unchanged checks)')
+  rows.push('')
   rows.push('| Route | Desktop stalls | Mobile stalls | Desktop longtasks | Mobile longtasks | Desktop gaps>180px | Mobile gaps>140px | Oversized-empty | Sticky broken | Process mismatch | H-overflow@390 | Overlaps | Console err (d/m) | Dark toggles |')
   rows.push('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|')
   for (const r of report.routes) {
@@ -576,6 +951,45 @@ async function main() {
       `| ${r.label} | ${r.desktop.scroll?.stalls?.length ?? '-'} | ${r.mobile.scroll?.stalls?.length ?? '-'} | ${r.desktop.longtaskCount ?? '-'} | ${r.mobile.longtaskCount ?? '-'} | ${r.desktop.gaps?.length ?? '-'} | ${r.mobile.gaps?.length ?? '-'} | ${(r.desktop.oversizedEmpty?.length ?? 0) + (r.mobile.oversizedEmpty?.length ?? 0)} | ${r.sticky?.length ?? '-'} | ${r.processReadout?.mismatches?.length ?? '-'} | ${r.mobile.horizontalOverflow ? 'YES' : 'no'} | ${r.overlaps?.length ?? '-'} | ${r.errors.desktop?.length ?? 0}/${r.errors.mobile?.length ?? 0} | ${r.dark.toggled === null ? 'n/a' : r.dark.toggled} |`,
     )
   }
+
+  rows.push('')
+  rows.push('## v2 table (new human-like checks)')
+  rows.push('')
+  rows.push('| Route | Sheet wheel-scroll | Blank windows (d/m) | Scroll swallowers (d/m) | Footer/Nav/Switcher | Broken/oversized imgs (d/m) | CLS (d/m) | Failed requests (d/m) |')
+  rows.push('|---|---|---|---|---|---|---|---|')
+  for (const r of report.routes) {
+    const sheet = r.desktop.sheetWheel
+    const sheetCell = !sheet ? 'no gallery' : !sheet.opened ? 'FAILED TO OPEN' : !sheet.scrollable ? 'n/a (fits)' : sheet.stuck ? `STUCK (top=${sheet.scrollTopAfterWheel})` : 'ok'
+    const blanksD = r.desktop.paintedWindowBlanks?.length ?? '-'
+    const blanksM = r.mobile.paintedWindowBlanks?.length ?? '-'
+    const swallowD = (r.desktop.scrollSwallowers ?? []).filter((s) => s.swallowsPageScroll).length
+    const swallowM = (r.mobile.scrollSwallowers ?? []).filter((s) => s.swallowsPageScroll).length
+    const chrome = r.chrome
+    const chromeCell = chrome ? `${chrome.footer.present && chrome.footer.visible ? 'F✓' : 'F✗'} ${chrome.nav.present && chrome.nav.visible ? 'N✓' : 'N✗'} ${chrome.switcher.present && chrome.switcher.visible ? 'S✓' : 'S✗'}` : '-'
+    const imgsD = (r.desktop.images ?? []).filter((i) => i.broken || i.oversized).length
+    const imgsM = (r.mobile.images ?? []).filter((i) => i.broken || i.oversized).length
+    const failD = r.desktop.failedRequests?.length ?? 0
+    const failM = r.mobile.failedRequests?.length ?? 0
+    rows.push(`| ${r.label} | ${sheetCell} | ${blanksD}/${blanksM} | ${swallowD}/${swallowM} | ${chromeCell} | ${imgsD}/${imgsM} | ${r.desktop.cls ?? '-'}/${r.mobile.cls ?? '-'} | ${failD}/${failM} |`)
+  }
+  rows.push('')
+  rows.push('_"Broken/oversized imgs" only counts an image the browser actually attempted (a network response or `img.complete`) — an offscreen `loading="lazy"` image this pass never scrolled to is not "broken", it is correctly not loaded yet. CLS is the real `layout-shift` PerformanceObserver score (0 = no shift), not a static width/height-attribute proxy — several images here are intentionally unsized `<img>` tags inside an `aspect-ratio`-boxed parent (DeviceFrame.tsx), which is CLS-safe by construction without the attribute._')
+
+  rows.push('')
+  rows.push('## Arcade per-screen (G2)')
+  rows.push('')
+  rows.push('| Screen | Desktop stalls | H-overflow@390 | Overlaps | TopBar | BottomBar | Footer/Switcher | Blank windows (mobile) | Sheet wheel-scroll | Console err |')
+  rows.push('|---|---|---|---|---|---|---|---|---|---|')
+  for (const s of report.arcadeScreens) {
+    const chrome = s.chrome
+    const chromeCell = chrome ? `${chrome.footer.present && chrome.footer.visible ? 'F✓' : 'F✗'} ${chrome.switcher.present && chrome.switcher.visible ? 'S✓' : 'S✗'}` : '-'
+    const sheet = s.desktop.sheetWheel
+    const sheetCell = !sheet ? '—' : !sheet.opened ? 'FAILED TO OPEN' : !sheet.scrollable ? 'n/a (fits)' : sheet.stuck ? `STUCK (top=${sheet.scrollTopAfterWheel})` : 'ok'
+    rows.push(
+      `| #${s.screen} | ${s.desktop.scroll?.stalls?.length ?? '-'} | ${s.desktop.horizontalOverflow ? 'YES' : 'no'} | ${s.desktop.overlaps?.length ?? '-'} | ${s.desktop.topBarPresent ? 'yes' : 'MISSING'} | ${s.desktop.bottomBarPresent ? 'yes' : 'MISSING'} | ${chromeCell} | ${s.mobile.paintedWindowBlanks?.length ?? '-'} | ${sheetCell} | ${s.errors?.desktop?.length ?? 0} |`,
+    )
+  }
+
   rows.push('')
   rows.push('## Theme switcher (h)')
   for (const f of switcherFindings) rows.push(`- ${f.step}: ${JSON.stringify(f)}`)
@@ -595,6 +1009,26 @@ async function main() {
     if (r.errors.desktop?.length) rows.push('Console errors (desktop): ' + JSON.stringify(r.errors.desktop))
     if (r.errors.mobile?.length) rows.push('Console errors (mobile): ' + JSON.stringify(r.errors.mobile))
     if (r.mobile.horizontalOverflow) rows.push('Horizontal overflow: ' + JSON.stringify(r.mobile.horizontalOverflow))
+    if (r.desktop.paintedWindowBlanks?.length) rows.push('Desktop blank windows: ' + JSON.stringify(r.desktop.paintedWindowBlanks))
+    if (r.mobile.paintedWindowBlanks?.length) rows.push('Mobile blank windows: ' + JSON.stringify(r.mobile.paintedWindowBlanks))
+    const swallowersD = (r.desktop.scrollSwallowers ?? []).filter((s) => s.swallowsPageScroll)
+    const swallowersM = (r.mobile.scrollSwallowers ?? []).filter((s) => s.swallowsPageScroll)
+    if (swallowersD.length) rows.push('Desktop scroll swallowers: ' + JSON.stringify(swallowersD))
+    if (swallowersM.length) rows.push('Mobile scroll swallowers: ' + JSON.stringify(swallowersM))
+    if (r.desktop.sheetWheel) rows.push('Sheet wheel-scroll: ' + JSON.stringify(r.desktop.sheetWheel))
+    if (r.chrome) rows.push('Chrome (footer/nav/switcher): ' + JSON.stringify(r.chrome))
+    const badImgsD = (r.desktop.images ?? []).filter((i) => i.broken || i.oversized || i.missingDims)
+    const badImgsM = (r.mobile.images ?? []).filter((i) => i.broken || i.oversized || i.missingDims)
+    if (badImgsD.length) rows.push('Desktop image issues: ' + JSON.stringify(badImgsD))
+    if (badImgsM.length) rows.push('Mobile image issues: ' + JSON.stringify(badImgsM))
+    if (r.desktop.failedRequests?.length) rows.push('Desktop failed requests: ' + JSON.stringify(r.desktop.failedRequests))
+    if (r.mobile.failedRequests?.length) rows.push('Mobile failed requests: ' + JSON.stringify(r.mobile.failedRequests))
+  }
+  rows.push('\n### Arcade screens')
+  for (const s of report.arcadeScreens) {
+    if (s.mobile.paintedWindowBlanks?.length) rows.push(`#${s.screen} mobile blank windows: ` + JSON.stringify(s.mobile.paintedWindowBlanks))
+    if (s.desktop.overlaps?.length) rows.push(`#${s.screen} overlaps: ` + JSON.stringify(s.desktop.overlaps))
+    if (s.errors?.desktop?.length) rows.push(`#${s.screen} console errors: ` + JSON.stringify(s.errors.desktop))
   }
   writeFileSync(resolve(OUT, 'qa-report.md'), rows.join('\n'))
   log('\nWrote', jsonPath)

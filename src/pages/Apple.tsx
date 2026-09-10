@@ -27,8 +27,12 @@ const Contact = lazy(() => import('../components/sections/Contact').then((mod) =
 const BuildHeatmap = lazy(() => import('../components/sections/BuildHeatmap').then((mod) => ({ default: mod.BuildHeatmap })))
 const CareerSubway = lazy(() => import('../components/sections/CareerSubway').then((mod) => ({ default: mod.CareerSubway })))
 
-/** Keeps the page height stable while a section's chunk loads. */
-const Pending = ({ h = 'min-h-[60vh]' }: { h?: string }) => <div className={h} aria-hidden="true" />
+/** Keeps the page height stable while a section's chunk loads. Capped at 40vh: on a slow connection
+ * every one of these chunks starts downloading at mount (they aren't gated behind an
+ * IntersectionObserver), so a scrolling visitor can land on one before it resolves — 60vh read as a
+ * dead end mid-scroll (QA v2, 2026-09-09). 40vh still holds layout for the tallest sections without
+ * manufacturing that much blank space for the short ones. */
+const Pending = ({ h = 'min-h-[40vh]' }: { h?: string }) => <div className={h} aria-hidden="true" />
 
 /** Wall-clock time in Medellín, refreshed every 30 s — a real vital, not decoration. */
 function useLocalTime(locale: string) {

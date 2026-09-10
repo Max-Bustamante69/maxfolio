@@ -253,7 +253,10 @@ const Icon = {
 function ScreenLoading({ accentCls, muted }: { accentCls: string; muted: string }) {
   const reduced = useReducedMotion()
   return (
-    <div className="min-h-[55vh] flex flex-col items-center justify-center gap-4" role="status" aria-label="Loading screen">
+    // Capped at 40vh, same reasoning as the other themes' `Pending` fallback (QA v2, 2026-09-09):
+    // this screen's chunk starts downloading as soon as its route is hashed to, unresolved, and a
+    // taller guess just manufactures more blank space if it stays here a moment.
+    <div className="min-h-[40vh] flex flex-col items-center justify-center gap-4" role="status" aria-label="Loading screen">
       <span className={`font-persona-display text-3xl uppercase ${accentCls}`} style={{ fontStyle: 'oblique 6deg' }}>
         <RansomText text="Loading" intensity={0.6} />
       </span>

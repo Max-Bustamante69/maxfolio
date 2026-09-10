@@ -268,7 +268,13 @@ export function ProjectModal({ open, data, skin, labels, onClose }: ProjectModal
             </div>
 
             {/* numbers */}
-            <div ref={scrollerRef} className="relative flex-1 overflow-y-auto p-6 lg:p-8">
+            {/* Lenis's own wheel listener lives on `window` and drives page scroll; with the body locked
+                (overflow: hidden, above) while this sheet is open, a plain wheel gesture here would be
+                captured by Lenis and try to scroll a page that cannot move — dead-ending the sheet's own
+                scroll under a mouse wheel (touch was never affected: Lenis's `syncTouch` defaults off, so
+                touch scroll here was always native). `data-lenis-prevent` opts this scroller out so the
+                wheel reaches its native `overflow-y-auto` behavior instead. */}
+            <div ref={scrollerRef} className="relative flex-1 overflow-y-auto p-6 lg:p-8" data-lenis-prevent>
               {!reduced && (
                 <m.div
                   aria-hidden="true"
