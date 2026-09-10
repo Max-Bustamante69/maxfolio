@@ -1,5 +1,15 @@
 [
   {
+    "hash": "85a69bb",
+    "date": "2026-09-09",
+    "subject": "fix(sheet): the illustrative Lighthouse baseline only pairs with a real score that clears it by 8 points (no red deltas "
+  },
+  {
+    "hash": "1750dc8",
+    "date": "2026-09-09",
+    "subject": "chore(terminal): regenerated changelog.json"
+  },
+  {
     "hash": "5bbf811",
     "date": "2026-09-09",
     "subject": "fix(sheet): label the Impact block's illustrative charts individually, fix draw-in timing and the info-button tap target"
@@ -48,15 +58,5 @@
     "hash": "7e396f4",
     "date": "2026-09-09",
     "subject": "feat(skyline): add the Skyline data-monument theme (theme 8)"
-  },
-  {
-    "hash": "c6fab3b",
-    "date": "2026-09-09",
-    "subject": "feat(stats): the band leads with optimization — Lighthouse 70→95+, load time -30–40%, conversion +10–20%, organic +20% ("
-  },
-  {
-    "hash": "ec654eb",
-    "date": "2026-09-09",
-    "subject": "docs(lighthouse): round 27 row"
   }
 ]
