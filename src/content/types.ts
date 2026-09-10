@@ -117,14 +117,18 @@ export interface PortfolioContent {
     projects: SectionHeading & { view: string }
     skills: SectionHeading & {
       groups: Record<SkillGroupId, string>
-      narrative: Record<SkillGroupId, string>
-      /** A one-line honest note per group, standalone (no {skills} placeholder) — used by the skill panel. */
+      /** aria-label for the horizontal group-filter tabs above the tile grid. */
+      groupSelectorLabel: string
+      /** A one-line honest note per group — shown in the panel under whichever tool from that group is selected. */
       groupNote: Record<SkillGroupId, string>
-      usageLabel: string
-      usageUnit: string
-      usageNote: string
-      usageItems: Record<string, string>
-      sunburst: {
+      /** The compact depth strip above the grid: three real fleet totals, always the same three. */
+      depthLabel: {
+        liquid: string
+        ts: string
+        stores: string
+      }
+      usage: {
+        /** Idle panel caption, before any tile is hovered/pinned. */
         caption: string
         storesUnit: string
         storesUnitOne: string
@@ -133,15 +137,11 @@ export interface PortfolioContent {
         roleUnit: string
         roleUnitOne: string
         noData: string
-        legendLabel: string
-        triLiquid: string
-        triTs: string
-        triStoresDefault: string
-        depthLabel: string
       }
-      /** The selected-skill panel: name/group/usage come from sunburst.* and groupNote above. */
+      /** The selected-tool panel: name/group/usage come from usage.* and groupNote above. */
       panel: {
         eyebrow: string
+        usageLabel: string
         pinned: string
         hint: string
       }
