@@ -17,6 +17,7 @@ const Chapters = lazy(() => import('../components/sections/Chapters').then((mod)
 const Process = lazy(() => import('../components/sections/Process').then((mod) => ({ default: mod.Process })))
 const ShopifyWork = lazy(() => import('../components/sections/ShopifyWork').then((mod) => ({ default: mod.ShopifyWork })))
 const Gallery = lazy(() => import('../components/sections/Gallery').then((mod) => ({ default: mod.Gallery })))
+const FeaturedBuild = lazy(() => import('../components/sections/FeaturedBuild').then((mod) => ({ default: mod.FeaturedBuild })))
 const Manifesto = lazy(() => import('../components/sections/Manifesto').then((mod) => ({ default: mod.Manifesto })))
 const Projects = lazy(() => import('../components/sections/Projects').then((mod) => ({ default: mod.Projects })))
 const Skills = lazy(() => import('../components/sections/Skills').then((mod) => ({ default: mod.Skills })))
@@ -406,6 +407,17 @@ function AppleContent() {
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Gallery skin={skin} heading={Heading} />
+              </Suspense>
+            </div>
+          </section>
+
+          {/* Featured build — The Gummy Box, told through one of four selectable design variants
+              (?featured=a|b|c|d). Tighter rhythm than its neighbors on purpose — the brief asked for
+              denser spacing than the site's usual py-14/py-20 band. */}
+          <section className="px-4 py-12 md:py-16 scroll-mt-20">
+            <div className="max-w-5xl mx-auto">
+              <Suspense fallback={<Pending />}>
+                <FeaturedBuild skin={skin} heading={Heading} />
               </Suspense>
             </div>
           </section>
