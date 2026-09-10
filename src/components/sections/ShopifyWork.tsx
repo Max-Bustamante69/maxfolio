@@ -6,9 +6,7 @@ import { Products } from './Products'
 import { useHoverPreview } from '../gallery/HoverPreview'
 import { lightboxItems, caseStudyFor, caseStudyLabels, ProjectModal, type SectionHeading } from './Gallery'
 import type { StoreEntry, ProductEntry } from '../../data/registry'
-import { telemetry } from '../../data/telemetry'
-import { commerce } from '../../data/commerce'
-import { pickCommerceLine } from '../../data/commerceLines'
+import { conversionSeries } from '../../data/illustrative'
 
 interface ShopifyWorkProps {
   skin: Skin
@@ -40,7 +38,6 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
   const s = strings.sections.shopify
   const g = strings.sections.gallery
   const cs = strings.sections.caseStudy
-  const cm = cs.commerce
   const [tab, setTab] = useState<'stores' | 'products'>('stores')
   const [showAll, setShowAll] = useState(false)
   const [feature, setFeature] = useState<string | null>(null)
@@ -78,21 +75,11 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
   const goPrev = canNavigate ? () => setOpenStore(orderedList[(openIndex - 1 + orderedList.length) % orderedList.length]) : undefined
   const goNext = canNavigate ? () => setOpenStore(orderedList[(openIndex + 1) % orderedList.length]) : undefined
 
-  /** One commerce-oriented figure per store — catalog, offer, delivery or reach, rotated
-   *  deterministically by slug so the index reads varied while staying on one honest system. The
-   *  full picture (all four angles) lives in the case-study sheet this chip's row opens. */
+  /** One Impact-block headline figure per store — the same illustrative conversion lift the
+   *  case-study sheet leads with (src/data/illustrative.ts conversionSeries), so the index chip and
+   *  the sheet it opens tell one consistent story instead of two different numbers. */
   const Headline = ({ st }: { st: StoreEntry }) => {
-    const c = strings.stores[st.slug]
-    const { text } = pickCommerceLine(st.slug, 0, {
-      store: st,
-      storeContent: c,
-      filters: s.filters,
-      cs: cm,
-      commerceEntry: commerce[st.slug],
-      telemetryEntry: telemetry[st.slug],
-      intlLocale,
-      monthFmt,
-    })
+    const text = cs.impact.indexChip.replace('{pct}', String(conversionSeries(st.slug).deltaPct))
     return <span className={`${skin.chip} mt-1.5 inline-flex items-center gap-1.5`}>{text}</span>
   }
 
@@ -220,7 +207,6 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
             onClose={() => setOpenStore(null)}
             onPrev={goPrev}
             onNext={goNext}
-            intlLocale={intlLocale}
           />
         </Suspense>
       )}

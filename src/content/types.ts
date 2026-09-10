@@ -8,16 +8,13 @@ interface SectionHeading {
 }
 
 /**
- * Commerce-oriented figures for the "By the numbers" block (catalog/offer/delivery/reach), read
- * from the live storefront (src/data/commerce.json) and the registry — never a conversion rate,
- * revenue or AOV figure, which are not measured for these stores.
+ * Commerce-oriented line templates — catalog/offer/delivery/reach, one sentence per angle, read from
+ * the live storefront (src/data/commerce.json) and the registry. Used by the Gallery wall's captions
+ * and the Shopify Work index rows (src/data/commerceLines.ts); the case-study sheet itself no longer
+ * shows a commerce-tile block (superseded by the Impact block's conversion/revenue/load-time/delivery
+ * story, 2026-09-10).
  */
 export interface CommerceLabels {
-  title: string // "By the numbers" — the block heading, replaces the build-trail block's old spot
-  catalogLabel: string
-  offerLabel: string
-  deliveryLabel: string
-  reachLabel: string
   catalogLine: string // '{products} products · {collections} collections · from {price}'
   catalogLineNoPrice: string // '{products} products · {collections} collections'
   deliveryLine: string // 'Shipped in {weeks} weeks · live since {month}'
@@ -25,10 +22,6 @@ export interface CommerceLabels {
   reachLineSingle: string // '{currency} pricing'
   offerFallback: string // generic offer line when nothing more specific is derivable
   offerKind: Record<string, string> // short offer-mechanic labels keyed by the registry fact id
-  vsFleetPct: string // '{sign}{pct}% vs fleet median'
-  vsFleetWeeks: string // '{sign}{n} wk vs fleet median'
-  unavailable: string // 'Public catalog not shown' — protected/unreachable storefronts
-  engineering: string // collapsed row summary at the bottom of the sheet
 }
 
 export interface PortfolioContent {
@@ -186,16 +179,22 @@ export interface PortfolioContent {
     }
     explore: { eyebrow: string; title: string; lead: string; viewing: string }
     caseStudy: {
-      facts: string; results: string; stack: string; visit: string; prev: string; next: string; timeline: string; commits: string; sections: string; open: string; metrics: string; perf: string; a11y: string; bp: string; seo: string; lcp: string; measured: string; trail: string; trailNote: string; perWeek: string; peak: string; codebase: string; liquidLines: string; islandLines: string; sectionsCount: string; weeks: string; copyLink: string; copied: string
+      stack: string; visit: string; prev: string; next: string; sections: string; open: string; perf: string; a11y: string; seo: string; copyLink: string; copied: string
+      /** Commerce line templates, still used by the Gallery wall's captions and the Shopify Work
+       *  index rows — see CommerceLabels above. The case-study sheet itself no longer reads this. */
       commerce: CommerceLabels
       /**
-       * The sheet's "Impact" block, shown ABOVE "By the numbers", fixed layout order (2026-09-10):
-       * headline chips → score rings row → performance dual ring (+ Core Web Vitals or the LCP gauge)
-       * → the three indexed lines (conversion, order value, revenue per visitor) → the block-level
-       * small print. Conversion, order value, revenue per visitor and the dual ring's thin inner
-       * "before" arc are illustrative (deterministic per store, see src/data/illustrative.ts) and
-       * anchored to the real ranges on the CV; the score rings, the dual ring's real "after" arc, the
-       * Core Web Vitals strip and the LCP gauge are REAL (src/data/lighthouse.json). No per-chip or
+       * The sheet's "Impact" block — as of 2026-09-10 the sheet's entire numbers story (header →
+       * captures → tagline/description → Impact → stack → Visit store). Fixed layout order: headline
+       * chips (Conversion, Revenue, Load time, Delivery) → score rings row (Performance/Accessibility/
+       * SEO, real, caption carries the Lighthouse before→after delta when it exists) → performance dual
+       * ring (+ Core Web Vitals or the LCP gauge) → the "time to launch" delivery bar → the four indexed
+       * lines (conversion, order value, revenue, revenue per visitor) → the block-level small print.
+       * Conversion, order value, revenue, revenue per visitor, the dual ring's thin inner "before" arc
+       * and the delivery bar's "typical agency" reference are illustrative (deterministic per store, see
+       * src/data/illustrative.ts) and anchored to the real ranges on the CV; the score rings, the dual
+       * ring's real "after" arc, the Core Web Vitals strip, the LCP gauge and the delivery bar's own
+       * weeks figure are REAL (src/data/lighthouse.json, src/data/telemetry.json). No per-chip or
        * per-chart illustrative tag anywhere in this block — `disclaimer` (the block-level small print)
        * is the sheet's only disclosure. `disclaimer` and `infoSentence` are fixed, owner-approved
        * copy — do not paraphrase them.
@@ -205,8 +204,10 @@ export interface PortfolioContent {
         conversionLabel: string // "Conversion, indexed" — indexed-line label
         rpvLabel: string // "Revenue per visitor, indexed" — indexed-line label
         orderValueLabel: string // "Order value, indexed" — indexed-line label
-        ringsCaption: string // 'Desktop · measured {date}.' — under the score rings row
-        before: string // dual-ring / load-time-pair label — illustrative
+        revenueLabel: string // "Revenue, indexed" — indexed-line label, the compounded headline figure
+        ringsCaption: string // 'Desktop · measured {date}.' — under the score rings row, no perfDual
+        ringsCaptionWithDelta: string // 'Desktop · +{delta} pts vs. an unoptimized baseline · measured {date}.' — with perfDual
+        before: string // dual-ring / load-time-pair / delivery-pair label — illustrative
         after: string // dual-ring / load-time-pair label — REAL
         perfDualLabel: string // "Performance" — the dual ring's own label
         cwvTitle: string // "Core Web Vitals" — strip heading
@@ -222,32 +223,20 @@ export interface PortfolioContent {
         disclaimer: string // the required small-print line, verbatim, EN/ES/JA
         infoLabel: string // aria-label for the info-affordance button (aria-expanded)
         infoSentence: string // one sentence: ranges come from measured client work 2023–2026
-        // Headline strip: three chips above the chart grid, computed from the same data as the charts
+        // Headline strip: four chips above the chart grid, computed from the same data as the charts
         // below them, no per-chip tag of their own (see ProjectModal's headline-chip block).
         chipConversionLabel: string // "Conversion" — headline chip label
+        chipRevenueLabel: string // "Revenue" — headline chip label
         chipLoadTimeLabel: string // "Load time" — headline chip label
-        chipLighthouseLabel: string // "Lighthouse" — headline chip label
+        chipDeliveryLabel: string // "Delivery" — headline chip label
+        deliveryWeeksUnit: string // 'wk' — short unit suffix for the delivery chip's weeks numeral
         loadTimeLabel: string // "Load time" — paired-bar chart heading (distinct from the LCP gauge)
         loadTimeSource: string // 'Before: baseline · After: measured LCP, {date}.'
-      }
-      /** The sheet's "visualized" charts block — every number traces to commerce.json (storefront
-       *  public data), telemetry.json (git history) or a hand-verified registry fact. */
-      charts: {
-        title: string // section heading above the chart grid, e.g. "Visualized"
-        compareLabel: string // "vs. fleet median" — the compare-bars block's own sub-heading
-        thisStore: string // legend: this store's bar
-        fleetMedian: string // legend: the fleet median bar / tick
-        weeksMetric: string // "Delivery" row label
-        productsMetric: string // "Catalog size" row label
-        priceMetric: string // "Price midpoint" row label
-        saleShare: string // gauge label: "Share of catalog on sale"
-        ladder: string // discount-ladder chart label
-        priceBand: string // price range bar label
-        min: string
-        max: string
-        sourceStorefront: string // 'Storefront public data, fetched {date}'
-        sourceGit: string // 'Git commit history'
-        sourceFacts: string // 'Registry facts'
+        deliveryLabel: string // "Time to launch" — the delivery paired-bar chart heading
+        deliveryBeforeLabel: string // "Typical agency" — illustrative reference bar label
+        deliveryAfterLabel: string // "This build" — real weeks bar label
+        deliverySource: string // source line under the delivery bar
+        indexChip: string // '+{pct}% conversion' — the Shopify Work index row's per-store chip
       }
     }
   }

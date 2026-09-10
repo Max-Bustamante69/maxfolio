@@ -134,3 +134,34 @@ export function loadTimeSeries(slug: string, afterSeconds: number): LoadTimeSeri
   const r = 0.38 + rngFrom(seedFrom(slug, 'loadtime-r'))() * 0.02
   return { beforeSeconds: round1(afterSeconds / (1 - r)), afterSeconds: round1(afterSeconds), deltaPct: Math.round(r * 100) }
 }
+
+export interface RevenueSeries {
+  points: number[] // indexed (before = 100), illustrative
+  deltaPct: number // compounded conversion × order value × organic traffic lift
+}
+
+/** Revenue, indexed (before = 100): the three measured CV components compounded — conversion
+ *  (+19–20%, this store's own `conversionSeries` result), order value (+7–8%, `orderValueSeries`)
+ *  and organic traffic (+15–20%, seeded here, capped at the CV's own measured +20% organic ceiling —
+ *  Digitdeck FE `organic: '+20%'` in src/data/registry.ts). Takes the caller's own conversion/order-
+ *  value deltas (rather than re-seeding independent ones) so the three lines this block shows tell one
+ *  consistent compounding story instead of three unrelated numbers. Lands in the CV-anchored ~+46–55%
+ *  band per the owner's 2026-09-10 call. */
+export function revenueSeries(slug: string, conversionDeltaPct: number, orderValueDeltaPct: number, weeks = 6): RevenueSeries {
+  const shape = easeShape(weeks)
+  const organicPct = round1(15 + rngFrom(seedFrom(slug, 'organic'))() * 5) // 15–20, ceiling = the CV's own +20%
+  const compounded = (1 + conversionDeltaPct / 100) * (1 + orderValueDeltaPct / 100) * (1 + organicPct / 100)
+  const targetPct = Math.round((compounded - 1) * 100)
+  const jitter = rngFrom(seedFrom(slug, 'revenue-jitter'))
+  const points = shape.map((s) => round1(100 + s * targetPct + (jitter() - 0.5) * 1.4))
+  return { points, deltaPct: targetPct }
+}
+
+/** An illustrative "typical agency" delivery reference, 14–18 weeks, seeded per store — the muted bar
+ *  the store's own real delivery weeks (src/data/telemetry.json, or the registry's build-window
+ *  fallback — see commerceLines.weeksFor) is measured against in the sheet's "time to launch" chart.
+ *  Never itself shown as a store's own number; always the illustrative half of a real/illustrative
+ *  pair, same house rule as `loadTimeSeries` above. */
+export function deliveryReferenceWeeks(slug: string): number {
+  return Math.round(14 + rngFrom(seedFrom(slug, 'delivery-reference'))() * 4)
+}
