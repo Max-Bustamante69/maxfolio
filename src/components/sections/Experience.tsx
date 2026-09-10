@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { useContent } from '../../hooks'
 import { CompanyLogo } from '../common'
 import type { Skin } from '../gallery'
 import type { SectionHeading } from './Gallery'
+import { onRequestRole, scrollToSection } from '../../lib/sectionLinks'
 
 interface ExperienceProps {
   skin: Skin
@@ -23,6 +24,20 @@ export function Experience({ skin, heading }: ExperienceProps) {
   const x = strings.sections.experience
   const [job, setJob] = useState(registry.experience[0])
   const t = strings.experience[job.id]
+
+  // A real link into this rail from elsewhere on the page (the orbit skill layout's client-role
+  // lines, see src/lib/sectionLinks.ts): select the role and scroll here. `setJob` already drives the
+  // rail's sliding accent marker, which doubles as the "you're looking at this one now" highlight.
+  useEffect(
+    () =>
+      onRequestRole(({ id }) => {
+        const role = registry.experience.find((e) => e.id === id)
+        if (!role) return
+        scrollToSection('experience')
+        setJob(role)
+      }),
+    [registry.experience],
+  )
 
   return (
     <section id="experience" className="scroll-mt-20">

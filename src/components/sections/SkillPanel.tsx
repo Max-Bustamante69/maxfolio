@@ -6,6 +6,7 @@ import { personaArt } from '../../data/personaArt'
 import { CountUp } from '../gallery/charts'
 import { formatTool } from './skillsFormat'
 import { toolIcon, monogram, ToolMark } from './skillIcons'
+import { ToolUsageLinks } from './skillLayouts/ToolUsageLinks'
 
 interface SkillPanelProps {
   skin: Skin
@@ -196,6 +197,9 @@ export function SkillPanel({ skin, tool, pinned, onUnpin }: SkillPanelProps) {
                     ))}
                   </ul>
                 )}
+                <div className="mt-3">
+                  <ToolUsageLinks tool={tool} skin={skin} sk={sk} size="sm" />
+                </div>
               </>
             ) : (
               <span className={`mt-1.5 inline-block ${tone.chip}`}>{sk.usage.noData}</span>

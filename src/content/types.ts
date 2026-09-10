@@ -162,6 +162,27 @@ export interface PortfolioContent {
         unpin: string
         toolsSuffix: string
       }
+      /** Orbit layout's filter bar + hover/press preview card + the same two pieces reused (filter
+       *  chips, tap-to-expand preview) by the sub-1024px ledger fallback. `allLabel` for the surface
+       *  "All" chip reuses `layoutExtra.allLabel` rather than duplicating it. */
+      orbit: {
+        surfaceLabel: string // aria-label for the surface radiogroup ('Storefronts' / 'Apps & products' / 'Client roles')
+        surfaceStorefronts: string
+        surfaceProducts: string
+        surfaceRoles: string
+        searchLabel: string // aria-label for the text filter input
+        searchPlaceholder: string
+        clear: string // resets every active filter
+        noMatches: string // every group collapsed by the current filter combination
+        /** 'Used at {company} · {role} · {years}' — one line per client-role deliverable in the preview. */
+        usedAt: string
+        openStore: string // 'Open case study — {name}' — accessible name for a store thumbnail/link
+        openProduct: string // 'View product — {name}' — accessible name for a product thumbnail/link
+        openRole: string // 'View role — {company}' — accessible name for a role-work line
+        previewLabel: string // eyebrow on the floating quick-look card
+        expandRow: string // ledger fallback: tap-to-expand a tool row
+        collapseRow: string // ledger fallback: collapse an expanded tool row
+      }
     }
     contact: SectionHeading & {
       lead: string

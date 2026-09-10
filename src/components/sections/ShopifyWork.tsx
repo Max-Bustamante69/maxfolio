@@ -1,12 +1,17 @@
-import { Suspense, useState, type MouseEvent } from 'react'
+import { Suspense, useEffect, useState, type MouseEvent } from 'react'
 import { AnimatePresence, m } from 'framer-motion'
 import { useContent, useSheetHistory } from '../../hooks'
 import { GalleryLightbox, type Skin } from '../gallery'
-import { Products } from './Products'
+import { Products, type ProductSelectRequest } from './Products'
 import { useHoverPreview } from '../gallery/HoverPreview'
 import { lightboxItems, caseStudyFor, caseStudyLabels, ProjectModal, type SectionHeading } from './Gallery'
 import type { StoreEntry, ProductEntry } from '../../data/registry'
 import { conversionSeries } from '../../data/illustrative'
+import { onRequestProduct, onRequestStore, scrollToSection } from '../../lib/sectionLinks'
+
+/** How long a row's accent flash stays visible after the orbit links here — long enough to read as
+ *  "this is the one that just opened", short enough to not linger once the shopper has moved on. */
+const HIGHLIGHT_MS = 1500
 
 interface ShopifyWorkProps {
   skin: Skin
@@ -59,6 +64,37 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
   // Desktop hover: the store's home capture follows the cursor along the row (touch just opens the sheet).
   const preview = useHoverPreview()
 
+  // A real link into this section from elsewhere on the page (currently the orbit skill layout's
+  // preview/center card, see src/lib/sectionLinks.ts): a store opens the exact same case-study sheet
+  // the index itself opens (reusing `setOpenStore` → `useSheetHistory` above, never a forked
+  // mechanism), a product switches to the products tab and selects it in `Products`' own rail. Both
+  // also clear any active row filter/collapse so the target row is genuinely visible, not just
+  // technically open behind the sheet, and flash the row's accent color for `HIGHLIGHT_MS`.
+  const [highlightSlug, setHighlightSlug] = useState<string | null>(null)
+  const [productSelect, setProductSelect] = useState<ProductSelectRequest | null>(null)
+  useEffect(() => {
+    const offStore = onRequestStore(({ slug }) => {
+      const st = registry.stores.find((x) => x.slug === slug)
+      setTab('stores')
+      setFeature(null)
+      setShowAll(true)
+      scrollToSection('shopify')
+      if (st) setOpenStore(st)
+      setHighlightSlug(slug)
+      window.setTimeout(() => setHighlightSlug((prev) => (prev === slug ? null : prev)), HIGHLIGHT_MS)
+    })
+    const offProduct = onRequestProduct(({ id }) => {
+      setTab('products')
+      scrollToSection('shopify')
+      setProductSelect({ id, nonce: Date.now() })
+    })
+    return () => {
+      offStore()
+      offProduct()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [registry.stores])
+
   const active = FEATURES.find((f) => f.id === feature)
   const matches = (st: StoreEntry) => !active || st.stack.some((t) => active.test.test(t))
   const fleet = registry.stores.filter((x) => !x.legacy && matches(x))
@@ -94,8 +130,17 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
 
   const StoreRow = ({ st }: { st: StoreEntry }) => {
     const c = strings.stores[st.slug]
+    const highlighted = highlightSlug === st.slug
     return (
-      <li className={`group relative overflow-hidden ${skin.rowHover} transition-colors`} onMouseMove={onRowMove} {...(st.gallery ? preview.bind(`/gallery/${st.slug}/home-desktop.webp`) : {})}>
+      <li
+        data-orbit-row={st.slug}
+        className={`group relative overflow-hidden ${skin.rowHover} transition-colors`}
+        onMouseMove={onRowMove}
+        {...(st.gallery ? preview.bind(`/gallery/${st.slug}/home-desktop.webp`) : {})}
+      >
+        {/* Accent flash from an external "open this store" request (the orbit's preview/center card) —
+            `currentColor` off `skin.accent` so it matches every theme with zero per-theme code. */}
+        <span aria-hidden="true" className={`pointer-events-none absolute inset-0 bg-current transition-opacity duration-500 ${skin.accent} ${highlighted ? 'opacity-[0.12]' : 'opacity-0'}`} />
         <span
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 [@media(hover:hover)_and_(pointer:fine)]:group-hover:opacity-100"
@@ -192,7 +237,7 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
           </m.div>
         ) : (
           <m.div key="products" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}>
-            <Products skin={skin} onOpen={setOpenProduct} />
+            <Products skin={skin} onOpen={setOpenProduct} select={productSelect} />
           </m.div>
         )}
       </AnimatePresence>
