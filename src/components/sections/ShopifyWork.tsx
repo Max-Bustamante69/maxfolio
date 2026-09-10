@@ -70,6 +70,14 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
   const hidden = registry.stores.length - visibleFleet.length
   const chipFor = (on: boolean) => `${on ? skin.chipOn : skin.chip} compact-touch transition-colors`
 
+  // Prev/Next inside the sheet cycle through exactly the rows this list currently renders (the
+  // visible fleet, plus the legacy rows once "Show all" reveals them) — wrapping at the ends.
+  const orderedList = [...visibleFleet, ...(showAll ? legacy : [])]
+  const openIndex = openStore ? orderedList.findIndex((x) => x.slug === openStore.slug) : -1
+  const canNavigate = orderedList.length > 1 && openIndex !== -1
+  const goPrev = canNavigate ? () => setOpenStore(orderedList[(openIndex - 1 + orderedList.length) % orderedList.length]) : undefined
+  const goNext = canNavigate ? () => setOpenStore(orderedList[(openIndex + 1) % orderedList.length]) : undefined
+
   /** One commerce-oriented figure per store — catalog, offer, delivery or reach, rotated
    *  deterministically by slug so the index reads varied while staying on one honest system. The
    *  full picture (all four angles) lives in the case-study sheet this chip's row opens. */
@@ -210,6 +218,9 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
             skin={skin}
             labels={caseStudyLabels(strings)}
             onClose={() => setOpenStore(null)}
+            onPrev={goPrev}
+            onNext={goNext}
+            intlLocale={intlLocale}
           />
         </Suspense>
       )}
