@@ -130,6 +130,190 @@
   transform: translateY(calc(var(--p-scroll-y) * -0.15px));
 }
 
+/* ---------- Backdrop art layer: full-bleed comic panel behind a hero band only ---------- */
+/* The image sits on its own absolutely-positioned layer, cropped to the section that hosts it —
+   never behind body copy (callers only mount this inside a hero band, per persona-figma brief). */
+.persona-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.persona-backdrop img {
+  position: absolute;
+  inset: -6% -6%;
+  width: 112%;
+  height: 112%;
+  object-fit: cover;
+  object-position: center;
+}
+/* Scrim measured so the text stacked above it clears AA (4.5:1) against either mode's ink/paper. */
+.persona-backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--p-scrim);
+}
+.theme-persona[data-mode='light'] .persona-backdrop {
+  --p-scrim: linear-gradient(180deg, rgba(238, 243, 247, 0.86) 0%, rgba(238, 243, 247, 0.94) 55%, rgba(238, 243, 247, 0.98) 100%);
+}
+.theme-persona[data-mode='dark'] .persona-backdrop {
+  --p-scrim: linear-gradient(180deg, rgba(17, 16, 19, 0.86) 0%, rgba(17, 16, 19, 0.94) 55%, rgba(17, 16, 19, 0.98) 100%);
+}
+/* Menu gets a lighter scrim (art is the whole point there) — its own opt-in modifier. */
+.persona-backdrop--menu::after {
+  background: var(--p-scrim-menu);
+}
+.theme-persona[data-mode='light'] .persona-backdrop--menu {
+  --p-scrim-menu: linear-gradient(180deg, rgba(238, 243, 247, 0.55) 0%, rgba(238, 243, 247, 0.72) 60%, rgba(238, 243, 247, 0.9) 100%);
+}
+.theme-persona[data-mode='dark'] .persona-backdrop--menu {
+  --p-scrim-menu: linear-gradient(180deg, rgba(17, 16, 19, 0.55) 0%, rgba(17, 16, 19, 0.72) 60%, rgba(17, 16, 19, 0.9) 100%);
+}
+/* Diagonal "cut" on the menu: a second strip of art peeking through a hard-edged wedge. */
+.persona-backdrop-cut {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  clip-path: polygon(62% 0, 100% 0, 100% 100%, 78% 100%);
+  opacity: 0.9;
+}
+.persona-backdrop-cut img {
+  position: absolute;
+  inset: -6% -6%;
+  width: 112%;
+  height: 112%;
+  object-fit: cover;
+  object-position: 70% center;
+  filter: saturate(1.15);
+}
+.persona-backdrop-cut::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  opacity: 0.14;
+  mix-blend-mode: multiply;
+}
+
+/* ---------- Comic device: thick-bordered tilted panel for a key number ---------- */
+.persona-num-panel {
+  position: relative;
+  border: 3px solid currentColor;
+  transform: rotate(-2deg);
+  background: var(--p-panel-bg, transparent);
+}
+
+/* ---------- Comic device: speech-bubble callout (tail bottom-left) ---------- */
+.persona-speech-callout {
+  position: relative;
+  display: inline-flex;
+  border: 2.5px solid currentColor;
+  border-radius: 999px;
+  transform: rotate(-1.5deg);
+}
+.persona-speech-callout::after {
+  content: '';
+  position: absolute;
+  left: 22px;
+  bottom: -9px;
+  width: 14px;
+  height: 14px;
+  background: inherit;
+  border-right: 2.5px solid currentColor;
+  border-bottom: 2.5px solid currentColor;
+  transform: rotate(45deg) skew(-8deg, -8deg);
+}
+
+/* ---------- Comic device: action lines radiating behind a screen title ---------- */
+.persona-action-lines {
+  position: relative;
+  display: inline-block;
+}
+.persona-action-lines::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: 50%;
+  width: 220%;
+  height: 420%;
+  transform: translate(-50%, -50%);
+  background-image: repeating-conic-gradient(from 0deg, currentColor 0deg 1.2deg, transparent 1.2deg 9deg);
+  opacity: 0.09;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* ---------- "Cut-in" title entrance: a skewed ink slab that slides behind the title ---------- */
+.persona-cutin-slab {
+  position: absolute;
+  inset: -6px -14px;
+  z-index: -1;
+  transform-origin: left center;
+  clip-path: polygon(0 12%, 100% 0, 100% 88%, 0 100%);
+}
+
+/* ---------- Hover: skew + halftone flash (restrained — every persona row already skews on hover) ---------- */
+.persona-hover-flash {
+  position: relative;
+}
+.persona-hover-flash::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(currentColor 1px, transparent 1.4px);
+  background-size: 9px 9px;
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+  pointer-events: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .persona-hover-flash:hover::after,
+  .persona-hover-flash:focus-visible::after {
+    opacity: 0.22;
+  }
+}
+
+/* ---------- Hover: skew + color-invert + halftone flash (persona-owned playful cards only) ---------- */
+.persona-hover-invert {
+  position: relative;
+  transition: transform 150ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.persona-hover-invert::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(currentColor 1px, transparent 1.4px);
+  background-size: 8px 8px;
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+  pointer-events: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .persona-hover-invert:hover,
+  .persona-hover-invert:focus-visible {
+    transform: skewX(-1.5deg);
+    filter: invert(1);
+  }
+  .persona-hover-invert:hover::after,
+  .persona-hover-invert:focus-visible::after {
+    opacity: 0.3;
+  }
+}
+
+/* ---------- Slash reveal: a diagonal wipe uncovering an eyebrow/label on scroll-into-view ---------- */
+@keyframes persona-slash-reveal {
+  from { clip-path: polygon(0 0, 0 0, 0 100%, 0 100%); }
+  to { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+}
+.persona-slash-reveal {
+  animation: persona-slash-reveal 0.5s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
 /* ---------- Reduced motion: freeze every ambient/parallax/ring animation ---------- */
 @media (prefers-reduced-motion: reduce) {
   .persona-ring {

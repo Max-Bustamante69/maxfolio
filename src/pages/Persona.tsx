@@ -9,6 +9,7 @@ import { Experience } from '../components/sections/Experience'
 import { skins } from '../components/gallery/skins'
 import { useDynamicFavicon, useI18n, useContent } from '../hooks'
 import { designById, otherDesigns, MENU } from '../data/designs'
+import { personaArt } from '../data/personaArt'
 import '../styles/persona.css'
 
 // Each screen's heavier sections arrive as their own chunk, one shared Suspense boundary per screen
@@ -171,6 +172,31 @@ function RansomText({ text, className = '', intensity = 1 }: { text: string; cla
   )
 }
 
+/** Full-bleed comic-panel art behind a hero band only — never behind body copy. Cropped to its own
+ *  section via `overflow-clip` on the caller, parallaxed at 0.2x, scrimmed to the theme's own AA-safe
+ *  tint (`--p-scrim` in persona.css), with a sparse halftone wash on top so it reads as one ink layer
+ *  rather than a stock photo. `torn` clips the art to the same jagged panel edge as `.persona-torn`. */
+function ScreenBackdrop({ screen, isDark, accentCls, torn = false, menu = false }: { screen: 'menu' | ScreenId; isDark: boolean; accentCls: string; torn?: boolean; menu?: boolean }) {
+  const src = personaArt(screen, isDark)
+  return (
+    <div aria-hidden="true" className={`persona-backdrop ${menu ? 'persona-backdrop--menu' : ''} ${torn ? 'persona-torn' : ''}`} data-parallax="back">
+      <img src={src} alt="" loading="eager" decoding="async" width={1600} height={1067} />
+      <div className={`persona-halftone ${accentCls}`} />
+    </div>
+  )
+}
+
+/** The menu's own second layer: a diagonal wedge on the right edge cut to reveal a different piece
+ *  of art underneath the city — the "cut" the brief calls for, distinct from the full backdrop. */
+function MenuBackdropCut({ isDark }: { isDark: boolean }) {
+  const src = personaArt('home', isDark)
+  return (
+    <div aria-hidden="true" className="persona-backdrop-cut">
+      <img src={src} alt="" loading="eager" decoding="async" width={1600} height={1067} />
+    </div>
+  )
+}
+
 /** Tilted card-in entrance: panels arrive slightly rotated and settle flush, once, on view. */
 const CardIn = ({ children, delay = 0, x = 0, y = 26, rotate = -2.5, className = '' }: { children: ReactNode; delay?: number; x?: number; y?: number; rotate?: number; className?: string }) => {
   const reduced = useReducedMotion()
@@ -302,25 +328,61 @@ function ArcadeMenu({
 }) {
   const [index, setIndex] = useState(0)
   const reduced = useReducedMotion()
+  const navRef = useRef<HTMLElement>(null)
+  const itemRefs = useRef<Map<number, HTMLButtonElement>>(new Map())
+  const [trail, setTrail] = useState<{ key: number; top: number; height: number }[]>([])
+  const trailKey = useRef(0)
+  const [burst, setBurst] = useState<{ key: number; top: number; height: number } | null>(null)
+
+  // A short afterimage of the selector's previous slot, fading out — the layoutId spring above
+  // already glides between rows; this adds a literal one-frame "ghost" the game-menu grammar wants.
+  const leaveGhost = (fromIndex: number) => {
+    if (reduced) return
+    const nav = navRef.current
+    const el = itemRefs.current.get(fromIndex)
+    if (!nav || !el) return
+    const navRect = nav.getBoundingClientRect()
+    const elRect = el.getBoundingClientRect()
+    const key = trailKey.current++
+    setTrail((t) => [...t, { key, top: elRect.top - navRect.top + 6, height: elRect.height - 12 }])
+    window.setTimeout(() => setTrail((t) => t.filter((g) => g.key !== key)), 260)
+  }
+
+  const move = (next: number) => {
+    leaveGhost(index)
+    setIndex(next)
+    playBlip()
+  }
+
+  const confirm = (i: number) => {
+    const nav = navRef.current
+    const el = itemRefs.current.get(i)
+    if (nav && el && !reduced) {
+      const navRect = nav.getBoundingClientRect()
+      const elRect = el.getBoundingClientRect()
+      setBurst({ key: trailKey.current++, top: elRect.top - navRect.top + elRect.height / 2, height: elRect.height })
+      window.setTimeout(() => setBurst(null), 300)
+    }
+    onActivate(items[i].id)
+  }
 
   useEffect(() => {
     if (suspended) return
     function onKey(e: KeyboardEvent) {
       if (e.key === 'ArrowDown') {
         e.preventDefault()
-        setIndex((i) => (i + 1) % items.length)
-        playBlip()
+        move((index + 1) % items.length)
       } else if (e.key === 'ArrowUp') {
         e.preventDefault()
-        setIndex((i) => (i - 1 + items.length) % items.length)
-        playBlip()
+        move((index - 1 + items.length) % items.length)
       } else if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault()
-        onActivate(items[index].id)
+        confirm(index)
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items, index, onActivate, playBlip, suspended])
 
   const activeText = isDark ? 'text-[#f5f2ee]' : 'text-white'
@@ -329,22 +391,57 @@ function ArcadeMenu({
   // order) — not role="menu"/"menuitem" (that ARIA pattern implies roving-tabindex focus movement
   // on Arrow keys, which this doesn't do: Arrow keys move a visual selection, not DOM focus).
   return (
-    <nav aria-label="Choose a screen" className="relative flex flex-col">
+    <nav aria-label="Choose a screen" className="relative flex flex-col" ref={navRef}>
+      {/* Selector afterimage — a fading ghost of the row just left, behind the live selector. */}
+      {!reduced && (
+        <AnimatePresence>
+          {trail.map((g) => (
+            <m.span
+              key={g.key}
+              aria-hidden="true"
+              className={`absolute left-0 right-0 ${accentBg} persona-skew-selector pointer-events-none`}
+              style={{ top: g.top, height: g.height }}
+              initial={{ opacity: 0.4, scaleX: 1 }}
+              animate={{ opacity: 0, scaleX: 0.9 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.26, ease: 'easeOut' }}
+            />
+          ))}
+        </AnimatePresence>
+      )}
+      {/* Confirm burst — radial shards at the chosen row, handing off to the route's diagonal wipe. */}
+      {!reduced && burst && (
+        <div aria-hidden="true" className="pointer-events-none absolute left-4 md:left-7" style={{ top: burst.top }}>
+          {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+            <m.span
+              key={i}
+              className={`absolute h-1.5 w-1.5 ${accentBg}`}
+              style={{ clipPath: 'polygon(50% 0,100% 50%,50% 100%,0 50%)' }}
+              initial={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+              animate={{ opacity: 0, x: Math.cos((i / 8) * Math.PI * 2) * 60, y: Math.sin((i / 8) * Math.PI * 2) * 40, scale: 0.4 }}
+              transition={{ duration: 0.32, ease: 'easeOut' }}
+            />
+          ))}
+        </div>
+      )}
       {items.map((item, i) => {
         const active = i === index
         return (
           <m.button
             key={item.id}
+            ref={(el) => {
+              if (el) itemRefs.current.set(i, el)
+              else itemRefs.current.delete(i)
+            }}
             type="button"
             aria-current={active || undefined}
             onMouseEnter={() => {
-              if (i !== index) {
-                setIndex(i)
-                playBlip()
-              }
+              if (i !== index) move(i)
             }}
-            onFocus={() => setIndex(i)}
-            onClick={() => onActivate(item.id)}
+            onFocus={() => {
+              if (i !== index) move(i)
+            }}
+            onClick={() => confirm(i)}
             initial={reduced ? false : { opacity: 0, x: -70, skewX: -8 }}
             animate={{ opacity: 1, x: 0, skewX: 0 }}
             transition={{ ...SNAP, delay: 0.07 * i }}
@@ -394,6 +491,7 @@ function HomeScreen({ chrome, openContact, skin }: { chrome: SkinLike; openConta
   return (
     <>
       <section className="relative min-h-[68vh] flex items-center px-4 py-16 md:py-20 overflow-clip" aria-labelledby="home-heading">
+        <ScreenBackdrop screen="home" isDark={isDark} accentCls={accentCls} torn />
         <div aria-hidden="true" className="persona-ghost-wordmark" data-parallax="back">
           MB
         </div>
@@ -420,7 +518,10 @@ function HomeScreen({ chrome, openContact, skin }: { chrome: SkinLike; openConta
                 {c.hero.ctaPrimary}
               </CrashButton>
             </Magnetic>
-            <a href="#work" className={`${accentCls} inline-flex items-center gap-1.5 text-sm font-persona-label font-semibold uppercase tracking-[0.1em]`}>
+            <a
+              href="#work"
+              className={`persona-speech-callout ${accentCls} ${surface} items-center gap-1.5 px-4 py-2 text-sm font-persona-label font-semibold uppercase tracking-[0.1em]`}
+            >
               {c.hero.ctaSecondary} {Icon.down}
             </a>
             <a href={registry.personal.cv} download className={`${muted} text-sm font-persona-label font-semibold uppercase tracking-[0.1em]`}>
@@ -489,7 +590,7 @@ function WorkScreen({ chrome, heading, skin }: { chrome: SkinLike; heading: Head
   return (
     <>
       <section id="work-experience" className={`relative px-4 py-14 md:py-20 ${surface} overflow-clip scroll-mt-16`}>
-        <div aria-hidden="true" className={`persona-torn absolute right-0 top-0 h-full w-1/3 ${chrome.isDark ? 'bg-[#f5f2ee]/[0.03]' : 'bg-[#0a0f1a]/[0.03]'}`} />
+        <ScreenBackdrop screen="work" isDark={chrome.isDark} accentCls={accentCls} torn />
         <div className="max-w-5xl mx-auto relative">
           <Experience skin={skin} heading={heading} />
         </div>
@@ -531,8 +632,9 @@ function YearsScreen({ chrome, heading, skin }: { chrome: SkinLike; heading: Hea
   const { surface, accentCls, muted } = chrome
   return (
     <Suspense fallback={<ScreenLoading accentCls={accentCls} muted={muted} />}>
-      <section className="px-4 py-14 md:py-20">
-        <div className="max-w-5xl mx-auto">
+      <section className="relative overflow-clip px-4 py-14 md:py-20">
+        <ScreenBackdrop screen="years" isDark={chrome.isDark} accentCls={accentCls} torn />
+        <div className="max-w-5xl mx-auto relative">
           <Years skin={skin} heading={(e, ti, a, l) => heading(`[ ${e} ]`, ti, a, l)} />
         </div>
       </section>
@@ -552,8 +654,9 @@ function SkillsScreen({ chrome, heading, skin }: { chrome: SkinLike; heading: He
   const { surface, line, accentCls, muted } = chrome
   return (
     <Suspense fallback={<ScreenLoading accentCls={accentCls} muted={muted} />}>
-      <section className={`px-4 py-14 md:py-20 ${surface}`}>
-        <div className="max-w-5xl mx-auto">
+      <section className={`relative overflow-clip px-4 py-14 md:py-20 ${surface}`}>
+        <ScreenBackdrop screen="skills" isDark={chrome.isDark} accentCls={accentCls} torn />
+        <div className="max-w-5xl mx-auto relative">
           <Skills skin={skin} heading={heading} />
         </div>
       </section>
@@ -572,8 +675,9 @@ function ContactScreen({ chrome, heading, skin, primaryBtn, openContact, t }: { 
 
   return (
     <Suspense fallback={<ScreenLoading accentCls={accentCls} muted={muted} />}>
-      <section className={`px-4 py-16 md:py-20 ${surface}`}>
-        <div className={`max-w-5xl mx-auto persona-notch border ${line} ${bg} p-6 md:p-12`}>
+      <section className={`relative overflow-clip px-4 py-16 md:py-20 ${surface}`}>
+        <ScreenBackdrop screen="contact" isDark={chrome.isDark} accentCls={accentCls} torn />
+        <div className={`relative max-w-5xl mx-auto persona-notch border ${line} ${bg} p-6 md:p-12`}>
           <Contact skin={skin} ctaClass={primaryBtn} onContact={openContact} />
         </div>
       </section>
@@ -583,7 +687,7 @@ function ContactScreen({ chrome, heading, skin, primaryBtn, openContact, t }: { 
           {heading(c.sections.explore.eyebrow, c.sections.explore.title, '', c.sections.explore.lead)}
           <div className="grid sm:grid-cols-3 gap-4">
             {otherDesigns('persona').map((d) => (
-              <TransitionLink key={d.id} to={d.href} transitionColor={d.transitionColor} transitionAccent={d.transitionAccent} transitionLabel={t(d.nameKey)} className={`block clip-corner-sm overflow-hidden border ${line} ${surface} transition-transform duration-150 hover:-skew-x-1`}>
+              <TransitionLink key={d.id} to={d.href} transitionColor={d.transitionColor} transitionAccent={d.transitionAccent} transitionLabel={t(d.nameKey)} className={`persona-hover-invert block clip-corner-sm overflow-hidden border ${line} ${surface}`}>
                 <div className="h-28 overflow-hidden">
                   <d.Preview size="md" />
                 </div>
@@ -593,7 +697,7 @@ function ContactScreen({ chrome, heading, skin, primaryBtn, openContact, t }: { 
                 </div>
               </TransitionLink>
             ))}
-            <TransitionLink to={MENU.route} transitionColor={chrome.isDark ? '#171717' : '#fafafa'} transitionAccent={chrome.isDark ? '#ffffff' : '#171717'} transitionLabel={t(MENU.labelKey)} className={`block clip-corner-sm overflow-hidden border ${line} ${surface} transition-transform duration-150 hover:-skew-x-1`}>
+            <TransitionLink to={MENU.route} transitionColor={chrome.isDark ? '#171717' : '#fafafa'} transitionAccent={chrome.isDark ? '#ffffff' : '#171717'} transitionLabel={t(MENU.labelKey)} className={`persona-hover-invert block clip-corner-sm overflow-hidden border ${line} ${surface}`}>
               <div className="h-28 overflow-hidden">
                 <MenuPreview isDark={chrome.isDark} />
               </div>
@@ -639,7 +743,7 @@ function PersonaFooter({ chrome, self, t }: { chrome: SkinLike; self: ReturnType
 function ThemeSwitch({ chrome, t }: { chrome: SkinLike; t: ReturnType<typeof useI18n>['t'] }) {
   const [open, setOpen] = useState(false)
   const { line, muted, isDark, accentBg, accentCls } = chrome
-  const item = `block px-3 py-2 font-persona-label text-xs font-semibold uppercase tracking-[0.12em] ${isDark ? 'hover:bg-[#f5f2ee]/10' : 'hover:bg-[#0a0f1a]/5'}`
+  const item = `persona-hover-flash block px-3 py-2 font-persona-label text-xs font-semibold uppercase tracking-[0.12em] overflow-hidden ${isDark ? 'hover:bg-[#f5f2ee]/10' : 'hover:bg-[#0a0f1a]/5'}`
   return (
     <div className="relative">
       <button
@@ -802,11 +906,33 @@ function PersonaContent() {
     { id: 'contact', label: t('nav.contact') },
   ]
 
+  // Screen-heading "cut-in": a skewed ink slab slides in behind the title from the left and the title
+  // itself pops with a one-frame overshoot spring; the eyebrow slashes into view first, and action
+  // lines radiate behind the title (comic devices, used once per heading — never on scroll).
   const Heading: HeadingFn = (eyebrow, title, accent, lead) => (
     <CardIn className="mb-10 md:mb-14">
-      <p className={`font-persona-label text-xs font-semibold uppercase tracking-[0.35em] ${accentCls} mb-3 before:content-['—'] before:mr-2`}>{eyebrow}</p>
-      <h2 className="font-persona-display text-4xl md:text-6xl uppercase leading-[0.95]" style={{ fontStyle: 'oblique 6deg' }}>
-        {title} {accent && <RansomText text={accent} className={muted} intensity={0.6} />}
+      <p className={`persona-slash-reveal font-persona-label text-xs font-semibold uppercase tracking-[0.35em] ${accentCls} mb-3 before:content-['—'] before:mr-2`}>{eyebrow}</p>
+      <h2 className="relative font-persona-display text-4xl md:text-6xl uppercase leading-[0.95]" style={{ fontStyle: 'oblique 6deg' }}>
+        <m.span
+          aria-hidden="true"
+          className={`persona-cutin-slab ${accentBg} opacity-[0.1]`}
+          initial={reduced ? false : { scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.3, ease: EASE }}
+        />
+        <span className={`persona-action-lines ${accentCls}`}>
+          <m.span
+            className="relative inline-block"
+            initial={reduced ? false : { opacity: 0, scale: 0.94, y: 10 }}
+            whileInView={{ opacity: 1, scale: [0.94, 1.05, 1], y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.4, times: [0, 0.7, 1], ease: EASE, delay: 0.08 }}
+          >
+            {title}
+          </m.span>
+        </span>{' '}
+        {accent && <RansomText text={accent} className={muted} intensity={0.6} />}
       </h2>
       {lead && <p className={`${muted} text-lg md:text-xl mt-5 max-w-2xl leading-relaxed font-sf`}>{lead}</p>}
     </CardIn>
@@ -820,7 +946,7 @@ function PersonaContent() {
       <SEOHead title={`${c.meta.title} — ${t(self.nameKey)}`} description={c.meta.description} canonical="https://www.maxfolio.dev/arcade" />
       <ContactFormModal isOpen={contactOpen} onClose={() => setContactOpen(false)} variant="persona" isDark={isDark} initialMessage={contactPrefill} />
 
-      <div ref={rootRef} className={`theme-persona min-h-screen font-sf ${bg} transition-colors duration-300 [overflow-x:clip]`} role="document">
+      <div ref={rootRef} data-mode={isDark ? 'dark' : 'light'} className={`theme-persona min-h-screen font-sf ${bg} transition-colors duration-300 [overflow-x:clip]`} role="document">
         <TopBar chrome={chrome} self={self} t={t} isDark={isDark} toggleTheme={toggleTheme} openContact={() => openContact()} navigate={navigate} />
 
         {/* Diagonal wipe + flash — ~500ms, fires only on a route change, never on scroll. */}
@@ -842,6 +968,8 @@ function PersonaContent() {
         <main id="main-content" className="pt-12 md:pt-14">
           {displayRoute === '' && (
             <section className="relative min-h-[calc(100svh-3rem)] md:min-h-[calc(100svh-3.5rem)] flex flex-col justify-center px-2 sm:px-4 py-10 overflow-clip" aria-label="Arcade menu">
+              <ScreenBackdrop screen="menu" isDark={isDark} accentCls={accentCls} menu />
+              <MenuBackdropCut isDark={isDark} />
               <div aria-hidden="true" className={`persona-drift ${accentCls}`} />
               <div aria-hidden="true" className={`persona-halftone ${accentCls}`} />
               <svg className="persona-ring absolute w-[80vw] max-w-[640px] aspect-square opacity-[0.12] pointer-events-none" style={{ right: '-10%', top: '50%', transform: 'translateY(-50%)' }} viewBox="0 0 200 200" aria-hidden="true" data-parallax="back">
