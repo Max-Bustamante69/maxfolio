@@ -1,5 +1,20 @@
 [
   {
+    "hash": "5bbf811",
+    "date": "2026-09-09",
+    "subject": "fix(sheet): label the Impact block's illustrative charts individually, fix draw-in timing and the info-button tap target"
+  },
+  {
+    "hash": "fa87964",
+    "date": "2026-09-09",
+    "subject": "chore(terminal): regenerated changelog.json"
+  },
+  {
+    "hash": "ca6cbb2",
+    "date": "2026-09-09",
+    "subject": "fix(skills): localize the wall/orbit/rows layout candidates for es/ja"
+  },
+  {
     "hash": "3e93ca1",
     "date": "2026-09-09",
     "subject": "fix(seo): the sitemap lists every theme route (Soft UI, Arcade, Terminal, Skyline were missing)"
@@ -15,9 +30,19 @@
     "subject": "fix(menu): make the design-count copy track the real total"
   },
   {
+    "hash": "bf667ae",
+    "date": "2026-09-09",
+    "subject": "feat(sheet): Impact block returns illustrative + real charts, small print included"
+  },
+  {
     "hash": "ccda2cd",
     "date": "2026-09-09",
     "subject": "feat(terminal): add Terminal theme, the engineer-for-engineers register"
+  },
+  {
+    "hash": "580a053",
+    "date": "2026-09-09",
+    "subject": "feat(skills): six alternative \"What I work with\" layouts behind ?skills="
   },
   {
     "hash": "7e396f4",
@@ -33,30 +58,5 @@
     "hash": "ec654eb",
     "date": "2026-09-09",
     "subject": "docs(lighthouse): round 27 row"
-  },
-  {
-    "hash": "5c05b06",
-    "date": "2026-09-09",
-    "subject": "fix(a11y): the stat band is no longer a definition list wrapped in buttons; skill tiles take their name from their visib"
-  },
-  {
-    "hash": "4a9a240",
-    "date": "2026-09-09",
-    "subject": "fix(3d,sheet): the scroll object's render loop sleeps while off-screen; the sheet's charts redraw per store on prev/next"
-  },
-  {
-    "hash": "a52bdc8",
-    "date": "2026-09-09",
-    "subject": "fix(art3d): drop negative viewport margins from touched pages' reveal helpers"
-  },
-  {
-    "hash": "d90d685",
-    "date": "2026-09-09",
-    "subject": "fix(charts): pin CountUp's number formatting to en-US"
-  },
-  {
-    "hash": "d3ac7c5",
-    "date": "2026-09-09",
-    "subject": "feat(skills): replace the skills sunburst with a real tool-tile grid"
   }
 ]
