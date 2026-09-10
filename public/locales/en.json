@@ -131,8 +131,7 @@
       "apple": "Apple Clean",
       "neo": "Soft UI",
       "persona": "Arcade",
-      "terminal": "Terminal",
-      "skyline": "Skyline"
+      "terminal": "Terminal"
     },
     "designSubtitles": {
       "luxuryMinimal": "Elegant & Refined",
@@ -140,8 +139,7 @@
       "apple": "Quiet & Precise",
       "neo": "Tactile & Extruded",
       "persona": "Loud & Kinetic",
-      "terminal": "Console & Monospace",
-      "skyline": "Data & Monument"
+      "terminal": "Console & Monospace"
     },
     "whyVersions": "Why {n} versions?",
     "whyVersionsDesc": "Different aesthetics for different contexts. Same skills, proven versatility."

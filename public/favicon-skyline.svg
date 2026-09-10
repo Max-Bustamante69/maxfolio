@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#0d1420"/>
-  <!-- bar readout: same shape as the hero chart, tallest bar in the reserved cyan -->
-  <rect x="6" y="18" width="4" height="8" fill="#3c4a68"/>
-  <rect x="12" y="13" width="4" height="13" fill="#3c4a68"/>
-  <rect x="18" y="7" width="4" height="19" fill="#4fd1ff"/>
-  <rect x="24" y="15" width="4" height="11" fill="#3c4a68"/>
-</svg>

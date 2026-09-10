@@ -1,4 +1,5 @@
 import type { PortfolioContent } from './types'
+import { designCountWord } from './designCount'
 
 export const ja: PortfolioContent = {
   meta: {
@@ -170,49 +171,6 @@ export const ja: PortfolioContent = {
       currentState: '今月',
       countUnit: '稼働月',
     },
-    skylineHero: {
-      clockLabel: 'ローカル時間 — メデジン',
-      scrollLabel: 'スクロール',
-      viewportLabel: 'ビューポート',
-      chartCaption: '{n}件のストアとプロダクト、リリース年別 — バーの高さ = 実際のコミット数',
-      tableCaption: '同じデータを表で',
-      tableYear: '年',
-      tableName: 'ストア / プロダクト',
-      tableCommits: 'コミット数',
-      fallbackNote: '高さはgit履歴から得た実際のコミット数。テレメトリがまだない項目(自社プロダクト、2026年以前のレガシービルド)は1ユニットで表示。',
-    },
-    instruments: {
-      eyebrow: '創作ではなくフリートから読み取った数値',
-      title: '3つの',
-      titleAccent: '実測値',
-      lead: 'ここに架空のスコアはない — 各リングはこのページの他の部分と同じレジストリ、git履歴、公開ストアデータから得た実際の割合や件数。',
-      liveShare: {
-        label: '公開中 対 開発中のストア比率',
-        source: 'レジストリのステータス項目、現行フリート',
-        tableCaption: 'フリートの状態、集計',
-        live: '公開中',
-        dev: '開発中',
-        total: 'ストア合計',
-      },
-      saleShare: {
-        label: 'セール中カタログの割合、フリート平均',
-        source: '公開ストアデータ(/products.json)、2026年9月取得',
-        tableCaption: '取得できたストアごとのセール比率',
-        counted: '公開カタログデータのあるストア',
-        average: 'フリート平均',
-        highest: '最高',
-        lowest: '最低',
-      },
-      busiestWeek: {
-        label: '最も忙しかったビルド週、全コミットに占める割合',
-        source: '各ストアリポジトリのgit履歴',
-        tableCaption: '最も忙しかった週、フリート全体',
-        week: '週の開始日',
-        commits: 'コミット数',
-        shareOfAll: '全コミットに占める割合',
-        value: '{date}の週に{n}件のコミット — フリート全履歴の{pct}%',
-      },
-    },
     projects: { eyebrow: 'Shopifyの外で作っているもの', title: '個人的に', titleAccent: 'つくっているもの', view: 'プロジェクトを見る' },
     skills: {
       eyebrow: '導入済みではなく、実際に使ったもの',
@@ -276,7 +234,7 @@ export const ja: PortfolioContent = {
       location: '所在地',
       elsewhere: 'その他',
     },
-    explore: { eyebrow: '探索', title: '同じポートフォリオ、4つのデザイン', lead: 'お好みの美学を選んでください。内容は同じです。', viewing: '表示中' },
+    explore: { eyebrow: '探索', title: `同じポートフォリオ、${designCountWord('ja')}のデザイン`, lead: 'お好みの美学を選んでください。内容は同じです。', viewing: '表示中' },
     caseStudy: {
       facts: '店舗データ', results: '計測した成果', stack: '技術スタック', visit: 'ストアを見る', prev: '前へ', next: '次へ', timeline: '構築期間', commits: 'コミット', sections: '独自セクション', open: '事例を見る', metrics: 'Lighthouse・モバイル', perf: 'パフォーマンス', a11y: 'アクセシビリティ', bp: 'ベストプラクティス', seo: 'SEO', lcp: 'LCP', measured: 'トップページのラボ計測、{date}、Lighthouse {runs}回の中央値（モバイル、回線シミュレーション）。', trail: '構築の記録', trailNote: 'ストアリポジトリのgit履歴より：{n}コミット、{range}。行数はテーマのlayout・sections・snippets・templatesで数えています。', perWeek: '週ごとのコミット数', peak: '最も多かった週：{n}コミット', codebase: 'コードベース', liquidLines: 'Liquidの行数', islandLines: 'TypeScriptの行数', sectionsCount: 'テーマのセクション数', weeks: '週', copyLink: 'リンクをコピー', copied: 'コピーしました',
       commerce: {
@@ -441,7 +399,7 @@ export const ja: PortfolioContent = {
     pagui: { tagline: 'OCRによるオンボーディング', description: '銀行の顧客向けにOCRで本人登録。' },
     scorrea: { tagline: 'デベロッパーのポートフォリオ', description: 'シニアソフトウェアデベロッパーのためのAstroサイト。' },
     'dr-hugo': { tagline: '審美歯科のサイト', description: '歯科クリニックのサービス紹介と予約導線。' },
-    maxfolio: { tagline: 'このサイト', description: '4つのデザイン言語、1つのコンテンツモデル、3つの言語。' },
+    maxfolio: { tagline: 'このサイト', description: `${designCountWord('ja')}のデザイン言語、1つのコンテンツモデル、3つの言語。` },
   },
   footer: { tagline: '計測に基づくShopifyエンジニアリング。', services: ['Shopifyストア', 'Shopifyアプリ', 'CROとA/Bテスト', 'ストア移行', 'パフォーマンス'], servicesTitle: '提供すること', quickLinks: 'クイックリンク', rights: 'All rights reserved.', stamp: '2026年9月に再構築 · React 19 + Vite · デスクトップでLighthouse 100/100/100/100（ローカル計測）', backToTop: 'トップへ戻る' },
   location: 'コロンビア、メデジン',

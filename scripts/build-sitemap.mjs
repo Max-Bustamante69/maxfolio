@@ -26,7 +26,6 @@ const routes = [
   { loc: '/neo', file: 'src/pages/Neo.tsx', changefreq: 'monthly', priority: '0.8' },
   { loc: '/arcade', file: 'src/pages/Persona.tsx', changefreq: 'monthly', priority: '0.8' },
   { loc: '/terminal', file: 'src/pages/Terminal.tsx', changefreq: 'monthly', priority: '0.8' },
-  { loc: '/skyline', file: 'src/pages/Skyline.tsx', changefreq: 'monthly', priority: '0.8' },
   { loc: '/menu', file: 'src/pages/Home.tsx', changefreq: 'monthly', priority: '0.5' },
 ]
 

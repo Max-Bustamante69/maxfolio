@@ -1,4 +1,5 @@
 import type { PortfolioContent } from './types'
+import { designCountWord, designCountWordCapitalized } from './designCount'
 
 export const es: PortfolioContent = {
   meta: {
@@ -170,49 +171,6 @@ export const es: PortfolioContent = {
       currentState: 'mes actual',
       countUnit: 'meses activos',
     },
-    skylineHero: {
-      clockLabel: 'Hora local — Medellín',
-      scrollLabel: 'Scroll',
-      viewportLabel: 'Viewport',
-      chartCaption: '{n} tiendas y productos, por año de lanzamiento — la altura de la barra = commits reales',
-      tableCaption: 'La misma flota, en tabla',
-      tableYear: 'Año',
-      tableName: 'Tienda / producto',
-      tableCommits: 'Commits',
-      fallbackNote: 'La altura es el conteo real de commits del historial de git; se muestra 1 unidad donde aún no hay telemetría (productos propios, builds anteriores a 2026).',
-    },
-    instruments: {
-      eyebrow: 'Leído de la flota, no inventado',
-      title: 'Tres lecturas',
-      titleAccent: 'reales',
-      lead: 'Ningún puntaje aquí es inventado — cada anillo es una proporción o conteo real, tomado del mismo registro, historial de git y datos públicos de tienda que el resto de esta página.',
-      liveShare: {
-        label: 'Tiendas en vivo vs. en desarrollo',
-        source: 'Campo de estado del registro, flota actual',
-        tableCaption: 'Estado de la flota, contado',
-        live: 'En vivo',
-        dev: 'En desarrollo',
-        total: 'Tiendas totales',
-      },
-      saleShare: {
-        label: 'Porcentaje del catálogo en oferta, promedio de la flota',
-        source: 'Datos públicos de tienda (/products.json), obtenidos en septiembre de 2026',
-        tableCaption: 'Porcentaje en oferta por tienda accesible',
-        counted: 'Tiendas con catálogo público',
-        average: 'Promedio de la flota',
-        highest: 'Más alto',
-        lowest: 'Más bajo',
-      },
-      busiestWeek: {
-        label: 'Semana más activa, porcentaje de todos los commits',
-        source: 'Historial de git de cada repositorio de tienda',
-        tableCaption: 'Semanas más activas, toda la flota',
-        week: 'Semana del',
-        commits: 'Commits',
-        shareOfAll: 'Porcentaje de todos los commits',
-        value: '{n} commits en la semana del {date} — {pct}% de cada commit en el historial de la flota',
-      },
-    },
     projects: { eyebrow: 'La suite de apps, fuera de Shopify', title: 'Lo que construyo', titleAccent: 'en mi tiempo', view: 'Ver proyecto' },
     skills: {
       eyebrow: 'Lo que se usó, no lo instalado',
@@ -276,7 +234,7 @@ export const es: PortfolioContent = {
       location: 'Ubicación',
       elsewhere: 'También en',
     },
-    explore: { eyebrow: 'Explorar', title: 'El mismo portafolio, cuatro diseños', lead: 'Elige la estética que prefieras. El contenido es idéntico.', viewing: 'Estás viendo' },
+    explore: { eyebrow: 'Explorar', title: `El mismo portafolio, ${designCountWord('es')} diseños`, lead: 'Elige la estética que prefieras. El contenido es idéntico.', viewing: 'Estás viendo' },
     caseStudy: {
       facts: 'Datos de la tienda', results: 'Resultados medidos', stack: 'Stack', visit: 'Visitar tienda', prev: 'Anterior', next: 'Siguiente', timeline: 'Ventana de construcción', commits: 'commits', sections: 'secciones propias', open: 'Caso', metrics: 'Lighthouse · móvil', perf: 'Rendimiento', a11y: 'Accesibilidad', bp: 'Buenas prácticas', seo: 'SEO', lcp: 'LCP', measured: 'Medición de laboratorio en la página de inicio, {date}, mediana de {runs} corridas de Lighthouse (móvil, red simulada).', trail: 'Rastro de construcción', trailNote: 'Del historial git del repo de la tienda: {n} commits, {range}. Líneas contadas sobre layout, secciones, snippets y plantillas del tema.', perWeek: 'Commits por semana', peak: 'Semana más intensa: {n} commits', codebase: 'Código', liquidLines: 'líneas de Liquid', islandLines: 'líneas de TypeScript', sectionsCount: 'secciones del tema', weeks: 'semanas', copyLink: 'Copiar enlace', copied: 'Copiado',
       commerce: {
@@ -441,7 +399,7 @@ export const es: PortfolioContent = {
     pagui: { tagline: 'Onboarding con OCR', description: 'Registro de identidad con OCR para clientes bancarios.' },
     scorrea: { tagline: 'Portafolio de desarrollador', description: 'Sitio en Astro para un desarrollador senior.' },
     'dr-hugo': { tagline: 'Sitio de odontólogo estético', description: 'Presencia de servicios y citas para un consultorio dental.' },
-    maxfolio: { tagline: 'Este sitio', description: 'Cuatro lenguajes de diseño, un modelo de contenido, tres idiomas.' },
+    maxfolio: { tagline: 'Este sitio', description: `${designCountWordCapitalized('es')} lenguajes de diseño, un modelo de contenido, tres idiomas.` },
   },
   footer: { tagline: 'Ingeniería Shopify, medida.', services: ['Tiendas Shopify', 'Apps Shopify', 'CRO y pruebas A/B', 'Migraciones de tienda', 'Rendimiento'], servicesTitle: 'Qué hago', quickLinks: 'Enlaces rápidos', rights: 'Todos los derechos reservados.', stamp: 'Reconstruido en septiembre de 2026 · React 19 + Vite · Lighthouse 100/100/100/100 en escritorio (medición local)', backToTop: 'Volver arriba' },
   location: 'Medellín, Colombia',

@@ -1,5 +1,10 @@
 [
   {
+    "hash": "1468b5d",
+    "date": "2026-09-10",
+    "subject": "fix(sheet,apple): the LCP form labels exist in the sheet's label contract; 'One build, in full' leaves the Apple home"
+  },
+  {
     "hash": "0debd8d",
     "date": "2026-09-10",
     "subject": "fix(sheet): the LCP gauge and load-time pair show the better-measured form (desktop, labeled, when the mobile lab LCP is"
@@ -53,10 +58,5 @@
     "hash": "7109356",
     "date": "2026-09-09",
     "subject": "feat(skills,sheet): the orbit is the layout for What I work with; illustrative figures sit at the top of the measured ba"
-  },
-  {
-    "hash": "c6bdd22",
-    "date": "2026-09-09",
-    "subject": "chore(terminal): regenerated changelog.json"
   }
 ]
