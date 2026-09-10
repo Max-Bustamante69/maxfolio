@@ -139,17 +139,22 @@ export function ContactFormModal({
       : 'border-black/10 text-[#1d1d1f] hover:bg-black/5 rounded-full press',
   }
 
-  // Neo variant styles: recessed (inset) fields — the shadow IS the border, no visible border color —
-  // and a flat accent-fill primary button, the one deliberate style break (§2.5.2 / Idea 11).
+  // Neo variant styles — restraint pass (2026-09-10): the sheet itself, its fields and its Cancel
+  // button are flat (hairline border, no shadow); only the primary accent-fill CTA keeps a raised
+  // read (§2.5.2 / Idea 11's flat accent break, not a bevel). Every token is dark-mode aware — the
+  // static `text-neo-ink` this used to carry regardless of `isDark` left dark mode reading dark
+  // ink on a dark surface.
   const neoStyles = {
-    bgModal: 'neo-raised neo-xl bg-neo-surface',
-    bgInput: 'neo-field neo-md border-transparent text-neo-ink placeholder:text-neo-inkMuted focus:outline-none',
-    textPrimary: 'text-neo-ink',
-    textSecondary: 'text-neo-inkMuted',
-    textMuted: 'text-neo-inkMuted',
-    accent: 'text-neo-accent',
+    bgModal: isDark ? 'bg-neo-darkSurfaceRaised rounded-[22px]' : 'bg-neo-surfaceRaised rounded-[22px]',
+    bgInput: isDark
+      ? 'border-white/15 bg-neo-dark text-neo-darkInk placeholder:text-neo-darkInkMuted focus:border-neo-darkAccent focus:outline-none'
+      : 'border-black/[0.12] bg-neo-surface text-neo-ink placeholder:text-neo-inkMuted focus:border-neo-accent focus:outline-none',
+    textPrimary: isDark ? 'text-neo-darkInk' : 'text-neo-ink',
+    textSecondary: isDark ? 'text-neo-darkInkMuted' : 'text-neo-inkMuted',
+    textMuted: isDark ? 'text-neo-darkInkMuted' : 'text-neo-inkMuted',
+    accent: isDark ? 'text-neo-darkAccent' : 'text-neo-accent',
     btnPrimary: 'neo-btn neo-btn-accent',
-    btnSecondary: 'neo-raised neo-md neo-interactive border-transparent text-neo-ink',
+    btnSecondary: isDark ? 'border-white/15 text-neo-darkInk hover:bg-white/5' : 'border-black/[0.12] text-neo-ink hover:bg-black/[0.03]',
   }
 
   // Persona variant: a "dialogue box" — a notch-cut name-plate corner, ink/paper ground, one accent.

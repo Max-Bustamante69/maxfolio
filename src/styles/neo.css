@@ -22,6 +22,8 @@
   --neo-accent: #4453d9;
   --neo-accent-ink: #ffffff;
   --neo-focus: #4453d9;
+  /* restraint pass — the hairline every flat surface (cards, rows, tags) uses instead of a shadow. */
+  --neo-line: rgba(58, 63, 75, 0.1);
   color-scheme: light;
 }
 
@@ -36,6 +38,7 @@
   --neo-accent: #8b93ff;
   --neo-accent-ink: #14151a;
   --neo-focus: #8b93ff;
+  --neo-line: rgba(231, 233, 238, 0.12);
   color-scheme: dark;
 }
 
@@ -189,8 +192,47 @@
   cursor: pointer;
 }
 
+/* Restraint pass (2026-09-10) — flat tags for everyday chip content (filter tabs, skill/stack tags,
+ * the "no data" pill). No shadow, no bevel: a hairline idle, a flat accent tint + border when on.
+ * The raised/inset .neo-chip above is reserved for the one primary control that keeps the effect
+ * (the nav's language switch) — every other chip-shaped thing in the page uses these instead. */
+.neo-tag {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--neo-ink-muted);
+  background: transparent;
+  border: 1px solid var(--neo-line);
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    border-color 150ms ease;
+}
+@media (hover: hover) {
+  .neo-tag:hover {
+    color: var(--neo-ink);
+    border-color: var(--neo-accent);
+  }
+}
+.neo-tag-on {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--neo-accent);
+  background: color-mix(in srgb, var(--neo-accent) 12%, transparent);
+  border: 1px solid var(--neo-accent);
+  cursor: pointer;
+}
+
 /* §2.5.3 focus-visible: the accent ring is layered ON TOP of the extrusion, never a substitute for it */
-.theme-neo :is(.neo-raised, .neo-inset, .neo-btn, .neo-field, .neo-chip, .neo-chip-on, a, button):focus-visible {
+.theme-neo :is(.neo-raised, .neo-inset, .neo-btn, .neo-field, .neo-chip, .neo-chip-on, .neo-tag, .neo-tag-on, a, button):focus-visible {
   outline: 3px solid var(--neo-focus);
   outline-offset: 2px;
 }
