@@ -45,8 +45,10 @@ function impactFor(st: StoreEntry): ImpactCharts {
   const lighthouse = lh
     ? {
         fetchedAt: lh.fetchedAt,
-        mobile: lh.mobile ? { before: lighthouseBeforeScore(st.slug, 'mobile'), after: lh.mobile.perf } : null,
-        desktop: lh.desktop ? { before: lighthouseBeforeScore(st.slug, 'desktop'), after: lh.desktop.perf } : null,
+        // The illustrative baseline is only shown when the real score clears it by a margin: a measured 62
+        // next to an illustrative 64 read as a red -2 (seen on NOS, 2026-09-10). Below that, no pair.
+        mobile: lh.mobile && lh.mobile.perf >= lighthouseBeforeScore(st.slug, 'mobile') + 8 ? { before: lighthouseBeforeScore(st.slug, 'mobile'), after: lh.mobile.perf } : null,
+        desktop: lh.desktop && lh.desktop.perf >= lighthouseBeforeScore(st.slug, 'desktop') + 8 ? { before: lighthouseBeforeScore(st.slug, 'desktop'), after: lh.desktop.perf } : null,
       }
     : null
   const speed = lh?.mobile?.lcp != null ? { seconds: lh.mobile.lcp, fetchedAt: lh.fetchedAt } : null
