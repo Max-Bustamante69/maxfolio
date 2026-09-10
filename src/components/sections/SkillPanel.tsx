@@ -43,7 +43,8 @@ function panelTone(skin: Skin): PanelTone {
         className: `rounded-[22px] border ${skin.line} ${skin.dark ? 'bg-white/[0.03]' : 'bg-black/[0.015]'}`,
         title: skin.title,
         body: skin.body,
-        muted: skin.muted,
+        // the panel's tint darkens the surface just enough for the shared muted gray to slip under AA at 11px (Lighthouse 97)
+        muted: skin.dark ? skin.muted : 'text-[#5c5c62]',
         accent: skin.accent,
         chip: skin.chip,
         line: skin.line,
