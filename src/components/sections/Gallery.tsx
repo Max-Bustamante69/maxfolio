@@ -1,14 +1,14 @@
 import { lazy, Suspense, useMemo, useState, type ReactNode } from 'react'
 import { m } from 'framer-motion'
 import { useContent, useSheetHistory } from '../../hooks'
-import { ProjectFrame, GlassControls, carouselTokens, type Skin, type FrameShots, type LightboxItem, type CaseStudyData, type CompareRow } from '../gallery'
+import { ProjectFrame, GlassControls, carouselTokens, type Skin, type FrameShots, type LightboxItem, type CaseStudyData } from '../gallery'
 import type { CaseStudyLabels } from '../gallery/ProjectModal'
 import { Carousel } from '../../vendor/carousel'
-import { metrics, stores as allStores, type StoreEntry } from '../../data/registry'
+import type { StoreEntry } from '../../data/registry'
 import { telemetry } from '../../data/telemetry'
-import { commerce, isLiveCommerce } from '../../data/commerce'
-import { computeFleetMedians, formatMoney, lineForAngle, pickCommerceLine, vsFleetPctChip, vsFleetWeeksChip, weeksFor } from '../../data/commerceLines'
-import { conversionSeries, lighthouseBeforeScore, loadTimeSeries, orderValueSeries, revenuePerVisitorSeries } from '../../data/illustrative'
+import { commerce } from '../../data/commerce'
+import { pickCommerceLine, weeksFor } from '../../data/commerceLines'
+import { conversionSeries, deliveryReferenceWeeks, lighthouseBeforeScore, loadTimeSeries, orderValueSeries, revenuePerVisitorSeries, revenueSeries } from '../../data/illustrative'
 import lighthouseJson from '../../data/lighthouse.json'
 import type { PortfolioContent } from '../../content/types'
 import type { ImpactCharts } from '../gallery/ProjectModal'
@@ -45,14 +45,15 @@ function lighthouseFor(slug: string): LighthouseStoreEntry | undefined {
   return entry && typeof entry === 'object' && 'fetchedAt' in entry ? (entry as LighthouseStoreEntry) : undefined
 }
 
-/** "Impact" block data: conversion, order value and revenue-per-visitor are always-present
- *  illustrative representations (see src/data/illustrative.ts). Everything else is real, read straight
- *  from src/data/lighthouse.json — null piece by piece whenever that store has no measured value for
- *  it, never backfilled with an estimate: `rings` (desktop Performance/Accessibility/SEO, Best
- *  Practices always omitted, any sub-50 score omitted rather than shown red), `perfDual.after` (the
- *  dual ring's real outer arc — `.before` is the one illustrative figure here), `cwv` (CrUX field data,
- *  only when the origin has enough real-user traffic) and `speed` (the lab LCP gauge fallback when
- *  `cwv` is null). */
+/** "Impact" block data: conversion, order value, revenue and revenue-per-visitor are always-present
+ *  illustrative representations (see src/data/illustrative.ts). `delivery`'s weeks figure is REAL
+ *  (telemetry/registry, via commerceLines.weeksFor); its "typical agency" reference is illustrative.
+ *  Everything else is real, read straight from src/data/lighthouse.json — null piece by piece whenever
+ *  that store has no measured value for it, never backfilled with an estimate: `rings` (desktop
+ *  Performance/Accessibility/SEO, Best Practices always omitted, any sub-50 score omitted rather than
+ *  shown red), `perfDual.after` (the dual ring's real outer arc — `.before` is the one illustrative
+ *  figure here), `cwv` (CrUX field data, only when the origin has enough real-user traffic) and `speed`
+ *  (the lab LCP gauge fallback when `cwv` is null). */
 function impactFor(st: StoreEntry, ringLabels: { perf: string; a11y: string; seo: string }): ImpactCharts {
   const lh = lighthouseFor(st.slug)
   const desktop = lh?.desktop ?? null
@@ -89,12 +90,21 @@ function impactFor(st: StoreEntry, ringLabels: { perf: string; a11y: string; seo
   const lcpValue = lcpForm === 'mobile' ? mobile?.lcp ?? null : desktop?.lcp ?? null
   const speed = !cwv && lcpValue != null && lh ? { seconds: lcpValue, fetchedAt: lh.fetchedAt, form: lcpForm } : null
   const loadTime = lcpValue != null && lh ? { ...loadTimeSeries(st.slug, lcpValue), fetchedAt: lh.fetchedAt, form: lcpForm } : null
-  return { conversion: conversionSeries(st.slug), orderValue: orderValueSeries(st.slug), rpv: revenuePerVisitorSeries(st.slug), rings, perfDual, cwv, speed, loadTime }
-}
 
-// Computed once at module scope: registry/commerce/telemetry are static build-time data, so every
-// open sheet compares against the same real fleet snapshot rather than re-deriving it per render.
-const FLEET_MEDIANS = computeFleetMedians(allStores, commerce, telemetry)
+  const conversion = conversionSeries(st.slug)
+  const orderValue = orderValueSeries(st.slug)
+  const revenue = revenueSeries(st.slug, conversion.deltaPct, orderValue.deltaPct)
+
+  // Delivery: real weeks (telemetry.json git history, or the registry's build-window fallback — see
+  // commerceLines.weeksFor) against an illustrative "typical agency" reference (14–18 weeks, seeded).
+  // Every real fleet build lands well inside that reference, so the pair is omitted only in the
+  // defensive case a store's real weeks would somehow meet or exceed it (never observed on this fleet).
+  const realWeeks = weeksFor(st, telemetry[st.slug])
+  const referenceWeeks = deliveryReferenceWeeks(st.slug)
+  const delivery: ImpactCharts['delivery'] = referenceWeeks > realWeeks ? { weeks: realWeeks, referenceWeeks, deltaPct: Math.round(((referenceWeeks - realWeeks) / referenceWeeks) * 100) } : null
+
+  return { conversion, orderValue, revenue, rpv: revenuePerVisitorSeries(st.slug), delivery, rings, perfDual, cwv, speed, loadTime }
+}
 
 export type SectionHeading = (eyebrow: string, title: string, accent: string, lead?: string) => ReactNode
 
@@ -130,87 +140,25 @@ export const caseStudyLabels = (strings: PortfolioContent): CaseStudyLabels => {
   const cs = strings.sections.caseStudy
   return {
     close: g.close, prev: cs.prev, next: cs.next, home: g.home, pdp: g.pdp, desktop: g.desktop, mobile: g.mobile,
-    facts: cs.facts, results: cs.results, stack: cs.stack, visit: cs.visit,
-    metrics: cs.metrics, perf: cs.perf, a11y: cs.a11y, bp: cs.bp, seo: cs.seo, lcp: cs.lcp, measured: cs.measured,
-    trail: cs.trail, trailNote: cs.trailNote, perWeek: cs.perWeek, peak: cs.peak, codebase: cs.codebase, liquidLines: cs.liquidLines, islandLines: cs.islandLines, sectionsCount: cs.sectionsCount, commits: cs.commits, weeks: cs.weeks,
+    stack: cs.stack, visit: cs.visit,
     copyLink: cs.copyLink, copied: cs.copied,
-    commerce: cs.commerce,
     impact: cs.impact,
-    charts: cs.charts,
   }
 }
 
-/** Parses the registry's `ladder` fact ("10% → 20%") into ascending numbers for the discount-ladder
- *  chart. Returns null for anything that doesn't look like a real percentage ladder. */
-function parseLadder(value: string | undefined): number[] | null {
-  if (!value) return null
-  const nums = [...value.matchAll(/(\d+(?:\.\d+)?)\s*%/g)].map((m) => Number(m[1]))
-  return nums.length >= 2 ? nums : null
-}
-
-/** Builds the case-study sheet data for a store from the registry + the active locale. */
+/** Builds the case-study sheet data for a store from the registry + the active locale. The sheet is
+ *  header → captures → tagline/description → Impact → stack → Visit store (2026-09-10) — everything
+ *  here traces to that shape; there is no separate commerce-tiles or "visualized" data to assemble. */
 export function caseStudyFor(
   st: StoreEntry,
   strings: PortfolioContent,
   skin: Skin,
-  formatPeriod: (start: string, end: string | null) => string,
-  intlLocale: string,
-  monthFmt: Intl.DateTimeFormat,
+  _formatPeriod: (start: string, end: string | null) => string,
+  _intlLocale: string,
+  _monthFmt: Intl.DateTimeFormat,
 ): CaseStudyData {
   const c = strings.stores[st.slug]
   const cs = strings.sections.caseStudy
-  const cm = cs.commerce
-  const stats = [
-    { label: cs.timeline, value: formatPeriod(st.timeline.start, st.timeline.end) },
-    ...st.facts.map((f) => ({ label: c?.factLabels?.[f.id] ?? f.id, value: f.value })),
-  ]
-  const results = st.results.map((r) => ({ label: c?.factLabels?.[r.id] ?? r.id, value: r.value }))
-
-  // "By the numbers": the four commerce angles, always all four (offer and delivery always
-  // resolve; catalog and reach fall back to `unavailable` for a protected/unreachable storefront).
-  const commerceEntry = commerce[st.slug]
-  const ctx = { store: st, storeContent: c, filters: strings.sections.shopify.filters, cs: cm, commerceEntry, telemetryEntry: telemetry[st.slug], intlLocale, monthFmt }
-  const weeks = weeksFor(st, telemetry[st.slug])
-  const priceMid = isLiveCommerce(commerceEntry) && commerceEntry.priceMin !== null && commerceEntry.priceMax !== null ? (commerceEntry.priceMin + commerceEntry.priceMax) / 2 : null
-  const commerceTiles = [
-    {
-      label: cm.catalogLabel,
-      value: lineForAngle('catalog', ctx) ?? cm.unavailable,
-      deltas: [
-        isLiveCommerce(commerceEntry) ? vsFleetPctChip(commerceEntry.products, FLEET_MEDIANS.products, cm.vsFleetPct) : null,
-        isLiveCommerce(commerceEntry) && commerceEntry.currency && priceMid !== null ? vsFleetPctChip(priceMid, FLEET_MEDIANS.priceMidByCurrency[commerceEntry.currency], cm.vsFleetPct) : null,
-      ].filter((d): d is string => !!d),
-    },
-    { label: cm.offerLabel, value: lineForAngle('offer', ctx, true) ?? cm.offerFallback, deltas: [] },
-    {
-      label: cm.deliveryLabel,
-      value: lineForAngle('delivery', ctx) ?? cm.offerFallback,
-      deltas: [vsFleetWeeksChip(weeks, FLEET_MEDIANS.weeks, cm.vsFleetWeeks)].filter((d): d is string => !!d),
-    },
-    { label: cm.reachLabel, value: lineForAngle('reach', ctx) ?? cm.unavailable, deltas: [] },
-  ]
-
-  // The "Visualized" charts block: every field traces to a real source and is left out entirely
-  // when that source doesn't have a real number for this store — never a placeholder or estimate.
-  const tel = telemetry[st.slug]
-  const compare: CompareRow[] = []
-  if (FLEET_MEDIANS.weeks != null) {
-    const value = weeksFor(st, tel)
-    compare.push({ key: 'weeks', label: '', storeValue: value, fleetValue: FLEET_MEDIANS.weeks, displayStore: `${value} ${cs.weeks}`, displayFleet: `${Math.round(FLEET_MEDIANS.weeks)} ${cs.weeks}` })
-  }
-  if (isLiveCommerce(commerceEntry) && FLEET_MEDIANS.products != null) {
-    compare.push({ key: 'products', label: '', storeValue: commerceEntry.products, fleetValue: FLEET_MEDIANS.products, displayStore: String(commerceEntry.products), displayFleet: String(Math.round(FLEET_MEDIANS.products)) })
-  }
-  if (isLiveCommerce(commerceEntry) && commerceEntry.currency && priceMid !== null) {
-    const fleetPriceMid = FLEET_MEDIANS.priceMidByCurrency[commerceEntry.currency]
-    if (fleetPriceMid != null) {
-      const fmt = (n: number) => formatMoney(n, commerceEntry.currency as string, intlLocale)
-      compare.push({ key: 'price', label: '', storeValue: priceMid, fleetValue: fleetPriceMid, displayStore: fmt(priceMid), displayFleet: fmt(fleetPriceMid) })
-    }
-  }
-  const ladderFact = st.facts.find((f) => f.id === 'ladder')
-
-  // Client-facing sheet: the engineering trail (commits, custom sections) stays in the registry but collapsed at the bottom.
   return {
     name: st.name,
     url: st.url || undefined,
@@ -218,25 +166,9 @@ export function caseStudyFor(
     badge: { text: st.status === 'live' ? strings.badges.live : strings.badges.dev, className: st.status === 'live' ? skin.badgeLive : skin.badgeDev },
     tagline: c?.tagline ?? '',
     description: c?.description ?? '',
-    metrics: st.status === 'live' ? metrics[st.slug] : undefined,
-    trail: telemetry[st.slug] ? { data: telemetry[st.slug], range: formatPeriod(telemetry[st.slug].first.slice(0, 7), telemetry[st.slug].last.slice(0, 7)) } : undefined,
-    commerceTiles,
-    stats,
-    results,
     stack: st.stack,
     shots: shotsFor(st.slug, st.gallery),
-    charts: {
-      compare,
-      onSaleShare: isLiveCommerce(commerceEntry) ? commerceEntry.onSaleShare : null,
-      ladder: parseLadder(ladderFact?.value),
-      weeklyCommits: tel ? { weeks: tel.weeks, weekOf: tel.weekOf } : null,
-      priceRange:
-        isLiveCommerce(commerceEntry) && commerceEntry.priceMin !== null && commerceEntry.priceMax !== null && commerceEntry.currency
-          ? { min: commerceEntry.priceMin, max: commerceEntry.priceMax, median: commerceEntry.currency ? (FLEET_MEDIANS.priceMidByCurrency[commerceEntry.currency] ?? null) : null, currency: commerceEntry.currency }
-          : null,
-      fetchedAt: isLiveCommerce(commerceEntry) ? commerceEntry.fetchedAt : null,
-      impact: impactFor(st, { perf: cs.perf, a11y: cs.a11y, seo: cs.seo }),
-    },
+    impact: impactFor(st, { perf: cs.perf, a11y: cs.a11y, seo: cs.seo }),
   }
 }
 
@@ -400,7 +332,6 @@ export function Gallery({ skin, heading }: GalleryProps) {
             onClose={() => setOpenSlug(null)}
             onPrev={goPrev}
             onNext={goNext}
-            intlLocale={intlLocale}
           />
         </Suspense>
       )}

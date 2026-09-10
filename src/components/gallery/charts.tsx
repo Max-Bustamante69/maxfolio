@@ -53,123 +53,13 @@ const SrTable = ({ caption, rows }: { caption: string; rows: [string, string][] 
   </table>
 )
 
-/**
- * Commits per week of a store's build, read from its git history: one bar per week, the busiest week
- * called out. Real counts; the bars grow in from the baseline, transform-only.
- */
-export function WeeklyBars({ weeks, weekOf, peakLabel, caption, color, dark, delay = 0 }: { weeks: number[]; weekOf: string; peakLabel: string; caption: string; delay?: number } & Palette) {
-  const reduced = useReducedMotion()
-  const max = Math.max(1, ...weeks)
-  const peak = weeks.indexOf(max)
-  const start = new Date(`${weekOf}T12:00:00Z`)
-  const labelOf = (i: number) => {
-    const d = new Date(start.getTime() + i * 7 * 86400000)
-    return d.toISOString().slice(0, 10)
-  }
-  return (
-    <figure className="m-0">
-      <div className="flex items-baseline justify-between gap-2">
-        <figcaption className={`text-[11px] leading-tight ${mutedText(dark)}`}>{caption}</figcaption>
-        <span className={`text-[11px] leading-tight ${mutedText(dark)}`}>{peakLabel}</span>
-      </div>
-      <div className="mt-2 flex h-16 items-end gap-[3px]" role="img" aria-label={`${caption}: ${weeks.join(', ')}`}>
-        {weeks.map((n, i) => (
-          <m.div
-            key={i}
-            className="flex-1 rounded-[2px]"
-            style={{ height: `${Math.max(4, (n / max) * 100)}%`, backgroundColor: i === peak ? color : dark ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.16)', transformOrigin: 'bottom' }}
-            initial={reduced ? false : { scaleY: 0 }}
-            animate={{ scaleY: 1 }}
-            transition={{ delay: delay + i * 0.04, duration: 0.6, ease: EASE }}
-            title={`${labelOf(i)}: ${n}`}
-          />
-        ))}
-      </div>
-      <SrTable caption={caption} rows={weeks.map((n, i) => [labelOf(i), String(n)] as [string, string])} />
-    </figure>
-  )
-}
-
-export interface CompareRow {
-  key: string
-  label: string
-  storeValue: number
-  fleetValue: number
-  displayStore: string
-  displayFleet: string
-}
-
-/**
- * "vs. fleet median" — one row per metric (delivery weeks, catalog size, price midpoint), a bold bar
- * for this store against a muted bar for the fleet median directly beneath it. A metric is omitted
- * upstream (see commerceLines.computeFleetMedians) whenever the fleet doesn't have a real median yet
- * for that currency/measure, so every row shown here compares two real numbers.
- */
-export function CompareBars({ rows, thisLabel, fleetLabel, color, dark, delay = 0 }: { rows: CompareRow[]; thisLabel: string; fleetLabel: string; delay?: number } & Palette) {
-  const reduced = useReducedMotion()
-  if (rows.length === 0) return null
-  return (
-    <figure className="m-0 space-y-4">
-      {rows.map((r, i) => {
-        const max = Math.max(r.storeValue, r.fleetValue, 1)
-        return (
-          <div key={r.key}>
-            <p className={`text-[11px] leading-tight ${mutedText(dark)}`}>{r.label}</p>
-            <div className="mt-1.5 space-y-1">
-              <div className="flex items-center gap-2">
-                <div className={`h-2.5 flex-1 overflow-hidden rounded-full ${dark ? 'bg-white/10' : 'bg-black/[0.06]'}`}>
-                  <m.div
-                    className="h-full rounded-full"
-                    style={{ backgroundColor: color, width: `${Math.max(4, (r.storeValue / max) * 100)}%`, transformOrigin: 'left' }}
-                    initial={reduced ? false : { scaleX: 0 }}
-                    animate={{ scaleX: 1 }}
-                    transition={{ delay: delay + i * 0.12, duration: 0.7, ease: EASE }}
-                  />
-                </div>
-                <span className="w-[92px] shrink-0 text-right text-xs font-semibold tabular-nums">{r.displayStore}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className={`h-1.5 flex-1 overflow-hidden rounded-full ${dark ? 'bg-white/[0.06]' : 'bg-black/[0.035]'}`}>
-                  <m.div
-                    className={`h-full rounded-full ${dark ? 'bg-white/30' : 'bg-black/25'}`}
-                    style={{ width: `${Math.max(4, (r.fleetValue / max) * 100)}%`, transformOrigin: 'left' }}
-                    initial={reduced ? false : { scaleX: 0 }}
-                    animate={{ scaleX: 1 }}
-                    transition={{ delay: delay + i * 0.12 + 0.08, duration: 0.7, ease: EASE }}
-                  />
-                </div>
-                <span className={`w-[92px] shrink-0 text-right text-[11px] tabular-nums ${mutedText(dark)}`}>{r.displayFleet}</span>
-              </div>
-            </div>
-          </div>
-        )
-      })}
-      <div className="flex items-center gap-4 pt-1">
-        <span className="inline-flex items-center gap-1.5 text-[11px]">
-          <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: color }} aria-hidden="true" />
-          {thisLabel}
-        </span>
-        <span className={`inline-flex items-center gap-1.5 text-[11px] ${mutedText(dark)}`}>
-          <span className={`h-2 w-2 shrink-0 rounded-full ${dark ? 'bg-white/30' : 'bg-black/25'}`} aria-hidden="true" />
-          {fleetLabel}
-        </span>
-      </div>
-      <SrTable
-        caption={`${thisLabel} / ${fleetLabel}`}
-        rows={rows.flatMap((r) => [
-          [`${r.label} — ${thisLabel}`, r.displayStore],
-          [`${r.label} — ${fleetLabel}`, r.displayFleet],
-        ] as [string, string][])}
-      />
-    </figure>
-  )
-}
-
 const GAUGE_R = 24
 const GAUGE_C = 2 * Math.PI * GAUGE_R
 
-/** A single-metric percentage gauge (e.g. share of catalog on sale) — same arc-fill language as the
- *  Lighthouse rings, one accent color instead of a banded score. */
+/** A single-metric percentage gauge — same arc-fill language as the Lighthouse rings, one accent
+ *  color instead of a banded score. Used by the Skyline theme's Instruments section for its own real,
+ *  fleet-derived readouts (live share, sale share, busiest-week share) — unrelated to the case-study
+ *  sheet's Impact block. */
 export function Gauge({ value, label, color, dark, delay = 0 }: { value: number; label: string; delay?: number } & Palette) {
   const reduced = useReducedMotion()
   const mv = useMotionValue(reduced ? value : 0)
@@ -199,165 +89,6 @@ export function Gauge({ value, label, color, dark, delay = 0 }: { value: number;
   )
 }
 
-/** A stepped discount ladder ("10% → 20%") — one bar per step, tallest (last) step in the accent. */
-export function DiscountLadder({ steps, unit = '%', label, color, dark, delay = 0 }: { steps: number[]; unit?: string; label: string; delay?: number } & Palette) {
-  const reduced = useReducedMotion()
-  if (steps.length === 0) return null
-  const max = Math.max(1, ...steps)
-  return (
-    <figure className="m-0">
-      <figcaption className={`text-[11px] leading-tight ${mutedText(dark)}`}>{label}</figcaption>
-      <div className="mt-2 flex items-end gap-2" role="img" aria-label={`${label}: ${steps.map((s) => `${s}${unit}`).join(' → ')}`}>
-        {steps.map((s, i) => (
-          <div key={i} className="flex flex-1 flex-col items-center gap-1.5">
-            <span className="text-xs font-semibold tabular-nums">
-              <CountUp value={s} suffix={unit} delay={delay + i * 0.15} />
-            </span>
-            {/* The bar's percentage height needs a parent with a definite height to resolve against —
-                putting the label inside this box (as a sibling of the bar) left the box's own height
-                driven by content, which made every percentage height here resolve to 0. Fixed h-16
-                box, bar as its only child, mirrors the (working) WeeklyBars pattern above. */}
-            <div className="flex h-16 w-full items-end">
-              <m.div
-                className="w-full rounded-t-[3px]"
-                style={{ height: `${Math.max(8, (s / max) * 100)}%`, backgroundColor: i === steps.length - 1 ? color : dark ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.16)', transformOrigin: 'bottom' }}
-                initial={reduced ? false : { scaleY: 0 }}
-                animate={{ scaleY: 1 }}
-                transition={{ delay: delay + i * 0.15, duration: 0.5, ease: EASE }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-      <SrTable caption={label} rows={steps.map((s, i) => [`${i + 1}`, `${s}${unit}`] as [string, string])} />
-    </figure>
-  )
-}
-
-/** A mini line chart of commits per week (real git history) — the stroke draws in on open, the
- *  busiest week gets a dot. Paint-only (stroke-dasharray/offset), no layout thrash. */
-export function CommitsLine({ weeks, caption, peakLabel, color, dark, delay = 0 }: { weeks: number[]; caption: string; peakLabel: string; delay?: number } & Palette) {
-  const reduced = useReducedMotion()
-  if (weeks.length === 0) return null
-  const w = 240
-  const h = 48
-  const pad = 4
-  const max = Math.max(1, ...weeks)
-  const stepX = weeks.length > 1 ? (w - pad * 2) / (weeks.length - 1) : 0
-  const points = weeks.map((n, i) => [pad + i * stepX, pad + (1 - n / max) * (h - pad * 2)] as [number, number])
-  const linePath = points.map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`).join(' ')
-  const last = points[points.length - 1]
-  const first = points[0]
-  const areaPath = `${linePath} L${last[0].toFixed(1)},${h} L${first[0].toFixed(1)},${h} Z`
-  const peakIdx = weeks.indexOf(max)
-  return (
-    <figure className="m-0">
-      <figcaption className={`text-[11px] leading-tight ${mutedText(dark)}`}>{caption}</figcaption>
-      <svg viewBox={`0 0 ${w} ${h}`} className="mt-2 h-12 w-full" preserveAspectRatio="none" role="img" aria-label={`${caption}: ${weeks.join(', ')}`}>
-        <m.path d={areaPath} fill={color} fillOpacity={dark ? 0.16 : 0.1} stroke="none" initial={reduced ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: delay + 0.35, duration: 0.5 }} />
-        <m.path
-          d={linePath}
-          fill="none"
-          stroke={color}
-          strokeWidth={2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          initial={reduced ? false : { pathLength: 0 }}
-          animate={{ pathLength: 1 }}
-          transition={{ delay, duration: 0.9, ease: EASE }}
-        />
-        {points.map(([x, y], i) => i === peakIdx && <circle key={i} cx={x} cy={y} r={2.5} fill={color} />)}
-      </svg>
-      <p className={`mt-1 text-[11px] leading-tight ${mutedText(dark)}`}>{peakLabel}</p>
-      <SrTable caption={caption} rows={weeks.map((n, i) => [`W${i + 1}`, String(n)] as [string, string])} />
-    </figure>
-  )
-}
-
-/** A store's own price band (min → max), with the fleet's currency-matched median marked as a tick
- *  when there are enough peer stores in that currency to make a median meaningful. */
-export function PriceRangeBar({
-  min,
-  max,
-  median,
-  currency,
-  intlLocale,
-  minLabel,
-  maxLabel,
-  medianLabel,
-  label,
-  color,
-  dark,
-  delay = 0,
-}: {
-  min: number
-  max: number
-  median: number | null
-  currency: string
-  intlLocale: string
-  minLabel: string
-  maxLabel: string
-  medianLabel: string
-  label: string
-  delay?: number
-} & Palette) {
-  const reduced = useReducedMotion()
-  const fmt = (n: number) => {
-    try {
-      return new Intl.NumberFormat(intlLocale, { style: 'currency', currency, maximumFractionDigits: 0 }).format(n)
-    } catch {
-      return `${Math.round(n).toLocaleString(intlLocale)} ${currency}`
-    }
-  }
-  const domainMax = Math.max(max, median ?? 0) * 1.08 || 1
-  const minPct = (min / domainMax) * 100
-  const maxPct = (max / domainMax) * 100
-  const medianPct = median !== null ? (median / domainMax) * 100 : null
-  return (
-    <figure className="m-0">
-      <figcaption className={`text-[11px] leading-tight ${mutedText(dark)}`}>{label}</figcaption>
-      <div className="relative mt-3 h-2 rounded-full" style={{ backgroundColor: dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)' }}>
-        <div className="absolute inset-y-0 overflow-hidden rounded-full" style={{ left: `${minPct}%`, width: `${Math.max(2, maxPct - minPct)}%` }}>
-          <m.div
-            className="h-full w-full rounded-full"
-            style={{ backgroundColor: color, transformOrigin: 'left' }}
-            initial={reduced ? false : { scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ delay, duration: 0.8, ease: EASE }}
-          />
-        </div>
-        {medianPct !== null && (
-          <m.span
-            className={`absolute top-1/2 h-3.5 w-[2px] -translate-y-1/2 rounded-full ${dark ? 'bg-white/70' : 'bg-black/60'}`}
-            style={{ left: `${medianPct}%` }}
-            initial={reduced ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: delay + 0.5, duration: 0.4 }}
-            title={medianLabel}
-          />
-        )}
-      </div>
-      <div className="mt-1.5 flex items-center justify-between gap-2 text-[11px]">
-        <span className={mutedText(dark)}>
-          {minLabel} {fmt(min)}
-        </span>
-        {median !== null && (
-          <span className={`hidden sm:inline ${mutedText(dark)}`}>
-            {medianLabel} {fmt(median)}
-          </span>
-        )}
-        <span className={mutedText(dark)}>
-          {maxLabel} {fmt(max)}
-        </span>
-      </div>
-      <SrTable
-        caption={label}
-        rows={[[minLabel, fmt(min)], ...(median !== null ? [[medianLabel, fmt(median)] as [string, string]] : []), [maxLabel, fmt(max)]] as [string, string][]}
-      />
-    </figure>
-  )
-}
-
 /**
  * An indexed line (before = 100) for an illustrative outcome — conversion or revenue-per-visitor.
  * When `band` is given (conversion: the CV's own +10%/+20% floor and ceiling) it's drawn as a soft
@@ -374,12 +105,16 @@ export function IndexAreaLine({
   color,
   dark,
   delay = 0,
+  big = false,
 }: {
   points: number[]
   band?: { low: number[]; high: number[] }
   label: string
   deltaPct: number
   delay?: number
+  /** Renders the headline delta at a larger size — for the one indexed line meant to read as the
+   *  block's summary claim (Revenue, compounding the other three). */
+  big?: boolean
 } & Palette) {
   const reduced = useReducedMotion()
   const w = 240
@@ -406,7 +141,7 @@ export function IndexAreaLine({
     <figure className="m-0">
       <div className="flex items-baseline justify-between gap-2">
         <figcaption className={`text-[11px] leading-tight ${mutedText(dark)}`}>{label}</figcaption>
-        <CountUp value={deltaPct} prefix="+" suffix="%" delay={delay + 0.6} duration={0.8} className={`text-xl font-semibold leading-none tabular-nums ${goodText(dark)}`} />
+        <CountUp value={deltaPct} prefix="+" suffix="%" delay={delay + 0.6} duration={0.8} className={`${big ? 'text-2xl' : 'text-xl'} font-semibold leading-none tabular-nums ${goodText(dark)}`} />
       </div>
       <svg viewBox={`0 0 ${w} ${h}`} className="mt-1.5 h-[62px] w-full" preserveAspectRatio="none" role="img" aria-label={`${label}: ${points[0]} → ${points[n - 1]} (index, base 100)`}>
         <line x1={pad} x2={w - pad} y1={baselineY} y2={baselineY} stroke={dark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)'} strokeWidth={1} strokeDasharray="3 4" />
@@ -745,24 +480,73 @@ export function SpeedGauge({
   )
 }
 
-/** A short ledger of codebase volumes (sections, lines), each bar scaled to the largest, counted up. */
-export function VolumeBars({ rows, color, dark, delay = 0 }: { rows: { label: string; value: number }[]; delay?: number } & Palette) {
+/** Paired before/after bars for delivery weeks: "before" is the illustrative "typical agency" reference
+ *  (src/data/illustrative.ts deliveryReferenceWeeks, 14–18 weeks), muted like every other illustrative
+ *  bar in this file; "after" is this build's REAL delivery weeks (src/data/telemetry.json, or the
+ *  registry's build-window fallback — see commerceLines.weeksFor), always in the accent color since a
+ *  real delivery inside the illustrative reference band is the point of the chart. Same visual language
+ *  as LoadTimePairedBar just above, integer weeks instead of seconds. */
+export function DeliveryPairedBar({
+  beforeWeeks,
+  afterWeeks,
+  deltaPct,
+  beforeLabel,
+  afterLabel,
+  label,
+  weekUnit,
+  color,
+  dark,
+  delay = 0,
+}: {
+  beforeWeeks: number
+  afterWeeks: number
+  deltaPct: number // positive: % faster than the illustrative reference, shown as "−N%"
+  beforeLabel: string
+  afterLabel: string
+  label: string
+  weekUnit: string
+  dark: boolean
+  delay?: number
+} & Palette) {
   const reduced = useReducedMotion()
-  const max = Math.max(1, ...rows.map((r) => r.value))
+  const domainMax = Math.max(beforeWeeks, afterWeeks, 1) * 1.08
+  const bars = [
+    { key: beforeLabel, v: beforeWeeks, c: dark ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.16)' },
+    { key: afterLabel, v: afterWeeks, c: color },
+  ]
   return (
-    <figure className="m-0 space-y-2">
-      {rows.map((r, i) => (
-        <div key={r.label} className="flex items-center gap-2">
-          <div className={`h-2 flex-1 overflow-hidden rounded-full ${dark ? 'bg-white/10' : 'bg-black/[0.06]'}`}>
-            <m.div className="h-full rounded-full" style={{ backgroundColor: color, width: `${(r.value / max) * 100}%`, transformOrigin: 'left' }} initial={reduced ? false : { scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ delay: delay + i * 0.12, duration: 0.8, ease: EASE }} />
+    <figure className="m-0">
+      <div className="flex items-baseline justify-between gap-2">
+        <figcaption className={`text-[11px] leading-tight ${mutedText(dark)}`}>{label}</figcaption>
+        <CountUp value={deltaPct} prefix="−" suffix="%" delay={delay + 0.5} duration={0.8} className={`text-xs font-semibold tabular-nums ${goodText(dark)}`} />
+      </div>
+      <div className="mt-1.5 space-y-1.5" role="img" aria-label={`${label}: ${beforeLabel} ${beforeWeeks} ${weekUnit}, ${afterLabel} ${afterWeeks} ${weekUnit}`}>
+        {bars.map((b, j) => (
+          <div key={b.key} className="flex items-center gap-2">
+            <span className={`w-14 shrink-0 truncate text-[10px] uppercase tracking-[0.12em] ${mutedText(dark)}`}>{b.key}</span>
+            <div className={`h-2.5 flex-1 overflow-hidden rounded-full ${dark ? 'bg-white/10' : 'bg-black/[0.06]'}`}>
+              <m.div
+                className="h-full rounded-full"
+                style={{ backgroundColor: b.c }}
+                initial={reduced ? false : { width: 0 }}
+                animate={{ width: `${Math.max(2, (b.v / domainMax) * 100)}%` }}
+                transition={{ delay: delay + j * 0.12, duration: 0.8, ease: EASE }}
+              />
+            </div>
+            <span className="w-12 shrink-0 text-right text-xs font-semibold tabular-nums">
+              {b.v}
+              {weekUnit}
+            </span>
           </div>
-          <span className="w-16 shrink-0 text-right text-xs font-semibold tabular-nums">
-            <CountUp value={r.value} delay={delay + i * 0.12} />
-          </span>
-          <span className={`w-28 shrink-0 text-[11px] leading-tight sm:w-36 ${mutedText(dark)}`}>{r.label}</span>
-        </div>
-      ))}
-      <SrTable caption={rows.map((r) => r.label).join(' / ')} rows={rows.map((r) => [r.label, String(r.value)] as [string, string])} />
+        ))}
+      </div>
+      <SrTable
+        caption={label}
+        rows={[
+          [beforeLabel, `${beforeWeeks}${weekUnit}`],
+          [afterLabel, `${afterWeeks}${weekUnit}`],
+        ]}
+      />
     </figure>
   )
 }
