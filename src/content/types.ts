@@ -166,6 +166,16 @@ export interface PortfolioContent {
         pinned: string
         hint: string
       }
+      /** Strings used only by the alternative `?skills=` layout candidates (wall/orbit/rows) —
+       *  never shown to shoppers unless one of those layouts ships, but still real user-facing
+       *  copy and must not read as English-only on the es/ja builds. */
+      layoutExtra: {
+        wallFilterLabel: string
+        allLabel: string
+        hoverRing: string
+        unpin: string
+        toolsSuffix: string
+      }
     }
     contact: SectionHeading & {
       lead: string

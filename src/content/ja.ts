@@ -249,6 +249,13 @@ export const ja: PortfolioContent = {
         pinned: '固定中',
         hint: 'クリックまたはEnterで固定、Escで解除します。',
       },
+      layoutExtra: {
+        wallFilterLabel: 'グループで壁を絞り込む',
+        allLabel: 'すべて',
+        hoverRing: 'リングにカーソルを合わせてください',
+        unpin: '固定解除',
+        toolsSuffix: 'ツール',
+      },
     },
     contact: {
       eyebrow: 'まず診断。無料、20分。',

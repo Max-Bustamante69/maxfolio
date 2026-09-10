@@ -249,6 +249,13 @@ export const en: PortfolioContent = {
         pinned: 'Pinned',
         hint: 'Click or press Enter to pin it — Esc releases it.',
       },
+      layoutExtra: {
+        wallFilterLabel: 'Filter the wall by group',
+        allLabel: 'All',
+        hoverRing: 'Hover a ring',
+        unpin: 'Unpin',
+        toolsSuffix: 'tools',
+      },
     },
     contact: {
       eyebrow: 'Diagnosis first, free, 20 minutes',
