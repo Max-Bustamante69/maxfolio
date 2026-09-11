@@ -12,6 +12,12 @@ export interface StoreTelemetry {
   lines: { liquid: number; islands: number; css: number }
   sections: number
   busiestWeek: { index: number; commits: number; week: string }
+  /** Theme blocks (blocks/*.liquid) and sections/blocks carrying a data-dd-component tracking hook.
+   *  Optional: only counted so far for the-gummy-box, by hand from the theme repo on disk, 2026-09-10
+   *  (`blocks`: file count under blocks/*.liquid; `trackedComponents`: grep for data-dd-component
+   *  across sections/ and blocks/). Not produced by scripts/store-telemetry.mjs yet. */
+  blocks?: number
+  trackedComponents?: number
 }
 
 export const telemetry: Record<string, StoreTelemetry> = data as Record<string, StoreTelemetry>

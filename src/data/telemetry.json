@@ -36,7 +36,9 @@
       "index": 12,
       "commits": 267,
       "week": "2026-W36"
-    }
+    },
+    "blocks": 28,
+    "trackedComponents": 21
   },
   "nos-cafe": {
     "repo": "nos-cafe",
