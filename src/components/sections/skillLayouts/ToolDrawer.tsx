@@ -132,7 +132,7 @@ function CaptureTile({ thumb, skin, sk, badges }: { thumb: ToolThumb; skin: Skin
  * own header uses) so the panel never depends on the footer alone to be dismissable. A real sibling of
  * the scrollable middle, not `position: sticky` inside it — same reasoning as `ProjectModal`'s header.
  */
-function DrawerHeader({ tool, skin, groupLabel, formatTool, closeLabel, navBtn, onClose }: { tool: ToolUsage; skin: Skin; groupLabel: Record<SkillGroupId, string>; formatTool: (u: ToolUsage) => string; closeLabel: string; navBtn: string; onClose: () => void }) {
+function DrawerHeader({ tool, skin, groupLabel, formatTool, closeLabel, navBtn, neoBtnShadow, onClose }: { tool: ToolUsage; skin: Skin; groupLabel: Record<SkillGroupId, string>; formatTool: (u: ToolUsage) => string; closeLabel: string; navBtn: string; neoBtnShadow: { boxShadow: string } | undefined; onClose: () => void }) {
   const icon = toolIcon(tool.tool)
   return (
     <header className={`flex shrink-0 items-start justify-between gap-3 border-b px-5 py-4 lg:px-6 ${skin.line} ${skin.dark ? 'bg-white/[0.02]' : 'bg-black/[0.015]'}`}>
@@ -150,7 +150,7 @@ function DrawerHeader({ tool, skin, groupLabel, formatTool, closeLabel, navBtn, 
           </div>
         </div>
       </div>
-      <button type="button" onClick={onClose} aria-label={closeLabel} className={navBtn}>
+      <button type="button" onClick={onClose} aria-label={closeLabel} className={navBtn} style={neoBtnShadow}>
         <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -453,7 +453,7 @@ export function ToolDrawer({ skin, sk, groupLabel, formatTool, tool, open, onClo
                 <span className={`h-1.5 w-10 rounded-full ${skin.dark ? 'bg-white/25' : 'bg-black/20'}`} />
               </div>
             )}
-            <DrawerHeader tool={tool} skin={skin} groupLabel={groupLabel} formatTool={formatTool} closeLabel={sk.orbit.drawer.close} navBtn={navBtn} onClose={onClose} />
+            <DrawerHeader tool={tool} skin={skin} groupLabel={groupLabel} formatTool={formatTool} closeLabel={sk.orbit.drawer.close} navBtn={navBtn} neoBtnShadow={neoBtnShadow} onClose={onClose} />
             <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 lg:px-6" data-lenis-prevent>
               <DrawerBody tool={tool} skin={skin} sk={sk} bodyReady={bodyReady} reduced={reduced} />
             </div>

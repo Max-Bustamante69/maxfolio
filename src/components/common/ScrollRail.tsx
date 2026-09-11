@@ -88,10 +88,13 @@ export function ScrollRail({ sections, dark, accent = '#0071e3' }: ScrollRailPro
 
   return (
     <>
-      {/* progress bar: touch / small screens */}
+      {/* progress bar: touch / small screens. Stays at top-11 for its whole visible range (below lg,
+          1024px) — the nav itself only grows to 56px from lg up, i.e. exactly where this bar is
+          already lg:hidden, so there's no breakpoint here where the bar is shown at the taller bar
+          height. */}
       <m.div
         aria-hidden="true"
-        className="fixed left-0 top-11 md:top-14 z-40 h-[2px] w-full origin-left lg:hidden [@media(hover:hover)_and_(min-width:1024px)]:hidden"
+        className="fixed left-0 top-11 z-40 h-[2px] w-full origin-left lg:hidden [@media(hover:hover)_and_(min-width:1024px)]:hidden"
         style={{ scaleX: progress, backgroundColor: accent }}
       />
 
