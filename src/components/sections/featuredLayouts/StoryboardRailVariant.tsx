@@ -4,9 +4,11 @@
 // controls and keyboard ←/→ track which frame is centered — the same IntersectionObserver-driven
 // pattern Chapters.tsx uses, not scroll-position math. On top of that: the rail tilts a few degrees in
 // 3D as it moves, proportional to drag/scroll velocity, and eases flat the moment motion stops —
-// transform-only, and skipped entirely under reduced motion.
+// transform-only, and skipped entirely under reduced motion. Mouse drag itself is the same
+// useDragRail hook Chapters.tsx uses, so both rails feel identical.
 import { useEffect, useRef, useState } from 'react'
 import { m, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion'
+import { useDragRail } from '../../../hooks'
 import { fill, type FeaturedData } from './types'
 
 const EASE = [0.23, 1, 0.32, 1] as const
@@ -31,6 +33,18 @@ export function StoryboardRailVariant({ data }: { data: FeaturedData }) {
   const [active, setActive] = useState(0)
   const railRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
+  // `m.div`'s own `onDragStart` is framer-motion's pan-gesture callback (a different signature from
+  // the native DOM event), so it can't take useDragRail's native `onDragStart` — that one is wired via
+  // a plain `dragstart` listener below instead, and only the pointer/click handlers are spread here.
+  const { handlers: allDragHandlers, isDragging } = useDragRail(railRef, { centerSnapBelow: 768 })
+  const { onDragStart: killNativeGhostDrag, ...dragHandlers } = allDragHandlers
+  useEffect(() => {
+    const rail = railRef.current
+    if (!rail) return
+    const listener = (e: globalThis.DragEvent) => killNativeGhostDrag(e as unknown as React.DragEvent<HTMLDivElement>)
+    rail.addEventListener('dragstart', listener)
+    return () => rail.removeEventListener('dragstart', listener)
+  }, [killNativeGhostDrag])
 
   // Velocity -> tilt. A ref tracks the last scrollLeft/timestamp; every 'scroll' event (native wheel,
   // touch swipe, or the pointer-drag handler below — setting scrollLeft dispatches the same event)
@@ -53,25 +67,6 @@ export function StoryboardRailVariant({ data }: { data: FeaturedData }) {
     lastScroll.current = { x: rail.scrollLeft, t: now }
     window.clearTimeout(decayTimer.current)
     decayTimer.current = window.setTimeout(() => rawTilt.set(0), 140)
-  }
-
-  // Basic pointer-drag-to-scroll for desktop mice only — touch already scrolls natively, and letting
-  // this handler also drive `scrollLeft` on a touch pointer would fight the browser's own momentum
-  // scroll (double-handled, jumpy).
-  const drag = useRef<{ active: boolean; startX: number; startLeft: number }>({ active: false, startX: 0, startLeft: 0 })
-  const onPointerDown = (e: React.PointerEvent) => {
-    const rail = railRef.current
-    if (!rail || e.pointerType !== 'mouse') return
-    drag.current = { active: true, startX: e.clientX, startLeft: rail.scrollLeft }
-    rail.setPointerCapture(e.pointerId)
-  }
-  const onPointerMove = (e: React.PointerEvent) => {
-    const rail = railRef.current
-    if (!rail || !drag.current.active) return
-    rail.scrollLeft = drag.current.startLeft - (e.clientX - drag.current.startX)
-  }
-  const endDrag = () => {
-    drag.current.active = false
   }
 
   useEffect(() => {
@@ -135,11 +130,9 @@ export function StoryboardRailVariant({ data }: { data: FeaturedData }) {
       <div style={{ perspective: 1200 }}>
         <m.div
           ref={railRef}
+          data-dragging={isDragging}
           onScroll={onRailScroll}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={endDrag}
-          onPointerLeave={endDrag}
+          {...dragHandlers}
           onKeyDown={(e) => {
             if (e.key === 'ArrowRight') {
               e.preventDefault()
@@ -152,8 +145,8 @@ export function StoryboardRailVariant({ data }: { data: FeaturedData }) {
           tabIndex={0}
           role="group"
           aria-label={fb.eyebrow}
-          style={{ rotateY, cursor: 'grab' }}
-          className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 outline-none no-scrollbar"
+          style={{ rotateY }}
+          className="drag-rail -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 outline-none no-scrollbar"
         >
         {fb.frames.map((frame, i) => {
           const crop = CROPS[i] ?? CROPS[0]
@@ -164,7 +157,7 @@ export function StoryboardRailVariant({ data }: { data: FeaturedData }) {
                 cardRefs.current[i] = el
               }}
               data-idx={i}
-              className={`w-[80%] shrink-0 snap-start overflow-hidden rounded-[22px] border sm:w-[52%] md:w-[34%] ${skin.line} ${skin.dark ? 'bg-white/[0.03]' : 'bg-white'}`}
+              className={`w-[80%] shrink-0 snap-center overflow-hidden rounded-[22px] border md:w-[46%] md:snap-start lg:w-[calc((100%-2rem)/3.15)] ${skin.line} ${skin.dark ? 'bg-white/[0.03]' : 'bg-white'}`}
             >
               <div className="relative aspect-[4/3] overflow-hidden">
                 <img
@@ -174,6 +167,7 @@ export function StoryboardRailVariant({ data }: { data: FeaturedData }) {
                   height={880}
                   loading="lazy"
                   decoding="async"
+                  draggable={false}
                   className={`h-full w-full object-cover ${crop.position} ${crop.zoom ? 'scale-125' : ''}`}
                 />
                 <div className={`absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t ${skin.dark ? 'from-black/60' : 'from-black/35'} to-transparent`} aria-hidden="true" />
@@ -186,6 +180,9 @@ export function StoryboardRailVariant({ data }: { data: FeaturedData }) {
             </div>
           )
         })}
+        {/* Trailing spacer, not a slide (no data-idx): gives the rail room to bring the last frame all
+            the way to the desktop frame line. */}
+        <div aria-hidden="true" className="w-[75%] shrink-0" />
         </m.div>
       </div>
 

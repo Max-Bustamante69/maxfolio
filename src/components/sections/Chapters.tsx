@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { m, useReducedMotion } from 'framer-motion'
-import { useContent } from '../../hooks'
+import { useContent, useDragRail } from '../../hooks'
 import { RevealText } from '../common'
 import type { Skin } from '../gallery'
 import type { SectionHeading } from './Gallery'
@@ -56,6 +56,7 @@ export function Chapters({ skin, heading }: ChaptersProps) {
   const [active, setActive] = useState(0)
   const railRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
+  const { handlers: dragHandlers, isDragging } = useDragRail(railRef, { centerSnapBelow: 768 })
 
   const kindFill: Record<WorkKind, string> = { stores: skin.accentBg, work: `${skin.accentBg} opacity-70`, products: `${skin.accentBg} opacity-45`, personal: `${skin.accentBg} opacity-25` }
   const kindLabel: Record<WorkKind, string> = { stores: y.shipped, work: y.work, products: y.products, personal: y.side }
@@ -130,6 +131,8 @@ export function Chapters({ skin, heading }: ChaptersProps) {
 
       <div
         ref={railRef}
+        data-dd-component="chapters-rail"
+        data-dragging={isDragging}
         onKeyDown={(e) => {
           if (e.key === 'ArrowRight') {
             e.preventDefault()
@@ -139,10 +142,11 @@ export function Chapters({ skin, heading }: ChaptersProps) {
             goTo(active - 1)
           }
         }}
+        {...dragHandlers}
         tabIndex={0}
         role="group"
         aria-label={c.eyebrow}
-        className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 outline-none no-scrollbar"
+        className="drag-rail -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 outline-none no-scrollbar"
       >
         {years.map((entry, i) => {
           const filled = WORK_KINDS.flatMap((k) => Array.from({ length: workCount(entry, k) }, (_, u) => ({ k, u })))
@@ -154,7 +158,7 @@ export function Chapters({ skin, heading }: ChaptersProps) {
                 cardRefs.current[i] = el
               }}
               data-idx={i}
-              className={`w-[82%] shrink-0 snap-start rounded-[22px] border p-6 sm:w-[46%] md:w-[31%] md:p-8 ${skin.line} ${skin.dark ? 'bg-white/[0.03]' : 'bg-white'}`}
+              className={`w-[80%] shrink-0 snap-center rounded-[22px] border p-6 md:w-[46%] md:snap-start md:p-8 lg:w-[calc((100%-2rem)/3.15)] ${skin.line} ${skin.dark ? 'bg-white/[0.03]' : 'bg-white'}`}
             >
               <p className="font-sf text-6xl font-semibold leading-none tracking-[-0.05em] tabular-nums md:text-7xl">
                 <RevealText text={String(entry.year)} trigger="load" />
@@ -191,6 +195,10 @@ export function Chapters({ skin, heading }: ChaptersProps) {
             </div>
           )
         })}
+        {/* Trailing spacer, not a slide (no data-idx, never a snap/landing target): without it the last
+            card can't reach the desktop frame line — there isn't enough real content after it to give
+            the rail room to scroll that far. */}
+        <div aria-hidden="true" className="w-[75%] shrink-0" />
       </div>
     </section>
   )
