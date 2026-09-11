@@ -176,7 +176,7 @@ export function MeasuredBand({ skin }: MeasuredBandProps) {
               <>
                 <span className="sr-only">{byId.organic}</span>
                 <span aria-hidden="true">
-                  <CountUp value={20} prefix="+" suffix="%" duration={0.8} delay={0.5} />
+                  <CountUp value={20} prefix="+" suffix="%" duration={0.6} delay={0.25} />
                 </span>
               </>
             ) : (
