@@ -1,62 +1,62 @@
 [
   {
-    "hash": "1e1a6ac",
-    "date": "2026-09-10",
-    "subject": "fix(orbit): make the Apple center mark visible in dark mode"
+    "hash": "be27d76",
+    "date": "2026-09-11",
+    "subject": "fix(skills): drop the derived depth facet (it mislabeled core tools)"
   },
   {
-    "hash": "eb3efbe",
-    "date": "2026-09-10",
-    "subject": "refactor(orbit): move fleet totals into the drawer, give the center a per-theme mark"
+    "hash": "6117e9d",
+    "date": "2026-09-11",
+    "subject": "copy(manifesto): four checkable mechanisms instead of slogans; impact tiles 5-up on desktop"
   },
   {
-    "hash": "71cb0de",
-    "date": "2026-09-10",
-    "subject": "fix(themes): Terminal's custom properties also live on :root while the theme is mounted (body-portalled sheets and drawe"
+    "hash": "25c060e",
+    "date": "2026-09-11",
+    "subject": "fix(review): stop the nav breathing-room from overflowing tablet widths, sync the neo close-button shadow"
   },
   {
-    "hash": "e025ae0",
+    "hash": "80a8d89",
     "date": "2026-09-10",
-    "subject": "chore(terminal): regenerated changelog.json"
+    "subject": "feat(nav): give the Apple nav bar more breathing room from md up"
   },
   {
-    "hash": "bcc13dd",
+    "hash": "8b35aef",
     "date": "2026-09-10",
-    "subject": "fix(skills): one dialog at a time when a capture opens the case-study sheet"
+    "subject": "feat(drawer): give ToolDrawer the house spring, blur, and staggered reveal"
   },
   {
-    "hash": "336709e",
+    "hash": "c4ba2ff",
     "date": "2026-09-10",
-    "subject": "feat(skills): replace the orbit's hover preview with a real ToolDrawer"
+    "subject": "feat(review-checklist): visualize the QA run instead of a text ledger"
   },
   {
-    "hash": "fefe7e0",
+    "hash": "87629f3",
     "date": "2026-09-10",
-    "subject": "chore(terminal): regenerated changelog.json"
+    "subject": "content(review-checklist): add run caption and status strings"
   },
   {
-    "hash": "c91237f",
+    "hash": "1f3ab05",
     "date": "2026-09-10",
-    "subject": "fix(apple): one element per section id — the wrappers around Experience and Skills no longer duplicate the ids the secti"
+    "subject": "fix(rail): measure slide targets by geometry, not offsetLeft, on the storyboard rail"
   },
   {
-    "hash": "08222c6",
+    "hash": "fd9bd9d",
     "date": "2026-09-10",
-    "subject": "fix(skills): 44px tap targets for the orbit/ledger filter bar on mobile"
+    "subject": "fix(skills): roving radiogroup keyboard nav and quiet the live-region counters"
   },
   {
-    "hash": "e250d3c",
+    "hash": "97f7c78",
     "date": "2026-09-10",
-    "subject": "refactor(gallery): restructure the case-study Impact block layout"
+    "subject": "fix(featured): gate the Impact strip's real-number tiles on scroll into view"
   },
   {
-    "hash": "6edeea0",
+    "hash": "a2b1393",
     "date": "2026-09-10",
-    "subject": "feat(skills): orbit hover/press previews, real cross-section links, filters"
+    "subject": "fix(skills): stop the rail's edge fade from lying at rest"
   },
   {
-    "hash": "e570682",
+    "hash": "45819ae",
     "date": "2026-09-10",
-    "subject": "chore(terminal): regenerated changelog.json"
+    "subject": "fix(chapters): correct active-card tracking and scope drag targets"
   }
 ]
