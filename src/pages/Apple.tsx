@@ -6,7 +6,6 @@ import { SEOHead, MobileMenuApple, LanguageSelectorApple, LogoSelectorApple, Mag
 import { ContactFormModal } from '../components/modals'
 import { MenuPreview } from '../components/previews'
 import { Testimonials } from '../components/sections/Testimonials'
-import { StatBand } from '../components/sections/StatBand'
 import { Experience } from '../components/sections/Experience'
 import { skins } from '../components/gallery/skins'
 import { useDynamicFavicon, useI18n, useContent } from '../hooks'
@@ -16,6 +15,9 @@ import { defaultDesign, otherDesigns, MENU } from '../data/designs'
 const Chapters = lazy(() => import('../components/sections/Chapters').then((mod) => ({ default: mod.Chapters })))
 const Process = lazy(() => import('../components/sections/Process').then((mod) => ({ default: mod.Process })))
 const ShopifyWork = lazy(() => import('../components/sections/ShopifyWork').then((mod) => ({ default: mod.ShopifyWork })))
+// The measured-ranges graphic band that replaced the hero's old stat band — it earns its place at
+// the top of the Shopify storefronts section instead, where "See the storefronts" actually lands.
+const MeasuredBand = lazy(() => import('../components/sections/MeasuredBand').then((mod) => ({ default: mod.MeasuredBand })))
 const Gallery = lazy(() => import('../components/sections/Gallery').then((mod) => ({ default: mod.Gallery })))
 const FeaturedBuild = lazy(() => import('../components/sections/FeaturedBuild').then((mod) => ({ default: mod.FeaturedBuild })))
 const Manifesto = lazy(() => import('../components/sections/Manifesto').then((mod) => ({ default: mod.Manifesto })))
@@ -278,7 +280,7 @@ function AppleContent() {
 
         <main id="main-content" className="pt-11 lg:pt-14">
           {/* Hero — typographic */}
-          <section id="hero" className="px-4 pt-16 md:pt-24 pb-10 md:pb-14 text-center scroll-mt-20 lg:scroll-mt-[92px]" aria-labelledby="hero-heading">
+          <section id="hero" className="px-4 pt-16 md:pt-24 pb-14 md:pb-20 text-center scroll-mt-20 lg:scroll-mt-[92px]" aria-labelledby="hero-heading">
             <p className={`text-sm font-semibold ${blue}`}>{c.hero.eyebrow}</p>
             {/* The LCP element stays static: an entrance fade would delay the first meaningful paint. */}
             <h1
@@ -317,13 +319,6 @@ function AppleContent() {
                 {Icon.globe}
                 {c.hero.location}
               </span>
-            </div>
-          </section>
-
-          {/* Stat band — six real numerals, each with a one-line source on hover/tap */}
-          <section className="px-4 pb-14 md:pb-20">
-            <div className="max-w-5xl mx-auto">
-              <StatBand skin={skin} />
             </div>
           </section>
 
@@ -413,6 +408,11 @@ function AppleContent() {
           {/* Shopify work — the index */}
           <section id="shopify" className="px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
             <div className="max-w-5xl mx-auto">
+              {/* Measured ranges — the hero's old stat band, moved here and re-drawn as small graphics:
+                  where "See the storefronts" actually lands, not stacked on top of the hero's own claim. */}
+              <Suspense fallback={<Pending h="min-h-[24vh]" />}>
+                <MeasuredBand skin={skin} />
+              </Suspense>
               <Suspense fallback={<Pending />}>
                 <ShopifyWork ownId={false} skin={skin} heading={Heading} />
               </Suspense>

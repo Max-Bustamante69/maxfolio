@@ -25,7 +25,7 @@ export const es: PortfolioContent = {
     conversion: 'Conversión, tiendas Shopify',
     organic: 'Tráfico orgánico tras el SEO técnico',
     storefronts: 'Tiendas Shopify entregadas',
-    tests: 'Chequeos automáticos del harness de QA',
+    tests: 'Pruebas automatizadas en toda la suite de apps',
 
   },
   statSources: {
@@ -107,7 +107,7 @@ export const es: PortfolioContent = {
     manifesto: { label: 'Lo que hago siempre', lines: ['Leo Lighthouse y las cifras de ventas primero.', 'Cada despliegue sale de un commit de git.', 'Más de 40 pruebas de Playwright antes de lanzar.', 'Te quedas con el editor, los docs y el repo.'] },
     testimonials: { eyebrow: 'En sus palabras', title: 'Lo que dicen', titleAccent: 'los clientes' },
     now: { label: 'Ahora', live: '{n} tiendas en vivo', dev: '{n} en construcción', band: 'Tiendas entregadas', local: 'Medellín · {time} hora local' },
-    statBand: { label: 'El trabajo, en números', asOf: 'Septiembre de 2026', sourceLabel: 'Fuente', note: 'Rangos medidos en tiendas de clientes; las cifras exactas por tienda se mantienen confidenciales.' },
+    statBand: { label: 'El trabajo, en números', asOf: 'Septiembre de 2026', sourceLabel: 'Fuente', note: 'Rangos medidos en tiendas de clientes, de 2023 a 2026; las cifras exactas por tienda se mantienen confidenciales.' },
     careerSubway: { eyebrow: 'Mapa de carrera', title: 'Los roles,', titleAccent: 'en una sola línea', lead: 'Seis años como mapa de metro: una línea por empleador, un transbordo donde dos roles se cruzaron.', toggleShow: 'Ver como mapa', toggleHide: 'Ocultar el mapa', transferLabel: 'Cruce', rowAria: '{company}: {period}' },
     years: { eyebrow: 'Un bloque por año, sin relleno', title: 'Cinco años,', titleAccent: 'una sola dirección', lead: 'De componentes React en 2022 a una flota de tiendas Shopify y la plataforma detrás. Cada línea sale de los mismos registros que el resto del sitio.', roles: 'Roles', shipped: 'Tiendas', work: 'Proyectos con clientes', products: 'Productos', side: 'En mi tiempo', more: '+{n} más', count: '{n} tiendas', perYear: 'Trabajo entregado cuya construcción tocó el año', eras: { '2022': 'React y Salesforce', '2023': 'Primeras tiendas Shopify', '2024': 'Front enterprise, luego CTO', '2025': 'CTO y builds por contrato', '2026': 'La flota y la plataforma' } },
     chapters: {

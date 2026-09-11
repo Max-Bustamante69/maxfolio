@@ -25,7 +25,7 @@ export const ja: PortfolioContent = {
     conversion: 'コンバージョン向上（Shopifyストア）',
     organic: 'テクニカルSEO後のオーガニック流入',
     storefronts: '納品したShopifyストア',
-    tests: 'QAハーネスの自動チェック',
+    tests: 'アプリ群全体の自動テスト',
 
   },
   statSources: {
@@ -107,7 +107,7 @@ export const ja: PortfolioContent = {
     manifesto: { label: '毎回すること', lines: ['まずLighthouseと売上の数字を読む。', 'デプロイは必ずgitのコミットから。', '公開前にPlaywrightで40件以上を検証する。', 'エディタもドキュメントもリポジトリも、あなたの手元に。'] },
     testimonials: { eyebrow: 'お客様の声', title: 'クライアントの', titleAccent: '言葉' },
     now: { label: '現在', live: '公開中のストア {n}', dev: '構築中 {n}', band: '納品したストア', local: 'メデジン・現地時間 {time}' },
-    statBand: { label: '仕事を数字で', asOf: '2026年9月時点', sourceLabel: '出典', note: 'クライアントストアで測定した範囲です。店舗ごとの正確な数値は非公開です。' },
+    statBand: { label: '仕事を数字で', asOf: '2026年9月時点', sourceLabel: '出典', note: '2023年から2026年までのクライアントストアで測定した範囲です。店舗ごとの正確な数値は非公開です。' },
     careerSubway: { eyebrow: 'キャリアマップ', title: '役割を、', titleAccent: '一本の路線に', lead: '6年間を路線図として: 雇用主ごとに一本の線、二つの役割が重なった場所に乗り換え。', toggleShow: '地図で見る', toggleHide: '地図を隠す', transferLabel: '重複', rowAria: '{company}: {period}' },
     years: { eyebrow: '1年に1ブロック、水増しなし', title: '5年間、', titleAccent: 'ひとつの方向へ', lead: '2022年のReactコンポーネントから、Shopifyストア群とその裏側のプラットフォームまで。各行はサイト全体と同じ記録から生成しています。', roles: '役割', shipped: 'ストア', work: 'クライアント案件', products: 'プロダクト', side: '個人プロジェクト', more: '+{n}件', count: 'ストア {n}', perYear: '構築がその年に及んだ納品物の数', eras: { '2022': 'ReactとSalesforce', '2023': '最初のShopifyストア', '2024': 'エンタープライズのフロント、そしてCTO', '2025': 'CTOと契約案件', '2026': 'ストア群とプラットフォーム' } },
     chapters: {
