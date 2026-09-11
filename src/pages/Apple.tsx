@@ -57,6 +57,17 @@ function useActiveSection(ids: string[]) {
   const [active, setActive] = useState(ids[0] ?? '')
   const activeRef = useRef(active)
   activeRef.current = active
+  // The nav is 44px through tablet widths, 56px from lg up (more breathing room, same 1024px cutoff
+  // the drawer/sheet split uses) — the observer's top margin has to track that or "active" flips a
+  // beat early/late right at the lg boundary.
+  const [navHeight, setNavHeight] = useState(() => (typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches ? 56 : 44))
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)')
+    const onChange = () => setNavHeight(mq.matches ? 56 : 44)
+    onChange()
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
   useEffect(() => {
     const ratios = new Map<string, number>()
     const observer = new IntersectionObserver(
@@ -72,7 +83,7 @@ function useActiveSection(ids: string[]) {
         }
         if (bestRatio > 0) setActive(best)
       },
-      { rootMargin: '-44px 0px -55% 0px', threshold: [0, 0.25, 0.5, 0.75, 1] },
+      { rootMargin: `-${navHeight}px 0px -55% 0px`, threshold: [0, 0.25, 0.5, 0.75, 1] },
     )
     const attached = new Set<string>()
     const attach = () => {
@@ -93,7 +104,7 @@ function useActiveSection(ids: string[]) {
       ro.disconnect()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ids.join('|')])
+  }, [ids.join('|'), navHeight])
   return active
 }
 
@@ -204,14 +215,19 @@ function AppleContent() {
 
       <div className={`theme-apple min-h-screen font-sf ${bg} transition-colors duration-300 [overflow-x:clip]`} role="document">
         <ScrollRail sections={nav.map(([href, label]) => ({ id: href.slice(1), label }))} dark={isDark} accent={isDark ? '#2997ff' : '#0071e3'} />
-        {/* Nav — 44px, frosted */}
+        {/* Nav — 44px through tablet widths, 56px from lg (1024px, the same desktop cutoff the
+            drawer/sheet split already uses) up for more breathing room, frosted. The extra padding/
+            gaps/text-size only kick in at lg: at md (768-1023px, e.g. iPad portrait/landscape) the
+            full nav — logo, 6 links, language selector, theme toggle, CTA — needs more horizontal
+            room than those viewports have; gating the wider values behind lg keeps the compact 44px
+            metrics (which do fit that range) all the way to desktop, where there's room to spare. */}
         <nav
-          className={`fixed top-0 inset-x-0 z-40 h-11 ${isDark ? 'bg-black/70' : 'bg-white/70'} backdrop-blur-xl border-b ${isDark ? 'border-white/10' : 'border-black/5'}`}
+          className={`fixed top-0 inset-x-0 z-40 h-11 lg:h-14 ${isDark ? 'bg-black/70' : 'bg-white/70'} backdrop-blur-xl border-b ${isDark ? 'border-white/10' : 'border-black/5'}`}
           aria-label="Main navigation"
         >
-          <div className="max-w-5xl mx-auto h-full px-4 flex items-center justify-between gap-3">
+          <div className="max-w-5xl mx-auto h-full px-4 lg:px-6 flex items-center justify-between gap-3">
             <LogoSelectorApple isDark={isDark} />
-            <div className="hidden md:flex items-center gap-6 text-xs">
+            <div className="hidden md:flex items-center gap-6 lg:gap-8 text-xs lg:text-[13px]">
               {nav.map(([href, label]) => {
                 const on = activeSection === href.slice(1)
                 return (
@@ -219,7 +235,7 @@ function AppleContent() {
                     key={href}
                     href={href}
                     aria-current={on ? 'true' : undefined}
-                    className={`relative inline-flex items-center h-11 transition-colors duration-150 ${on ? blue : `${muted} hover:${blue}`}`}
+                    className={`relative inline-flex items-center h-11 lg:h-14 transition-colors duration-150 ${on ? blue : `${muted} hover:${blue}`}`}
                   >
                     {label}
                     {on && (
@@ -233,20 +249,20 @@ function AppleContent() {
                 )
               })}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 lg:gap-3">
               <LanguageSelectorApple isDark={isDark} />
               <button
                 type="button"
                 onClick={toggleTheme}
                 aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-                className={`press compact-touch w-8 h-8 rounded-full flex items-center justify-center ${isDark ? 'bg-white/10 text-white' : 'bg-black/5 text-[#1d1d1f]'}`}
+                className={`press compact-touch w-8 h-8 lg:w-9 lg:h-9 rounded-full flex items-center justify-center ${isDark ? 'bg-white/10 text-white' : 'bg-black/5 text-[#1d1d1f]'}`}
               >
                 {isDark ? Icon.sun : Icon.moon}
               </button>
               <button
                 type="button"
                 onClick={() => setContactOpen(true)}
-                className="press compact-touch hidden sm:inline-flex h-8 items-center rounded-full bg-apple-blue px-3.5 text-xs font-medium text-white hover:bg-apple-blueHover"
+                className="press compact-touch hidden sm:inline-flex h-8 lg:h-9 items-center rounded-full bg-apple-blue px-3.5 lg:px-4 text-xs font-medium text-white hover:bg-apple-blueHover"
               >
                 {c.hero.ctaContact}
               </button>
@@ -260,9 +276,9 @@ function AppleContent() {
           </div>
         </nav>
 
-        <main id="main-content" className="pt-11">
+        <main id="main-content" className="pt-11 lg:pt-14">
           {/* Hero — typographic */}
-          <section id="hero" className="px-4 pt-16 md:pt-24 pb-10 md:pb-14 text-center scroll-mt-20" aria-labelledby="hero-heading">
+          <section id="hero" className="px-4 pt-16 md:pt-24 pb-10 md:pb-14 text-center scroll-mt-20 lg:scroll-mt-[92px]" aria-labelledby="hero-heading">
             <p className={`text-sm font-semibold ${blue}`}>{c.hero.eyebrow}</p>
             {/* The LCP element stays static: an entrance fade would delay the first meaningful paint. */}
             <h1
@@ -349,8 +365,12 @@ function AppleContent() {
           </section>
 
           {/* Experience — split 50/50, with an optional subway-map view of the same roles */}
-          {/* The inner section owns id="experience" (shared with every theme); the wrapper carries no id so the page has one. */}
-          <section className={`px-4 py-14 md:py-20 ${surface}`}>
+          {/* The inner Experience.tsx also renders its own id="experience" (shared with every theme,
+              fixed at scroll-mt-20 for their 44px bars); this outer wrapper carries the SAME id first
+              in document order so Apple's own taller md+ bar gets its own scroll-mt without touching
+              the shared file — the same duplicate-id override already used below for shopify/gallery/
+              projects/contact. */}
+          <section id="experience" className={`px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
             <div className="max-w-5xl mx-auto">
               <Experience skin={skin} heading={Heading} />
               <div className="mt-10 md:mt-14">
@@ -377,7 +397,7 @@ function AppleContent() {
           {/* Chapters — a horizontal scroll-snap rail of five year cards, not the shared Years.tsx
               editorial list or the old Gantt ribbon. content-visibility:auto was tried and reverted
               here — see docs/seo.md "content-visibility" for the measured instability. */}
-          <section className="px-4 py-14 md:py-20 scroll-mt-20">
+          <section className="px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Chapters skin={skin} heading={Heading} />
@@ -395,7 +415,7 @@ function AppleContent() {
           </section>
 
           {/* Shopify work — the index */}
-          <section id="shopify" className="px-4 py-14 md:py-20 scroll-mt-20">
+          <section id="shopify" className="px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <ShopifyWork skin={skin} heading={Heading} />
@@ -404,7 +424,7 @@ function AppleContent() {
           </section>
 
           {/* Gallery — media carousel. content-visibility:auto tried and reverted — docs/seo.md. */}
-          <section id="gallery" className={`px-4 py-14 md:py-20 scroll-mt-20 ${surface}`}>
+          <section id="gallery" className={`px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Gallery skin={skin} heading={Heading} />
@@ -415,7 +435,7 @@ function AppleContent() {
           {/* Featured build — The Gummy Box, told through one of four selectable design variants
               (?featured=a|b|c|d). Tighter rhythm than its neighbors on purpose — the brief asked for
               denser spacing than the site's usual py-14/py-20 band. */}
-          <section className="px-4 py-12 md:py-16 scroll-mt-20">
+          <section className="px-4 py-12 md:py-16 scroll-mt-20 lg:scroll-mt-[92px]">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <FeaturedBuild skin={skin} heading={Heading} />
@@ -432,7 +452,7 @@ function AppleContent() {
           <Testimonials skin={skin} heading={Heading} />
 
           {/* Projects — index list. content-visibility:auto tried and reverted — docs/seo.md. */}
-          <section id="projects" className="px-4 py-14 md:py-20 scroll-mt-20">
+          <section id="projects" className="px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Projects skin={skin} heading={Heading} />
@@ -441,8 +461,10 @@ function AppleContent() {
           </section>
 
           {/* Skills — narrative with inline chips. content-visibility:auto tried and reverted — docs/seo.md. */}
-          {/* Same: Skills.tsx renders id="skills". */}
-          <section className={`px-4 py-14 md:py-20 ${surface}`}>
+          {/* Same duplicate-id override as "experience" above: Skills.tsx renders its own id="skills"
+              at scroll-mt-20 for every theme's default bar; this wrapper's id (first in the DOM) gives
+              Apple's own taller md+ bar the right offset without touching the shared file. */}
+          <section id="skills" className={`px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Skills skin={skin} heading={Heading} />
@@ -469,7 +491,7 @@ function AppleContent() {
           </section>
 
           {/* Contact — typographic close, a mesh gradient at 30% opacity so the last section isn't flat */}
-          <section id="contact" className={`relative overflow-hidden px-4 py-24 md:py-32 scroll-mt-20 ${surface}`}>
+          <section id="contact" className={`relative overflow-hidden px-4 py-24 md:py-32 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
             <img
               src="/art/apple/mesh.webp"
               alt=""
@@ -488,7 +510,7 @@ function AppleContent() {
           </section>
 
           {/* Explore */}
-          <section id="explore" className="px-4 py-20 scroll-mt-20">
+          <section id="explore" className="px-4 py-20 scroll-mt-20 lg:scroll-mt-[92px]">
             <div className="max-w-5xl mx-auto">
               {Heading(c.sections.explore.eyebrow, c.sections.explore.title, '', c.sections.explore.lead)}
               <div className="grid sm:grid-cols-3 gap-3">

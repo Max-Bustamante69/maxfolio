@@ -304,6 +304,7 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
                     <button
                       key={u.tool}
                       type="button"
+                      data-tool={u.tool}
                       aria-pressed={isOpen}
                       aria-expanded={isOpen}
                       aria-controls={DRAWER_ID}
@@ -316,7 +317,7 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
                       onKeyDown={onDotKeyDown(u.tool)}
                       tabIndex={filteredOut ? -1 : 0}
                       style={{ left: `${cx}%`, top: `${cy}%` }}
-                      className={`group pointer-events-auto absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-opacity duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current ${dim ? 'opacity-25' : 'opacity-100'} ${filteredOut ? 'pointer-events-none' : ''}`}
+                      className={`group pointer-events-auto absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-opacity duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current ${dim ? 'opacity-25' : 'opacity-100'} ${filteredOut ? 'pointer-events-none' : ''} ${isOpen ? 'outline outline-2 outline-offset-2 outline-current' : ''}`}
                     >
                       {/* Hairline tick bridging the dot to its ring: a sibling of `mfOrbitDot`, not a
                           child of it — it must inherit ONLY the ring's own rotation (so it keeps

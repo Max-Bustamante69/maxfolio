@@ -62,7 +62,7 @@ export function LogoSelectorApple({ isDark }: { isDark: boolean }) {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-haspopup="menu"
-        className={`press inline-flex items-center gap-2 h-8 pl-1 pr-2.5 rounded-full ${isDark ? 'hover:bg-white/10' : 'hover:bg-black/5'} compact-touch`}
+        className={`press inline-flex items-center gap-2 h-8 lg:h-9 pl-1 pr-2.5 lg:pl-1.5 lg:pr-3 rounded-full ${isDark ? 'hover:bg-white/10' : 'hover:bg-black/5'} compact-touch`}
       >
         <Mark id="apple" isDark={isDark} />
         <span className={`text-sm font-semibold ${text}`}>Maxfolio</span>

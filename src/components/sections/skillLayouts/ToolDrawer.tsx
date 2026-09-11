@@ -12,6 +12,17 @@
 // [drawer]... that data looks horrible there") lost its four fleet totals to a new strip here, under
 // the header, shown for every tool regardless of what it links to (`CenterMark` fills the vacated
 // center with a decorative per-theme mark instead — see that component).
+//
+// 2026-09-10 (third pass) — "make the drawer more animated and occupying our conventions of drawers":
+// the panel now runs the house drawer spring (`{ type: 'spring', bounce: 0, duration: 0.6 }` open,
+// 60% of that on close — one spring for every drawer/sheet in the house, not this component's own
+// tuned ease), the backdrop blurs the page 3px on top of dimming it, and — once the panel actually
+// lands — the body staggers in (header, fleet strip, captures/roles, depth) rather than appearing as
+// one flat block. The header and footer moved OUT of the scrollable middle into their own flex rows
+// (a real sibling each, "sits naturally with the content" the same way `ProjectModal`'s own header
+// does — see that file's comment — rather than `position: sticky` inside the pane): the footer is now
+// a real action zone (primary "show in index" pill + a secondary icon-adjacent close), and the header
+// gained its own icon-only close button (`navBtn`, the same 44px round control `ProjectModal` uses).
 import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, m, useDragControls, useReducedMotion } from 'framer-motion'
@@ -39,13 +50,37 @@ export interface ToolDrawerProps {
 
 export const DRAWER_ID = 'orbit-tool-drawer'
 const DRAWER_TITLE_ID = 'orbit-tool-drawer-title'
-// A strong ease-out (framer's "expo out" family) — the rules call for ≤0.35s.
+// A strong ease-out (framer's "expo out" family) — used for the body's stagger-in, not the panel
+// itself (the panel runs the house drawer spring below).
 const EASE_OUT_STRONG = [0.16, 1, 0.3, 1] as const
-const OPEN_DURATION = 0.32
+// House drawer/sheet convention: one spring for every panel in the site, bounce 0 (smooth, no
+// overshoot) — open at its full duration, close at 60% of it so dismissing never feels sluggish.
+const PANEL_SPRING_OPEN = { duration: 0.6 } as const
+const PANEL_SPRING_CLOSE = { duration: 0.36 } as const
+// The body's stagger starts once the panel has visibly landed — ~40% into its own spring — rather
+// than waiting for the spring's `onAnimationComplete` (a spring's settle time is harder to pin down
+// than its nominal duration once bounce is 0 and it's already visually still by this point).
+const BODY_REVEAL_DELAY_MS = PANEL_SPRING_OPEN.duration * 1000 * 0.4
 
 const fill = (template: string, vars: Record<string, string>) => Object.entries(vars).reduce((s, [k, v]) => s.replace(`{${k}}`, v), template)
 
 const focusableSelector = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+/** Container/item variants for the body's stagger-in. Reduced motion collapses every duration and
+ *  stagger gap to zero — the parent's `staggerChildren` still elapses real time even when each
+ *  child's own transition is instant, so it has to be zeroed too, not just the item transitions. */
+const bodyContainerVariants = (reduced: boolean) => ({
+  hidden: {},
+  visible: { transition: { staggerChildren: reduced ? 0 : 0.05 } },
+})
+const bodyItemVariants = (reduced: boolean) => ({
+  hidden: reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0, transition: reduced ? { duration: 0 } : { duration: 0.22, ease: EASE_OUT_STRONG } },
+})
+const capturesContainerVariants = (reduced: boolean) => ({
+  hidden: {},
+  visible: { transition: { staggerChildren: reduced ? 0 : 0.03 } },
+})
 
 /**
  * One capture tile in the drawer's 2-column grid — a real store/product thumbnail (16:10) or, when the
@@ -92,34 +127,21 @@ function CaptureTile({ thumb, skin, sk, badges }: { thumb: ToolThumb; skin: Skin
 }
 
 /**
- * The drawer's actual content — a separate component so its hooks (`useContent`, for the role→company
- * lookup) only run while a tool is really selected, and so the parent can key it by tool for a clean
- * re-mount between two different tools opened back to back.
+ * The compact header row: icon + title (21px, comfortably inside the house 21–24px band) + group
+ * chip/usage meta, plus an icon-only close (`navBtn` — the same round 44px control `ProjectModal`'s
+ * own header uses) so the panel never depends on the footer alone to be dismissable. A real sibling of
+ * the scrollable middle, not `position: sticky` inside it — same reasoning as `ProjectModal`'s header.
  */
-function DrawerBody({ tool, skin, sk, groupLabel, formatTool, onShowInIndex, onClose }: { tool: ToolUsage; skin: Skin; sk: SkillsStrings; groupLabel: Record<SkillGroupId, string>; formatTool: (u: ToolUsage) => string; onShowInIndex: () => void; onClose: () => void }) {
-  const { strings, registry } = useContent()
-  const ob = sk.orbit
-  const dr = ob.drawer
+function DrawerHeader({ tool, skin, groupLabel, formatTool, closeLabel, navBtn, neoBtnShadow, onClose }: { tool: ToolUsage; skin: Skin; groupLabel: Record<SkillGroupId, string>; formatTool: (u: ToolUsage) => string; closeLabel: string; navBtn: string; neoBtnShadow: { boxShadow: string } | undefined; onClose: () => void }) {
   const icon = toolIcon(tool.tool)
-  const thumbs = toolThumbs(tool, Infinity)
-  const roles = toolRoleLines(tool)
-  const depth = tool.tool === 'Liquid' ? { label: sk.depthLabel.liquid, value: fleetLiquidLines } : tool.tool === 'TypeScript' ? { label: sk.depthLabel.ts, value: fleetIslandLines } : null
-  const hasAnyUsage = thumbs.length > 0 || roles.length > 0
-
-  const roleCompany = (id: RoleWorkId, fallback: string) => {
-    const w = registry.roleWork.find((r) => r.id === id)
-    const exp = w ? registry.experience.find((e) => e.id === w.role) : undefined
-    return { logo: exp?.logo, name: fallback }
-  }
-
   return (
-    <>
-      <div className="flex items-start gap-3.5">
+    <header className={`flex shrink-0 items-start justify-between gap-3 border-b px-5 py-4 lg:px-6 ${skin.line} ${skin.dark ? 'bg-white/[0.02]' : 'bg-black/[0.015]'}`}>
+      <div className="flex min-w-0 flex-1 items-start gap-3">
         <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sm font-bold ${skin.dark ? 'bg-white/[0.06] text-current' : 'bg-black/[0.05] text-current'} ${skin.accent}`}>
           {icon ? <ToolMark tool={tool.tool} className="h-5 w-5" /> : monogram(tool.tool)}
         </span>
         <div className="min-w-0 flex-1">
-          <h3 id={DRAWER_TITLE_ID} className={`truncate text-lg font-semibold leading-tight ${skin.title}`}>
+          <h3 id={DRAWER_TITLE_ID} className={`truncate text-[21px] font-semibold leading-tight ${skin.title}`}>
             {tool.tool}
           </h3>
           <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
@@ -128,14 +150,69 @@ function DrawerBody({ tool, skin, sk, groupLabel, formatTool, onShowInIndex, onC
           </div>
         </div>
       </div>
+      <button type="button" onClick={onClose} aria-label={closeLabel} className={navBtn} style={neoBtnShadow}>
+        <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </header>
+  )
+}
 
+/**
+ * The sticky footer action zone (house convention): the primary action ("show in the storefront
+ * index") as a filled pill, a secondary close beside it — a real sibling after the scrollable middle,
+ * so both stay in view regardless of scroll position instead of riding along with the content.
+ */
+function DrawerFooter({ skin, actionBtn, neoBtnShadow, showInIndexLabel, closeLabel, onShowInIndex, onClose }: { skin: Skin; actionBtn: string; neoBtnShadow: { boxShadow: string } | undefined; showInIndexLabel: string; closeLabel: string; onShowInIndex: () => void; onClose: () => void }) {
+  return (
+    <footer className={`flex shrink-0 items-center justify-between gap-3 border-t px-5 py-4 lg:px-6 ${skin.line} ${skin.dark ? 'bg-white/[0.02]' : 'bg-black/[0.015]'}`}>
+      <button
+        type="button"
+        onClick={onShowInIndex}
+        className={`press inline-flex h-10 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-4 text-[12.5px] font-medium text-white ${skin.accentBg}`}
+      >
+        {showInIndexLabel}
+      </button>
+      <button type="button" onClick={onClose} className={actionBtn} style={neoBtnShadow}>
+        {closeLabel}
+      </button>
+    </footer>
+  )
+}
+
+/**
+ * The drawer's scrollable middle — fleet strip, then this tool's own captures/roles, then depth —
+ * staggered in once the panel has landed (`bodyReady`, driven by the shell below). A separate
+ * component so its hooks (`useContent`, for the role→company lookup) only run while a tool is really
+ * selected, and so the parent can key it by tool for a clean re-mount between two different tools
+ * opened back to back.
+ */
+function DrawerBody({ tool, skin, sk, bodyReady, reduced }: { tool: ToolUsage; skin: Skin; sk: SkillsStrings; bodyReady: boolean; reduced: boolean }) {
+  const { strings, registry } = useContent()
+  const ob = sk.orbit
+  const dr = ob.drawer
+  const thumbs = toolThumbs(tool, Infinity)
+  const roles = toolRoleLines(tool)
+  const depth = tool.tool === 'Liquid' ? { label: sk.depthLabel.liquid, value: fleetLiquidLines } : tool.tool === 'TypeScript' ? { label: sk.depthLabel.ts, value: fleetIslandLines } : null
+  const hasAnyUsage = thumbs.length > 0 || roles.length > 0
+  const item = bodyItemVariants(reduced)
+
+  const roleCompany = (id: RoleWorkId, fallback: string) => {
+    const w = registry.roleWork.find((r) => r.id === id)
+    const exp = w ? registry.experience.find((e) => e.id === w.role) : undefined
+    return { logo: exp?.logo, name: fallback }
+  }
+
+  return (
+    <m.div variants={bodyContainerVariants(reduced)} initial="hidden" animate={bodyReady ? 'visible' : 'hidden'}>
       {/* Fleet-wide strip (2026-09-10): the four real fleet totals that used to sit in the orbit's
           center card — moved here per the owner's call ("that data looks horrible there"). Shown for
           every tool, on both `ToolDrawer` hosts (`OrbitLayout` and `LedgerLayout`), never conditioned
           on `hasAnyUsage` below — it's fleet-wide, not this tool's own usage. Four columns on the
           desktop panel, 2×2 on the phone sheet (the `lg:` breakpoint tracks the same 1024px split
           that decides which host is mounted, so it never needs its own `isDesktop` check here). */}
-      <div className={`mt-5 border-t pt-4 ${skin.line}`}>
+      <m.div variants={item}>
         <p className={`text-[11px] font-semibold uppercase tracking-[0.14em] ${skin.muted}`}>{dr.fleetLabel}</p>
         <div className="mt-2.5 grid grid-cols-2 gap-x-3 gap-y-3 lg:grid-cols-4">
           {[
@@ -152,23 +229,25 @@ function DrawerBody({ tool, skin, sk, groupLabel, formatTool, onShowInIndex, onC
             </div>
           ))}
         </div>
-      </div>
+      </m.div>
 
       {hasAnyUsage ? (
         <>
           {thumbs.length > 0 && (
-            <div className="mt-6">
+            <m.div variants={item} className="mt-6">
               <p className={`text-[11px] font-semibold uppercase tracking-[0.14em] ${skin.muted}`}>{dr.capturesLabel}</p>
-              <div className="mt-2.5 grid grid-cols-2 gap-2.5">
+              <m.div variants={capturesContainerVariants(reduced)} initial="hidden" animate={bodyReady ? 'visible' : 'hidden'} className="mt-2.5 grid grid-cols-2 gap-2.5">
                 {thumbs.map((t) => (
-                  <CaptureTile key={t.kind === 'store' ? `store-${t.slug}` : `product-${t.id}`} thumb={t} skin={skin} sk={sk} badges={strings.badges} />
+                  <m.div key={t.kind === 'store' ? `store-${t.slug}` : `product-${t.id}`} layout variants={item}>
+                    <CaptureTile thumb={t} skin={skin} sk={sk} badges={strings.badges} />
+                  </m.div>
                 ))}
-              </div>
-            </div>
+              </m.div>
+            </m.div>
           )}
 
           {roles.length > 0 && (
-            <div className="mt-6">
+            <m.div variants={item} className="mt-6">
               <p className={`text-[11px] font-semibold uppercase tracking-[0.14em] ${skin.muted}`}>{dr.rolesLabel}</p>
               <ul className="mt-2 flex flex-col gap-1" role="list">
                 {roles.map((r) => {
@@ -191,31 +270,24 @@ function DrawerBody({ tool, skin, sk, groupLabel, formatTool, onShowInIndex, onC
                   )
                 })}
               </ul>
-            </div>
+            </m.div>
           )}
         </>
       ) : (
-        <p className={`mt-6 text-sm ${skin.muted}`}>{dr.noCaptures}</p>
+        <m.p variants={item} className={`mt-6 text-sm ${skin.muted}`}>
+          {dr.noCaptures}
+        </m.p>
       )}
 
       {depth && (
-        <div className={`mt-6 border-t pt-4 ${skin.line}`}>
+        <m.div variants={item} className={`mt-6 border-t pt-4 ${skin.line}`}>
           <p className={`text-lg font-semibold tabular-nums ${skin.title}`}>
             <CountUp value={depth.value} />
           </p>
           <p className={`mt-0.5 text-[10px] uppercase leading-tight tracking-wide ${skin.muted}`}>{depth.label}</p>
-        </div>
+        </m.div>
       )}
-
-      <div className={`mt-auto flex items-center justify-between gap-3 border-t pt-4 ${skin.line}`}>
-        <button type="button" onClick={onShowInIndex} className={`text-left text-[12.5px] font-medium underline-offset-2 hover:underline ${skin.accent}`}>
-          {dr.showInIndex}
-        </button>
-        <button type="button" onClick={onClose} className={`shrink-0 rounded-full border px-3 py-1.5 text-[11px] font-medium ${skin.line} ${skin.body}`}>
-          {dr.close}
-        </button>
-      </div>
-    </>
+    </m.div>
   )
 }
 
@@ -226,7 +298,8 @@ function DrawerBody({ tool, skin, sk, groupLabel, formatTool, onShowInIndex, onC
  */
 export function ToolDrawer({ skin, sk, groupLabel, formatTool, tool, open, onClose }: ToolDrawerProps) {
   const isDesktop = useMediaQuery('(min-width: 1024px)')
-  const reduced = useReducedMotion()
+  const reducedMotion = useReducedMotion()
+  const reduced = !!reducedMotion
   const panelRef = useRef<HTMLDivElement>(null)
   const returnFocusRef = useRef<Element | null>(null)
   const drag = useDragControls()
@@ -242,6 +315,24 @@ export function ToolDrawer({ skin, sk, groupLabel, formatTool, tool, open, onClo
   // subscription below would otherwise start a tick too late to catch the very first broadcast.
   const [suppressed, setSuppressed] = useState(() => typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('store'))
   useEffect(() => onCaseStudyVisibleChange(setSuppressed), [])
+
+  // Gates the body's stagger-in: false the instant the panel starts opening (or re-keys to a new
+  // tool), true once the panel has visibly landed — see `BODY_REVEAL_DELAY_MS`. Reduced motion skips
+  // straight to true, matching "reduced motion means instant" for the whole drawer, not just the panel.
+  const [bodyReady, setBodyReady] = useState(reduced)
+  useEffect(() => {
+    if (!open) {
+      setBodyReady(false)
+      return
+    }
+    if (reduced) {
+      setBodyReady(true)
+      return
+    }
+    setBodyReady(false)
+    const id = window.setTimeout(() => setBodyReady(true), BODY_REVEAL_DELAY_MS)
+    return () => window.clearTimeout(id)
+  }, [open, reduced, tool?.tool])
 
   // Focus management: remember what was focused before the drawer opened (the orbit dot / ledger row),
   // move focus into the panel, and give it back on close — never left dangling on a removed trigger.
@@ -302,9 +393,15 @@ export function ToolDrawer({ skin, sk, groupLabel, formatTool, tool, open, onClo
     onClose()
   }
 
-  const backdropTransition = reduced ? { duration: 0 } : { duration: 0.2, ease: 'easeOut' as const }
-  const panelTransition = reduced ? { duration: 0 } : { duration: OPEN_DURATION, ease: EASE_OUT_STRONG }
-  const { panel, panelBg } = sheetTokens(skin)
+  // Backdrop: house timing (0.22s, the site's other strong ease-out) whichever way it's moving — only
+  // the panel gets a different duration on the way out. Reduced motion collapses both to instant.
+  const backdropTransition = reduced ? { duration: 0 } : { duration: 0.22, ease: [0.22, 1, 0.36, 1] as const }
+  // House drawer spring — bounce 0, one duration for every drawer/sheet in the site — open at full
+  // duration, close at 60% of it. Framer resolves a differing `transition` per animation target when
+  // it's nested inside that target rather than shared, so `animate`/`exit` each carry their own.
+  const panelOpenTransition = reduced ? { duration: 0 } : { type: 'spring' as const, bounce: 0, ...PANEL_SPRING_OPEN }
+  const panelCloseTransition = reduced ? { duration: 0 } : { type: 'spring' as const, bounce: 0, ...PANEL_SPRING_CLOSE }
+  const { panel, panelBg, navBtn, actionBtn, neoBtnShadow } = sheetTokens(skin)
 
   const content = (
     <AnimatePresence>
@@ -317,10 +414,12 @@ export function ToolDrawer({ skin, sk, groupLabel, formatTool, tool, open, onClo
         // permanently: two portalled `AnimatePresence` trees animating in the same commit — this
         // drawer's exit and the sheet's own entrance — left the drawer's exit callback never firing,
         // so it never unmounted (confirmed empirically: `role="dialog"` count stayed 2 indefinitely).
+        // z-[9998] sits above the fixed nav's z-40, so the backdrop (inset-0) covers it — including
+        // its frosted bar — while the drawer is open, per house convention.
         <m.div
           inert={suppressed || undefined}
           aria-hidden={suppressed || undefined}
-          className={`fixed inset-0 z-[9998] flex ${isDesktop ? 'items-stretch justify-end' : 'items-end justify-center'} bg-black/60 ${suppressed ? 'invisible' : ''}`}
+          className={`fixed inset-0 z-[9998] flex ${isDesktop ? 'items-stretch justify-end' : 'items-end justify-center'} bg-black/60 backdrop-blur-[3px] ${suppressed ? 'invisible' : ''}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -336,11 +435,10 @@ export function ToolDrawer({ skin, sk, groupLabel, formatTool, tool, open, onClo
             tabIndex={-1}
             onKeyDown={onPanelKeyDown}
             onClick={(e) => e.stopPropagation()}
-            className={`relative flex w-full flex-col overflow-hidden outline-none ${panel} ${panelBg} shadow-[0_20px_60px_rgba(0,0,0,0.35)] ${isDesktop ? 'top-24 h-[calc(100%-6rem)] max-w-[440px]' : 'max-h-[85vh]'}`}
-            initial={isDesktop ? { x: '100%' } : { y: '100%' }}
-            animate={isDesktop ? { x: 0 } : { y: 0 }}
-            exit={isDesktop ? { x: '100%' } : { y: '100%' }}
-            transition={panelTransition}
+            className={`relative flex w-full flex-col overflow-hidden outline-none ${panel} ${panelBg} shadow-[0_20px_60px_rgba(0,0,0,0.35)] ${isDesktop ? 'top-[108px] h-[calc(100%-108px)] max-w-[440px]' : 'max-h-[85vh]'}`}
+            initial={isDesktop ? { x: '100%', opacity: 0.96 } : { y: '100%', opacity: 0.96 }}
+            animate={isDesktop ? { x: 0, opacity: 1, transition: panelOpenTransition } : { y: 0, opacity: 1, transition: panelOpenTransition }}
+            exit={isDesktop ? { x: '100%', opacity: 0.96, transition: panelCloseTransition } : { y: '100%', opacity: 0.96, transition: panelCloseTransition }}
             drag={isDesktop ? false : 'y'}
             dragControls={drag}
             dragListener={false}
@@ -355,11 +453,19 @@ export function ToolDrawer({ skin, sk, groupLabel, formatTool, tool, open, onClo
                 <span className={`h-1.5 w-10 rounded-full ${skin.dark ? 'bg-white/25' : 'bg-black/20'}`} />
               </div>
             )}
-            <div className="min-h-0 flex-1 overflow-y-auto p-5 lg:p-6" data-lenis-prevent>
-              <div className="flex min-h-full flex-col">
-                <DrawerBody tool={tool} skin={skin} sk={sk} groupLabel={groupLabel} formatTool={formatTool} onShowInIndex={onShowInIndex} onClose={onClose} />
-              </div>
+            <DrawerHeader tool={tool} skin={skin} groupLabel={groupLabel} formatTool={formatTool} closeLabel={sk.orbit.drawer.close} navBtn={navBtn} neoBtnShadow={neoBtnShadow} onClose={onClose} />
+            <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 lg:px-6" data-lenis-prevent>
+              <DrawerBody tool={tool} skin={skin} sk={sk} bodyReady={bodyReady} reduced={reduced} />
             </div>
+            <DrawerFooter
+              skin={skin}
+              actionBtn={actionBtn}
+              neoBtnShadow={neoBtnShadow}
+              showInIndexLabel={sk.orbit.drawer.showInIndex}
+              closeLabel={sk.orbit.drawer.close}
+              onShowInIndex={onShowInIndex}
+              onClose={onClose}
+            />
           </m.div>
         </m.div>
       )}
