@@ -48,6 +48,12 @@ const CHIP = 'compact-touch shrink-0 snap-start max-lg:inline-flex max-lg:min-h-
 /** Real scroll position, not a guess: drives the rail's own one-sided `mask-image` (transparent only
  *  on the edge that still has content to reveal) so it never becomes the "fixed two-sided mask" the
  *  house filter-motion contract rules out. Off entirely at `lg`+, where the rail stops scrolling. */
+// Scroll-snap containers can rest a few pixels off true zero on first paint (Chromium settling the
+// first `snap-start` child against this rail's own left padding) — real scroll, but nothing a visitor
+// would call "hidden content". The epsilon matches the fade width itself: anything within one fade's
+// worth of an edge reads as "at that edge", so the snap settle never paints a false sliver of fade.
+const FADE_PX = 20
+
 function useEdgeFade(active: boolean) {
   const ref = useRef<HTMLDivElement | null>(null)
   const [edge, setEdge] = useState({ start: false, end: false })
@@ -59,7 +65,7 @@ function useEdgeFade(active: boolean) {
     }
     const measure = () => {
       const max = el.scrollWidth - el.clientWidth
-      setEdge({ start: el.scrollLeft > 2, end: el.scrollLeft < max - 2 })
+      setEdge({ start: el.scrollLeft > FADE_PX, end: el.scrollLeft < max - FADE_PX })
     }
     measure()
     el.addEventListener('scroll', measure, { passive: true })
@@ -72,7 +78,7 @@ function useEdgeFade(active: boolean) {
   }, [active])
   const mask = active && (edge.start || edge.end)
   const maskImage = mask
-    ? `linear-gradient(to right, ${edge.start ? 'transparent, black 20px' : 'black 0'}, ${edge.end ? 'black calc(100% - 20px), transparent' : 'black 100%'})`
+    ? `linear-gradient(to right, ${edge.start ? `transparent, black ${FADE_PX}px` : 'black 0'}, ${edge.end ? `black calc(100% - ${FADE_PX}px), transparent` : 'black 100%'})`
     : 'none'
   return { ref, maskImage }
 }
