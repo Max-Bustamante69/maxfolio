@@ -7,7 +7,7 @@
 // scrollable, snapping rail with a one-sided edge fade (mask-image driven off real scroll position,
 // never a fixed two-sided mask — see `useEdgeFade`); at `lg` and up the same controls wrap into
 // centered rows and the rail's own scroll/mask machinery switches off entirely.
-import { useEffect, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type KeyboardEvent, type ReactNode } from 'react'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { useMediaQuery } from '../../../hooks'
 import type { SkillGroupId } from '../../../data/registry'
@@ -42,6 +42,26 @@ const SORT_LABEL: Record<SortId, 'sortUsage' | 'sortName' | 'sortGroup'> = {
 }
 
 const fill = (template: string, vars: Record<string, string>) => Object.entries(vars).reduce((s, [k, v]) => s.replace(`{${k}}`, v), template)
+
+/** ARIA APG radiogroup keyboard pattern: arrow keys move focus (and, for a single-choice group,
+ *  selection) between options, wrapping at the ends; Home/End jump to the first/last. Paired with
+ *  roving `tabIndex` below (0 on the checked option, -1 on the rest) so Tab enters/leaves the whole
+ *  group in one stop, matching how a screen reader announces and drives a native radio group. */
+function onRadioGroupKeyDown(e: KeyboardEvent<HTMLDivElement>) {
+  const keys = ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp', 'Home', 'End']
+  if (!keys.includes(e.key)) return
+  const options = Array.from(e.currentTarget.querySelectorAll<HTMLButtonElement>('[role="radio"]'))
+  if (!options.length) return
+  e.preventDefault()
+  const current = options.indexOf(document.activeElement as HTMLButtonElement)
+  let next: number
+  if (e.key === 'Home') next = 0
+  else if (e.key === 'End') next = options.length - 1
+  else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = current < 0 ? 0 : (current + 1) % options.length
+  else next = current < 0 ? options.length - 1 : (current - 1 + options.length) % options.length
+  options[next].focus()
+  options[next].click()
+}
 
 const CHIP = 'compact-touch shrink-0 snap-start max-lg:inline-flex max-lg:min-h-11 max-lg:min-w-11 max-lg:items-center max-lg:justify-center rounded-full px-2.5 py-1 text-[11px] transition-colors'
 
@@ -111,16 +131,27 @@ function Divider({ skin }: { skin: Skin }) {
 }
 
 const SUMMARY_TOKEN = /(\{n\}|\{m\}|\{k\})/
+const fillSummary = (template: string, n: number, m: number, k: number) =>
+  template.replace('{n}', String(n)).replace('{m}', String(m)).replace('{k}', String(k))
 
+/** The visible counters tween through several intermediate values on every filter change (measured:
+ *  ~16 DOM mutations per toggle, e.g. 39 -> 28 -> 20 -> 15 -> 7 -> ... -> 3) — fine to watch, but
+ *  inside a live region a screen reader queues and reads out each intermediate value in turn, which
+ *  is real noise on every single interaction. `aria-hidden` on the animating span keeps it out of the
+ *  accessibility tree (it still renders and animates visually) while a plain `sr-only` sibling carries
+ *  the one, already-settled sentence a live region should actually announce. */
 function Summary({ template, n, m, k }: { template: string; n: number; m: number; k: number }) {
   return (
     <>
-      {template.split(SUMMARY_TOKEN).map((part, i) => {
-        if (part === '{n}') return <CountUp key={`n-${i}`} value={n} duration={0.2} className="tabular-nums" />
-        if (part === '{m}') return <span key={`m-${i}`} className="tabular-nums">{m}</span>
-        if (part === '{k}') return <CountUp key={`k-${i}`} value={k} duration={0.2} className="tabular-nums" />
-        return <span key={`t-${i}`}>{part}</span>
-      })}
+      <span aria-hidden="true">
+        {template.split(SUMMARY_TOKEN).map((part, i) => {
+          if (part === '{n}') return <CountUp key={`n-${i}`} value={n} duration={0.2} className="tabular-nums" />
+          if (part === '{m}') return <span key={`m-${i}`} className="tabular-nums">{m}</span>
+          if (part === '{k}') return <CountUp key={`k-${i}`} value={k} duration={0.2} className="tabular-nums" />
+          return <span key={`t-${i}`}>{part}</span>
+        })}
+      </span>
+      <span className="sr-only">{fillSummary(template, n, m, k)}</span>
     </>
   )
 }
@@ -188,11 +219,12 @@ export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, fo
       </Rail>
 
       <Rail ariaLabel={ob.surfaceLabel}>
-        <div role="radiogroup" aria-label={ob.surfaceLabel} className="flex shrink-0 items-center gap-1.5">
+        <div role="radiogroup" aria-label={ob.surfaceLabel} onKeyDown={onRadioGroupKeyDown} className="flex shrink-0 items-center gap-1.5">
           <button
             type="button"
             role="radio"
             aria-checked={filter.surface === null}
+            tabIndex={filter.surface === null ? 0 : -1}
             onClick={() => filter.setSurface(null)}
             className={`${CHIP} ${filter.surface === null ? skin.chipOn : skin.chip}`}
           >
@@ -204,6 +236,7 @@ export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, fo
               type="button"
               role="radio"
               aria-checked={filter.surface === s}
+              tabIndex={filter.surface === s ? 0 : -1}
               onClick={() => filter.setSurface(s)}
               className={`${CHIP} ${filter.surface === s ? skin.chipOn : skin.chip}`}
             >
@@ -214,11 +247,12 @@ export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, fo
 
         <Divider skin={skin} />
 
-        <div role="radiogroup" aria-label={ob.depthFilterLabel} className="flex shrink-0 items-center gap-1.5">
+        <div role="radiogroup" aria-label={ob.depthFilterLabel} onKeyDown={onRadioGroupKeyDown} className="flex shrink-0 items-center gap-1.5">
           <button
             type="button"
             role="radio"
             aria-checked={filter.depth === null}
+            tabIndex={filter.depth === null ? 0 : -1}
             onClick={() => filter.setDepth(null)}
             className={`${CHIP} ${filter.depth === null ? skin.chipOn : skin.chip}`}
           >
@@ -230,6 +264,7 @@ export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, fo
               type="button"
               role="radio"
               aria-checked={filter.depth === d}
+              tabIndex={filter.depth === d ? 0 : -1}
               onClick={() => filter.setDepth(d)}
               className={`${CHIP} ${filter.depth === d ? skin.chipOn : skin.chip}`}
             >
@@ -240,13 +275,14 @@ export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, fo
 
         <Divider skin={skin} />
 
-        <div role="radiogroup" aria-label={ob.minStoresLabel} className="flex shrink-0 items-center gap-1.5">
+        <div role="radiogroup" aria-label={ob.minStoresLabel} onKeyDown={onRadioGroupKeyDown} className="flex shrink-0 items-center gap-1.5">
           {MIN_STORES_STOPS.map((stop: MinStoresStop) => (
             <button
               key={stop}
               type="button"
               role="radio"
               aria-checked={filter.minStores === stop}
+              tabIndex={filter.minStores === stop ? 0 : -1}
               aria-label={stop === 0 ? ob.minStoresAny : fill(ob.minStoresOptionAria, { n: String(stop) })}
               onClick={() => filter.setMinStores(stop)}
               className={`${CHIP} ${filter.minStores === stop ? skin.chipOn : skin.chip}`}
@@ -258,13 +294,14 @@ export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, fo
 
         <Divider skin={skin} />
 
-        <div role="radiogroup" aria-label={ob.sortLabel} className="flex shrink-0 items-center gap-1.5">
+        <div role="radiogroup" aria-label={ob.sortLabel} onKeyDown={onRadioGroupKeyDown} className="flex shrink-0 items-center gap-1.5">
           {SORT_IDS.map((s: SortId) => (
             <button
               key={s}
               type="button"
               role="radio"
               aria-checked={filter.sort === s}
+              tabIndex={filter.sort === s ? 0 : -1}
               onClick={() => filter.setSort(s)}
               className={`${CHIP} ${filter.sort === s ? skin.chipOn : skin.chip}`}
             >
