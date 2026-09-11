@@ -77,10 +77,14 @@ export function StoryboardRailVariant({ data }: { data: FeaturedData }) {
       (entries) => {
         for (const entry of entries) {
           const idx = Number((entry.target as HTMLElement).dataset.idx)
-          ratios.set(idx, entry.intersectionRatio)
+          // Round off sub-pixel layout noise (a fractional card width can leave a fully-visible card
+          // reading e.g. 0.9997 instead of 1) so it doesn't lose a tie it should win.
+          ratios.set(idx, Math.round(entry.intersectionRatio * 100) / 100)
         }
         let best = 0
         let bestRatio = 0
+        // Desktop shows several whole cards at once, so more than one can genuinely tie at ratio 1 —
+        // on a tie the leftmost (lowest index) wins, since that's the card snapped to the frame line.
         ratios.forEach((ratio, idx) => {
           if (ratio > bestRatio) {
             bestRatio = ratio

@@ -103,8 +103,11 @@ export function useDragRail(ref: React.RefObject<HTMLDivElement | null>, options
     (rail: HTMLDivElement): number[] => {
       const centered = window.innerWidth < centerSnapBelow
       const railOffset = rail.offsetLeft
-      return Array.from(rail.children).map((node) => {
-        const el = node as HTMLElement
+      // Only direct children marked as a slide (`data-idx`) count as landing targets — a trailing
+      // spacer some callers add so the last real slide can still reach the frame line is deliberately
+      // excluded, never a place to land.
+      const slides = Array.from(rail.querySelectorAll<HTMLElement>(':scope > [data-idx]'))
+      return slides.map((el) => {
         const base = el.offsetLeft - railOffset
         return centered ? base - (rail.clientWidth - el.offsetWidth) / 2 : base
       })

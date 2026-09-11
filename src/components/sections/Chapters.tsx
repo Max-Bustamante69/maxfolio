@@ -69,10 +69,16 @@ export function Chapters({ skin, heading }: ChaptersProps) {
       (entries) => {
         for (const entry of entries) {
           const idx = Number((entry.target as HTMLElement).dataset.idx)
-          ratios.set(idx, entry.intersectionRatio)
+          // Round off sub-pixel layout noise (a fractional card width can leave a fully-visible card
+          // reading e.g. 0.9997 instead of 1) so it doesn't lose a tie it should win.
+          ratios.set(idx, Math.round(entry.intersectionRatio * 100) / 100)
         }
         let best = 0
         let bestRatio = 0
+        // Desktop shows several whole cards at once, so more than one can genuinely tie at ratio 1 —
+        // on a tie the leftmost (lowest index) wins, since that's the card snapped to the frame line.
+        // Ascending iteration + a strict `>` already keeps the first (lowest-index) max; only the
+        // rounding above was letting a near-tie slip through to a higher index.
         ratios.forEach((ratio, idx) => {
           if (ratio > bestRatio) {
             bestRatio = ratio
