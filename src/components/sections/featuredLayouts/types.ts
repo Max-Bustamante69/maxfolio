@@ -5,15 +5,35 @@ import type { Skin } from '../../gallery'
 import type { PortfolioContent } from '../../../content/types'
 import type { StoreEntry } from '../../../data/registry'
 
+/**
+ * Numbers for the shared Impact strip (FeaturedImpact.tsx), computed once in FeaturedBuild.tsx.
+ * `conversionPct`/`revenuePct`/`loadTimePct` are illustrative — the exact same seeded calls
+ * Gallery.tsx's `impactFor()` makes (conversionSeries → revenueSeries → loadTimeSeries off the real
+ * desktop LCP) — so these hero numerals always equal the case-study sheet's own hero numerals for
+ * this store. Everything else here is real, straight from lighthouse.json/telemetry.json.
+ */
+export interface FeaturedImpactData {
+  conversionPct: number
+  revenuePct: number
+  loadTimePct: number
+  rings: { perf: number; a11y: number; seo: number }
+  lcpDesktop: number
+  tbtDesktop: number
+  build: { commits: number; weeks: number; sections: number; blocks: number; trackedComponents: number }
+}
+
 export interface FeaturedData {
   skin: Skin
   fb: PortfolioContent['sections']['featuredBuild']
   g: PortfolioContent['sections']['gallery']
+  cs: PortfolioContent['sections']['caseStudy']
   store: StoreEntry
   /** {placeholder} -> real value, applied to every templated string this section renders. */
   vars: Record<string, string | number>
   /** Real telemetry: commits, weeks tracked, sections — the bento variant's three count-up numerals. */
   metrics: { commits: number; weeks: number; sections: number }
+  /** The shared Impact strip's numbers — see `FeaturedImpactData` above. */
+  impact: FeaturedImpactData
   /** `/gallery/<slug>/<name>-<variant>.webp` — only 'home' and 'pdp' exist for this store. */
   img: (name: 'home' | 'pdp', variant: 'desktop' | 'mobile') => string
   /** deep-links into the Gallery section's case-study sheet for this store (`?store=<slug>#gallery`). */
