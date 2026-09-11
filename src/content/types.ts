@@ -100,6 +100,18 @@ export interface PortfolioContent {
       countLabel: string // '{n}+ automated checks'
       cta: string
       groups: { label: string; items: string[] }[]
+      /** Sits under the visual run: states plainly that this replays the check list, never a live result. */
+      runCaption: string
+      /** A group tile's status while its items are still being marked off. */
+      statusChecking: string
+      /** A group tile's status once every one of its items is marked off. */
+      statusDone: string
+      /** Alt text for the home-page capture inside the device frame, names the store. */
+      screenshotAlt: string
+      /** aria-label for each hotspot marker over the capture; '{group}' is replaced with that group's label. */
+      hotspotAria: string
+      /** aria-valuetext for a group's progress meter; '{done}' and '{total}' are replaced with counts. */
+      progressAria: string
     }
     /** Luxury's Years intro: the unit chart re-narrated as one composed sentence per year. */
     fiveLines: {

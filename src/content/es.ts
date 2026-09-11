@@ -166,6 +166,12 @@ export const es: PortfolioContent = {
         { label: 'Navegación', items: ['Todo enlace ancla resuelve a una sección real', 'Los mega menús funcionan bien con hover y con toque'] },
         { label: 'Overlays', items: ['Los fondos oscuros cubren el header, no solo el body', 'El scroll se bloquea mientras un overlay está abierto', 'Las barras de compra sticky completan sus dos fases', 'El orden de z-index nunca deja un overlay detrás de otro'] },
       ],
+      runCaption: 'Esto reproduce la misma lista de chequeos que corre la revisión sobre tu tienda. Nunca muestra un resultado en vivo.',
+      statusChecking: 'Revisando…',
+      statusDone: 'Lista completada',
+      screenshotAlt: 'Página de inicio de The Gummy Box, la tienda real sobre la que esta demo reproduce los chequeos',
+      hotspotAria: 'Chequeos de {group}, marcados sobre la página de inicio',
+      progressAria: '{done} de {total} chequeos',
     },
     fiveLines: {
       kinds: {
