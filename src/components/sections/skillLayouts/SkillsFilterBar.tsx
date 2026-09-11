@@ -1,21 +1,23 @@
 // The filter bar shared by the orbit layout (above the rings, doubling as the group legend) and the
-// sub-1024px ledger fallback: group chips (multi-select, live facet counts), a surface radiogroup
-// (which kind of real usage), a "used in at least N stores" radiogroup, a sort radiogroup, free text,
-// Clear, an active-filter chips row and a live result summary. One component so every surface that
-// filters (orbit legend, ledger toolbar) filters identically and never drifts. Below `lg` every
-// toggle-style control rides one horizontally scrollable, snapping rail with a one-sided edge fade
-// (mask-image driven off real scroll position, never a fixed two-sided mask — see `useEdgeFade`); at
-// `lg` and up the same controls wrap into centered rows and the rail's own scroll/mask machinery
-// switches off entirely.
+// sub-1024px ledger fallback: group chips (multi-select, live facet counts), a "Show:" surface
+// radiogroup (which kind of real usage), free text, and a live result summary with a Clear link. One
+// component so every surface that filters (orbit legend, ledger toolbar) filters identically and
+// never drifts. Below `lg` the chips and the surface control each ride their own horizontally
+// scrollable, snapping rail with a one-sided edge fade (mask-image driven off real scroll position,
+// never a fixed two-sided mask — see `useEdgeFade`) and the search box goes full width; at `lg` and up
+// chips sit left, the surface control and search sit right on the same row (wrapping to a second row
+// only if it doesn't fit), and the rail's own scroll/mask machinery switches off entirely.
+// 2026-09-11 — owner feedback: "fewer filters, clearer". The min-stores threshold, the sort order and
+// the active-filter chips row are gone — three controls remain (group, surface, name) plus the result
+// line and a Clear link.
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type KeyboardEvent, type ReactNode } from 'react'
-import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { useMediaQuery } from '../../../hooks'
 import type { SkillGroupId } from '../../../data/registry'
 import type { ToolUsage } from '../../../data/skillUsage'
 import { CountUp } from '../../gallery/charts'
 import type { Skin } from '../../gallery'
 import type { SkillsStrings } from '../skillsFormat'
-import { MIN_STORES_STOPS, SORT_IDS, SURFACE_IDS, type MinStoresStop, type SkillsFilter, type SortId, type SurfaceId } from './useSkillsFilter'
+import { SURFACE_IDS, type SkillsFilter, type SurfaceId } from './useSkillsFilter'
 
 interface SkillsFilterBarProps {
   skin: Skin
@@ -34,14 +36,6 @@ const SURFACE_LABEL: Record<SurfaceId, 'surfaceStorefronts' | 'surfaceProducts' 
   products: 'surfaceProducts',
   roles: 'surfaceRoles',
 }
-
-const SORT_LABEL: Record<SortId, 'sortUsage' | 'sortName' | 'sortGroup'> = {
-  usage: 'sortUsage',
-  name: 'sortName',
-  group: 'sortGroup',
-}
-
-const fill = (template: string, vars: Record<string, string>) => Object.entries(vars).reduce((s, [k, v]) => s.replace(`{${k}}`, v), template)
 
 /** ARIA APG radiogroup keyboard pattern: arrow keys move focus (and, for a single-choice group,
  *  selection) between options, wrapping at the ends; Home/End jump to the first/last. Paired with
@@ -126,10 +120,6 @@ function Rail({ ariaLabel, children }: RailProps) {
   )
 }
 
-function Divider({ skin }: { skin: Skin }) {
-  return <span aria-hidden="true" className={`mx-0.5 h-5 w-px shrink-0 ${skin.dark ? 'bg-white/10' : 'bg-black/10'}`} />
-}
-
 const SUMMARY_TOKEN = /(\{n\}|\{m\}|\{k\})/
 const fillSummary = (template: string, n: number, m: number, k: number) =>
   template.replace('{n}', String(n)).replace('{m}', String(m)).replace('{k}', String(k))
@@ -158,13 +148,12 @@ function Summary({ template, n, m, k }: { template: string; n: number; m: number
 
 export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, formatGroup, filter, onHoverGroup }: SkillsFilterBarProps) {
   const ob = sk.orbit
-  const reduced = useReducedMotion()
   const onQueryChange = (e: ChangeEvent<HTMLInputElement>) => filter.setQuery(e.target.value)
 
   // Facet counting (deliverable a): a group chip's own count ignores the group facet itself so it
   // always answers "how many tools in this group would show if this chip were toggled on", given every
-  // OTHER active filter (surface/min-stores/query) — never affected by which other groups happen to be
-  // selected right now.
+  // OTHER active filter (surface/query) — never affected by which other groups happen to be selected
+  // right now.
   const groupFacet = useMemo(
     () =>
       Object.fromEntries(
@@ -180,176 +169,102 @@ export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, fo
   const matchingTools = useMemo(() => allTools.filter(filter.matchesTool), [allTools, filter.matchesTool])
   const matchingStores = useMemo(() => new Set(matchingTools.flatMap((u) => u.storeNames)).size, [matchingTools])
 
-  interface ActiveChip {
-    id: string
-    label: string
-    onRemove: () => void
-  }
-  const activeChips: ActiveChip[] = []
-  for (const g of groups) {
-    if (filter.groups.has(g)) activeChips.push({ id: `g-${g}`, label: groupLabel[g], onRemove: () => filter.toggleGroup(g) })
-  }
-  if (filter.surface) activeChips.push({ id: 'surface', label: ob[SURFACE_LABEL[filter.surface]], onRemove: () => filter.setSurface(null) })
-  if (filter.minStores > 0) activeChips.push({ id: 'min', label: fill(ob.minStoresOption, { n: String(filter.minStores) }), onRemove: () => filter.setMinStores(0) })
-  if (filter.query.trim()) activeChips.push({ id: 'q', label: fill(ob.filterQueryLabel, { query: filter.query.trim() }), onRemove: () => filter.setQuery('') })
-
   return (
     <div className="flex flex-col gap-3">
-      <Rail ariaLabel={sk.groupSelectorLabel}>
-        {groups.map((g) => {
-          const on = filter.groups.has(g)
-          const facet = groupFacet[g]
-          return (
-            <button
-              key={g}
-              type="button"
-              aria-pressed={on}
-              onClick={() => filter.toggleGroup(g)}
-              onMouseEnter={() => onHoverGroup?.(g)}
-              onMouseLeave={() => onHoverGroup?.(null)}
-              onFocus={() => onHoverGroup?.(g)}
-              onBlur={() => onHoverGroup?.(null)}
-              className={`${CHIP} ${on ? skin.chipOn : skin.chip}`}
-            >
-              {groupLabel[g]} · {facet.tools} {sk.layoutExtra.toolsSuffix} · {formatGroup(facet.stores)}
-            </button>
-          )
-        })}
-      </Rail>
+      <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center lg:justify-between">
+        <Rail ariaLabel={sk.groupSelectorLabel}>
+          {groups.map((g) => {
+            const on = filter.groups.has(g)
+            const facet = groupFacet[g]
+            // Full-sentence accessible name ('Shopify, 13 tools, 22 stores') — the visible chip only
+            // ever shows the group name and the tool count. A group whose tools carry no real store
+            // usage (entirely in-house products / client-role work) never announces "0 stores": the
+            // sentence names what it IS used in instead.
+            const storesPhrase = facet.stores > 0 ? formatGroup(facet.stores) : ob.chipAriaNoStores
+            const chipAriaLabel = `${groupLabel[g]}, ${facet.tools} ${sk.layoutExtra.toolsSuffix}, ${storesPhrase}`
+            return (
+              <button
+                key={g}
+                type="button"
+                aria-pressed={on}
+                aria-label={chipAriaLabel}
+                onClick={() => filter.toggleGroup(g)}
+                onMouseEnter={() => onHoverGroup?.(g)}
+                onMouseLeave={() => onHoverGroup?.(null)}
+                onFocus={() => onHoverGroup?.(g)}
+                onBlur={() => onHoverGroup?.(null)}
+                className={`${CHIP} ${on ? skin.chipOn : skin.chip}`}
+              >
+                {groupLabel[g]} · <span className="tabular-nums">{facet.tools}</span>
+              </button>
+            )
+          })}
+        </Rail>
 
-      <Rail ariaLabel={ob.surfaceLabel}>
-        <div role="radiogroup" aria-label={ob.surfaceLabel} onKeyDown={onRadioGroupKeyDown} className="flex shrink-0 items-center gap-1.5">
-          <button
-            type="button"
-            role="radio"
-            aria-checked={filter.surface === null}
-            tabIndex={filter.surface === null ? 0 : -1}
-            onClick={() => filter.setSurface(null)}
-            className={`${CHIP} ${filter.surface === null ? skin.chipOn : skin.chip}`}
-          >
-            {sk.layoutExtra.allLabel}
-          </button>
-          {SURFACE_IDS.map((s) => (
-            <button
-              key={s}
-              type="button"
-              role="radio"
-              aria-checked={filter.surface === s}
-              tabIndex={filter.surface === s ? 0 : -1}
-              onClick={() => filter.setSurface(s)}
-              className={`${CHIP} ${filter.surface === s ? skin.chipOn : skin.chip}`}
-            >
-              {ob[SURFACE_LABEL[s]]}
-            </button>
-          ))}
-        </div>
-
-        <Divider skin={skin} />
-
-        <div role="radiogroup" aria-label={ob.minStoresLabel} onKeyDown={onRadioGroupKeyDown} className="flex shrink-0 items-center gap-1.5">
-          {MIN_STORES_STOPS.map((stop: MinStoresStop) => (
-            <button
-              key={stop}
-              type="button"
-              role="radio"
-              aria-checked={filter.minStores === stop}
-              tabIndex={filter.minStores === stop ? 0 : -1}
-              aria-label={stop === 0 ? ob.minStoresAny : fill(ob.minStoresOptionAria, { n: String(stop) })}
-              onClick={() => filter.setMinStores(stop)}
-              className={`${CHIP} ${filter.minStores === stop ? skin.chipOn : skin.chip}`}
-            >
-              {stop === 0 ? ob.minStoresAny : fill(ob.minStoresOption, { n: String(stop) })}
-            </button>
-          ))}
-        </div>
-
-        <Divider skin={skin} />
-
-        <div role="radiogroup" aria-label={ob.sortLabel} onKeyDown={onRadioGroupKeyDown} className="flex shrink-0 items-center gap-1.5">
-          {SORT_IDS.map((s: SortId) => (
-            <button
-              key={s}
-              type="button"
-              role="radio"
-              aria-checked={filter.sort === s}
-              tabIndex={filter.sort === s ? 0 : -1}
-              onClick={() => filter.setSort(s)}
-              className={`${CHIP} ${filter.sort === s ? skin.chipOn : skin.chip}`}
-            >
-              {ob[SORT_LABEL[s]]}
-            </button>
-          ))}
-        </div>
-
-        <Divider skin={skin} />
-
-        <label className="relative shrink-0 snap-start">
-          <span className="sr-only">{ob.searchLabel}</span>
-          <input
-            type="search"
-            value={filter.query}
-            onChange={onQueryChange}
-            placeholder={ob.searchPlaceholder}
-            aria-label={ob.searchLabel}
-            className={`w-36 max-lg:min-h-11 rounded-full border bg-transparent px-3 py-1 text-[11px] outline-none transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current sm:w-44 ${skin.line} ${skin.body}`}
-          />
-        </label>
-
-        {filter.isActive && (
-          <button type="button" onClick={filter.clear} className={`${CHIP} underline-offset-2 hover:underline ${skin.accent}`}>
-            {ob.clear}
-          </button>
-        )}
-      </Rail>
-
-      <m.div layout="position" transition={reduced ? { duration: 0 } : { type: 'spring', bounce: 0.15, duration: 0.4 }} className="flex flex-col items-center gap-2">
-        <AnimatePresence initial={false}>
-          {activeChips.length > 0 && (
-            <m.div
-              key="active-chips"
-              layout
-              initial={reduced ? false : { opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={reduced ? { duration: 0 } : { duration: 0.16 }}
-              role="group"
-              aria-label={ob.activeFiltersLabel}
-              className="flex flex-wrap justify-center gap-1.5 overflow-hidden"
-            >
-              {activeChips.map((chip) => (
-                <m.button
-                  key={chip.id}
-                  layout
-                  initial={reduced ? false : { opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={reduced ? { duration: 0 } : { duration: 0.16 }}
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-3">
+          <Rail ariaLabel={ob.surfaceLabel}>
+            <span className={`mr-0.5 shrink-0 text-[11px] font-semibold uppercase tracking-[0.1em] ${skin.muted}`}>{ob.showLabel}</span>
+            <div role="radiogroup" aria-label={ob.surfaceLabel} onKeyDown={onRadioGroupKeyDown} className="flex shrink-0 items-center gap-1.5">
+              <button
+                type="button"
+                role="radio"
+                aria-checked={filter.surface === null}
+                tabIndex={filter.surface === null ? 0 : -1}
+                onClick={() => filter.setSurface(null)}
+                className={`${CHIP} ${filter.surface === null ? skin.chipOn : skin.chip}`}
+              >
+                {sk.layoutExtra.allLabel}
+              </button>
+              {SURFACE_IDS.map((s) => (
+                <button
+                  key={s}
                   type="button"
-                  onClick={chip.onRemove}
-                  aria-label={fill(ob.removeFilter, { label: chip.label })}
-                  className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] ${skin.chipOn}`}
+                  role="radio"
+                  aria-checked={filter.surface === s}
+                  tabIndex={filter.surface === s ? 0 : -1}
+                  onClick={() => filter.setSurface(s)}
+                  className={`${CHIP} ${filter.surface === s ? skin.chipOn : skin.chip}`}
                 >
-                  {chip.label}
-                  <span aria-hidden="true">×</span>
-                </m.button>
+                  {ob[SURFACE_LABEL[s]]}
+                </button>
               ))}
-            </m.div>
-          )}
-        </AnimatePresence>
+            </div>
+          </Rail>
 
+          <label className="relative block w-full lg:w-44 lg:shrink-0">
+            <span className="sr-only">{ob.searchLabel}</span>
+            <input
+              type="search"
+              value={filter.query}
+              onChange={onQueryChange}
+              placeholder={ob.searchPlaceholder}
+              aria-label={ob.searchLabel}
+              className={`min-h-11 w-full rounded-full border bg-transparent px-3 py-1.5 text-[11px] outline-none transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current lg:min-h-0 lg:py-1 ${skin.line} ${skin.body}`}
+            />
+          </label>
+        </div>
+      </div>
+
+      <div className="flex flex-col items-center gap-1">
         <p aria-live="polite" className={`text-center text-[11px] ${skin.muted}`}>
           <Summary template={ob.summary} n={matchingTools.length} m={allTools.length} k={matchingStores} />
           {filter.isActive && matchingTools.length === 0 && (
             <>
               {' — '}
-              {ob.noMatches}{' '}
+              {ob.noMatches}
+            </>
+          )}
+          {filter.isActive && (
+            <>
+              {' '}
               <button type="button" onClick={filter.clear} className={`underline-offset-2 hover:underline ${skin.accent}`}>
                 {ob.clear}
               </button>
             </>
           )}
         </p>
-      </m.div>
+        <p className={`text-center text-[11px] ${skin.muted}`}>{ob.helpLine}</p>
+      </div>
     </div>
   )
 }

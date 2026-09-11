@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useContent } from '../../hooks'
 import { Ticker } from '../common'
 import type { SkillGroupId } from '../../data/registry'
@@ -7,7 +7,7 @@ import { CountUp } from '../gallery/charts'
 import type { Skin } from '../gallery'
 import type { SectionHeading } from './Gallery'
 import { formatTool, formatGroup, type SkillsStrings } from './skillsFormat'
-import { TilesLayout, LedgerLayout, WallLayout, BentoLayout, ColumnsLayout, OrbitLayout, RowsLayout, LayoutSwitcher, isLayoutId, type LayoutId, type SkillsData } from './skillLayouts'
+import { OrbitLayout, type SkillsData } from './skillLayouts'
 
 interface SkillsProps {
   /** False when the page's own non-lazy wrapper carries the section id (Apple), so the id stays unique and hash links land before this chunk mounts. */
@@ -35,24 +35,12 @@ function DepthStat({ skin, value, text }: DepthStatProps) {
   )
 }
 
-const readInitialLayout = (): { layout: LayoutId; hasParam: boolean } => {
-  if (typeof window === 'undefined') return { layout: 'orbit', hasParam: false }
-  try {
-    const params = new URLSearchParams(window.location.search)
-    if (!params.has('skills')) return { layout: 'orbit', hasParam: false }
-    const v = params.get('skills')
-    return { layout: isLayoutId(v) ? v : 'orbit', hasParam: true }
-  } catch {
-    return { layout: 'orbit', hasParam: false }  }
-}
-
 /**
- * "What I work with" — six selectable layouts (`?skills=<id>`, read once on mount) over the same real
- * data: `skillUsage.ts` (per-tool store/product/role-work counts), `skillGroups` (the six skill
- * domains) and `storeNamesByTool`-shaped names surfaced through each tool's `storeNames`. The default
- * (`tiles`) is the original grid-of-tiles-plus-panel design; the other five are comparison candidates,
- * flippable live via the switcher that only renders when `?skills=` is present in the URL at all, so
- * shoppers never see it. Every layout shares the depth strip above and the "Now" ticker below.
+ * "What I work with" — the orbit: six skill groups over the same real data (`skillUsage.ts`'s
+ * per-tool store/product/role-work counts, `skillGroups`'s six domains, and `storeNamesByTool`-shaped
+ * names surfaced through each tool's `storeNames`). Below 1024px and under reduced motion, `OrbitLayout`
+ * falls back to the ledger register on its own. Every layout shares the depth strip above and the
+ * "Now" ticker below.
  */
 export function Skills({ skin, heading, ownId = true }: SkillsProps) {
   const { strings, registry } = useContent()
@@ -60,20 +48,6 @@ export function Skills({ skin, heading, ownId = true }: SkillsProps) {
   const groups = Object.keys(registry.skillGroups) as SkillGroupId[]
   const groupLabel = sk.groups as Record<SkillGroupId, string>
   const groupNote = sk.groupNote as Record<SkillGroupId, string>
-
-  const [{ layout: initialLayout, hasParam }] = useState(readInitialLayout)
-  const [layout, setLayout] = useState<LayoutId>(initialLayout)
-
-  const onSelectLayout = (id: LayoutId) => {
-    setLayout(id)
-    try {
-      const url = new URL(window.location.href)
-      url.searchParams.set('skills', id)
-      window.history.replaceState(null, '', url)
-    } catch {
-      // preview-only convenience; never block the switch on it
-    }
-  }
 
   // Every tool named across the groups, deduplicated, in group order — real registry data, feeds the
   // bottom ticker so the breadth stays visible regardless of which layout/filter is active above.
@@ -122,20 +96,8 @@ export function Skills({ skin, heading, ownId = true }: SkillsProps) {
         <DepthStat skin={skin} value={fleetStoreCount} text={sk.depthLabel.stores} />
       </div>
 
-      {hasParam && (
-        <div className="mt-7">
-          <LayoutSwitcher skin={skin} active={layout} onSelect={onSelectLayout} />
-        </div>
-      )}
-
-      <div className={hasParam ? '' : 'mt-7'}>
-        {layout === 'tiles' && <TilesLayout data={data} />}
-        {layout === 'ledger' && <LedgerLayout data={data} />}
-        {layout === 'wall' && <WallLayout data={data} />}
-        {layout === 'bento' && <BentoLayout data={data} />}
-        {layout === 'columns' && <ColumnsLayout data={data} />}
-        {layout === 'orbit' && <OrbitLayout data={data} />}
-        {layout === 'rows' && <RowsLayout data={data} />}
+      <div className="mt-7">
+        <OrbitLayout data={data} />
       </div>
 
       <div className="mt-14 rail-wide md:mt-16">

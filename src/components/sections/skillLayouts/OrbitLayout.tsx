@@ -35,10 +35,7 @@
 //
 // 2026-09-11 — owner feedback: filtering dimmed instead of removing (fixed below — a filtered-out dot
 // unmounts through `AnimatePresence` instead of fading, so it also leaves the tab order and can't open
-// the drawer), and "in mobile this section is still horrible, find another way... maybe accordions".
-// `MobileSkillsLayout` is the sub-1024px gate now: it renders this same ledger fallback by default and
-// only swaps in one of four mechanically different candidates when the page loads with
-// `?skillsMobile=a|b|c|d` — see that file.
+// the drawer). The sub-1024px/reduced-motion gate renders `LedgerLayout` directly.
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from 'react'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { useMediaQuery, useSheetHistory } from '../../../hooks'
@@ -46,7 +43,7 @@ import type { SkillGroupId } from '../../../data/registry'
 import { toolUsageById, type ToolUsage } from '../../../data/skillUsage'
 import { toolIcon, monogram, ToolMark } from '../skillIcons'
 import { CenterMark } from './CenterMark'
-import { MobileSkillsLayout } from './mobile/MobileSkillsLayout'
+import { LedgerLayout } from './LedgerLayout'
 import { SkillsFilterBar } from './SkillsFilterBar'
 import { ToolDrawer, DRAWER_ID } from './ToolDrawer'
 import { useSkillsFilter } from './useSkillsFilter'
@@ -188,14 +185,12 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
   }, [filter.isActive, filter.matchesTool, hoveredTool])
 
   if (!isDesktop || reduced) {
-    return <MobileSkillsLayout data={data} />
+    return <LedgerLayout data={data} />
   }
 
   const ringSpecs: RingSpec[] = ringOrder.map((g, ri) => ({
     group: g,
-    // The active sort reorders dots around the ring (deliverable d) — usage/name/group; ring geometry
-    // (radius, direction, duration) stays keyed to the group itself, never the sort.
-    tools: filter.sortTools(toolsByGroup[g]),
+    tools: toolsByGroup[g],
     radius: RADII[ri],
     duration: DURATIONS[ri],
     ccw: ri % 2 === 1,

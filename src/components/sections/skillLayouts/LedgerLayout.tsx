@@ -57,14 +57,12 @@ export function LedgerLayout({ data }: SkillsLayoutProps) {
                 </div>
               </div>
               <div className="mt-3 mb-6">
-                {/* `layout="position"` on each surviving row (deliverable d/i): re-sorting reorders
-                    this array and the house filter-motion contract wants items sliding into their new
-                    position rather than jumping. 2026-09-11: a row that fails the filter now unmounts
-                    through AnimatePresence instead of just dimming — every sibling still carrying
-                    `layout="position"` slides up to close the gap on its own, no separate height
-                    animation needed. */}
+                {/* `layout="position"` on each surviving row: 2026-09-11 — a row that fails the filter
+                    unmounts through AnimatePresence instead of just dimming — every sibling still
+                    carrying `layout="position"` slides up to close the gap on its own, no separate
+                    height animation needed. */}
                 <AnimatePresence initial={false}>
-                  {filter.sortTools(toolsByGroup[g]).map((u) => {
+                  {toolsByGroup[g].map((u) => {
                     if (!filter.matchesTool(u)) return null
                     const isOpen = openTool === u.tool
                     return (

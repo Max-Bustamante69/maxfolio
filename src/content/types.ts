@@ -76,27 +76,14 @@ export interface PortfolioContent {
       nextAria: string
       highlightsLabel: string
     }
-    /** Apple's featured-build section for one storefront (FeaturedBuild.tsx + featuredLayouts/*) — four
-     *  selectable design variants over the same real data, picked with `?featured=a|b|c|d`. */
+    /** Apple's featured-build section for one storefront (FeaturedBuild.tsx + featuredLayouts/*) — the
+     *  "split story" layout over real registry/commerce/telemetry data. */
     featuredBuild: SectionHeading & {
       lead: string
       visit: string
       cta: string // opens the gallery case-study sheet for the featured store
-      progressLabel: string // '{n} / {total}'
-      prevAria: string
-      nextAria: string
-      railHint: string // sr-only keyboard hint for the storyboard rail
       beats: { label: string; body: string; metric: string }[] // problem -> plan -> build -> result; {placeholders} filled from the registry/commerce
-      frames: { label: string; headline: string; fact: string }[] // storyboard rail: problem -> design -> build -> launch -> result
-      ticker: string[] // cinematic variant's fact strip; {placeholders} filled
-      /** Bento count-up captions AND the default variant's design-to-code diagram legend — one set of
-       *  process-fact labels, no commits/weeks (2026-09-11 owner call: git facts and elapsed time never
-       *  belong in this story; sections/blocks/tracked-components are the process facts instead). */
-      metricLabels: { sections: string; blocks: string; trackedComponents: string }
-      stackLabel: string
-      shippedLabel: string
-      shipped: string[] // bento "what shipped" list; {placeholders} filled
-      /** FeaturedImpact.tsx — the strip every variant renders below it. Hero-numeral labels and the
+      /** FeaturedImpact.tsx — the strip the story renders below it. Hero-numeral labels and the
        *  disclaimer are NOT duplicated here: they reuse caseStudy.impact.{chipConversionLabel,
        *  chipRevenueLabel, chipLoadTimeLabel, conversionLabel, revenueLabel, loadTimeLabel, before,
        *  after, disclaimer} verbatim, and the score-ring labels reuse caseStudy.{perf, a11y, seo}, so
@@ -128,20 +115,6 @@ export interface PortfolioContent {
       hotspotAria: string
       /** aria-valuetext for a group's progress meter; '{done}' and '{total}' are replaced with counts. */
       progressAria: string
-      /** Console replay (?review=a) header log line; '{n}' is replaced with CHECK_COUNT. */
-      consoleHeaderLine: string
-      /** Console replay's replay-the-log button. */
-      replayLabel: string
-      /** Report card (?review=c) header block's store-name placeholder cell. */
-      reportStoreLabel: string
-      /** Report card (?review=c) header block's run-date placeholder cell. */
-      reportDateLabel: string
-      /** Report card (?review=c) footer stamp line. */
-      reportFooterLabel: string
-      /** X-ray overlay (?review=b) group chip aria-label; '{group}' is replaced with that group's label. */
-      xrayChipAria: string
-      /** Stations rail (?review=d) counter under the rail; '{current}' and '{total}' are replaced with counts. */
-      railCounterLabel: string
     }
     /** Luxury's Years intro: the unit chart re-narrated as one composed sentence per year. */
     fiveLines: {
@@ -192,11 +165,8 @@ export interface PortfolioContent {
         pinned: string
         hint: string
       }
-      /** Strings used only by the alternative `?skills=` layout candidates (wall/orbit/rows) —
-       *  never shown to shoppers unless one of those layouts ships, but still real user-facing
-       *  copy and must not read as English-only on the es/ja builds. */
+      /** Strings shared by the orbit and ledger layouts. */
       layoutExtra: {
-        wallFilterLabel: string
         allLabel: string
         /** Caption for the "in-house products" fleet stat in `ToolDrawer`'s fleet-wide strip (moved
          *  there 2026-09-10 from the orbit's old center card; the other three stats in that strip
@@ -207,9 +177,13 @@ export interface PortfolioContent {
       }
       /** Orbit layout's filter bar + hover/press preview card + the same two pieces reused (filter
        *  chips, tap-to-expand preview) by the sub-1024px ledger fallback. `allLabel` for the surface
-       *  "All" chip reuses `layoutExtra.allLabel` rather than duplicating it. */
+       *  "All" chip reuses `layoutExtra.allLabel` rather than duplicating it.
+       *  2026-09-11 — "fewer filters, clearer": three controls (group chips, a 'Show:' surface
+       *  control, free text) plus the result line and a Clear link. The min-stores threshold, the
+       *  sort order and the active-filter chips row are gone. */
       orbit: {
         surfaceLabel: string // aria-label for the surface radiogroup ('Storefronts' / 'Apps & products' / 'Client roles')
+        showLabel: string // visible 'Show:' label in front of the surface radiogroup
         surfaceStorefronts: string
         surfaceProducts: string
         surfaceRoles: string
@@ -224,21 +198,12 @@ export interface PortfolioContent {
         openRole: string // 'View role — {company}' — accessible name for a role-work line
         expandRow: string // ledger fallback: tap-to-expand a tool row
         collapseRow: string // ledger fallback: collapse an expanded tool row
-        /** Filters pass (2026-09-10) — facet counts, the "used in at least N stores" control, the
-         *  sort control, the live result summary and the active-filter chips row. All new controls
-         *  sit in the same filter bar as the pieces above. */
-        minStoresLabel: string // aria-label for the min-stores radiogroup
-        minStoresAny: string // the 0/"any" stop's visible + accessible label
-        minStoresOption: string // '{n}+' — visible label for the 1/5/10/15 stops, {n} filled in
-        minStoresOptionAria: string // 'Used in {n}+ stores' — accessible name for the same stop
-        sortLabel: string // aria-label for the sort radiogroup
-        sortUsage: string
-        sortName: string
-        sortGroup: string
         summary: string // '{n} of {m} tools · {k} stores' — live result summary line
-        activeFiltersLabel: string // aria-label for the active-filter chips row
-        removeFilter: string // 'Remove filter — {label}' — accessible name for a chip's own remove button
-        filterQueryLabel: string // 'Search: “{query}”' — the active-chip label for the free-text filter
+        /** Replaces the store-count phrase in a group chip's full-sentence aria-label when that
+         *  group's live facet has 0 real stores (entirely in-house products / client-role work). */
+        chipAriaNoStores: string
+        /** Muted 11px helper line under the result summary, explaining the three controls above it. */
+        helpLine: string
         /** `ToolDrawer` (2026-09-10) — the right-side/bottom-sheet drawer a dot or ledger row opens,
          *  replacing the orbit's floating quick-look card and its big center card. */
         drawer: {
@@ -252,24 +217,6 @@ export interface PortfolioContent {
           close: string // close button label/aria-label
           noCaptures: string // shown when a tool has no linkable store/product at all (rare)
         }
-      }
-      /** The four `?skillsMobile=a|b|c|d` sub-1024px candidates (2026-09-11 — "in mobile this section
-       *  is still horrible, find another way"). Dev-only surface (switcher + labels never shown
-       *  unless the URL already carries the param), still real user-facing copy once one ships. */
-      mobile: {
-        switcherLabel: string // aria-label for the dev-only mobile-layout switcher
-        optionAccordion: string // 'Accordion' — switcher button label
-        optionRail: string // 'Rail'
-        optionRanked: string // 'Ranked list'
-        optionConstellation: string // 'Constellation'
-        expandGroup: string // 'Expand {group}' — accordion header aria-label while collapsed
-        collapseGroup: string // 'Collapse {group}' — accordion header aria-label while expanded
-        topToolsLabel: string // eyebrow above a rail card's top-5 mini bar chart
-        seeAll: string // 'See all {n}' — rail card's expand-to-sheet button
-        seeAllClose: string // close label for the rail's "see all" sheet
-        openCluster: string // 'Open {group}' — constellation cluster button aria-label
-        back: string // 'Back' — constellation zoom-out button label/aria-label
-        rankedListLabel: string // aria-label for the ranked list's own role="list"
       }
     }
     contact: SectionHeading & {
