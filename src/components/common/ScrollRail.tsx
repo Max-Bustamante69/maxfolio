@@ -91,7 +91,7 @@ export function ScrollRail({ sections, dark, accent = '#0071e3' }: ScrollRailPro
       {/* progress bar: touch / small screens */}
       <m.div
         aria-hidden="true"
-        className="fixed left-0 top-11 z-40 h-[2px] w-full origin-left lg:hidden [@media(hover:hover)_and_(min-width:1024px)]:hidden"
+        className="fixed left-0 top-11 md:top-14 z-40 h-[2px] w-full origin-left lg:hidden [@media(hover:hover)_and_(min-width:1024px)]:hidden"
         style={{ scaleX: progress, backgroundColor: accent }}
       />
 
