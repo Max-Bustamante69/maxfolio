@@ -1,5 +1,25 @@
 [
   {
+    "hash": "67ef77c",
+    "date": "2026-09-11",
+    "subject": "fix(anchors): hash landing honors scroll-margin and re-lands while lazy chunks mount; one id per section on Apple"
+  },
+  {
+    "hash": "dcaf086",
+    "date": "2026-09-11",
+    "subject": "fix(apple): projects wrapper drops its duplicate id too"
+  },
+  {
+    "hash": "5508d28",
+    "date": "2026-09-11",
+    "subject": "fix(apple): one id per section again; shorter manifesto lines one size down"
+  },
+  {
+    "hash": "5f768a3",
+    "date": "2026-09-11",
+    "subject": "chore(build): regenerated changelog, sitemap, jsonld and index for round 41"
+  },
+  {
     "hash": "be27d76",
     "date": "2026-09-11",
     "subject": "fix(skills): drop the derived depth facet (it mislabeled core tools)"
@@ -38,25 +58,5 @@
     "hash": "1f3ab05",
     "date": "2026-09-10",
     "subject": "fix(rail): measure slide targets by geometry, not offsetLeft, on the storyboard rail"
-  },
-  {
-    "hash": "fd9bd9d",
-    "date": "2026-09-10",
-    "subject": "fix(skills): roving radiogroup keyboard nav and quiet the live-region counters"
-  },
-  {
-    "hash": "97f7c78",
-    "date": "2026-09-10",
-    "subject": "fix(featured): gate the Impact strip's real-number tiles on scroll into view"
-  },
-  {
-    "hash": "a2b1393",
-    "date": "2026-09-10",
-    "subject": "fix(skills): stop the rail's edge fade from lying at rest"
-  },
-  {
-    "hash": "45819ae",
-    "date": "2026-09-10",
-    "subject": "fix(chapters): correct active-card tracking and scope drag targets"
   }
 ]
