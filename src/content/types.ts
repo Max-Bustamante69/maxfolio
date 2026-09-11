@@ -1,4 +1,5 @@
 import type { ExperienceId, RoleWorkId, StatId, SkillGroupId, StoreRole } from '../data/registry'
+import type { DepthId } from '../data/skillUsage'
 import type { WorkKind } from '../data/timeline'
 
 interface SectionHeading {
@@ -182,6 +183,24 @@ export interface PortfolioContent {
         openRole: string // 'View role — {company}' — accessible name for a role-work line
         expandRow: string // ledger fallback: tap-to-expand a tool row
         collapseRow: string // ledger fallback: collapse an expanded tool row
+        /** Filters pass (2026-09-10) — facet counts, the "used in at least N stores" control, the
+         *  derived depth filter, the sort control, the live result summary and the active-filter
+         *  chips row. All new controls sit in the same filter bar as the pieces above. */
+        minStoresLabel: string // aria-label for the min-stores radiogroup
+        minStoresAny: string // the 0/"any" stop's visible + accessible label
+        minStoresOption: string // '{n}+' — visible label for the 1/5/10/15 stops, {n} filled in
+        minStoresOptionAria: string // 'Used in {n}+ stores' — accessible name for the same stop
+        depthFilterLabel: string // aria-label for the depth radiogroup
+        depthAny: string // the "any depth" default option
+        depthGroups: Record<DepthId, string> // daily / regular / occasional, in that order
+        sortLabel: string // aria-label for the sort radiogroup
+        sortUsage: string
+        sortName: string
+        sortGroup: string
+        summary: string // '{n} of {m} tools · {k} stores' — live result summary line
+        activeFiltersLabel: string // aria-label for the active-filter chips row
+        removeFilter: string // 'Remove filter — {label}' — accessible name for a chip's own remove button
+        filterQueryLabel: string // 'Search: “{query}”' — the active-chip label for the free-text filter
         /** `ToolDrawer` (2026-09-10) — the right-side/bottom-sheet drawer a dot or ledger row opens,
          *  replacing the orbit's floating quick-look card and its big center card. */
         drawer: {
