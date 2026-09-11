@@ -104,7 +104,7 @@ export const en: PortfolioContent = {
         { q: 'Did an AI build this portfolio?', a: 'Every section started as a Figma or Framer reference I approved, then got built by hand. Sample data is always labeled.' },
       ],
     },
-    manifesto: { label: 'What every build does', lines: ['I read the Lighthouse report and the sales numbers before writing code.', 'I deploy every change from a git commit, never from the editor.', 'I run 40+ Playwright checks across the whole store before launch.', 'I hand you the editor, the docs and the repo at the end.'] },
+    manifesto: { label: 'What every build does', lines: ['I read Lighthouse and the sales numbers first.', 'Every deploy comes from a git commit.', '40+ Playwright checks run before every launch.', 'You keep the editor, the docs and the repo.'] },
     testimonials: { eyebrow: 'In their words', title: 'What clients', titleAccent: 'say' },
     now: { label: 'Now', live: '{n} storefronts live', dev: '{n} in development', band: 'Storefronts shipped', local: 'Medellín · {time} local' },
     statBand: { label: 'The work, in numbers', asOf: 'September 2026', sourceLabel: 'Source', note: 'Measured ranges across client storefronts; exact per-store figures stay confidential.' },

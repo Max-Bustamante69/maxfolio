@@ -111,7 +111,7 @@ export function Skills({ skin, heading }: SkillsProps) {
   }
 
   return (
-    <section id="skills" className="scroll-mt-20">
+    <section id="skills" className={`scroll-mt-20 ${skin.frame === 'apple' ? 'lg:scroll-mt-[92px]' : ''}`}>
       {heading(sk.eyebrow, sk.title, sk.titleAccent)}
 
       <div className={`mt-8 flex flex-wrap items-baseline gap-x-10 gap-y-3 border-b pb-6 ${skin.line}`}>

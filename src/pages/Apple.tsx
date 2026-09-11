@@ -365,12 +365,8 @@ function AppleContent() {
           </section>
 
           {/* Experience — split 50/50, with an optional subway-map view of the same roles */}
-          {/* The inner Experience.tsx also renders its own id="experience" (shared with every theme,
-              fixed at scroll-mt-20 for their 44px bars); this outer wrapper carries the SAME id first
-              in document order so Apple's own taller md+ bar gets its own scroll-mt without touching
-              the shared file — the same duplicate-id override already used below for shopify/gallery/
-              projects/contact. */}
-          <section id="experience" className={`px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
+          {/* No id on this wrapper: Experience.tsx owns id="experience" and applies the Apple-only lg anchor offset itself via skin.frame. */}
+          <section className={`px-4 py-14 md:py-20 ${surface}`}>
             <div className="max-w-5xl mx-auto">
               <Experience skin={skin} heading={Heading} />
               <div className="mt-10 md:mt-14">
@@ -461,10 +457,8 @@ function AppleContent() {
           </section>
 
           {/* Skills — narrative with inline chips. content-visibility:auto tried and reverted — docs/seo.md. */}
-          {/* Same duplicate-id override as "experience" above: Skills.tsx renders its own id="skills"
-              at scroll-mt-20 for every theme's default bar; this wrapper's id (first in the DOM) gives
-              Apple's own taller md+ bar the right offset without touching the shared file. */}
-          <section id="skills" className={`px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
+          {/* No id on this wrapper: Skills.tsx owns id="skills" and applies the Apple-only lg anchor offset itself via skin.frame. */}
+          <section className={`px-4 py-14 md:py-20 ${surface}`}>
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Skills skin={skin} heading={Heading} />

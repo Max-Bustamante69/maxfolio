@@ -50,7 +50,7 @@ export function Manifesto({ skin, bandClassName, eyebrowClassName, backdropSrc }
         <p className={`text-[11px] font-semibold uppercase tracking-[0.2em] ${eyebrow}`}>{mf.label}</p>
         <ul className="mt-6 space-y-2 md:space-y-3">
           {mf.lines.map((line, i) => (
-            <li key={line} className="font-sf text-4xl font-semibold leading-[1.06] tracking-[-0.03em] md:text-6xl lg:text-7xl">
+            <li key={line} className="font-sf text-3xl font-semibold leading-[1.08] tracking-[-0.03em] md:text-5xl lg:text-6xl">
               <RevealText text={line} delay={i * 0.12} />
             </li>
           ))}

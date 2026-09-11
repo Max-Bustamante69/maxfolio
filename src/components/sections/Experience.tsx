@@ -40,7 +40,7 @@ export function Experience({ skin, heading }: ExperienceProps) {
   )
 
   return (
-    <section id="experience" className="scroll-mt-20">
+    <section id="experience" className={`scroll-mt-20 ${skin.frame === 'apple' ? 'lg:scroll-mt-[92px]' : ''}`}>
       {heading(x.eyebrow, x.title, x.titleAccent)}
       <div className="grid gap-8 lg:grid-cols-12 lg:gap-12">
         {/* rail */}
