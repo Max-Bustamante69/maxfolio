@@ -82,7 +82,7 @@ export function FeaturedImpact({ data }: { data: FeaturedData }) {
   const tileProps = { line: skin.line, dark: skin.dark, title: skin.title, muted: skin.muted }
 
   return (
-    <div ref={ref} className={`mt-8 rounded-[22px] border p-5 [container-type:inline-size] md:mt-10 md:p-6 ${skin.line} ${skin.dark ? 'bg-white/[0.02]' : 'bg-[#fafafa]'}`}>
+    <div ref={ref} data-testid="featured-impact" className={`mt-8 rounded-[22px] border p-5 [container-type:inline-size] md:mt-10 md:p-6 ${skin.line} ${skin.dark ? 'bg-white/[0.02]' : 'bg-[#fafafa]'}`}>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {heroStats.map((s, i) => (
           <HeroStat key={s.key} value={s.value} prefix={s.prefix} suffix={s.suffix} label={s.label} dark={skin.dark} delay={0.05 + i * 0.08} show={show} />
