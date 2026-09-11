@@ -5,6 +5,8 @@ import { Magnetic, RevealText } from '../common'
 import type { Skin } from '../gallery'
 
 interface ContactProps {
+  /** False when the page's own non-lazy wrapper carries the section id (Apple), so the id stays unique. */
+  ownId?: boolean
   skin: Skin
   ctaClass: string
   /** Opens the contact form, optionally with the message prefilled (the store URL). */
@@ -21,7 +23,7 @@ const EASE = [0.23, 1, 0.32, 1] as const
  * the reassurance beside them, then "what happens next" as a numbered ladder — and the channels
  * on a hairline row below. No card around any of it.
  */
-export function Contact({ skin, ctaClass, onContact, fieldClassName }: ContactProps) {
+export function Contact({ skin, ctaClass, onContact, fieldClassName, ownId = true }: ContactProps) {
   const { strings, registry } = useContent()
   const reduced = useReducedMotion()
   const c = strings.sections.contact
@@ -36,7 +38,7 @@ export function Contact({ skin, ctaClass, onContact, fieldClassName }: ContactPr
   }
 
   return (
-    <section id="contact" className="scroll-mt-20" aria-labelledby="contact-heading">
+    <section id={ownId ? 'contact' : undefined} className="scroll-mt-20" aria-labelledby="contact-heading">
       <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
         <m.div className="lg:col-span-8" initial={reduced ? false : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-60px' }} transition={{ duration: 0.6, ease: EASE }}>
           <p className={`text-[11px] font-semibold uppercase tracking-[0.2em] ${skin.accent}`}>{c.eyebrow}</p>

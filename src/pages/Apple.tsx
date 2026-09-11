@@ -498,7 +498,7 @@ function AppleContent() {
             />
             <div className="relative max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
-                <Contact skin={skin} ctaClass={`${primaryBtn} px-7`} onContact={openContact} />
+                <Contact ownId={false} skin={skin} ctaClass={`${primaryBtn} px-7`} onContact={openContact} />
               </Suspense>
             </div>
           </section>
