@@ -132,7 +132,7 @@ interface RingSpec {
 }
 
 export function OrbitLayout({ data }: SkillsLayoutProps) {
-  const { skin, sk, groups, groupLabel, toolsByGroup, storesPerGroup, formatTool, formatGroup } = data
+  const { skin, sk, groups, groupLabel, toolsByGroup, formatTool, formatGroup } = data
   const isDesktop = useMediaQuery('(min-width: 1024px)')
   const reduced = useReducedMotion()
   const [hoveredTool, setHoveredTool] = useState<string | null>(null)
@@ -176,7 +176,9 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
 
   const ringSpecs: RingSpec[] = ringOrder.map((g, ri) => ({
     group: g,
-    tools: toolsByGroup[g],
+    // The active sort reorders dots around the ring (deliverable d) — usage/name/group; ring geometry
+    // (radius, direction, duration) stays keyed to the group itself, never the sort.
+    tools: filter.sortTools(toolsByGroup[g]),
     radius: RADII[ri],
     duration: DURATIONS[ri],
     ccw: ri % 2 === 1,
@@ -211,6 +213,16 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
   const onDotBlur = (tool: string) => () => setHoveredTool((prev) => (prev === tool ? null : prev))
   const onDotClick = (tool: string) => () => setOpenTool((prev) => (prev === tool ? null : tool))
 
+  // Deliverable g: a ring's own group-name label is the same toggle as its chip in the filter bar
+  // above — keyboard-reachable (native <text> takes no key activation of its own, so Enter/Space are
+  // wired by hand) and aria-pressed, mirroring SkillsFilterBar's group chips exactly.
+  const onGroupLabelKeyDown = (g: SkillGroupId) => (e: KeyboardEvent<SVGTextElement>) => {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+      e.preventDefault()
+      filter.toggleGroup(g)
+    }
+  }
+
   return (
     <div className="mt-4">
       <style>{ORBIT_CSS}</style>
@@ -221,7 +233,6 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
         groups={ringOrder}
         groupLabel={groupLabel}
         toolsByGroup={toolsByGroup}
-        storesPerGroup={storesPerGroup}
         formatGroup={formatGroup}
         filter={filter}
         onHoverGroup={setHoveredGroup}
@@ -316,7 +327,7 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
                       onKeyDown={onDotKeyDown(u.tool)}
                       tabIndex={filteredOut ? -1 : 0}
                       style={{ left: `${cx}%`, top: `${cy}%` }}
-                      className={`group pointer-events-auto absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-opacity duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current ${dim ? 'opacity-25' : 'opacity-100'} ${filteredOut ? 'pointer-events-none' : ''}`}
+                      className={`group pointer-events-auto absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-[opacity,transform] duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current ${dim ? 'opacity-25' : 'opacity-100'} ${filteredOut ? 'scale-95 pointer-events-none' : 'scale-100'}`}
                     >
                       {/* Hairline tick bridging the dot to its ring: a sibling of `mfOrbitDot`, not a
                           child of it — it must inherit ONLY the ring's own rotation (so it keeps
@@ -356,17 +367,27 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
           {/* Group-name arc labels — a layer of their own, painted after (on top of) the rotating
               dots above so a label stays fully legible through the moment a dot orbits behind it,
               instead of the dot winning paint order and eating a letter or two out of the name. */}
-          <svg viewBox="0 0 100 100" className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true">
+          <svg viewBox="0 0 100 100" className="pointer-events-none absolute inset-0 h-full w-full">
             {ringSpecs.map((ring) => {
               const bright = emphasizedGroup === ring.group
               const visibleInGroup = ring.tools.filter(filter.matchesTool).length
               const collapsed = filter.isActive && visibleInGroup === 0
               const dim = (emphasizedGroup !== null && !bright) || collapsed
+              const pressed = filter.groups.has(ring.group)
               return (
                 <text
                   key={`label-${ring.group}`}
-                  className={`select-none text-[2.3px] font-semibold uppercase transition-opacity duration-300 ${dim ? 'opacity-20' : 'opacity-100'} ${bright && !collapsed ? `${skin.accent} fill-current` : skin.dark ? 'fill-white/65' : 'fill-black/60'}`}
-                  style={{ letterSpacing: '0.08em' }}
+                  role="button"
+                  tabIndex={0}
+                  aria-pressed={pressed}
+                  onClick={() => filter.toggleGroup(ring.group)}
+                  onKeyDown={onGroupLabelKeyDown(ring.group)}
+                  onMouseEnter={() => setHoveredGroup(ring.group)}
+                  onMouseLeave={() => setHoveredGroup(null)}
+                  onFocus={() => setHoveredGroup(ring.group)}
+                  onBlur={() => setHoveredGroup(null)}
+                  className={`cursor-pointer select-none text-[2.3px] font-semibold uppercase outline-none transition-opacity duration-300 focus-visible:opacity-100 ${dim ? 'opacity-20' : 'opacity-100'} ${bright && !collapsed ? `${skin.accent} fill-current` : skin.dark ? 'fill-white/65' : 'fill-black/60'}`}
+                  style={{ letterSpacing: '0.08em', pointerEvents: 'auto' }}
                 >
                   <textPath href={`#mf-orbit-arc-${ring.group}`} startOffset={arcStartOffset(groupLabel[ring.group], ring.radius)}>
                     {groupLabel[ring.group]}
@@ -402,11 +423,8 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
         </div>
       </div>
 
-      {filter.isActive && ringOrder.every((g) => toolsByGroup[g].filter(filter.matchesTool).length === 0) && (
-        <p className={`mt-4 text-center text-sm ${skin.muted}`} aria-live="polite">
-          {sk.orbit.noMatches}
-        </p>
-      )}
+      {/* No-matches messaging + one-click reset now live in SkillsFilterBar's own result summary line,
+          always visible above the rings — never duplicated down here. */}
 
       <ToolDrawer skin={skin} sk={sk} groupLabel={groupLabel} formatTool={formatTool} tool={openToolUsage} open={!!openTool} onClose={() => setOpenTool(null)} />
 

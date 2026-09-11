@@ -3,6 +3,7 @@
 // tool is one row on a hairline with its real usage count right-aligned. No icons, no cards — the
 // list flows into two columns once there is room, same as a printed ledger.
 import { useState } from 'react'
+import { m, useReducedMotion } from 'framer-motion'
 import { useSheetHistory } from '../../../hooks'
 import { toolUsageById } from '../../../data/skillUsage'
 import { CountUp } from '../../gallery/charts'
@@ -24,6 +25,8 @@ export function LedgerLayout({ data }: SkillsLayoutProps) {
   const [openTool, setOpenTool] = useState<string | null>(null)
   const filter = useSkillsFilter(groups)
   const openToolUsage = openTool ? (toolUsageById.get(openTool) ?? null) : null
+  const reduced = useReducedMotion()
+  const rowTransition = reduced ? { duration: 0 } : { type: 'spring' as const, bounce: 0.15, duration: 0.4 }
 
   useSheetHistory(openTool, () => setOpenTool(null), {
     param: 'tool',
@@ -34,7 +37,7 @@ export function LedgerLayout({ data }: SkillsLayoutProps) {
 
   return (
     <div className="mt-2">
-      <SkillsFilterBar skin={skin} sk={sk} groups={groups} groupLabel={groupLabel} toolsByGroup={toolsByGroup} storesPerGroup={storesPerGroup} formatGroup={formatGroup} filter={filter} />
+      <SkillsFilterBar skin={skin} sk={sk} groups={groups} groupLabel={groupLabel} toolsByGroup={toolsByGroup} formatGroup={formatGroup} filter={filter} />
       <div className="mt-6 sm:columns-2 sm:gap-x-12">
         {groups.map((g) => {
           const visibleCount = toolsByGroup[g].filter(filter.matchesTool).length
@@ -51,32 +54,36 @@ export function LedgerLayout({ data }: SkillsLayoutProps) {
                 </div>
               </div>
               <div className="mt-3 mb-6">
-                {toolsByGroup[g].map((u) => {
+                {/* `layout` on each row (deliverable d/i): re-sorting reorders this array, and the
+                    house filter-motion contract wants items sliding into their new position rather
+                    than jumping — rows never unmount on a filter change (only dim), so no separate
+                    enter animation applies here, just the reorder itself. */}
+                {filter.sortTools(toolsByGroup[g]).map((u) => {
                   const isOpen = openTool === u.tool
                   const visible = filter.matchesTool(u)
                   return (
-                    <button
-                      key={u.tool}
-                      type="button"
-                      aria-pressed={isOpen}
-                      aria-expanded={isOpen}
-                      aria-controls={DRAWER_ID}
-                      aria-label={`${u.tool} — ${isOpen ? sk.orbit.collapseRow : sk.orbit.expandRow}`}
-                      onClick={() => setOpenTool((prev) => (prev === u.tool ? null : u.tool))}
-                      className={`flex w-full items-baseline justify-between gap-3 border-b py-2 text-left transition-opacity duration-300 ${skin.line} ${isOpen ? skin.accent : skin.body} ${visible ? 'opacity-100' : 'pointer-events-none opacity-25'}`}
-                    >
-                      <span className="truncate text-sm">{u.tool}</span>
-                      <span className={`shrink-0 text-xs tabular-nums ${isOpen ? skin.accent : skin.muted}`}>{formatTool(u)}</span>
-                    </button>
+                    <m.div key={u.tool} layout="position" transition={rowTransition}>
+                      <button
+                        type="button"
+                        aria-pressed={isOpen}
+                        aria-expanded={isOpen}
+                        aria-controls={DRAWER_ID}
+                        aria-label={`${u.tool} — ${isOpen ? sk.orbit.collapseRow : sk.orbit.expandRow}`}
+                        onClick={() => setOpenTool((prev) => (prev === u.tool ? null : u.tool))}
+                        className={`flex w-full items-baseline justify-between gap-3 border-b py-2 text-left transition-opacity duration-300 ${skin.line} ${isOpen ? skin.accent : skin.body} ${visible ? 'opacity-100' : 'pointer-events-none opacity-25'}`}
+                      >
+                        <span className="truncate text-sm">{u.tool}</span>
+                        <span className={`shrink-0 text-xs tabular-nums ${isOpen ? skin.accent : skin.muted}`}>{formatTool(u)}</span>
+                      </button>
+                    </m.div>
                   )
                 })}
               </div>
             </div>
           )
         })}
-        {filter.isActive && groups.every((g) => toolsByGroup[g].filter(filter.matchesTool).length === 0) && (
-          <p className={`py-6 text-sm ${skin.muted}`}>{sk.orbit.noMatches}</p>
-        )}
+        {/* No-matches messaging + one-click reset lives in SkillsFilterBar's own result summary line
+            above, always visible — never duplicated down here. */}
       </div>
       <p className="sr-only">{sk.usage.caption}</p>
 
