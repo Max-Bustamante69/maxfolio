@@ -365,10 +365,10 @@ function AppleContent() {
           </section>
 
           {/* Experience — split 50/50, with an optional subway-map view of the same roles */}
-          {/* No id on this wrapper: Experience.tsx owns id="experience" and applies the Apple-only lg anchor offset itself via skin.frame. */}
-          <section className={`px-4 py-14 md:py-20 ${surface}`}>
+          {/* This non-lazy wrapper owns id="experience" (so a hash link lands before the chunk mounts) and the Apple-only lg offset; the inner section renders no id here. */}
+          <section id="experience" className={`px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
             <div className="max-w-5xl mx-auto">
-              <Experience skin={skin} heading={Heading} />
+              <Experience ownId={false} skin={skin} heading={Heading} />
               <div className="mt-10 md:mt-14">
                 <button
                   type="button"
@@ -414,7 +414,7 @@ function AppleContent() {
           <section id="shopify" className="px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
-                <ShopifyWork skin={skin} heading={Heading} />
+                <ShopifyWork ownId={false} skin={skin} heading={Heading} />
               </Suspense>
             </div>
           </section>
@@ -423,7 +423,7 @@ function AppleContent() {
           <section id="gallery" className={`px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
-                <Gallery skin={skin} heading={Heading} />
+                <Gallery ownId={false} skin={skin} heading={Heading} />
               </Suspense>
             </div>
           </section>
@@ -448,20 +448,20 @@ function AppleContent() {
           <Testimonials skin={skin} heading={Heading} />
 
           {/* Projects — index list. content-visibility:auto tried and reverted — docs/seo.md. */}
-          <section className="px-4 py-14 md:py-20">
+          <section id="projects" className="px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
-                <Projects skin={skin} heading={Heading} />
+                <Projects ownId={false} skin={skin} heading={Heading} />
               </Suspense>
             </div>
           </section>
 
           {/* Skills — narrative with inline chips. content-visibility:auto tried and reverted — docs/seo.md. */}
-          {/* No id on this wrapper: Skills.tsx owns id="skills" and applies the Apple-only lg anchor offset itself via skin.frame. */}
-          <section className={`px-4 py-14 md:py-20 ${surface}`}>
+          {/* This non-lazy wrapper owns id="skills" (so a hash link lands before the chunk mounts) and the Apple-only lg offset; the inner section renders no id here. */}
+          <section id="skills" className={`px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
-                <Skills skin={skin} heading={Heading} />
+                <Skills ownId={false} skin={skin} heading={Heading} />
               </Suspense>
             </div>
           </section>

@@ -10,6 +10,8 @@ import { formatTool, formatGroup, type SkillsStrings } from './skillsFormat'
 import { TilesLayout, LedgerLayout, WallLayout, BentoLayout, ColumnsLayout, OrbitLayout, RowsLayout, LayoutSwitcher, isLayoutId, type LayoutId, type SkillsData } from './skillLayouts'
 
 interface SkillsProps {
+  /** False when the page's own non-lazy wrapper carries the section id (Apple), so the id stays unique and hash links land before this chunk mounts. */
+  ownId?: boolean
   skin: Skin
   heading: SectionHeading
 }
@@ -52,7 +54,7 @@ const readInitialLayout = (): { layout: LayoutId; hasParam: boolean } => {
  * flippable live via the switcher that only renders when `?skills=` is present in the URL at all, so
  * shoppers never see it. Every layout shares the depth strip above and the "Now" ticker below.
  */
-export function Skills({ skin, heading }: SkillsProps) {
+export function Skills({ skin, heading, ownId = true }: SkillsProps) {
   const { strings, registry } = useContent()
   const sk: SkillsStrings = strings.sections.skills
   const groups = Object.keys(registry.skillGroups) as SkillGroupId[]
@@ -111,7 +113,7 @@ export function Skills({ skin, heading }: SkillsProps) {
   }
 
   return (
-    <section id="skills" className={`scroll-mt-20 ${skin.frame === 'apple' ? 'lg:scroll-mt-[92px]' : ''}`}>
+    <section id={ownId ? 'skills' : undefined} className="scroll-mt-20">
       {heading(sk.eyebrow, sk.title, sk.titleAccent)}
 
       <div className={`mt-8 flex flex-wrap items-baseline gap-x-10 gap-y-3 border-b pb-6 ${skin.line}`}>

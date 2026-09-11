@@ -26,14 +26,41 @@ interface SmoothScrollProps {
 export function SmoothScroll({ children, offset = 56 }: SmoothScrollProps) {
   useEffect(() => {
     // Hash on load: land on the section under the fixed header instead of behind it.
-    if (!window.location.hash) return
-    const target = document.querySelector(window.location.hash) as HTMLElement | null
-    if (!target) return
-    const hasMargin = parseFloat(getComputedStyle(target).scrollMarginTop || '0') > 0
-    requestAnimationFrame(() => {
-      const top = target.getBoundingClientRect().top + window.scrollY - (hasMargin ? 0 : offset)
-      window.scrollTo({ top, behavior: 'auto' })
-    })
+    // Two things the naive version got wrong (measured 2026-09-11 on /#experience and /#projects):
+    // `window.scrollTo` ignores `scroll-margin-top`, so a section that carries one landed flush under
+    // the bar; and the landing ran once, before the lazy sections ABOVE the target had mounted, so
+    // every chunk that arrived afterwards pushed the target away from where the page had scrolled.
+    // Now the margin is subtracted explicitly and the landing repeats on each page-height change for a
+    // bounded window, unless the visitor has started scrolling on their own.
+    const id = window.location.hash.slice(1)
+    if (!id) return
+    let cancelled = false
+    const cancel = () => {
+      cancelled = true
+    }
+    const land = () => {
+      if (cancelled) return
+      const target = document.getElementById(id)
+      if (!target) return
+      const margin = parseFloat(getComputedStyle(target).scrollMarginTop || '0')
+      const top = Math.max(0, target.getBoundingClientRect().top + window.scrollY - (margin > 0 ? margin : offset))
+      if (Math.abs(window.scrollY - top) > 1) window.scrollTo({ top, behavior: 'auto' })
+    }
+    window.addEventListener('wheel', cancel, { passive: true })
+    window.addEventListener('touchstart', cancel, { passive: true })
+    window.addEventListener('keydown', cancel)
+    const frame = requestAnimationFrame(land)
+    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(() => land()) : null
+    observer?.observe(document.body)
+    const stop = window.setTimeout(() => observer?.disconnect(), 4000)
+    return () => {
+      cancelAnimationFrame(frame)
+      window.clearTimeout(stop)
+      observer?.disconnect()
+      window.removeEventListener('wheel', cancel)
+      window.removeEventListener('touchstart', cancel)
+      window.removeEventListener('keydown', cancel)
+    }
   }, [offset])
 
   return <LenisContext.Provider value={null}>{children}</LenisContext.Provider>

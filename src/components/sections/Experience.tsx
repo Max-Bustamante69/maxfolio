@@ -7,6 +7,8 @@ import type { SectionHeading } from './Gallery'
 import { onRequestRole, scrollToSection } from '../../lib/sectionLinks'
 
 interface ExperienceProps {
+  /** False when the page's own non-lazy wrapper carries the section id (Apple), so the id stays unique and hash links land before this chunk mounts. */
+  ownId?: boolean
   skin: Skin
   heading: SectionHeading
 }
@@ -18,7 +20,7 @@ const EASE = [0.23, 1, 0.32, 1] as const
  * editorial panel on the right — no tiles. The active marker slides between roles as a shared
  * layout element; the panel crossfades in opacity only, so switching never bounces the layout.
  */
-export function Experience({ skin, heading }: ExperienceProps) {
+export function Experience({ skin, heading, ownId = true }: ExperienceProps) {
   const { strings, registry, formatPeriod } = useContent()
   const reduced = useReducedMotion()
   const x = strings.sections.experience
@@ -40,7 +42,7 @@ export function Experience({ skin, heading }: ExperienceProps) {
   )
 
   return (
-    <section id="experience" className={`scroll-mt-20 ${skin.frame === 'apple' ? 'lg:scroll-mt-[92px]' : ''}`}>
+    <section id={ownId ? 'experience' : undefined} className="scroll-mt-20">
       {heading(x.eyebrow, x.title, x.titleAccent)}
       <div className="grid gap-8 lg:grid-cols-12 lg:gap-12">
         {/* rail */}

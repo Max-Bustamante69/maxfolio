@@ -158,6 +158,8 @@ export function caseStudyFor(
 }
 
 interface GalleryProps {
+  /** False when the page's own non-lazy wrapper carries the section id (Apple), so the id stays unique and hash links land before this chunk mounts. */
+  ownId?: boolean
   skin: Skin
   heading: SectionHeading
 }
@@ -166,7 +168,7 @@ interface GalleryProps {
  * The visual wall. Three views — the house carousel of laptop + phone composites (default), a grid of
  * the same, or a wall of phones — and a case-study sheet on click. The facts live in Shopify Work.
  */
-export function Gallery({ skin, heading }: GalleryProps) {
+export function Gallery({ skin, heading, ownId = true }: GalleryProps) {
   const { strings, registry, formatPeriod, intlLocale, monthFmt } = useContent()
   const g = strings.sections.gallery
   const cs = strings.sections.caseStudy
@@ -224,7 +226,7 @@ export function Gallery({ skin, heading }: GalleryProps) {
   }
 
   return (
-    <section id="gallery" className="scroll-mt-20">
+    <section id={ownId ? 'gallery' : undefined} className="scroll-mt-20">
       {heading(g.eyebrow, g.title, g.titleAccent, g.lead)}
 
       {/* Two filter groups, visibly separate: status | view */}

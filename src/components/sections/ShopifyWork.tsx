@@ -14,6 +14,8 @@ import { onRequestProduct, onRequestStore, scrollToSection, setCaseStudyVisible 
 const HIGHLIGHT_MS = 1500
 
 interface ShopifyWorkProps {
+  /** False when the page's own non-lazy wrapper carries the section id (Apple), so the id stays unique and hash links land before this chunk mounts. */
+  ownId?: boolean
   skin: Skin
   heading: SectionHeading
 }
@@ -38,7 +40,7 @@ const FEATURES: { id: string; test: RegExp }[] = [
  * else (description, Lighthouse, facts, stack, captures) lives in the case-study sheet the name
  * opens, so the section stays scannable. The Gallery is the visual wall.
  */
-export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
+export function ShopifyWork({ skin, heading, ownId = true }: ShopifyWorkProps) {
   const { strings, registry, formatPeriod, intlLocale, monthFmt } = useContent()
   const s = strings.sections.shopify
   const g = strings.sections.gallery
@@ -185,7 +187,7 @@ export function ShopifyWork({ skin, heading }: ShopifyWorkProps) {
   }
 
   return (
-    <section id="shopify" className="scroll-mt-20">
+    <section id={ownId ? 'shopify' : undefined} className="scroll-mt-20">
       {heading(s.eyebrow, s.title, s.titleAccent, s.lead)}
       {preview.node}
 

@@ -4,6 +4,8 @@ import type { Skin } from '../gallery'
 import type { SectionHeading } from './Gallery'
 
 interface ProjectsProps {
+  /** False when the page's own non-lazy wrapper carries the section id (Apple), so the id stays unique and hash links land before this chunk mounts. */
+  ownId?: boolean
   skin: Skin
   heading: SectionHeading
 }
@@ -26,14 +28,14 @@ const initials = (name: string) =>
     .toUpperCase()
 
 /** Side projects as an index: a numbered hairline list, one line each, the whole row a link. */
-export function Projects({ skin, heading }: ProjectsProps) {
+export function Projects({ skin, heading, ownId = true }: ProjectsProps) {
   const { strings, registry } = useContent()
   const reduced = useReducedMotion()
   const pr = strings.sections.projects
   const items = [...registry.personalProjects].sort((a, b) => b.year - a.year)
 
   return (
-    <section id="projects" className={`scroll-mt-20 ${skin.frame === 'apple' ? 'lg:scroll-mt-[92px]' : ''}`}>
+    <section id={ownId ? 'projects' : undefined} className="scroll-mt-20">
       {heading(pr.eyebrow, pr.title, pr.titleAccent)}
       <ol className={`border-t ${skin.line}`}>
         {items.map((p, i) => {
