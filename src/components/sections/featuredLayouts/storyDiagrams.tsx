@@ -23,8 +23,8 @@ function LadderDiagram({ skin }: { skin: FeaturedData['skin'] }) {
     { h: 24, tag: '−20%' },
   ]
   return (
-    <div className="mt-3 flex items-end gap-4">
-      <svg viewBox="0 0 116 48" className={`h-12 w-[116px] shrink-0 ${skin.accent}`} aria-hidden="true">
+    <div className="mt-3 w-[116px]">
+      <svg viewBox="0 0 116 48" className={`h-12 w-[116px] ${skin.accent}`} aria-hidden="true">
         {bars.map((b, i) => (
           <g key={i}>
             <rect x={8 + i * 38} y={48 - b.h} width={26} height={b.h} rx={4} fill="currentColor" opacity={1 - i * 0.24} />
@@ -36,7 +36,7 @@ function LadderDiagram({ skin }: { skin: FeaturedData['skin'] }) {
           </g>
         ))}
       </svg>
-      <div className={`flex flex-1 justify-between text-[10px] uppercase tracking-wide ${skin.muted}`}>
+      <div className={`mt-1 grid grid-cols-3 text-center text-[9px] uppercase leading-tight tracking-wide ${skin.muted}`}>
         <span>1 jar</span>
         <span>2 jars</span>
         <span>3+ jars</span>
