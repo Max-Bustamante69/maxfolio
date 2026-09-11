@@ -6,6 +6,7 @@
 // `getBoundingClientRect` on scroll/resize, so a fast scroll never misses a beat.
 import { useEffect, useRef, useState } from 'react'
 import { m, useReducedMotion } from 'framer-motion'
+import { BeatDiagram } from './storyDiagrams'
 import { fill, type FeaturedData } from './types'
 
 const EASE = [0.23, 1, 0.32, 1] as const
@@ -97,6 +98,7 @@ export function SplitStoryVariant({ data }: { data: FeaturedData }) {
               <p className={`text-[11px] font-semibold uppercase tracking-[0.18em] transition-colors ${active === i ? skin.title : skin.muted}`}>{beat.label}</p>
             </div>
             <p className={`max-w-md text-lg leading-snug transition-colors md:text-xl ${active === i ? '' : skin.muted}`}>{fill(beat.body, vars)}</p>
+            <BeatDiagram index={i} data={data} />
             <m.span
               initial={reduced ? false : { opacity: 0, y: 8 }}
               whileInView={{ opacity: 1, y: 0 }}
