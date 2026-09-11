@@ -63,7 +63,11 @@ export function ConstellationMobile({ data }: SkillsLayoutProps) {
         </div>
       </div>
 
-      <AnimatePresence initial={false}>
+      {/* 2026-09-11 review fix: `mode="popLayout"` pulls the exiting grid out of document flow the
+          instant it starts fading, instead of leaving its full box (and all six cluster cards) sitting
+          in normal flow underneath the panel for the whole ~0.15s exit — measured overlap where the
+          entering panel's text sat on top of the still-laid-out grid cards mid-transition. */}
+      <AnimatePresence initial={false} mode="popLayout">
         {!zoomed ? (
           <m.div key="grid" exit={reduced ? { opacity: 0 } : { opacity: 0 }} transition={{ duration: reduced ? 0 : 0.15 }} className="grid grid-cols-2 gap-3">
             {groups.map((g) => {
