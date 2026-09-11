@@ -25,7 +25,7 @@ export const en: PortfolioContent = {
     conversion: 'Conversion lift, Shopify storefronts',
     organic: 'Organic traffic, after technical SEO',
     storefronts: 'Shopify storefronts shipped',
-    tests: 'Automated checks in the QA harness',
+    tests: 'Automated tests across the app suite',
 
   },
   statSources: {
@@ -107,7 +107,7 @@ export const en: PortfolioContent = {
     manifesto: { label: 'What every build does', lines: ['I read Lighthouse and the sales numbers first.', 'Every deploy comes from a git commit.', '40+ Playwright checks run before every launch.', 'You keep the editor, the docs and the repo.'] },
     testimonials: { eyebrow: 'In their words', title: 'What clients', titleAccent: 'say' },
     now: { label: 'Now', live: '{n} storefronts live', dev: '{n} in development', band: 'Storefronts shipped', local: 'Medellín · {time} local' },
-    statBand: { label: 'The work, in numbers', asOf: 'September 2026', sourceLabel: 'Source', note: 'Measured ranges across client storefronts; exact per-store figures stay confidential.' },
+    statBand: { label: 'The work, in numbers', asOf: 'September 2026', sourceLabel: 'Source', note: 'Measured ranges across client storefronts, 2023 to 2026; exact per-store figures stay confidential.' },
     careerSubway: { eyebrow: 'Career map', title: 'The roles,', titleAccent: 'on one line', lead: 'Six years as a subway map: one line per employer, a transfer where two roles overlapped.', toggleShow: 'View as a map', toggleHide: 'Hide the map', transferLabel: 'Overlap', rowAria: '{company}: {period}' },
     years: { eyebrow: 'One block per year, nothing padded', title: 'Five years,', titleAccent: 'one direction', lead: 'From React components in 2022 to a fleet of Shopify stores and the platform behind them. Every line is derived from the same records as the rest of the site.', roles: 'Roles', shipped: 'Storefronts', work: 'Client projects', products: 'Products', side: 'On my own time', more: '+{n} more', count: '{n} storefronts', perYear: 'Shipped work whose build touched the year', eras: { '2022': 'React and Salesforce', '2023': 'First Shopify storefronts', '2024': 'Enterprise front end, then CTO', '2025': 'CTO and contract builds', '2026': 'The fleet and the platform' } },
     chapters: {
