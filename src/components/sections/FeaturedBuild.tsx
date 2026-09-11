@@ -15,7 +15,7 @@ import { FeaturedImpact } from './featuredLayouts/FeaturedImpact'
 import { isVariantId, type FeaturedData, type FeaturedImpactData, type VariantId } from './featuredLayouts/types'
 
 // Minimal local shape of src/data/lighthouse.json's per-store entry — just the fields this section's
-// Impact strip needs (desktop Performance/Accessibility/SEO/LCP/TBT). Gallery.tsx's own richer
+// Impact strip needs (desktop Performance/Accessibility/SEO/LCP/TBT/CLS). Gallery.tsx's own richer
 // `LighthouseStoreEntry` (CrUX field data, mobile form, `_skipped` diagnostics key) isn't exported from
 // that module, so this replicates only the slice used here rather than importing across lazy chunks.
 interface LighthouseFormEntry {
@@ -24,6 +24,7 @@ interface LighthouseFormEntry {
   seo: number
   lcp: number | null
   tbt: number | null
+  cls: number | null
 }
 const LIGHTHOUSE = lighthouseJson as unknown as Record<string, { desktop: LighthouseFormEntry | null } | undefined>
 
@@ -56,7 +57,7 @@ const readInitialVariant = (): { variant: VariantId; hasParam: boolean } => {
  * telemetry figures — nothing store-specific is duplicated per variant.
  */
 export function FeaturedBuild({ skin, heading }: FeaturedBuildProps) {
-  const { strings, registry, formatPeriod, intlLocale } = useContent()
+  const { strings, registry, intlLocale } = useContent()
   const fb = strings.sections.featuredBuild
   const g = strings.sections.gallery
   const cs = strings.sections.caseStudy
@@ -82,34 +83,29 @@ export function FeaturedBuild({ skin, heading }: FeaturedBuildProps) {
   if (!store) return null
 
   const ladder = store.facts.find((f) => f.id === 'ladder')?.value ?? ''
-  const range = formatPeriod(store.timeline.start, store.timeline.end)
   // One currency prefix, not one per number (formatMoney on each side reads noisy for a range).
   const priceRange = isLiveCommerce(c) && c.priceMin != null && c.priceMax != null && c.currency ? `${c.currency} ${Math.round(c.priceMin).toLocaleString(intlLocale)}–${Math.round(c.priceMax).toLocaleString(intlLocale)}` : ''
 
-  const weeks = t?.weeks.length ?? 0
-  const busiestWeekCommits = t?.busiestWeek.commits ?? 0
+  const sections = t?.sections ?? store.sections ?? 0
   const blocks = t?.blocks ?? 0
   const trackedComponents = t?.trackedComponents ?? 0
   const perfDesktop = lh?.perf ?? 0
   const a11yDesktop = lh?.a11y ?? 0
   const seoDesktop = lh?.seo ?? 0
   const tbtDesktop = lh?.tbt ?? 0
+  const clsDesktop = lh?.cls ?? 0
   const lcpDesktopValue = lh?.lcp ?? 0
   const shipsTo = isLiveCommerce(c) && c.shipsToCount != null ? c.shipsToCount : 0
 
+  // No git facts (commits, lines of code, busiest week) and no elapsed weeks anywhere in this
+  // section per the owner's 2026-09-11 call — every var below is a process or commerce fact instead.
   const vars: Record<string, string | number> = {
-    commits: (store.commits ?? 0).toLocaleString(intlLocale),
-    sections: store.sections ?? 0,
-    range,
+    sections,
     url: store.url.replace(/^https?:\/\//, ''),
     products: isLiveCommerce(c) ? c.products : 0,
     collections: isLiveCommerce(c) && c.collections != null ? c.collections : 0,
     priceRange,
     ladder,
-    weeks,
-    busiestWeekCommits: busiestWeekCommits.toLocaleString(intlLocale),
-    liquidLines: (t?.lines.liquid ?? 0).toLocaleString(intlLocale),
-    islandLines: (t?.lines.islands ?? 0).toLocaleString(intlLocale),
     blocks,
     trackedComponents,
     lcpDesktop: lcpDesktopValue.toFixed(2),
@@ -120,24 +116,24 @@ export function FeaturedBuild({ skin, heading }: FeaturedBuildProps) {
     shipsTo,
   }
 
-  // Illustrative deltas (data/illustrative.ts) — the exact same seeded calls Gallery.tsx's own
+  // Illustrative series (data/illustrative.ts) — the exact same seeded calls Gallery.tsx's own
   // `impactFor()` makes for this store, in the same order (conversion → order value → revenue, then
-  // load time off the real desktop LCP), so the Impact strip's hero numerals always equal the
-  // case-study sheet's own hero numerals. Order value itself isn't shown here; it only feeds revenue's
-  // compound.
+  // load time off the real desktop LCP), full point series (not just the headline delta) so the
+  // Impact strip's own charts always draw identically to the case-study sheet's own charts. Order
+  // value itself isn't shown here; it only feeds revenue's compound.
   const conv = conversionSeries(STORE_SLUG)
   const orderValue = orderValueSeries(STORE_SLUG)
   const rev = revenueSeries(STORE_SLUG, conv.deltaPct, orderValue.deltaPct)
   const loadTime = loadTimeSeries(STORE_SLUG, lcpDesktopValue)
 
   const impact: FeaturedImpactData = {
-    conversionPct: conv.deltaPct,
-    revenuePct: rev.deltaPct,
-    loadTimePct: loadTime.deltaPct,
+    conversion: { points: conv.points, low: conv.low, high: conv.high, deltaPct: conv.deltaPct },
+    revenue: { points: rev.points, deltaPct: rev.deltaPct },
+    loadTime: { beforeSeconds: loadTime.beforeSeconds, afterSeconds: loadTime.afterSeconds, deltaPct: loadTime.deltaPct },
     rings: { perf: perfDesktop, a11y: a11yDesktop, seo: seoDesktop },
     lcpDesktop: lcpDesktopValue,
     tbtDesktop,
-    build: { commits: t?.commits ?? store.commits ?? 0, weeks, sections: t?.sections ?? store.sections ?? 0, blocks, trackedComponents },
+    clsDesktop,
   }
 
   const data: FeaturedData = {
@@ -147,7 +143,7 @@ export function FeaturedBuild({ skin, heading }: FeaturedBuildProps) {
     cs,
     store,
     vars,
-    metrics: { commits: t?.commits ?? store.commits ?? 0, weeks, sections: t?.sections ?? store.sections ?? 0 },
+    metrics: { sections, blocks, trackedComponents },
     impact,
     img: (name, v) => `/gallery/${STORE_SLUG}/${name}-${v}.webp`,
     sheetHref: `?store=${STORE_SLUG}#gallery`,

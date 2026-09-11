@@ -60,9 +60,9 @@ function TiltCapture({ data }: { data: FeaturedData }) {
 function FactsTile({ data }: { data: FeaturedData }) {
   const { skin, fb, metrics } = data
   const stats: [number, string][] = [
-    [metrics.commits, fb.metricLabels.commits],
-    [metrics.weeks, fb.metricLabels.weeks],
     [metrics.sections, fb.metricLabels.sections],
+    [metrics.blocks, fb.metricLabels.blocks],
+    [metrics.trackedComponents, fb.metricLabels.trackedComponents],
   ]
   return (
     <div className={`grid h-full grid-cols-3 gap-3 rounded-[22px] border p-4 md:p-5 ${skin.line} ${skin.dark ? 'bg-white/[0.03]' : 'bg-white'}`}>

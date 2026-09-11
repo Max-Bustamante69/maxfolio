@@ -89,23 +89,25 @@ export interface PortfolioContent {
       beats: { label: string; body: string; metric: string }[] // problem -> plan -> build -> result; {placeholders} filled from the registry/commerce
       frames: { label: string; headline: string; fact: string }[] // storyboard rail: problem -> design -> build -> launch -> result
       ticker: string[] // cinematic variant's fact strip; {placeholders} filled
-      metricLabels: { commits: string; weeks: string; sections: string } // bento count-up captions
+      /** Bento count-up captions AND the default variant's design-to-code diagram legend — one set of
+       *  process-fact labels, no commits/weeks (2026-09-11 owner call: git facts and elapsed time never
+       *  belong in this story; sections/blocks/tracked-components are the process facts instead). */
+      metricLabels: { sections: string; blocks: string; trackedComponents: string }
       stackLabel: string
       shippedLabel: string
       shipped: string[] // bento "what shipped" list; {placeholders} filled
       /** FeaturedImpact.tsx — the strip every variant renders below it. Hero-numeral labels and the
        *  disclaimer are NOT duplicated here: they reuse caseStudy.impact.{chipConversionLabel,
-       *  chipRevenueLabel, chipLoadTimeLabel, disclaimer} verbatim, and the score-ring labels reuse
-       *  caseStudy.{perf, a11y, seo}, so the sheet and this strip always read the same words for the
-       *  same numbers. */
+       *  chipRevenueLabel, chipLoadTimeLabel, conversionLabel, revenueLabel, loadTimeLabel, before,
+       *  after, disclaimer} verbatim, and the score-ring labels reuse caseStudy.{perf, a11y, seo}, so
+       *  the sheet and this strip always read the same words for the same numbers. No build/commit/week
+       *  tiles live here any more (2026-09-11 restructure) — only the real Lighthouse group. */
       impact: {
         heading: string // small-caps label above the real-numbers group, e.g. 'Real numbers'
         lcpLabel: string
         tbtLabel: string
-        blocksLabel: string
-        trackedLabel: string
-        lighthouseCaption: string // what/where/when for the rings + LCP + TBT tiles
-        buildCaption: string // what/where/when for the commit/week/section/block/tracked tiles
+        clsLabel: string
+        lighthouseCaption: string // what/where/when for the rings + LCP + TBT + CLS tiles
       }
     }
     /** Apple's new section listing what the Playwright QA harness actually checks (ReviewChecklist.tsx). */
