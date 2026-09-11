@@ -1,17 +1,17 @@
 // The filter bar shared by the orbit layout (above the rings, doubling as the group legend) and the
 // sub-1024px ledger fallback: group chips (multi-select, live facet counts), a surface radiogroup
-// (which kind of real usage), a depth radiogroup (derived — see skillUsage.ts), a "used in at least N
-// stores" radiogroup, a sort radiogroup, free text, Clear, an active-filter chips row and a live result
-// summary. One component so every surface that filters (orbit legend, ledger toolbar) filters
-// identically and never drifts. Below `lg` every toggle-style control rides one horizontally
-// scrollable, snapping rail with a one-sided edge fade (mask-image driven off real scroll position,
-// never a fixed two-sided mask — see `useEdgeFade`); at `lg` and up the same controls wrap into
-// centered rows and the rail's own scroll/mask machinery switches off entirely.
+// (which kind of real usage), a "used in at least N stores" radiogroup, a sort radiogroup, free text,
+// Clear, an active-filter chips row and a live result summary. One component so every surface that
+// filters (orbit legend, ledger toolbar) filters identically and never drifts. Below `lg` every
+// toggle-style control rides one horizontally scrollable, snapping rail with a one-sided edge fade
+// (mask-image driven off real scroll position, never a fixed two-sided mask — see `useEdgeFade`); at
+// `lg` and up the same controls wrap into centered rows and the rail's own scroll/mask machinery
+// switches off entirely.
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type KeyboardEvent, type ReactNode } from 'react'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { useMediaQuery } from '../../../hooks'
 import type { SkillGroupId } from '../../../data/registry'
-import { DEPTH_IDS, type DepthId, type ToolUsage } from '../../../data/skillUsage'
+import type { ToolUsage } from '../../../data/skillUsage'
 import { CountUp } from '../../gallery/charts'
 import type { Skin } from '../../gallery'
 import type { SkillsStrings } from '../skillsFormat'
@@ -163,8 +163,8 @@ export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, fo
 
   // Facet counting (deliverable a): a group chip's own count ignores the group facet itself so it
   // always answers "how many tools in this group would show if this chip were toggled on", given every
-  // OTHER active filter (surface/depth/min-stores/query) — never affected by which other groups happen
-  // to be selected right now.
+  // OTHER active filter (surface/min-stores/query) — never affected by which other groups happen to be
+  // selected right now.
   const groupFacet = useMemo(
     () =>
       Object.fromEntries(
@@ -190,7 +190,6 @@ export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, fo
     if (filter.groups.has(g)) activeChips.push({ id: `g-${g}`, label: groupLabel[g], onRemove: () => filter.toggleGroup(g) })
   }
   if (filter.surface) activeChips.push({ id: 'surface', label: ob[SURFACE_LABEL[filter.surface]], onRemove: () => filter.setSurface(null) })
-  if (filter.depth) activeChips.push({ id: 'depth', label: ob.depthGroups[filter.depth], onRemove: () => filter.setDepth(null) })
   if (filter.minStores > 0) activeChips.push({ id: 'min', label: fill(ob.minStoresOption, { n: String(filter.minStores) }), onRemove: () => filter.setMinStores(0) })
   if (filter.query.trim()) activeChips.push({ id: 'q', label: fill(ob.filterQueryLabel, { query: filter.query.trim() }), onRemove: () => filter.setQuery('') })
 
@@ -241,34 +240,6 @@ export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, fo
               className={`${CHIP} ${filter.surface === s ? skin.chipOn : skin.chip}`}
             >
               {ob[SURFACE_LABEL[s]]}
-            </button>
-          ))}
-        </div>
-
-        <Divider skin={skin} />
-
-        <div role="radiogroup" aria-label={ob.depthFilterLabel} onKeyDown={onRadioGroupKeyDown} className="flex shrink-0 items-center gap-1.5">
-          <button
-            type="button"
-            role="radio"
-            aria-checked={filter.depth === null}
-            tabIndex={filter.depth === null ? 0 : -1}
-            onClick={() => filter.setDepth(null)}
-            className={`${CHIP} ${filter.depth === null ? skin.chipOn : skin.chip}`}
-          >
-            {ob.depthAny}
-          </button>
-          {DEPTH_IDS.map((d: DepthId) => (
-            <button
-              key={d}
-              type="button"
-              role="radio"
-              aria-checked={filter.depth === d}
-              tabIndex={filter.depth === d ? 0 : -1}
-              onClick={() => filter.setDepth(d)}
-              className={`${CHIP} ${filter.depth === d ? skin.chipOn : skin.chip}`}
-            >
-              {ob.depthGroups[d]}
             </button>
           ))}
         </div>

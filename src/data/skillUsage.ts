@@ -66,17 +66,6 @@ const ALIASES: Record<string, RegExp> = {
 
 const matches = <T extends StackEntry>(entries: readonly T[], re: RegExp): T[] => entries.filter((e) => e.stack.some((s) => re.test(s)))
 
-/** skillUsage carries no explicit "how often" field — the filter UI needs one (2026-09-10, filters
- *  pass), so it is DERIVED from the same real `total` every tile already prints, never curated by
- *  hand. Fixed value thresholds, not quantiles, so two tools with the same total always land in the
- *  same bucket regardless of how the rest of the fleet happens to be distributed: `total >= 5` is
- *  'daily' (the tool is named across five or more real stores/products/role-work entries — reused
- *  constantly), `2–4` is 'regular', `0–1` is 'occasional' (named once, or not yet matched to any
- *  stack line at all — see the module doc above on why 0 is an honest, expected value here). */
-export type DepthId = 'daily' | 'regular' | 'occasional'
-export const DEPTH_IDS: DepthId[] = ['daily', 'regular', 'occasional']
-export const deriveDepth = (total: number): DepthId => (total >= 5 ? 'daily' : total >= 2 ? 'regular' : 'occasional')
-
 export interface ToolUsage {
   tool: string
   group: SkillGroupId
@@ -87,8 +76,6 @@ export interface ToolUsage {
   /** Real named client-role deliverables whose stack names this tool. */
   roleWork: number
   total: number
-  /** Derived, never curated — see `deriveDepth` above. */
-  depth: DepthId
   /** The actual names/ids behind the counts above — real registry matches, in registry order, for the
    *  skill panel's "used in" list. Never a curated subset. */
   storeNames: string[]
@@ -102,15 +89,13 @@ export const toolUsage: ToolUsage[] = (Object.keys(skillGroups) as SkillGroupId[
     const matchedStores = re ? matches(stores, re) : []
     const matchedProducts = re ? matches(products, re) : []
     const matchedRoleWork = re ? matches(roleWork, re) : []
-    const total = matchedStores.length + matchedProducts.length + matchedRoleWork.length
     return {
       tool,
       group,
       stores: matchedStores.length,
       products: matchedProducts.length,
       roleWork: matchedRoleWork.length,
-      total,
-      depth: deriveDepth(total),
+      total: matchedStores.length + matchedProducts.length + matchedRoleWork.length,
       storeNames: matchedStores.map((s) => s.name),
       productNames: matchedProducts.map((p) => p.name),
       roleWorkIds: matchedRoleWork.map((w) => w.id),
