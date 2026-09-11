@@ -159,8 +159,8 @@ export const ja: PortfolioContent = {
     },
     reviewChecklist: {
       eyebrow: '無料診断が実際に確認すること',
-      title: 'ざっと見るのではなく、',
-      titleAccent: 'ハーネスで検証',
+      title: '公開前に',
+      titleAccent: '40項目を検証',
       lead: '無料診断は、Digitdeckの全ストアの裏で動く同じPlaywright QAハーネスを実行します: 巡回し、操作し、計測して、結果を報告します。',
       countLabel: '{n}以上の自動チェック',
       cta: '無料20分のストア診断を受ける',
@@ -179,6 +179,13 @@ export const ja: PortfolioContent = {
       screenshotAlt: 'The Gummy Boxのホームページ。このデモがチェックを再生する実店舗',
       hotspotAria: '{group}のチェック、ホームページ上の位置',
       progressAria: '{total}件中{done}件のチェック',
+      consoleHeaderLine: 'qa-harness run · {n}件以上のチェック · サンプルストア',
+      replayLabel: 'もう一度再生',
+      reportStoreLabel: 'あなたのストア',
+      reportDateLabel: 'レビュー当日',
+      reportFooterLabel: '公開前に毎回実行',
+      xrayChipAria: 'キャプチャ上に{group}のチェックを表示',
+      railCounterLabel: '{total}件中{current}件目のステーション',
     },
     fiveLines: {
       kinds: {

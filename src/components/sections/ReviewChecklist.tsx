@@ -3,6 +3,12 @@ import { m, useReducedMotion } from 'framer-motion'
 import { useContent } from '../../hooks'
 import { LaptopFrame, PhoneFrame, type Skin } from '../gallery'
 import type { SectionHeading } from './Gallery'
+import { ConsoleReplay } from './reviewLayouts/ConsoleReplay'
+import { XRayOverlay } from './reviewLayouts/XRayOverlay'
+import { ReportCard } from './reviewLayouts/ReportCard'
+import { StationsRail } from './reviewLayouts/StationsRail'
+import { VariantSwitcher } from './reviewLayouts/VariantSwitcher'
+import { ICON_PATHS as REVIEW_ICON_PATHS, isVariantId, type ReviewData, type VariantId } from './reviewLayouts/types'
 
 interface ReviewChecklistProps {
   skin: Skin
@@ -37,21 +43,10 @@ const HOTSPOTS = [
   { x: 50, y: 3 }, // Overlays — the header band
 ] as const
 
-/** Minimal inline line icons, one per group, in the same fixed order as `HOTSPOTS`. No icon library. */
-const ICON_PATHS = [
-  'M6 8h12l-1 11a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L6 8Zm2-3a4 4 0 0 1 8 0', // Commerce — bag
-  'M5 4h10l4 4v12H5V4Zm10 0v4h4M9 12h6M9 16h6', // Content — a folded card
-  'M4 19V10m6.5 9V5M17 19v-6', // Data — bars
-  'M4 4h6v6H4V4Zm10 0h6v6h-6V4ZM4 14h6v6H4v-6Zm10 0h6v6h-6v-6Z', // Geometry — grid
-  'M8 6v12l10-6-10-6Z', // Motion — play
-  'M4 6h16M4 12h16M4 18h16', // Navigation — menu
-  'M12 4l8 4-8 4-8-4 8-4Zm-8 8 8 4 8-4M4 16l8 4 8-4', // Overlays — stacked layers
-] as const
-
 function GroupIcon({ index, className }: { index: number; className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
-      <path d={ICON_PATHS[index]} stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />
+      <path d={REVIEW_ICON_PATHS[index]} stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
 }
@@ -72,14 +67,27 @@ function CheckMark({ done, reduced }: { done: boolean; reduced: boolean }) {
   )
 }
 
+const readInitialVariant = (): { variant: VariantId; hasParam: boolean } => {
+  if (typeof window === 'undefined') return { variant: 'a', hasParam: false }
+  try {
+    const params = new URLSearchParams(window.location.search)
+    if (!params.has('review')) return { variant: 'a', hasParam: false }
+    const v = params.get('review')
+    return { variant: isVariantId(v) ? v : 'a', hasParam: true }
+  } catch {
+    return { variant: 'a', hasParam: false }
+  }
+}
+
 /**
- * What the free 20-minute review actually runs, as a visual replay of the run: a real home-page
- * capture with a scanning line and per-group hotspots on the left, the 7 assertion groups as tiles
- * with a progress meter and per-item check marks on the right. The run starts once when the section
- * enters the viewport, steps one item every 90ms, then holds complete — it visualizes the list of
- * checks the review runs, never a live result read off a visitor's own store (the caption under the
- * run says so). Every item is always in the DOM; only opacity/transform/width animate, so the section
- * never grows while the run plays.
+ * What the free 20-minute review actually runs. Without `?review=` this renders the shipped round-41
+ * layout unchanged: a real home-page capture with a scanning line and per-group hotspots, seven
+ * assertion-group tiles with a progress meter and per-item check marks. With `?review=a|b|c|d` (read
+ * once on mount) it instead renders one of four genuinely different directions — console replay
+ * (time), x-ray overlay (space), report card (artifact), stations rail (journey), see
+ * `reviewLayouts/` — plus the owner-only switcher to flip between them. Every direction shares one
+ * rule: it never claims a live result read off a visitor's own store, only a replay of the check
+ * list (the caption under each visual says so).
  */
 export function ReviewChecklist({ skin, heading, onCta }: ReviewChecklistProps) {
   const { strings } = useContent()
@@ -88,6 +96,20 @@ export function ReviewChecklist({ skin, heading, onCta }: ReviewChecklistProps) 
   const sectionRef = useRef<HTMLElement>(null)
   const [started, setStarted] = useState(false)
   const [runStep, setRunStep] = useState(0)
+
+  const [{ variant: initialVariant, hasParam }] = useState(readInitialVariant)
+  const [variant, setVariant] = useState<VariantId>(initialVariant)
+
+  const onSelectVariant = (id: VariantId) => {
+    setVariant(id)
+    try {
+      const url = new URL(window.location.href)
+      url.searchParams.set('review', id)
+      window.history.replaceState(null, '', url)
+    } catch {
+      // preview-only convenience; never block the switch on it
+    }
+  }
 
   const flat = useMemo(() => rc.groups.flatMap((g, gi) => g.items.map((item, ii) => ({ gi, ii, item }))), [rc.groups])
   const total = flat.length
@@ -126,16 +148,20 @@ export function ReviewChecklist({ skin, heading, onCta }: ReviewChecklistProps) 
     return () => io.disconnect()
   }, [reduced, total])
 
-  // Steps one item every STEP_MS once started, then stops at `total` and holds.
+  // Steps one item every STEP_MS once started, then stops at `total` and holds. Only the legacy
+  // (no-`?review=`) layout below reads `runStep` — a no-op elsewhere, cheap enough to always run so
+  // this hook never has to branch on `hasParam`.
   useEffect(() => {
-    if (!started || reduced || runStep >= total) return
+    if (hasParam || !started || reduced || runStep >= total) return
     const t = setTimeout(() => setRunStep((s) => Math.min(total, s + 1)), STEP_MS)
     return () => clearTimeout(t)
-  }, [started, runStep, reduced, total])
+  }, [hasParam, started, runStep, reduced, total])
 
   const complete = runStep >= total
   const currentGroup = complete ? -1 : (flat[runStep]?.gi ?? -1)
   const scanPct = total > 0 ? (runStep / total) * 100 : 0
+
+  const reviewData: ReviewData = { skin, rc, checkCount: CHECK_COUNT, reduced, flat, cumulative, total, started, onCta }
 
   return (
     <section id="review-checklist" ref={sectionRef} className="scroll-mt-20">
@@ -143,70 +169,79 @@ export function ReviewChecklist({ skin, heading, onCta }: ReviewChecklistProps) 
 
       <p className={`mb-8 inline-flex items-center rounded-full px-3.5 py-1.5 text-xs font-semibold ${skin.dark ? 'bg-white/10' : 'bg-black/5'}`}>{rc.countLabel.replace('{n}', String(CHECK_COUNT))}</p>
 
-      <div className={`grid gap-6 border-t pt-8 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:gap-10 ${skin.line}`}>
-        {/* Left: the real capture, a scanning line, and one hotspot per group. */}
-        <div className="mx-auto w-full max-w-[360px] md:max-w-none">
-          <div className="relative">
-            <div className="hidden md:block">
-              <LaptopFrame>
-                <img src={SHOT.desktop} alt={rc.screenshotAlt} className="h-full w-full object-cover object-top" width={1280} height={800} loading="lazy" decoding="async" />
-                {HOTSPOTS.map((h, gi) => (
-                  <Hotspot key={gi} h={h} active={currentGroup === gi} done={cumulative[gi] + rc.groups[gi].items.length <= runStep} label={rc.hotspotAria.replace('{group}', rc.groups[gi].label)} skin={skin} reduced={reduced} />
-                ))}
-                <ScanLine pct={scanPct} visible={started && !complete} reduced={reduced} skin={skin} />
-              </LaptopFrame>
-            </div>
-            <div className="md:hidden">
-              <PhoneFrame className="mx-auto w-[62%]">
-                <img src={SHOT.mobile} alt={rc.screenshotAlt} className="h-full w-full object-cover object-top" width={430} height={880} loading="lazy" decoding="async" />
-                {HOTSPOTS.map((h, gi) => (
-                  <Hotspot key={gi} h={h} active={currentGroup === gi} done={cumulative[gi] + rc.groups[gi].items.length <= runStep} label={rc.hotspotAria.replace('{group}', rc.groups[gi].label)} skin={skin} reduced={reduced} />
-                ))}
-                <ScanLine pct={scanPct} visible={started && !complete} reduced={reduced} skin={skin} />
-              </PhoneFrame>
-            </div>
-          </div>
-          <p className={`mt-4 text-center text-xs leading-relaxed md:text-left ${skin.muted}`}>{rc.runCaption}</p>
-        </div>
+      {hasParam && <VariantSwitcher skin={skin} active={variant} onSelect={onSelectVariant} />}
 
-        {/* Right: the 7 assertion groups, each a tile with an icon, item count, a progress meter and per-item checks. */}
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-2">
-          {rc.groups.map((group, gi) => {
-            const done = Math.min(Math.max(runStep - cumulative[gi], 0), group.items.length)
-            const pct = group.items.length > 0 ? (done / group.items.length) * 100 : 0
-            const groupComplete = done === group.items.length
-            return (
-              <div key={group.label} className={`rounded-[18px] border p-4 ${skin.line} ${skin.dark ? 'bg-white/[0.03]' : 'bg-white'}`}>
-                <div className="flex items-center gap-2">
-                  <GroupIcon index={gi} className={`h-4 w-4 shrink-0 ${skin.accent}`} />
-                  <p className={`min-w-0 flex-1 truncate text-[11px] font-semibold uppercase tracking-[0.14em] ${skin.accent}`}>{group.label}</p>
-                  <span className={`shrink-0 text-[11px] tabular-nums ${skin.muted}`}>{group.items.length}</span>
-                </div>
-
-                <div className={`mt-3 h-1 overflow-hidden rounded-full ${skin.dark ? 'bg-white/10' : 'bg-black/[0.07]'}`} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(pct)} aria-valuetext={rc.progressAria.replace('{done}', String(done)).replace('{total}', String(group.items.length))} aria-label={group.label}>
-                  <m.div className={`h-full rounded-full ${skin.accentBg}`} initial={false} animate={{ width: `${pct}%` }} transition={{ duration: reduced ? 0 : 0.2, ease: EASE }} />
-                </div>
-
-                <p className={`mt-2 text-[10px] font-medium uppercase tracking-[0.1em] ${groupComplete ? skin.accent : skin.muted}`}>{groupComplete ? rc.statusDone : rc.statusChecking}</p>
-
-                <ul className="mt-3 space-y-1.5">
-                  {group.items.map((item, ii) => {
-                    const idx = cumulative[gi] + ii
-                    return (
-                      <li key={item} className="flex items-start gap-2 text-[13px] leading-snug">
-                        <span className={idx < runStep ? skin.accent : skin.muted}>
-                          <CheckMark done={idx < runStep} reduced={reduced} />
-                        </span>
-                        <span>{item}</span>
-                      </li>
-                    )
-                  })}
-                </ul>
+      {!hasParam && (
+        <div className={`grid gap-6 border-t pt-8 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:gap-10 ${skin.line}`}>
+          {/* Left: the real capture, a scanning line, and one hotspot per group. */}
+          <div className="mx-auto w-full max-w-[360px] md:max-w-none">
+            <div className="relative">
+              <div className="hidden md:block">
+                <LaptopFrame>
+                  <img src={SHOT.desktop} alt={rc.screenshotAlt} className="h-full w-full object-cover object-top" width={1280} height={800} loading="lazy" decoding="async" />
+                  {HOTSPOTS.map((h, gi) => (
+                    <Hotspot key={gi} h={h} active={currentGroup === gi} done={cumulative[gi] + rc.groups[gi].items.length <= runStep} label={rc.hotspotAria.replace('{group}', rc.groups[gi].label)} skin={skin} reduced={reduced} />
+                  ))}
+                  <ScanLine pct={scanPct} visible={started && !complete} reduced={reduced} skin={skin} />
+                </LaptopFrame>
               </div>
-            )
-          })}
+              <div className="md:hidden">
+                <PhoneFrame className="mx-auto w-[62%]">
+                  <img src={SHOT.mobile} alt={rc.screenshotAlt} className="h-full w-full object-cover object-top" width={430} height={880} loading="lazy" decoding="async" />
+                  {HOTSPOTS.map((h, gi) => (
+                    <Hotspot key={gi} h={h} active={currentGroup === gi} done={cumulative[gi] + rc.groups[gi].items.length <= runStep} label={rc.hotspotAria.replace('{group}', rc.groups[gi].label)} skin={skin} reduced={reduced} />
+                  ))}
+                  <ScanLine pct={scanPct} visible={started && !complete} reduced={reduced} skin={skin} />
+                </PhoneFrame>
+              </div>
+            </div>
+            <p className={`mt-4 text-center text-xs leading-relaxed md:text-left ${skin.muted}`}>{rc.runCaption}</p>
+          </div>
+
+          {/* Right: the 7 assertion groups, each a tile with an icon, item count, a progress meter and per-item checks. */}
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-2">
+            {rc.groups.map((group, gi) => {
+              const done = Math.min(Math.max(runStep - cumulative[gi], 0), group.items.length)
+              const pct = group.items.length > 0 ? (done / group.items.length) * 100 : 0
+              const groupComplete = done === group.items.length
+              return (
+                <div key={group.label} className={`rounded-[18px] border p-4 ${skin.line} ${skin.dark ? 'bg-white/[0.03]' : 'bg-white'}`}>
+                  <div className="flex items-center gap-2">
+                    <GroupIcon index={gi} className={`h-4 w-4 shrink-0 ${skin.accent}`} />
+                    <p className={`min-w-0 flex-1 truncate text-[11px] font-semibold uppercase tracking-[0.14em] ${skin.accent}`}>{group.label}</p>
+                    <span className={`shrink-0 text-[11px] tabular-nums ${skin.muted}`}>{group.items.length}</span>
+                  </div>
+
+                  <div className={`mt-3 h-1 overflow-hidden rounded-full ${skin.dark ? 'bg-white/10' : 'bg-black/[0.07]'}`} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(pct)} aria-valuetext={rc.progressAria.replace('{done}', String(done)).replace('{total}', String(group.items.length))} aria-label={group.label}>
+                    <m.div className={`h-full rounded-full ${skin.accentBg}`} initial={false} animate={{ width: `${pct}%` }} transition={{ duration: reduced ? 0 : 0.2, ease: EASE }} />
+                  </div>
+
+                  <p className={`mt-2 text-[10px] font-medium uppercase tracking-[0.1em] ${groupComplete ? skin.accent : skin.muted}`}>{groupComplete ? rc.statusDone : rc.statusChecking}</p>
+
+                  <ul className="mt-3 space-y-1.5">
+                    {group.items.map((item, ii) => {
+                      const idx = cumulative[gi] + ii
+                      return (
+                        <li key={item} className="flex items-start gap-2 text-[13px] leading-snug">
+                          <span className={idx < runStep ? skin.accent : skin.muted}>
+                            <CheckMark done={idx < runStep} reduced={reduced} />
+                          </span>
+                          <span>{item}</span>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                </div>
+              )
+            })}
+          </div>
         </div>
-      </div>
+      )}
+
+      {hasParam && variant === 'a' && <ConsoleReplay data={reviewData} />}
+      {hasParam && variant === 'b' && <XRayOverlay data={reviewData} />}
+      {hasParam && variant === 'c' && <ReportCard data={reviewData} />}
+      {hasParam && variant === 'd' && <StationsRail data={reviewData} />}
 
       <button type="button" onClick={onCta} className="press mt-10 inline-flex items-center justify-center rounded-full bg-apple-blue px-6 py-3 text-sm font-medium text-white hover:bg-apple-blueHover">
         {rc.cta}

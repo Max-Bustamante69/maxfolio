@@ -128,6 +128,20 @@ export interface PortfolioContent {
       hotspotAria: string
       /** aria-valuetext for a group's progress meter; '{done}' and '{total}' are replaced with counts. */
       progressAria: string
+      /** Console replay (?review=a) header log line; '{n}' is replaced with CHECK_COUNT. */
+      consoleHeaderLine: string
+      /** Console replay's replay-the-log button. */
+      replayLabel: string
+      /** Report card (?review=c) header block's store-name placeholder cell. */
+      reportStoreLabel: string
+      /** Report card (?review=c) header block's run-date placeholder cell. */
+      reportDateLabel: string
+      /** Report card (?review=c) footer stamp line. */
+      reportFooterLabel: string
+      /** X-ray overlay (?review=b) group chip aria-label; '{group}' is replaced with that group's label. */
+      xrayChipAria: string
+      /** Stations rail (?review=d) counter under the rail; '{current}' and '{total}' are replaced with counts. */
+      railCounterLabel: string
     }
     /** Luxury's Years intro: the unit chart re-narrated as one composed sentence per year. */
     fiveLines: {

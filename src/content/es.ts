@@ -159,8 +159,8 @@ export const es: PortfolioContent = {
     },
     reviewChecklist: {
       eyebrow: 'Lo que revisa de verdad una auditoría',
-      title: 'No es una mirada —',
-      titleAccent: 'es un arnés',
+      title: 'Cuarenta chequeos,',
+      titleAccent: 'antes de cada lanzamiento',
       lead: 'La revisión gratuita corre el mismo arnés de QA con Playwright que hay detrás de cada tienda Digitdeck: recorre, hace clic y mide, y luego reporta lo que encuentra.',
       countLabel: '{n}+ chequeos automatizados',
       cta: 'Pide tu revisión gratis de 20 minutos',
@@ -179,6 +179,13 @@ export const es: PortfolioContent = {
       screenshotAlt: 'Página de inicio de The Gummy Box, la tienda real sobre la que esta demo reproduce los chequeos',
       hotspotAria: 'Chequeos de {group}, marcados sobre la página de inicio',
       progressAria: '{done} de {total} chequeos',
+      consoleHeaderLine: 'qa-harness run · {n}+ chequeos · tienda de muestra',
+      replayLabel: 'Repetir',
+      reportStoreLabel: 'tu tienda',
+      reportDateLabel: 'día de la revisión',
+      reportFooterLabel: 'Se ejecuta antes de cada lanzamiento',
+      xrayChipAria: 'Mostrar los chequeos de {group} sobre la captura',
+      railCounterLabel: '{current} de {total} estaciones',
     },
     fiveLines: {
       kinds: {

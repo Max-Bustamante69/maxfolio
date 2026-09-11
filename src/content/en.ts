@@ -159,8 +159,8 @@ export const en: PortfolioContent = {
     },
     reviewChecklist: {
       eyebrow: 'What a review actually checks',
-      title: 'Not a glance —',
-      titleAccent: 'a harness',
+      title: 'Forty checks,',
+      titleAccent: 'before every launch',
       lead: 'The free review runs the same Playwright QA harness behind every Digitdeck store: it crawls, clicks and measures, then reports what it finds.',
       countLabel: '{n}+ automated checks',
       cta: 'Get the free 20-minute review',
@@ -179,6 +179,13 @@ export const en: PortfolioContent = {
       screenshotAlt: 'Home page of The Gummy Box, the live store this demo replays checks against',
       hotspotAria: '{group} checks, marked on the home page',
       progressAria: '{done} of {total} checks',
+      consoleHeaderLine: 'qa-harness run · {n}+ checks · sample store',
+      replayLabel: 'Replay',
+      reportStoreLabel: 'your store',
+      reportDateLabel: 'day of the review',
+      reportFooterLabel: 'Runs before every launch',
+      xrayChipAria: 'Show {group} checks on the capture',
+      railCounterLabel: '{current} of {total} stations',
     },
     fiveLines: {
       kinds: {
