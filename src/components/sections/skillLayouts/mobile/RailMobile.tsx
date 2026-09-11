@@ -10,6 +10,7 @@ import { useDragRail, useSheetHistory } from '../../../../hooks'
 import type { SkillGroupId } from '../../../../data/registry'
 import { toolUsageById } from '../../../../data/skillUsage'
 import { CountUp } from '../../../gallery/charts'
+import { SkillsFilterBar } from '../SkillsFilterBar'
 import { ToolDrawer, DRAWER_ID } from '../ToolDrawer'
 import { useSkillsFilter } from '../useSkillsFilter'
 import type { SkillsLayoutProps } from '../types'
@@ -17,7 +18,7 @@ import type { SkillsLayoutProps } from '../types'
 const fill = (template: string, vars: Record<string, string>) => Object.entries(vars).reduce((s, [k, v]) => s.replace(`{${k}}`, v), template)
 
 export function RailMobile({ data }: SkillsLayoutProps) {
-  const { skin, sk, groups, groupLabel, groupNote, storesPerGroup, toolsByGroup, formatTool } = data
+  const { skin, sk, groups, groupLabel, groupNote, storesPerGroup, toolsByGroup, formatTool, formatGroup } = data
   const reduced = useReducedMotion()
   const filter = useSkillsFilter(groups)
   const [active, setActive] = useState(0)
@@ -81,6 +82,13 @@ export function RailMobile({ data }: SkillsLayoutProps) {
 
   return (
     <div className="mt-2">
+      {/* 2026-09-11 review fix: this candidate had no filter UI at all — the "every option reuses the
+          same SkillsFilterBar (or a compact variant)" requirement wasn't met, so a visitor landing on
+          the rail had no way to filter cards/tools through the UI. Sticky, matching the accordion and
+          constellation candidates' own bar placement above their content. */}
+      <div className={`sticky top-16 z-20 -mx-4 px-4 pb-3 pt-1 backdrop-blur ${skin.dark ? 'bg-black/75' : 'bg-white/85'}`}>
+        <SkillsFilterBar skin={skin} sk={sk} groups={groups} groupLabel={groupLabel} toolsByGroup={toolsByGroup} formatGroup={formatGroup} filter={filter} />
+      </div>
       <div style={{ perspective: 1200 }}>
         <div
           ref={railRef}
