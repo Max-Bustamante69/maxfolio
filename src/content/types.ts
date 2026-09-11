@@ -239,6 +239,24 @@ export interface PortfolioContent {
           noCaptures: string // shown when a tool has no linkable store/product at all (rare)
         }
       }
+      /** The four `?skillsMobile=a|b|c|d` sub-1024px candidates (2026-09-11 — "in mobile this section
+       *  is still horrible, find another way"). Dev-only surface (switcher + labels never shown
+       *  unless the URL already carries the param), still real user-facing copy once one ships. */
+      mobile: {
+        switcherLabel: string // aria-label for the dev-only mobile-layout switcher
+        optionAccordion: string // 'Accordion' — switcher button label
+        optionRail: string // 'Rail'
+        optionRanked: string // 'Ranked list'
+        optionConstellation: string // 'Constellation'
+        expandGroup: string // 'Expand {group}' — accordion header aria-label while collapsed
+        collapseGroup: string // 'Collapse {group}' — accordion header aria-label while expanded
+        topToolsLabel: string // eyebrow above a rail card's top-5 mini bar chart
+        seeAll: string // 'See all {n}' — rail card's expand-to-sheet button
+        seeAllClose: string // close label for the rail's "see all" sheet
+        openCluster: string // 'Open {group}' — constellation cluster button aria-label
+        back: string // 'Back' — constellation zoom-out button label/aria-label
+        rankedListLabel: string // aria-label for the ranked list's own role="list"
+      }
     }
     contact: SectionHeading & {
       lead: string
