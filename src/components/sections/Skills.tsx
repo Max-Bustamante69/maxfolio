@@ -27,10 +27,10 @@ interface DepthStatProps {
 function DepthStat({ skin, value, text }: DepthStatProps) {
   return (
     <div>
-      <p className={`text-2xl font-semibold tabular-nums md:text-3xl ${skin.title}`}>
+      <p className={`text-xl font-semibold tabular-nums sm:text-2xl md:text-3xl ${skin.title}`}>
         <CountUp value={value} />
       </p>
-      <p className={`mt-1 text-[11px] uppercase leading-tight tracking-wide ${skin.muted}`}>{text}</p>
+      <p className={`mt-1 text-[10px] uppercase leading-tight tracking-wide sm:text-[11px] ${skin.muted}`}>{text}</p>
     </div>
   )
 }
@@ -116,7 +116,7 @@ export function Skills({ skin, heading, ownId = true }: SkillsProps) {
     <section id={ownId ? 'skills' : undefined} className="scroll-mt-20">
       {heading(sk.eyebrow, sk.title, sk.titleAccent)}
 
-      <div className={`mt-8 flex flex-wrap items-baseline gap-x-10 gap-y-3 border-b pb-6 ${skin.line}`}>
+      <div className={`mt-8 grid grid-cols-3 gap-3 border-b pb-6 sm:flex sm:flex-wrap sm:items-baseline sm:gap-x-10 sm:gap-y-3 ${skin.line}`}>
         <DepthStat skin={skin} value={fleetLiquidLines} text={sk.depthLabel.liquid} />
         <DepthStat skin={skin} value={fleetIslandLines} text={sk.depthLabel.ts} />
         <DepthStat skin={skin} value={fleetStoreCount} text={sk.depthLabel.stores} />
