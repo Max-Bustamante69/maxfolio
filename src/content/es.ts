@@ -104,7 +104,7 @@ export const es: PortfolioContent = {
         { q: '¿Este portafolio lo hizo una IA?', a: 'Cada sección partió de una referencia en Figma o Framer que yo aprobé, y se construyó a mano. Los datos de muestra siempre están etiquetados.' },
       ],
     },
-    manifesto: { label: 'Lo que no cambia', lines: ['Leer los números antes que el código.', 'Desplegar desde git, nunca desde el editor.', 'Probar la tienda completa, no una página.', 'Entregar las llaves.'] },
+    manifesto: { label: 'Lo que hago siempre', lines: ['Leo el reporte de Lighthouse y las cifras de ventas antes de escribir código.', 'Cada despliegue sale de un commit de git, nunca del editor.', 'Corro más de 40 pruebas con Playwright en toda la tienda antes de lanzar.', 'Te entrego el editor, la documentación y el repositorio al final.'] },
     testimonials: { eyebrow: 'En sus palabras', title: 'Lo que dicen', titleAccent: 'los clientes' },
     now: { label: 'Ahora', live: '{n} tiendas en vivo', dev: '{n} en construcción', band: 'Tiendas entregadas', local: 'Medellín · {time} hora local' },
     statBand: { label: 'El trabajo, en números', asOf: 'Septiembre de 2026', sourceLabel: 'Fuente', note: 'Rangos medidos en tiendas de clientes; las cifras exactas por tienda se mantienen confidenciales.' },

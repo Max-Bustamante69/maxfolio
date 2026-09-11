@@ -115,7 +115,7 @@ export function FeaturedImpact({ data }: { data: FeaturedData }) {
         )}
         <p className={`mt-2 text-[11px] leading-snug ${skin.muted}`}>{fi.lighthouseCaption}</p>
 
-        <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-4">
+        <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
           <Tile value={impact.build.commits} label={fb.metricLabels.commits} {...tileProps} />
           <Tile value={impact.build.weeks} label={fb.metricLabels.weeks} {...tileProps} />
           <Tile value={impact.build.sections} label={fb.metricLabels.sections} {...tileProps} />
