@@ -87,7 +87,7 @@ export function XRayOverlay({ data }: { data: ReviewData }) {
 
       {/* Right: 7 group chips, then the active group's numbered items. */}
       <div>
-        <div role="radiogroup" aria-label={group.label} className="flex flex-wrap gap-1.5">
+        <div role="radiogroup" aria-label={rc.eyebrow} className="flex flex-wrap gap-1.5">
           {rc.groups.map((g, gi) => (
             <button
               key={g.label}
@@ -102,7 +102,7 @@ export function XRayOverlay({ data }: { data: ReviewData }) {
                 <path d={ICON_PATHS[gi]} stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               {g.label}
-              <span className="tabular-nums opacity-60">{g.items.length}</span>
+              <span className="tabular-nums opacity-75">{g.items.length}</span>
             </button>
           ))}
         </div>

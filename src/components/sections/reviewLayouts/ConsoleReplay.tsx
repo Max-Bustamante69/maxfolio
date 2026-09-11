@@ -78,7 +78,7 @@ export function ConsoleReplay({ data }: { data: ReviewData }) {
                 <span className="shrink-0 text-[#39ff88]">✓</span>
                 <span className="shrink-0 opacity-60">[{code}]</span>
                 <span className="min-w-0 flex-1">{f.item}</span>
-                <span className="shrink-0 opacity-40 tabular-nums">{elapsedMs}ms</span>
+                <span className="shrink-0 opacity-55 tabular-nums">{elapsedMs}ms</span>
               </m.div>
             )
           })}

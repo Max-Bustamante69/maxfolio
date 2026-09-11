@@ -28,8 +28,8 @@ export function ReportCard({ data }: { data: ReviewData }) {
         {/* Header block. */}
         <div className={`flex flex-wrap items-start justify-between gap-4 border-b p-5 sm:p-7 ${ruleColor}`}>
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-50">{rc.reportStoreLabel}</p>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-50">{rc.reportDateLabel}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-70">{rc.reportStoreLabel}</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-70">{rc.reportDateLabel}</p>
           </div>
           <p className={`rounded-full px-3 py-1.5 text-xs font-semibold ${skin.dark ? 'bg-white/10' : 'bg-black/5'}`}>{rc.countLabel.replace('{n}', String(checkCount))}</p>
         </div>
@@ -45,7 +45,7 @@ export function ReportCard({ data }: { data: ReviewData }) {
                     <path d={ICON_PATHS[gi]} stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                   <p className="min-w-0 flex-1 truncate text-sm font-semibold uppercase tracking-[0.08em]">{group.label}</p>
-                  <span className="shrink-0 text-xs tabular-nums opacity-60">{group.items.length}</span>
+                  <span className="shrink-0 text-xs tabular-nums opacity-70">{group.items.length}</span>
                 </div>
                 <div className={`mt-2.5 h-1 overflow-hidden rounded-full ${skin.dark ? 'bg-white/10' : 'bg-black/[0.08]'}`} aria-hidden="true">
                   <m.div className={`h-full rounded-full ${skin.accentBg}`} initial={reduced ? false : { width: 0 }} whileInView={{ width: `${pct}%` }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: reduced ? 0 : 0.5, ease: EASE }} />
@@ -67,7 +67,7 @@ export function ReportCard({ data }: { data: ReviewData }) {
         </div>
 
         {/* Footer stamp. */}
-        <div className={`border-t p-5 text-center text-[11px] font-semibold uppercase tracking-[0.14em] opacity-60 sm:p-7 ${ruleColor}`}>{rc.reportFooterLabel}</div>
+        <div className={`border-t p-5 text-center text-[11px] font-semibold uppercase tracking-[0.14em] opacity-70 sm:p-7 ${ruleColor}`}>{rc.reportFooterLabel}</div>
       </m.div>
 
       <p className={`mt-4 text-xs leading-relaxed ${skin.muted}`}>{rc.runCaption}</p>
