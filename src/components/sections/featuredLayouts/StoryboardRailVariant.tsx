@@ -102,8 +102,20 @@ export function StoryboardRailVariant({ data }: { data: FeaturedData }) {
   const goTo = (i: number) => {
     const clamped = Math.max(0, Math.min(total - 1, i))
     const el = cardRefs.current[clamped]
-    if (!el || !railRef.current) return
-    railRef.current.scrollTo({ left: el.offsetLeft - railRef.current.offsetLeft, behavior: reduced ? 'auto' : 'smooth' })
+    const rail = railRef.current
+    if (!el || !rail) return
+    // getBoundingClientRect, not offsetLeft/offsetParent: this rail is an `m.div` with a framer-motion
+    // `rotateY` binding on `style`, which the browser treats as a transform (offsetParent-establishing)
+    // the moment that binding takes effect — and only from then on. Measured against whatever the
+    // CURRENT offsetParent happens to be, `el.offsetLeft - rail.offsetLeft` silently jumped by one
+    // slide's worth of the rail's own left padding depending on timing this component doesn't control
+    // (reproduced: landing 16px past the browser's own native scroll-snap rest position specifically
+    // once this rail had mounted alongside Chapters on the same page load, which is the realistic path
+    // — the variant switcher swaps this rail in without a reload, so Chapters is always already up).
+    // Rect deltas plus the rail's own scrollLeft give the same number regardless of what establishes
+    // offsetParent, matching useDragRail.ts's slideTargets so a drag-land and an arrow-click agree.
+    const left = el.getBoundingClientRect().left - rail.getBoundingClientRect().left + rail.scrollLeft
+    rail.scrollTo({ left, behavior: reduced ? 'auto' : 'smooth' })
   }
 
   return (

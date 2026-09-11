@@ -88,6 +88,7 @@ export function useDragRail(ref: React.RefObject<HTMLDivElement | null>, options
     targetLeft: 0,
     lastT: 0,
     velocity: 0, // px of scrollLeft target per ms
+    targets: [] as number[], // slide targets snapshotted at gesture start — see slideTargets' note
   })
   const rafId = useRef<number | null>(null)
   const controls = useRef<AnimationPlaybackControls | null>(null)
@@ -102,13 +103,33 @@ export function useDragRail(ref: React.RefObject<HTMLDivElement | null>, options
   const slideTargets = useCallback(
     (rail: HTMLDivElement): number[] => {
       const centered = window.innerWidth < centerSnapBelow
-      const railOffset = rail.offsetLeft
+      // getBoundingClientRect (viewport-relative), not offsetLeft/offsetParent: a scrolling element
+      // that carries any non-'none' transform (StoryboardRailVariant's `m.div` keeps a framer-motion
+      // `rotateY` binding on `style`, which the browser treats as a transform even at ~0deg) becomes an
+      // offsetParent-establishing element for its own children the moment that binding takes effect —
+      // and only once it has. Before that it isn't. offsetLeft is measured against whatever the CURRENT
+      // offsetParent is, so `child.offsetLeft - rail.offsetLeft` silently jumps by a constant (here, one
+      // slide's worth of the rail's own left padding) depending on timing neither this hook nor its
+      // caller controls — reproduced deterministically: fresh-loading the storyboard route directly
+      // gives correct targets, but visiting the page that mounts it via a same-page state change (the
+      // realistic path, since the variant switcher swaps it in without a reload) always lands 16px past
+      // the browser's own native scroll-snap rest position. Rect deltas plus the rail's own scrollLeft
+      // give the same number in the same coordinate space regardless of what establishes offsetParent.
+      //
+      // This still isn't safe to call mid-gesture on a rail a caller tilts in 3D by velocity
+      // (StoryboardRailVariant does, proportional to scroll speed, easing back to flat once motion
+      // stops): getBoundingClientRect reflects the CURRENT paint, so measuring while genuinely rotated
+      // (a real few degrees at a normal drag's release, not the ~0 in the note above) reads the
+      // perspective-skewed child positions, not the flat ones — a real, consistent few-px error,
+      // proportional to how fast the drag was. `land()` below only ever calls this once per gesture, at
+      // pointerdown, before any scroll-driven tilt exists, and reuses that snapshot through release.
+      const railRect = rail.getBoundingClientRect()
       // Only direct children marked as a slide (`data-idx`) count as landing targets — a trailing
       // spacer some callers add so the last real slide can still reach the frame line is deliberately
       // excluded, never a place to land.
       const slides = Array.from(rail.querySelectorAll<HTMLElement>(':scope > [data-idx]'))
       return slides.map((el) => {
-        const base = el.offsetLeft - railOffset
+        const base = el.getBoundingClientRect().left - railRect.left + rail.scrollLeft
         return centered ? base - (rail.clientWidth - el.offsetWidth) / 2 : base
       })
     },
@@ -132,7 +153,9 @@ export function useDragRail(ref: React.RefObject<HTMLDivElement | null>, options
   const land = useCallback(
     (rail: HTMLDivElement) => {
       const s = state.current
-      const targets = slideTargets(rail)
+      // Snapshotted at pointerdown (see slideTargets' note), not re-measured here: by release a rail
+      // that tilts with scroll velocity can be genuinely mid-rotation, which would skew a fresh read.
+      const targets = s.targets
       if (targets.length === 0) {
         restore(rail)
         return
@@ -171,7 +194,7 @@ export function useDragRail(ref: React.RefObject<HTMLDivElement | null>, options
         onStop: () => restore(rail),
       })
     },
-    [ref, reduced, restore, slideTargets],
+    [ref, reduced, restore],
   )
 
   const onPointerDown = useCallback(
@@ -189,9 +212,12 @@ export function useDragRail(ref: React.RefObject<HTMLDivElement | null>, options
       s.startScrollLeft = rail.scrollLeft
       s.targetLeft = rail.scrollLeft
       s.lastT = performance.now()
+      // Snapshot now, before this gesture can have produced any scroll-driven tilt on a caller that
+      // applies one — see the note on slideTargets.
+      s.targets = slideTargets(rail)
       s.velocity = 0
     },
-    [ref],
+    [ref, slideTargets],
   )
 
   const onPointerMove = useCallback(

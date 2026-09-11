@@ -96,8 +96,14 @@ export function Chapters({ skin, heading }: ChaptersProps) {
   const goTo = (i: number) => {
     const clamped = Math.max(0, Math.min(total - 1, i))
     const el = cardRefs.current[clamped]
-    if (!el || !railRef.current) return
-    railRef.current.scrollTo({ left: el.offsetLeft - railRef.current.offsetLeft, behavior: reduced ? 'auto' : 'smooth' })
+    const rail = railRef.current
+    if (!el || !rail) return
+    // getBoundingClientRect, not offsetLeft/offsetParent — see the matching note in useDragRail.ts's
+    // slideTargets: offsetLeft is only safe when the caller can guarantee nothing in the chain ever
+    // gains a transform. This rail doesn't, but the sibling storyboard rail does, and the two share the
+    // same landing-math contract, so both goTo()s use the same viewport-relative measurement.
+    const left = el.getBoundingClientRect().left - rail.getBoundingClientRect().left + rail.scrollLeft
+    rail.scrollTo({ left, behavior: reduced ? 'auto' : 'smooth' })
   }
 
   return (
