@@ -175,6 +175,12 @@ export const ja: PortfolioContent = {
         { label: 'ナビゲーション', items: ['すべてのアンカーリンクが実在するセクションに解決する', 'メガメニューはホバーでもタッチでも正しく動く'] },
         { label: 'オーバーレイ', items: ['背景幕はbodyだけでなくヘッダーも覆う', 'オーバーレイが開いている間はスクロールがロックされる', 'スティッキー購入バーは2段階のリビールを完了する', 'z-indexの順序でオーバーレイが別のオーバーレイの後ろに隠れることはない'] },
       ],
+      runCaption: 'これは、診断がストアに対して実行するのと同じチェックリストを再生したものです。ライブの結果は表示しません。',
+      statusChecking: 'チェック中…',
+      statusDone: 'リスト完了',
+      screenshotAlt: 'The Gummy Boxのホームページ。このデモがチェックを再生する実店舗',
+      hotspotAria: '{group}のチェック、ホームページ上の位置',
+      progressAria: '{total}件中{done}件のチェック',
     },
     fiveLines: {
       kinds: {

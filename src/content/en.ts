@@ -175,6 +175,12 @@ export const en: PortfolioContent = {
         { label: 'Navigation', items: ['Every anchor link resolves to a real section', 'Mega menus behave on hover and on touch'] },
         { label: 'Overlays', items: ['Backdrops cover the header, not just the body', 'Scroll locks while an overlay is open', 'Sticky buy bars complete their two-phase reveal', 'Z-index order never lets one overlay hide behind another'] },
       ],
+      runCaption: 'This plays the same list of checks the review runs on your store. It never shows a live result.',
+      statusChecking: 'Checking…',
+      statusDone: 'Passed the list',
+      screenshotAlt: 'Home page of The Gummy Box, the live store this demo replays checks against',
+      hotspotAria: '{group} checks, marked on the home page',
+      progressAria: '{done} of {total} checks',
     },
     fiveLines: {
       kinds: {
