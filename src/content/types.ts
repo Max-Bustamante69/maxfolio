@@ -93,6 +93,20 @@ export interface PortfolioContent {
       stackLabel: string
       shippedLabel: string
       shipped: string[] // bento "what shipped" list; {placeholders} filled
+      /** FeaturedImpact.tsx — the strip every variant renders below it. Hero-numeral labels and the
+       *  disclaimer are NOT duplicated here: they reuse caseStudy.impact.{chipConversionLabel,
+       *  chipRevenueLabel, chipLoadTimeLabel, disclaimer} verbatim, and the score-ring labels reuse
+       *  caseStudy.{perf, a11y, seo}, so the sheet and this strip always read the same words for the
+       *  same numbers. */
+      impact: {
+        heading: string // small-caps label above the real-numbers group, e.g. 'Real numbers'
+        lcpLabel: string
+        tbtLabel: string
+        blocksLabel: string
+        trackedLabel: string
+        lighthouseCaption: string // what/where/when for the rings + LCP + TBT tiles
+        buildCaption: string // what/where/when for the commit/week/section/block/tracked tiles
+      }
     }
     /** Apple's new section listing what the Playwright QA harness actually checks (ReviewChecklist.tsx). */
     reviewChecklist: SectionHeading & {
