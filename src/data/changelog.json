@@ -1,5 +1,15 @@
 [
   {
+    "hash": "f67d889",
+    "date": "2026-09-11",
+    "subject": "refactor(options): production ships only the chosen defaults; candidates live on feat/options-showroom"
+  },
+  {
+    "hash": "3f728fe",
+    "date": "2026-09-11",
+    "subject": "chore(build): regenerated artifacts for round 42"
+  },
+  {
     "hash": "6168cb6",
     "date": "2026-09-11",
     "subject": "fix(skills): fleet numerals sit on one row on phones"
@@ -48,15 +58,5 @@
     "hash": "e2a4ef8",
     "date": "2026-09-11",
     "subject": "fix(skills): give the rail mobile candidate a filter bar"
-  },
-  {
-    "hash": "ad33a08",
-    "date": "2026-09-11",
-    "subject": "fix(featured-build): align ladder-diagram labels under their own bars"
-  },
-  {
-    "hash": "c85b5c8",
-    "date": "2026-09-11",
-    "subject": "fix(skills): orbit dots disappear on filter, wire in the mobile switcher"
   }
 ]
