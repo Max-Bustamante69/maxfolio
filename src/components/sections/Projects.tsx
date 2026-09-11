@@ -33,7 +33,7 @@ export function Projects({ skin, heading }: ProjectsProps) {
   const items = [...registry.personalProjects].sort((a, b) => b.year - a.year)
 
   return (
-    <section id="projects" className="scroll-mt-20">
+    <section id="projects" className={`scroll-mt-20 ${skin.frame === 'apple' ? 'lg:scroll-mt-[92px]' : ''}`}>
       {heading(pr.eyebrow, pr.title, pr.titleAccent)}
       <ol className={`border-t ${skin.line}`}>
         {items.map((p, i) => {

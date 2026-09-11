@@ -448,7 +448,7 @@ function AppleContent() {
           <Testimonials skin={skin} heading={Heading} />
 
           {/* Projects — index list. content-visibility:auto tried and reverted — docs/seo.md. */}
-          <section id="projects" className="px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
+          <section className="px-4 py-14 md:py-20">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Projects skin={skin} heading={Heading} />
