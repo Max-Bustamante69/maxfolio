@@ -1,62 +1,62 @@
 [
   {
-    "hash": "67ef77c",
+    "hash": "6168cb6",
     "date": "2026-09-11",
-    "subject": "fix(anchors): hash landing honors scroll-margin and re-lands while lazy chunks mount; one id per section on Apple"
+    "subject": "fix(skills): fleet numerals sit on one row on phones"
   },
   {
-    "hash": "dcaf086",
+    "hash": "12f3631",
     "date": "2026-09-11",
-    "subject": "fix(apple): projects wrapper drops its duplicate id too"
+    "subject": "fix(apple): contact wrapper owns the id, the inner section takes ownId={false}"
   },
   {
-    "hash": "5508d28",
+    "hash": "31a3b68",
     "date": "2026-09-11",
-    "subject": "fix(apple): one id per section again; shorter manifesto lines one size down"
+    "subject": "fix(review): clear WCAG AA contrast on low-opacity small text"
   },
   {
-    "hash": "5f768a3",
+    "hash": "c1cb262",
     "date": "2026-09-11",
-    "subject": "chore(build): regenerated changelog, sitemap, jsonld and index for round 41"
+    "subject": "fix(apple): settle the organic CountUp before the QA screenshot window"
   },
   {
-    "hash": "be27d76",
+    "hash": "3b980cd",
     "date": "2026-09-11",
-    "subject": "fix(skills): drop the derived depth facet (it mislabeled core tools)"
+    "subject": "feat(review): select a review-checklist direction with ?review=a|b|c|d"
   },
   {
-    "hash": "6117e9d",
+    "hash": "1777eae",
     "date": "2026-09-11",
-    "subject": "copy(manifesto): four checkable mechanisms instead of slogans; impact tiles 5-up on desktop"
+    "subject": "feat(review): four genuinely different review-checklist directions"
   },
   {
-    "hash": "25c060e",
+    "hash": "01a3309",
     "date": "2026-09-11",
-    "subject": "fix(review): stop the nav breathing-room from overflowing tablet widths, sync the neo close-button shadow"
+    "subject": "content(review): new copy and labels for four review-checklist directions"
   },
   {
-    "hash": "80a8d89",
-    "date": "2026-09-10",
-    "subject": "feat(nav): give the Apple nav bar more breathing room from md up"
+    "hash": "43e04f9",
+    "date": "2026-09-11",
+    "subject": "fix(apple): declutter the hero, move the stat band into a measured graphic band"
   },
   {
-    "hash": "8b35aef",
-    "date": "2026-09-10",
-    "subject": "feat(drawer): give ToolDrawer the house spring, blur, and staggered reveal"
+    "hash": "f959fa6",
+    "date": "2026-09-11",
+    "subject": "fix(skills): stop the constellation zoom transition overlapping content"
   },
   {
-    "hash": "c4ba2ff",
-    "date": "2026-09-10",
-    "subject": "feat(review-checklist): visualize the QA run instead of a text ledger"
+    "hash": "e2a4ef8",
+    "date": "2026-09-11",
+    "subject": "fix(skills): give the rail mobile candidate a filter bar"
   },
   {
-    "hash": "87629f3",
-    "date": "2026-09-10",
-    "subject": "content(review-checklist): add run caption and status strings"
+    "hash": "ad33a08",
+    "date": "2026-09-11",
+    "subject": "fix(featured-build): align ladder-diagram labels under their own bars"
   },
   {
-    "hash": "1f3ab05",
-    "date": "2026-09-10",
-    "subject": "fix(rail): measure slide targets by geometry, not offsetLeft, on the storyboard rail"
+    "hash": "c85b5c8",
+    "date": "2026-09-11",
+    "subject": "fix(skills): orbit dots disappear on filter, wire in the mobile switcher"
   }
 ]
