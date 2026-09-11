@@ -32,14 +32,21 @@
 // of arc per dot, well under a 44px tap target, so nothing short of hiding most of the labels/dots stays
 // legible there. The brief's own escape hatch for this ("if it stays legible — else ledger only") is
 // why ledger covers all of <1024px.
-import { useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from 'react'
-import { useReducedMotion } from 'framer-motion'
+//
+// 2026-09-11 — owner feedback: filtering dimmed instead of removing (fixed below — a filtered-out dot
+// unmounts through `AnimatePresence` instead of fading, so it also leaves the tab order and can't open
+// the drawer), and "in mobile this section is still horrible, find another way... maybe accordions".
+// `MobileSkillsLayout` is the sub-1024px gate now: it renders this same ledger fallback by default and
+// only swaps in one of four mechanically different candidates when the page loads with
+// `?skillsMobile=a|b|c|d` — see that file.
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from 'react'
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { useMediaQuery, useSheetHistory } from '../../../hooks'
 import type { SkillGroupId } from '../../../data/registry'
 import { toolUsageById, type ToolUsage } from '../../../data/skillUsage'
 import { toolIcon, monogram, ToolMark } from '../skillIcons'
 import { CenterMark } from './CenterMark'
-import { LedgerLayout } from './LedgerLayout'
+import { MobileSkillsLayout } from './mobile/MobileSkillsLayout'
 import { SkillsFilterBar } from './SkillsFilterBar'
 import { ToolDrawer, DRAWER_ID } from './ToolDrawer'
 import { useSkillsFilter } from './useSkillsFilter'
@@ -170,8 +177,18 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
     return set
   }, [groups, toolsByGroup])
 
+  // A dot that fails the active filter unmounts (below) rather than dimming — clear a stale hover
+  // reference the instant its own tool drops out of the filtered set, since an unmounting element never
+  // reliably fires its own mouseleave/blur.
+  useEffect(() => {
+    if (!filter.isActive || !hoveredTool) return
+    const u = toolUsageById.get(hoveredTool)
+    if (u && !filter.matchesTool(u)) setHoveredTool(null)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter.isActive, filter.matchesTool, hoveredTool])
+
   if (!isDesktop || reduced) {
-    return <LedgerLayout data={data} />
+    return <MobileSkillsLayout data={data} />
   }
 
   const ringSpecs: RingSpec[] = ringOrder.map((g, ri) => ({
@@ -257,10 +274,12 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
           <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full" aria-hidden="true">
             {ringSpecs.map((ring) => {
               const bright = emphasizedGroup === ring.group
-              const visibleInGroup = ring.tools.filter(filter.matchesTool).length
-              const collapsed = filter.isActive && visibleInGroup === 0
-              const dim = (emphasizedGroup !== null && !bright) || collapsed
-              const strokeClass = bright && !collapsed ? `${skin.accent} stroke-current` : skin.dark ? 'stroke-white/10' : 'stroke-black/10'
+              // 2026-09-11: a ring that has nothing left showing keeps its own line at full geometry —
+              // "filtered things gone, not dimmed" only ever applies to the dots themselves (below) and
+              // to this ring's own group-name label (in the second svg layer); the circle line stays so
+              // the composition (and the still-running ambient rotation) never visibly collapses.
+              const dim = emphasizedGroup !== null && !bright
+              const strokeClass = bright ? `${skin.accent} stroke-current` : skin.dark ? 'stroke-white/10' : 'stroke-black/10'
               return (
                 <circle
                   key={ring.group}
@@ -268,8 +287,8 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
                   cy="50"
                   r={ring.radius}
                   fill="none"
-                  strokeWidth={collapsed ? 0.12 : bright ? 0.55 : 0.3}
-                  className={`transition-opacity duration-300 ${collapsed ? 'opacity-15' : dim ? 'opacity-30' : 'opacity-100'} ${strokeClass}`}
+                  strokeWidth={bright ? 0.55 : 0.3}
+                  className={`transition-opacity duration-300 ${dim ? 'opacity-30' : 'opacity-100'} ${strokeClass}`}
                 />
               )
             })}
@@ -299,68 +318,79 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
                   } as CSSProperties
                 }
               >
-                {ring.tools.map((u, ti) => {
-                  const n = ring.tools.length
-                  const angle = ring.startAngle + (Math.PI * 2 * (ti + 0.5)) / n
-                  const cx = 50 + 50 * Math.cos(angle)
-                  const cy = 50 + 50 * Math.sin(angle)
-                  const isOpen = openTool === u.tool
-                  const isEmphasized = hoveredTool === u.tool || isOpen
-                  const labelBelow = Math.sin(angle) >= 0
-                  const showLabel = isEmphasized || alwaysLabeled.has(u.tool)
-                  const size = sizeForTotal(u.total, minTotal, maxTotal)
-                  const filteredOut = filter.isActive && !filter.matchesTool(u)
-                  const dim = (emphasizedGroup !== null && emphasizedGroup !== u.group && !isEmphasized) || filteredOut
-                  return (
-                    <button
-                      key={u.tool}
-                      type="button"
-                      data-tool={u.tool}
-                      aria-pressed={isOpen}
-                      aria-expanded={isOpen}
-                      aria-controls={DRAWER_ID}
-                      aria-label={`${u.tool} — ${groupLabel[u.group]} — ${formatTool(u)}`}
-                      onMouseEnter={onDotEnter(u.tool)}
-                      onMouseLeave={onDotLeave}
-                      onFocus={onDotFocus(u.tool)}
-                      onBlur={onDotBlur(u.tool)}
-                      onClick={onDotClick(u.tool)}
-                      onKeyDown={onDotKeyDown(u.tool)}
-                      tabIndex={filteredOut ? -1 : 0}
-                      style={{ left: `${cx}%`, top: `${cy}%` }}
-                      className={`group pointer-events-auto absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full transition-[opacity,transform] duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current ${dim ? 'opacity-25' : 'opacity-100'} ${filteredOut ? 'scale-95 pointer-events-none' : 'scale-100'} ${isOpen ? 'outline outline-2 outline-offset-2 outline-current' : ''}`}
-                    >
-                      {/* Hairline tick bridging the dot to its ring: a sibling of `mfOrbitDot`, not a
-                          child of it — it must inherit ONLY the ring's own rotation (so it keeps
-                          pointing radially as the ring spins), never the dot's counter-rotation, or
-                          it would visibly swing away from the ring as soon as the ring turns. */}
-                      <span
-                        aria-hidden="true"
-                        className={`absolute left-1/2 top-1/2 h-3.5 w-px ${skin.dark ? 'bg-white/20' : 'bg-black/15'}`}
-                        style={{ transform: `translate(-50%, -50%) rotate(${(angle * 180) / Math.PI + 90}deg)` }}
-                      />
-                      {/* Counter-rotates so the disc/label stay upright as the ring spins — its OWN
-                          transform must stay pure rotation: the hover/active scale lives one level
-                          deeper (a nested span) so it never has to share the `transform` property with
-                          the counter-rotation animation, which would silently drop one of the two. */}
-                      <span className="mfOrbitDot relative flex items-center justify-center">
-                        <span className={`flex items-center justify-center transition-transform duration-200 ${isEmphasized ? 'scale-[1.15]' : ''}`}>
+                {/* 2026-09-11: a dot that fails the active filter unmounts through AnimatePresence
+                    instead of dimming — it leaves the tab order and can't open the drawer for free,
+                    since it isn't in the DOM at all. `ti`/`n` (and so `angle`) are read from the ring's
+                    own full, unfiltered tool list above, never from the filtered survivors — a dot's
+                    angular position is fixed the moment its ring is built and never redistributes when
+                    its neighbors disappear. */}
+                <AnimatePresence initial={false}>
+                  {ring.tools.map((u, ti) => {
+                    if (filter.isActive && !filter.matchesTool(u)) return null
+                    const n = ring.tools.length
+                    const angle = ring.startAngle + (Math.PI * 2 * (ti + 0.5)) / n
+                    const cx = 50 + 50 * Math.cos(angle)
+                    const cy = 50 + 50 * Math.sin(angle)
+                    const isOpen = openTool === u.tool
+                    const isEmphasized = hoveredTool === u.tool || isOpen
+                    const labelBelow = Math.sin(angle) >= 0
+                    const showLabel = isEmphasized || alwaysLabeled.has(u.tool)
+                    const size = sizeForTotal(u.total, minTotal, maxTotal)
+                    const dim = emphasizedGroup !== null && emphasizedGroup !== u.group && !isEmphasized
+                    return (
+                      <m.button
+                        key={u.tool}
+                        type="button"
+                        data-tool={u.tool}
+                        aria-pressed={isOpen}
+                        aria-expanded={isOpen}
+                        aria-controls={DRAWER_ID}
+                        aria-label={`${u.tool} — ${groupLabel[u.group]} — ${formatTool(u)}`}
+                        onMouseEnter={onDotEnter(u.tool)}
+                        onMouseLeave={onDotLeave}
+                        onFocus={onDotFocus(u.tool)}
+                        onBlur={onDotBlur(u.tool)}
+                        onClick={onDotClick(u.tool)}
+                        onKeyDown={onDotKeyDown(u.tool)}
+                        style={{ left: `${cx}%`, top: `${cy}%` }}
+                        initial={reduced ? false : { opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: dim ? 0.25 : 1, scale: 1 }}
+                        exit={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.9 }}
+                        transition={reduced ? { duration: 0 } : { duration: 0.18, ease: 'easeOut' }}
+                        className={`group pointer-events-auto absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current ${isOpen ? 'outline outline-2 outline-offset-2 outline-current' : ''}`}
+                      >
+                        {/* Hairline tick bridging the dot to its ring: a sibling of `mfOrbitDot`, not a
+                            child of it — it must inherit ONLY the ring's own rotation (so it keeps
+                            pointing radially as the ring spins), never the dot's counter-rotation, or
+                            it would visibly swing away from the ring as soon as the ring turns. */}
+                        <span
+                          aria-hidden="true"
+                          className={`absolute left-1/2 top-1/2 h-3.5 w-px ${skin.dark ? 'bg-white/20' : 'bg-black/15'}`}
+                          style={{ transform: `translate(-50%, -50%) rotate(${(angle * 180) / Math.PI + 90}deg)` }}
+                        />
+                        {/* Counter-rotates so the disc/label stay upright as the ring spins — its OWN
+                            transform must stay pure rotation: the hover/active scale lives one level
+                            deeper (a nested span) so it never has to share the `transform` property with
+                            the counter-rotation animation, which would silently drop one of the two. */}
+                        <span className="mfOrbitDot relative flex items-center justify-center">
+                          <span className={`flex items-center justify-center transition-transform duration-200 ${isEmphasized ? 'scale-[1.15]' : ''}`}>
+                            <span
+                              style={{ height: size, width: size }}
+                              className={`flex items-center justify-center rounded-full border text-[10px] font-bold transition-colors ${skin.line} ${isEmphasized ? `${skin.accent} ${skin.dark ? 'bg-white/10' : 'bg-black/[0.04]'}` : `${skin.muted} ${skin.dark ? 'bg-black/20' : 'bg-white/70'}`}`}
+                            >
+                              {toolIcon(u.tool) ? <ToolMark tool={u.tool} className="h-1/2 w-1/2" /> : monogram(u.tool).slice(0, 1)}
+                            </span>
+                          </span>
                           <span
-                            style={{ height: size, width: size }}
-                            className={`flex items-center justify-center rounded-full border text-[10px] font-bold transition-colors ${skin.line} ${isEmphasized ? `${skin.accent} ${skin.dark ? 'bg-white/10' : 'bg-black/[0.04]'}` : `${skin.muted} ${skin.dark ? 'bg-black/20' : 'bg-white/70'}`}`}
+                            className={`pointer-events-none absolute z-10 whitespace-nowrap rounded-full px-2 py-0.5 text-[10px] tabular-nums transition-opacity duration-150 ${showLabel ? 'opacity-90' : 'opacity-0 group-focus-visible:opacity-100'} ${isEmphasized ? skin.chip : skin.dark ? 'text-white/70' : 'text-black/60'} ${labelBelow ? 'top-full mt-1' : 'bottom-full mb-1'} left-1/2 -translate-x-1/2`}
                           >
-                            {toolIcon(u.tool) ? <ToolMark tool={u.tool} className="h-1/2 w-1/2" /> : monogram(u.tool).slice(0, 1)}
+                            {u.tool}
                           </span>
                         </span>
-                        <span
-                          className={`pointer-events-none absolute z-10 whitespace-nowrap rounded-full px-2 py-0.5 text-[10px] tabular-nums transition-opacity duration-150 ${showLabel ? 'opacity-90' : 'opacity-0 group-focus-visible:opacity-100'} ${isEmphasized ? skin.chip : skin.dark ? 'text-white/70' : 'text-black/60'} ${labelBelow ? 'top-full mt-1' : 'bottom-full mb-1'} left-1/2 -translate-x-1/2`}
-                        >
-                          {u.tool}
-                        </span>
-                      </span>
-                    </button>
-                  )
-                })}
+                      </m.button>
+                    )
+                  })}
+                </AnimatePresence>
               </div>
             ))}
           </div>
@@ -371,9 +401,12 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
           <svg viewBox="0 0 100 100" className="pointer-events-none absolute inset-0 h-full w-full">
             {ringSpecs.map((ring) => {
               const bright = emphasizedGroup === ring.group
+              // The one place filtering still reads as "dim" rather than "gone": a ring whose every
+              // tool just unmounted keeps its full-strength circle (above) but its own name fades to
+              // 30% — a quiet "nothing here right now" that never collapses the ring itself.
               const visibleInGroup = ring.tools.filter(filter.matchesTool).length
-              const collapsed = filter.isActive && visibleInGroup === 0
-              const dim = (emphasizedGroup !== null && !bright) || collapsed
+              const allFiltered = filter.isActive && visibleInGroup === 0
+              const hoverDim = emphasizedGroup !== null && !bright
               const pressed = filter.groups.has(ring.group)
               return (
                 <text
@@ -387,7 +420,7 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
                   onMouseLeave={() => setHoveredGroup(null)}
                   onFocus={() => setHoveredGroup(ring.group)}
                   onBlur={() => setHoveredGroup(null)}
-                  className={`cursor-pointer select-none text-[2.3px] font-semibold uppercase outline-none transition-opacity duration-300 focus-visible:opacity-100 ${dim ? 'opacity-20' : 'opacity-100'} ${bright && !collapsed ? `${skin.accent} fill-current` : skin.dark ? 'fill-white/65' : 'fill-black/60'}`}
+                  className={`cursor-pointer select-none text-[2.3px] font-semibold uppercase outline-none transition-opacity duration-300 focus-visible:opacity-100 ${allFiltered ? 'opacity-30' : hoverDim ? 'opacity-20' : 'opacity-100'} ${bright && !allFiltered ? `${skin.accent} fill-current` : skin.dark ? 'fill-white/65' : 'fill-black/60'}`}
                   style={{ letterSpacing: '0.08em', pointerEvents: 'auto' }}
                 >
                   <textPath href={`#mf-orbit-arc-${ring.group}`} startOffset={arcStartOffset(groupLabel[ring.group], ring.radius)}>
