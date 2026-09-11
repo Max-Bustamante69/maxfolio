@@ -41,17 +41,22 @@ interface TileProps {
   muted: string
   decimals?: number
   suffix?: string
+  show: boolean
 }
 
 /** One compact real-number tile — commits, weeks, LCP, TBT, and the rest of the "real row". Fixed
  *  `tabular-nums` + a container-relative clamp keeps a 5-digit value (29,983 lines, elsewhere) from
  *  ever overflowing its own cell at 390px; this block only ever shows 2-3 digit real counts, but the
- *  same clamp is used for consistency with every other numeral in this card. */
-function Tile({ value, label, line, dark, title, muted, decimals = 0, suffix = '' }: TileProps) {
+ *  same clamp is used for consistency with every other numeral in this card. `show` mirrors HeroStat:
+ *  without it, this tile's CountUp mounted (and finished its 0.8s animation) the instant the whole
+ *  strip rendered, below the fold, at page load — long before a normal scroll reaches it, so the
+ *  motion never actually played. Gating it on the same in-view flag makes it count up when seen, and
+ *  the static fallback still prints the exact final value, so nothing is ever missing for a11y. */
+function Tile({ value, label, line, dark, title, muted, decimals = 0, suffix = '', show }: TileProps) {
   return (
     <div className={`min-w-0 rounded-2xl border p-3 text-center ${line} ${dark ? 'bg-white/[0.03]' : 'bg-white'}`}>
       <p className={`font-sf text-[clamp(16px,5cqw,22px)] font-semibold leading-none tabular-nums tracking-[-0.02em] ${title}`}>
-        <CountUp value={value} decimals={decimals} suffix={suffix} duration={0.8} />
+        {show ? <CountUp value={value} decimals={decimals} suffix={suffix} duration={0.8} /> : `${value.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}${suffix}`}
       </p>
       <p className={`mt-1.5 text-[10px] uppercase leading-tight tracking-wide ${muted}`}>{label}</p>
     </div>
@@ -79,7 +84,7 @@ export function FeaturedImpact({ data }: { data: FeaturedData }) {
     { key: 'seo', label: cs.seo, value: impact.rings.seo },
   ].filter((r) => r.value >= 50)
 
-  const tileProps = { line: skin.line, dark: skin.dark, title: skin.title, muted: skin.muted }
+  const tileProps = { line: skin.line, dark: skin.dark, title: skin.title, muted: skin.muted, show }
 
   return (
     <div ref={ref} data-testid="featured-impact" className={`mt-8 rounded-[22px] border p-5 [container-type:inline-size] md:mt-10 md:p-6 ${skin.line} ${skin.dark ? 'bg-white/[0.02]' : 'bg-[#fafafa]'}`}>
