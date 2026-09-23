@@ -225,16 +225,6 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
   const onDotBlur = (tool: string) => () => setHoveredTool((prev) => (prev === tool ? null : prev))
   const onDotClick = (tool: string) => () => setOpenTool((prev) => (prev === tool ? null : tool))
 
-  // Deliverable g: a ring's own group-name label is the same toggle as its chip in the filter bar
-  // above — keyboard-reachable (native <text> takes no key activation of its own, so Enter/Space are
-  // wired by hand) and aria-pressed, mirroring SkillsFilterBar's group chips exactly.
-  const onGroupLabelKeyDown = (g: SkillGroupId) => (e: KeyboardEvent<SVGTextElement>) => {
-    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
-      e.preventDefault()
-      filter.toggleGroup(g)
-    }
-  }
-
   return (
     <div className="mt-4">
       <style>{ORBIT_CSS}</style>
@@ -352,7 +342,7 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
                         animate={{ opacity: dim ? 0.25 : 1, scale: 1 }}
                         exit={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.9 }}
                         transition={reduced ? { duration: 0 } : { duration: 0.18, ease: 'easeOut' }}
-                        className={`group pointer-events-auto absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current ${isOpen ? 'outline outline-2 outline-offset-2 outline-current' : ''}`}
+                        className={`group pointer-events-auto absolute flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current ${isOpen ? 'outline outline-2 outline-offset-2 outline-current' : ''}`}
                       >
                         {/* Hairline tick bridging the dot to its ring: a sibling of `mfOrbitDot`, not a
                             child of it — it must inherit ONLY the ring's own rotation (so it keeps
@@ -402,21 +392,15 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
               const visibleInGroup = ring.tools.filter(filter.matchesTool).length
               const allFiltered = filter.isActive && visibleInGroup === 0
               const hoverDim = emphasizedGroup !== null && !bright
-              const pressed = filter.groups.has(ring.group)
               return (
+                // A label, not a control: the area chips above already toggle each group. Making the
+                // curved names buttons (round 42) put a fixed tap target on top of the rotating dots,
+                // which fails Lighthouse's target-size whenever a dot passes under a name.
                 <text
                   key={`label-${ring.group}`}
-                  role="button"
-                  tabIndex={0}
-                  aria-pressed={pressed}
-                  onClick={() => filter.toggleGroup(ring.group)}
-                  onKeyDown={onGroupLabelKeyDown(ring.group)}
-                  onMouseEnter={() => setHoveredGroup(ring.group)}
-                  onMouseLeave={() => setHoveredGroup(null)}
-                  onFocus={() => setHoveredGroup(ring.group)}
-                  onBlur={() => setHoveredGroup(null)}
-                  className={`cursor-pointer select-none text-[2.3px] font-semibold uppercase outline-none transition-opacity duration-300 focus-visible:opacity-100 ${allFiltered ? 'opacity-30' : hoverDim ? 'opacity-20' : 'opacity-100'} ${bright && !allFiltered ? `${skin.accent} fill-current` : skin.dark ? 'fill-white/65' : 'fill-black/60'}`}
-                  style={{ letterSpacing: '0.08em', pointerEvents: 'auto' }}
+                  aria-hidden="true"
+                  className={`select-none text-[2.3px] font-semibold uppercase transition-opacity duration-300 ${allFiltered ? 'opacity-30' : hoverDim ? 'opacity-20' : 'opacity-100'} ${bright && !allFiltered ? `${skin.accent} fill-current` : skin.dark ? 'fill-white/65' : 'fill-black/60'}`}
+                  style={{ letterSpacing: '0.08em' }}
                 >
                   <textPath href={`#mf-orbit-arc-${ring.group}`} startOffset={arcStartOffset(groupLabel[ring.group], ring.radius)}>
                     {groupLabel[ring.group]}
