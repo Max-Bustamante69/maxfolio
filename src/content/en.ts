@@ -96,7 +96,7 @@ export const en: PortfolioContent = {
       titleAccent: 'work together',
       lead: 'Three ways in, all already on this page. Pick the one that matches where your store is today.',
       models: [
-        { title: 'Free review', body: 'A 20-minute look at your store with real numbers — no pitch, no contract.' },
+        { title: 'Free review', body: 'A 20-minute look at your store with real numbers: no pitch, no contract.' },
         { title: 'Project build', body: 'Discovery ends with a written window, then a Playwright QA run before anything ships.' },
         { title: 'Ongoing collaboration', body: 'You keep the editor and the content; I keep the engineering measured.' },
       ],
