@@ -71,10 +71,6 @@ export interface PortfolioContent {
     /** Apple's Years replacement: a horizontal scroll-snap rail of year cards (Chapters.tsx). */
     chapters: SectionHeading & {
       lead: string
-      chapterOf: string // '{n} / {total}'
-      prevAria: string
-      nextAria: string
-      highlightsLabel: string
     }
     /** Apple's featured-build section for one storefront (FeaturedBuild.tsx + featuredLayouts/*) — the
      *  "split story" layout over real registry/commerce/telemetry data. */
