@@ -212,19 +212,24 @@ function NeoContent() {
         {/* Nav — restraint pass: a flat hairline bar (the extrusion stays reserved for controls) */}
         <nav className="fixed top-0 inset-x-0 z-40 px-3 pt-3" aria-label="Main navigation">
           <div
-            className={`relative border backdrop-blur-md !rounded-[20px] max-w-5xl mx-auto h-14 px-4 flex items-center justify-between gap-3 ${isDark ? 'bg-neo-dark/85 border-white/10' : 'bg-neo-surfaceRaised/85 border-black/[0.08]'}`}
+            className={`border backdrop-blur-md !rounded-[20px] max-w-5xl mx-auto h-14 px-4 grid grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)] items-center gap-3 ${isDark ? 'bg-neo-dark/85 border-white/10' : 'bg-neo-surfaceRaised/85 border-black/[0.08]'}`}
           >
-            <LogoSelectorNeo isDark={isDark} />
-            {/* Absolutely centered on the container — see Apple/Terminal's nav for why a grid
-                `1fr auto 1fr` track layout doesn't do this when the two side clusters differ in width. */}
-            <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 md:flex items-center gap-1 text-xs font-semibold">
+            <div className="justify-self-start min-w-0">
+              <LogoSelectorNeo isDark={isDark} />
+            </div>
+            {/* Three-column grid, not absolute centering: `minmax(max-content,1fr)` on both side
+                columns means each grows to share the leftover space equally once there's room for
+                both, which lands the links group exactly on the container's midpoint; when the
+                container is too narrow for that the wider side freezes at its content width and the
+                links shift instead of sliding underneath either cluster — never an overlap. */}
+            <div className="hidden md:flex items-center gap-0.5 text-xs font-semibold">
               {nav.map(([href, label]) => (
                 <a key={href} href={href} className={`inline-flex items-center h-8 px-3 rounded-full ${muted} hover:${accent} transition-colors duration-150`}>
                   {label}
                 </a>
               ))}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 justify-self-end">
               <div className="hidden sm:inline-flex items-center gap-1" role="radiogroup" aria-label={t('language.selector.ariaLabel')}>
                 {supportedLocales.map((opt) => (
                   <button
@@ -233,14 +238,14 @@ function NeoContent() {
                     role="radio"
                     aria-checked={opt === locale}
                     onClick={() => setLocale(opt)}
-                    className={`${opt === locale ? 'neo-chip-on' : 'neo-chip'} !text-[10px]`}
+                    className={`${opt === locale ? 'neo-chip-on' : 'neo-chip'} !text-[10px] !min-w-[34px] !px-1.5`}
                   >
                     {opt.toUpperCase()}
                   </button>
                 ))}
               </div>
               <ThemeToggle variant="neo" size="sm" />
-              <button type="button" onClick={() => setContactOpen(true)} className="neo-btn neo-btn-accent hidden sm:inline-flex !py-2 !px-4 text-xs">
+              <button type="button" onClick={() => setContactOpen(true)} className="neo-btn neo-btn-accent hidden sm:inline-flex !py-2 !px-3 text-xs">
                 {c.hero.ctaContact}
               </button>
               <button

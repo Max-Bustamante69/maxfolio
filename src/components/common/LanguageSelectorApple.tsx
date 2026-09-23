@@ -12,7 +12,7 @@ export function LanguageSelectorApple({ isDark }: { isDark: boolean }) {
     <div
       role="radiogroup"
       aria-label={t('language.selector.ariaLabel')}
-      className={`inline-flex h-8 lg:h-9 items-center rounded-full p-0.5 lg:p-1 ${isDark ? 'bg-white/10' : 'bg-black/5'}`}
+      className={`inline-flex h-8 lg:h-9 items-center rounded-full p-0.5 ${isDark ? 'bg-white/10' : 'bg-black/5'}`}
     >
       {supportedLocales.map((opt) => {
         const active = opt === locale
@@ -23,7 +23,7 @@ export function LanguageSelectorApple({ isDark }: { isDark: boolean }) {
             role="radio"
             aria-checked={active}
             onClick={() => setLocale(opt)}
-            className={`press compact-touch h-7 lg:h-8 min-w-[34px] px-2 lg:px-2.5 rounded-full text-[11px] font-semibold tracking-wide ${
+            className={`press compact-touch h-7 lg:h-8 min-w-[34px] px-1.5 lg:px-2 rounded-full text-[11px] font-semibold tracking-wide ${
               active
                 ? isDark
                   ? 'bg-white text-black shadow-sm'

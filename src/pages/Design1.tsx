@@ -169,21 +169,23 @@ function Design1Content() {
           role="navigation"
           aria-label="Main navigation"
         >
-          {/* Nav links are absolutely centered on this row — see Terminal/Apple/Luxury's nav for why
-              a flex/grid "equal track" layout doesn't do this when the two side clusters differ in
-              width (measured). */}
-          <div className="relative max-w-[1800px] mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
-            <div className="flex items-center gap-4">
+          {/* Three-column grid, not absolute centering: `minmax(max-content,1fr)` on both side
+              columns means each grows to share the leftover space equally once there's room for
+              both, which lands the links group exactly on the container's midpoint; when the
+              container is too narrow for that the wider side freezes at its content width and the
+              links shift instead of sliding underneath either cluster — never an overlap. */}
+          <div className="max-w-[1800px] mx-auto px-4 md:px-6 py-4 grid grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)] items-center gap-4">
+            <div className="flex items-center gap-4 justify-self-start min-w-0">
               <LogoSelectorBrutalist isDark={isDark} />
             </div>
-            <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 lg:flex items-center gap-8 font-mono text-xs uppercase tracking-[0.2em] h-10">
+            <div className="hidden lg:flex items-center gap-6 font-mono text-xs uppercase tracking-[0.2em] h-10">
               {navItems.slice(0, 5).map((item) => (
                 <a key={item.href} href={item.href} className={`inline-flex items-center h-10 leading-none ${textMuted} hover:text-red-600 transition-colors`}>
                   {item.label}
                 </a>
               ))}
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 justify-self-end">
               <button
                 onClick={() => setIsContactOpen(true)}
                 className="hidden sm:flex items-center h-10 font-mono text-xs uppercase tracking-[0.2em] leading-none text-red-600 hover:text-red-500 transition-colors gap-2"

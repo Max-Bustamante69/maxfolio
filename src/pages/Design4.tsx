@@ -207,13 +207,16 @@ function Design4Content() {
           aria-label="Main navigation"
         >
           <div className="max-w-7xl mx-auto px-6 md:px-16 py-4 md:py-6">
-            {/* Nav links are absolutely centered on this row rather than a flex `1fr`-style track —
-                the logo and the right cluster (contact pill + selectors) are different widths, so a
-                naive equal-track layout centers on the wrong point (measured, see Terminal's nav for
-                the same bug + fix). */}
-            <div className="relative flex justify-between items-center">
-              <LogoSelectorLuxury isDark={isDark} />
-              <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 lg:flex items-center gap-8 h-10">
+            {/* Three-column grid, not absolute centering: `minmax(max-content,1fr)` on both side
+                columns means each grows to share the leftover space equally once there's room for
+                both, which lands the links group exactly on the container's midpoint; when the
+                container is too narrow for that the wider side freezes at its content width and the
+                links shift instead of sliding underneath either cluster — never an overlap. */}
+            <div className="grid grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)] items-center gap-4">
+              <div className="justify-self-start min-w-0">
+                <LogoSelectorLuxury isDark={isDark} />
+              </div>
+              <div className="hidden lg:flex items-center gap-6 h-10">
                 {navItems.map((item) => (
                   <a
                     key={item.href}
@@ -224,7 +227,7 @@ function Design4Content() {
                   </a>
                 ))}
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 justify-self-end">
                 <m.button
                   onClick={() => setIsContactOpen(true)}
                   whileHover={{ scale: 1.02 }}

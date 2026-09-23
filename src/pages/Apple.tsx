@@ -227,14 +227,17 @@ function AppleContent() {
           className={`fixed top-0 inset-x-0 z-40 h-11 lg:h-14 ${isDark ? 'bg-black/70' : 'bg-white/70'} backdrop-blur-xl border-b ${isDark ? 'border-white/10' : 'border-black/5'}`}
           aria-label="Main navigation"
         >
-          {/* The nav-links group is absolutely centered on this (relatively positioned) container
-              rather than sized as a flex `1fr` track — the left (logo) and right (lang/theme/CTA)
-              clusters are very different widths, and a grid `1fr auto 1fr` layout resolves its two
-              "equal" tracks to each side's own min-content floor first, so they end up unequal and
-              the middle stays off-center (measured, see Terminal's nav for the same bug + fix). */}
-          <div className="relative max-w-5xl mx-auto h-full px-4 lg:px-6 flex items-center justify-between gap-3">
-            <LogoSelectorApple isDark={isDark} />
-            <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 md:flex items-center gap-6 lg:gap-8 text-xs lg:text-[13px]">
+          {/* Three-column grid, not absolute centering: `minmax(max-content,1fr)` on both side
+              columns means each grows to share the leftover space equally once there's room for
+              both, which lands the links group exactly on the container's midpoint; when the
+              container is too narrow for that (e.g. the right cluster's own content is wider than
+              half the remaining space) the wider side freezes at its content width and the links
+              shift instead of sliding underneath either cluster — never an overlap. */}
+          <div className="max-w-5xl mx-auto h-full px-4 lg:px-6 grid grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)] items-center gap-3">
+            <div className="justify-self-start min-w-0">
+              <LogoSelectorApple isDark={isDark} />
+            </div>
+            <div className="hidden md:flex items-center gap-4 lg:gap-6 text-xs lg:text-[13px]">
               {nav.map(([href, label]) => {
                 const on = activeSection === href.slice(1)
                 return (
@@ -256,7 +259,7 @@ function AppleContent() {
                 )
               })}
             </div>
-            <div className="flex items-center gap-2 lg:gap-3">
+            <div className="flex items-center gap-1.5 lg:gap-2 justify-self-end">
               <LanguageSelectorApple isDark={isDark} />
               <button
                 type="button"
@@ -269,7 +272,7 @@ function AppleContent() {
               <button
                 type="button"
                 onClick={() => setContactOpen(true)}
-                className="press compact-touch hidden sm:inline-flex h-8 lg:h-9 items-center rounded-full bg-apple-blue px-3.5 lg:px-4 text-xs font-medium text-white hover:bg-apple-blueHover"
+                className="press compact-touch hidden sm:inline-flex h-8 lg:h-9 items-center rounded-full bg-apple-blue px-3 lg:px-3.5 text-xs font-medium text-white hover:bg-apple-blueHover"
               >
                 {c.hero.ctaContact}
               </button>

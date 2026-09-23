@@ -161,8 +161,13 @@ const Icon = {
  * different component type on each parent re-render and remounts it, silently resetting `open`
  * back to `false` within about a second of it being opened. Living at module scope keeps its
  * identity — and its state — stable across every parent re-render.
+ *
+ * Also carries the phosphor accent toggle (green/amber) as a row at the bottom of the popover —
+ * moved out of the top bar's right cluster, which was too wide for the nav-links group to center
+ * inside the shared `max-w-5xl` column at 1440/1920 (see the nav's own comment in `TerminalContent`).
+ * Same behaviour, persistence (`useAccent`, unchanged) and aria (`aria-pressed`) as before.
  */
-function StyleSelectorTerminal() {
+function StyleSelectorTerminal({ accent, onToggleAccent }: { accent: Accent; onToggleAccent: () => void }) {
   const { t } = useI18n()
   const skin = skins.terminal(true)
   const muted = skin.muted
@@ -254,6 +259,17 @@ function StyleSelectorTerminal() {
             >
               {t(MENU.subtitleKey)} ›
             </TransitionLink>
+            <div className="my-1 h-px bg-[var(--term-line)]" />
+            <button
+              type="button"
+              onClick={onToggleAccent}
+              aria-label={accent === 'green' ? 'Switch to amber phosphor' : 'Switch to green phosphor'}
+              aria-pressed={accent === 'amber'}
+              className="flex w-full items-center gap-1.5 px-2 py-1.5 text-[10px] font-mono uppercase hover:bg-white/5"
+            >
+              <span className="h-2 w-2 rounded-full" style={{ background: 'var(--term-accent)' }} aria-hidden="true" />
+              <span>{accent}</span>
+            </button>
           </m.div>
         )}
       </AnimatePresence>
@@ -409,25 +425,30 @@ function TerminalContent() {
         {/* Top bar: brand mark, bracket nav (desktop), language + accent toggle + contact CTA. The
             same bracket nav repeats, smaller, on its own scrollable row for phones. */}
         <header className="fixed top-0 inset-x-0 z-40 border-b border-[var(--term-line)] bg-[var(--term-bg)]/95 backdrop-blur-sm">
-          {/* Logo | absolutely-centered links | right cluster. A `grid-cols-[1fr_auto_1fr]` layout
-              was tried first, but CSS grid's `1fr` tracks size to each side's own min-content floor
-              before splitting remaining space — since the right cluster (several controls, `shrink-0`)
-              is much wider than the logo, the two "equal" tracks resolved to very different widths
-              (measured 238px vs 399px) and the links group stayed off-center. Absolute-centering the
-              links group on the (relatively positioned) container is unaffected by that: it centers
-              on the container's true midpoint regardless of how wide either side cluster is. */}
-          <div className="relative max-w-5xl mx-auto flex h-14 items-center px-4">
-            <TransitionLink to="/terminal" transitionColor="#0a0d0a" transitionAccent="#39ff88" transitionLabel="Terminal" className={`text-sm font-bold ${accentCls}`}>
-              MB<span className={muted}>$</span>
-            </TransitionLink>
-            <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 md:block">
+          {/* Three-column grid, not absolute centering: `minmax(max-content,1fr)` on both side
+              columns means each grows to share the leftover space equally once there's room for
+              both, which lands the links group exactly on the container's midpoint; when the
+              container is too narrow for that the wider side freezes at its content width and the
+              links shift instead of sliding underneath either cluster — never an overlap. The old
+              absolute-centering fix worked but left the right cluster (lang + style selector + accent
+              toggle + CTA) too wide to ever balance inside `max-w-5xl`; the accent toggle now lives in
+              the style popover instead (see `StyleSelectorTerminal`), narrowing this cluster enough
+              that the grid centers correctly at 1440/1920. */}
+          <div className="max-w-5xl mx-auto grid h-14 grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)] items-center px-4 gap-2">
+            <div className="justify-self-start min-w-0">
+              <TransitionLink to="/terminal" transitionColor="#0a0d0a" transitionAccent="#39ff88" transitionLabel="Terminal" className={`text-sm font-bold ${accentCls}`}>
+                MB<span className={muted}>$</span>
+              </TransitionLink>
+            </div>
+            <div className="hidden md:block">
               <BracketNav size="sm" />
             </div>
-            <div className="ml-auto flex items-center gap-2 sm:gap-3 shrink-0">
+            <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 justify-self-end">
               {/* Language selector stays visible at every width (390px included) — a phone visitor
-                  can switch locale exactly like a desktop one; only the accent label and the
-                  contact CTA's text shrink away below `sm` to keep the row on one line. */}
-              <div className="inline-flex items-center gap-1" role="radiogroup" aria-label={t('language.selector.ariaLabel')}>
+                  can switch locale exactly like a desktop one; only the contact CTA's text shrinks
+                  away below `sm` to keep the row on one line. Boxes are compact (~36px each,
+                  `min-w-[34px]`) so this cluster stays narrow enough to balance against the logo. */}
+              <div className="inline-flex items-center gap-0.5" role="radiogroup" aria-label={t('language.selector.ariaLabel')}>
                 {supportedLocales.map((opt) => (
                   <button
                     key={opt}
@@ -435,23 +456,13 @@ function TerminalContent() {
                     role="radio"
                     aria-checked={opt === locale}
                     onClick={() => setLocale(opt)}
-                    className={`border px-1.5 py-0.5 text-[10px] font-mono transition-colors ${opt === locale ? `border-[var(--term-accent)] ${accentCls}` : `border-[var(--term-line)] ${muted}`}`}
+                    className={`min-w-[34px] border px-1 py-0.5 text-center text-[10px] font-mono transition-colors ${opt === locale ? `border-[var(--term-accent)] ${accentCls}` : `border-[var(--term-line)] ${muted}`}`}
                   >
                     {opt.toUpperCase()}
                   </button>
                 ))}
               </div>
-              <StyleSelectorTerminal />
-              <button
-                type="button"
-                onClick={() => setAccent(accent === 'green' ? 'amber' : 'green')}
-                aria-label={accent === 'green' ? 'Switch to amber phosphor' : 'Switch to green phosphor'}
-                aria-pressed={accent === 'amber'}
-                className="flex items-center gap-1.5 border border-[var(--term-line)] px-2 py-1 text-[10px] font-mono uppercase"
-              >
-                <span className="h-2 w-2 rounded-full" style={{ background: 'var(--term-accent)' }} aria-hidden="true" />
-                <span className="hidden sm:inline">{accent}</span>
-              </button>
+              <StyleSelectorTerminal accent={accent} onToggleAccent={() => setAccent(accent === 'green' ? 'amber' : 'green')} />
               <button type="button" onClick={() => openContact()} aria-label={c.hero.ctaContact} className={`inline-flex items-center gap-1.5 border border-[var(--term-accent)] px-2 sm:px-3 py-1.5 text-xs font-semibold ${accentCls}`}>
                 {Icon.mail} <span className="hidden sm:inline">{c.hero.ctaContact}</span>
               </button>
