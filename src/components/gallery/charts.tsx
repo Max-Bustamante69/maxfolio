@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
-import { animate, m, useMotionValue, useReducedMotion, useTransform } from 'framer-motion'
+import { useEffect, useRef } from 'react'
+import { animate, m, useInView, useMotionValue, useReducedMotion, useTransform } from 'framer-motion'
 
 const EASE = [0.23, 1, 0.32, 1] as const
 
@@ -196,6 +196,12 @@ const RINGS_C = 2 * Math.PI * RINGS_R
 /** A single small Lighthouse-style ring inside ScoreRingsRow — count-up numeral, band-colored arc, an
  *  optional small "+N pts" badge beside the numeral (Performance's real before→after delta). */
 function MiniRing({ value, label, delay, dark, badge }: { value: number; label: string; delay: number; dark: boolean; badge?: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  // Same pattern as StatBand/MeasuredBand's own count-ups: gate the count-up on the ring's own entry
+  // into the viewport, not on mount — a visitor almost never sees ScoreRingsRow (buried in the Impact
+  // block, well below the fold) before the animation had already finished counting up to its resting
+  // value.
+  const inView = useInView(ref, { once: true, margin: '-80px' })
   const reduced = useReducedMotion()
   const mv = useMotionValue(reduced ? value : 0)
   const shown = useTransform(mv, (v) => Math.round(v))
@@ -205,11 +211,12 @@ function MiniRing({ value, label, delay, dark, badge }: { value: number; label: 
       mv.set(value)
       return
     }
+    if (!inView) return
     const ctrl = animate(mv, value, { duration: 0.8, delay, ease: EASE })
     return () => ctrl.stop()
-  }, [value, delay, reduced, mv])
+  }, [value, delay, reduced, mv, inView])
   return (
-    <div className="flex items-center gap-2.5">
+    <div ref={ref} className="flex items-center gap-2.5">
       <svg viewBox="0 0 48 48" className="h-11 w-11 shrink-0" aria-hidden="true">
         <circle cx="24" cy="24" r={RINGS_R} fill="none" strokeWidth="4.5" stroke={dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'} />
         <m.circle cx="24" cy="24" r={RINGS_R} fill="none" strokeWidth="4.5" strokeLinecap="round" stroke={scoreColor(value)} strokeDasharray={RINGS_C} style={{ strokeDashoffset: dash }} transform="rotate(-90 24 24)" />
