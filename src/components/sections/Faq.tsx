@@ -7,6 +7,11 @@ import type { SectionHeading } from './Gallery'
 interface FaqProps {
   skin: Skin
   heading: SectionHeading
+  /** False when the page's own non-lazy wrapper already owns `id="faq"` (Apple.tsx, so a hash link
+   *  lands before this chunk mounts) — avoids a duplicate id in the DOM. Defaults true so every other
+   *  caller (Design4/Design1/Neo/Persona/Terminal, none of which wrap this in their own `#faq`) keeps
+   *  working exactly as before. */
+  ownId?: boolean
 }
 
 const EASE = [0.23, 1, 0.32, 1] as const
@@ -15,14 +20,14 @@ const EASE = [0.23, 1, 0.32, 1] as const
  * The objections, answered right before the ask — an accordion of hairline rows, one open at a
  * time. Every answer is a fact already on this page (plans, deliverables, handoff), not a promise.
  */
-export function Faq({ skin, heading }: FaqProps) {
+export function Faq({ skin, heading, ownId = true }: FaqProps) {
   const { strings } = useContent()
   const reduced = useReducedMotion()
   const f = strings.sections.faq
   const [open, setOpen] = useState(0)
 
   return (
-    <section id="faq" className="scroll-mt-20">
+    <section id={ownId ? 'faq' : undefined} className="scroll-mt-20">
       {heading(f.eyebrow, f.title, f.titleAccent)}
       <div className={`max-w-3xl border-t ${skin.line}`}>
         {f.items.map((item, i) => {

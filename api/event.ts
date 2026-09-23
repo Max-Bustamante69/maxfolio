@@ -77,9 +77,23 @@ export default async function handler(req: Request) {
   }
   if (req.method !== 'POST') return new Response(null, { status: 405 })
   if (!kv()) return new Response(null, { status: 204 })
+  // Every real payload here is a fixed event name plus a couple of short slug/enum props — nothing
+  // this taxonomy ever sends is anywhere near this size. Rejecting an oversized body before it
+  // reaches `JSON.parse` (rather than relying only on the platform's own request-size ceiling) keeps
+  // a malformed or hostile POST cheap to reject.
+  const MAX_BODY_BYTES = 2048
+  const lenHeader = req.headers.get('content-length')
+  if (lenHeader && Number(lenHeader) > MAX_BODY_BYTES) return new Response(null, { status: 413 })
+  let raw: string
+  try {
+    raw = await req.text()
+  } catch {
+    return new Response(null, { status: 400 })
+  }
+  if (raw.length > MAX_BODY_BYTES) return new Response(null, { status: 413 })
   let body: { name?: string; props?: Record<string, unknown> }
   try {
-    body = await req.json()
+    body = JSON.parse(raw)
   } catch {
     return new Response(null, { status: 400 })
   }

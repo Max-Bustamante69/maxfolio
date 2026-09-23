@@ -136,6 +136,10 @@ async function main() {
   // A real store slug (from the registry, the single source) is accepted.
   await eqStatus(post(eventHandler, { name: 'store_sheet_open', props: { store: 'the-gummy-box' } }), 204, 'POST store_sheet_open with a real registry slug is 204')
 
+  // Body size cap: an oversized POST is rejected (413) before it ever reaches JSON.parse.
+  const hugeProps = { section: 'x'.repeat(4000) }
+  await eqStatus(post(eventHandler, { name: 'section_view', props: hugeProps }), 413, 'POST with an oversized body is 413')
+
   restoreFetch()
 
   console.log(`\n${pass} passed, ${fail} failed`)

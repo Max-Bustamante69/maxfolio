@@ -511,7 +511,7 @@ function AppleContent() {
           <section id="faq" data-track-section="faq" className="px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending h="min-h-[40vh]" />}>
-                <Faq skin={skin} heading={Heading} />
+                <Faq ownId={false} skin={skin} heading={Heading} />
               </Suspense>
             </div>
           </section>
