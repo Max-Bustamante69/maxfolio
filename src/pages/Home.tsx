@@ -264,7 +264,7 @@ function HomeContent() {
             <a
               href={`mailto:${personal.email}`}
               className={`text-xs ${textMuted} hover:${text} transition-colors`}
-              aria-label={`Email ${personal.name}`}
+              aria-label={`${personal.email}, email ${personal.name}`}
             >
               {personal.email}
             </a>

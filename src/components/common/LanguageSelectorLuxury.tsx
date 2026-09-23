@@ -40,7 +40,6 @@ export function LanguageSelectorLuxury({
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={`relative ${buttonSize} flex items-center justify-center group`}
-        aria-label={t('language.selector.ariaLabel')}
         aria-expanded={open}
         aria-haspopup="menu"
       >
@@ -63,6 +62,8 @@ export function LanguageSelectorLuxury({
 
         <span className={`relative z-10 ${textSize} font-display tracking-[0.25em] ${textPrimary}`}>
           {localeLabel(locale)}
+          {/* the accessible name keeps the visible text and adds the purpose (matches LogoSelectorApple) */}
+          <span className="sr-only">, {t('language.selector.ariaLabel')}</span>
         </span>
 
         <AnimatePresence>

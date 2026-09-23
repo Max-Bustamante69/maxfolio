@@ -403,8 +403,14 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
                         {/* Counter-rotates so the disc/label stay upright as the ring spins — its OWN
                             transform must stay pure rotation: the hover/active scale lives one level
                             deeper (a nested span) so it never has to share the `transform` property with
-                            the counter-rotation animation, which would silently drop one of the two. */}
-                        <span className="mfOrbitDot relative flex items-center justify-center">
+                            the counter-rotation animation, which would silently drop one of the two.
+                            `aria-hidden`: the button's own `aria-label` above is already the complete,
+                            correct accessible name — this monogram/icon plus the always-present (only
+                            opacity-toggled, never unmounted) tooltip span are real text nodes that
+                            axe's `label-content-name-mismatch` audit picks up as "content" the name
+                            must include verbatim, which it can't for a single-letter monogram next to
+                            a full tool name. Hiding the decoration removes the false mismatch. */}
+                        <span aria-hidden="true" className="mfOrbitDot relative flex items-center justify-center">
                           <span className={`flex items-center justify-center transition-transform duration-200 ${isEmphasized ? 'scale-[1.15]' : ''}`}>
                             <span
                               style={{ height: size, width: size }}

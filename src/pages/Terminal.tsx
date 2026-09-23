@@ -205,11 +205,15 @@ function StyleSelectorTerminal({ accent, onToggleAccent }: { accent: Accent; onT
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-haspopup="menu"
-        aria-label={t('logoSelector.selectYourStyle')}
         className={`inline-flex items-center gap-1 border border-[var(--term-line)] px-2 py-1 text-[10px] font-mono uppercase ${muted}`}
       >
         <span aria-hidden="true">[</span>
-        <span className="hidden sm:inline">theme</span>
+        <span className="hidden sm:inline">
+          theme
+          {/* the accessible name keeps the visible text and adds the purpose (matches LogoSelectorApple) */}
+          <span className="sr-only normal-case">, {t('logoSelector.selectYourStyle')}</span>
+        </span>
+        <span className="sm:hidden sr-only">{t('logoSelector.selectYourStyle')}</span>
         <span aria-hidden="true" className={`transition-transform duration-150 ${open ? '-rotate-180' : ''}`}>▾</span>
         <span aria-hidden="true">]</span>
       </button>

@@ -177,18 +177,21 @@ export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, fo
           {groups.map((g) => {
             const on = filter.groups.has(g)
             const facet = groupFacet[g]
-            // Full-sentence accessible name ('Shopify, 13 tools, 22 stores') — the visible chip only
-            // ever shows the group name and the tool count. A group whose tools carry no real store
-            // usage (entirely in-house products / client-role work) never announces "0 stores": the
-            // sentence names what it IS used in instead.
+            // The accessible name must literally CONTAIN the visible text ("Shopify · 13") as axe's
+            // `label-content-name-mismatch` compares it verbatim — a full-sentence `aria-label`
+            // ("Shopify, 13 tools, 22 stores") diverges right after the shared prefix (" · " vs ", ")
+            // and fails that check even though the *content* isn't misleading. Keeping the visible
+            // text as the name's own prefix (via a trailing sr-only span, the same pattern
+            // LogoSelectorApple already uses) satisfies it structurally instead of by coincidence.
+            // A group whose tools carry no real store usage (entirely in-house products / client-role
+            // work) never announces "0 stores": the sentence names what it IS used in instead.
             const storesPhrase = facet.stores > 0 ? formatGroup(facet.stores) : ob.chipAriaNoStores
-            const chipAriaLabel = `${groupLabel[g]}, ${facet.tools} ${sk.layoutExtra.toolsSuffix}, ${storesPhrase}`
+            const chipAriaExtra = `, ${sk.layoutExtra.toolsSuffix}, ${storesPhrase}`
             return (
               <button
                 key={g}
                 type="button"
                 aria-pressed={on}
-                aria-label={chipAriaLabel}
                 onClick={() => {
                   filter.toggleGroup(g)
                   track('filter_change', { kind: 'skills', value: g })
@@ -200,6 +203,7 @@ export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, fo
                 className={`${CHIP} ${on ? skin.chipOn : skin.chip}`}
               >
                 {groupLabel[g]} · <span className="tabular-nums">{facet.tools}</span>
+                <span className="sr-only">{chipAriaExtra}</span>
               </button>
             )
           })}

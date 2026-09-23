@@ -66,7 +66,6 @@ export function LogoSelectorLuxury({ isDark }: LogoSelectorLuxuryProps) {
         className="w-10 h-10 relative flex items-center justify-center group"
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
-        aria-label="Open design selector - click to switch portfolio styles"
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
@@ -97,6 +96,8 @@ export function LogoSelectorLuxury({ isDark }: LogoSelectorLuxuryProps) {
         </svg>
         <span className={`font-display text-xs tracking-[0.2em] font-medium ${textPrimary} relative z-10`}>
           MB
+          {/* the accessible name keeps the visible text and adds the purpose (matches LogoSelectorApple) */}
+          <span className="sr-only">, open design selector — click to switch portfolio styles</span>
         </span>
       </m.button>
 
