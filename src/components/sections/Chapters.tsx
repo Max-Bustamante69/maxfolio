@@ -1,10 +1,18 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { m, useReducedMotion } from 'framer-motion'
 import { useContent, useDragRail } from '../../hooks'
 import { RevealText } from '../common'
 import type { Skin } from '../gallery'
 import type { SectionHeading } from './Gallery'
 import { WORK_KINDS, timeline, workCount, workTotal, type WorkKind } from '../../data/timeline'
+import { readProposal } from './chaptersLayouts/shared'
+
+// Prototype-lane directions (`?proposal=chapters-a|b|c`) — never in the default bundle, each its own
+// chunk, only fetched when the param actually picks one. Absent (production today), none of these
+// three imports ever runs.
+const OdometerLayout = lazy(() => import('./chaptersLayouts/OdometerLayout').then((mod) => ({ default: mod.OdometerLayout })))
+const PosterRailLayout = lazy(() => import('./chaptersLayouts/PosterRailLayout').then((mod) => ({ default: mod.PosterRailLayout })))
+const ActivityMapLayout = lazy(() => import('./chaptersLayouts/ActivityMapLayout').then((mod) => ({ default: mod.ActivityMapLayout })))
 
 interface ChaptersProps {
   skin: Skin
@@ -63,6 +71,9 @@ export function Chapters({ skin, heading }: ChaptersProps) {
   const c = strings.sections.chapters
   const y = strings.sections.years
   const highlights = useHighlights()
+  // Read once, like the old `?featured=` param: a URL edited mid-visit never rewrites an already-
+  // mounted section, and absent (production today) this renders exactly the rail below, unchanged.
+  const [proposal] = useState(() => readProposal('chapters'))
   // Newest first: the current year is the most important card, the rail moves back in time.
   const years = [...timeline].reverse()
   const cardCount = years.length
@@ -152,6 +163,18 @@ export function Chapters({ skin, heading }: ChaptersProps) {
     const rail = railRef.current
     if (target === undefined || !rail) return
     rail.scrollTo({ left: target, behavior: reduced ? 'auto' : 'smooth' })
+  }
+
+  if (proposal === 'a' || proposal === 'b' || proposal === 'c') {
+    const Variant = proposal === 'a' ? OdometerLayout : proposal === 'b' ? PosterRailLayout : ActivityMapLayout
+    return (
+      <section id="chapters" className="scroll-mt-20">
+        {heading(c.eyebrow, c.title, c.titleAccent, c.lead)}
+        <Suspense fallback={<div className="min-h-[40vh]" aria-hidden="true" />}>
+          <Variant skin={skin} />
+        </Suspense>
+      </section>
+    )
   }
 
   return (
