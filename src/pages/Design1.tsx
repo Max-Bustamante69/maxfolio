@@ -551,6 +551,7 @@ function Design1Content() {
                 skin={{ ...skin, title: 'text-white', body: 'text-red-50', muted: 'text-red-100', accent: 'text-white underline', line: 'border-red-300/40', accentBg: 'bg-stone-900' }}
                 ctaClass="press inline-flex items-center justify-center font-mono text-sm uppercase tracking-wider bg-white text-red-600 px-8 py-4 hover:bg-stone-900 hover:text-white transition-colors"
                 onContact={openContact}
+                fieldClassName="border-2 border-white/40 bg-white/5 placeholder:text-red-100/60 focus:border-white"
               />
               <div className="mt-10 flex justify-center gap-8 md:gap-12">
                 <button

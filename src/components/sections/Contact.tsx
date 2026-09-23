@@ -11,8 +11,10 @@ interface ContactProps {
   ctaClass: string
   /** Opens the contact form, optionally with the message prefilled (the store URL). */
   onContact: (prefill?: string) => void
-  /** Overrides the store-URL field's classes, e.g. a recessed Neo field instead of the default bordered one. */
-  fieldClassName?: string
+  /** The store-URL field's border/bg/placeholder/focus classes — every theme's own, same discipline
+   *  as `ctaClass` (required, no shared default: a default here previously fell back to Apple's blue
+   *  focus ring on any page that forgot to pass one, e.g. Luxury/Brutalist/Persona — measured). */
+  fieldClassName: string
 }
 
 const EASE = [0.23, 1, 0.32, 1] as const
@@ -29,7 +31,7 @@ export function Contact({ skin, ctaClass, onContact, fieldClassName, ownId = tru
   const c = strings.sections.contact
   const [url, setUrl] = useState('')
   const label = `text-[11px] font-semibold uppercase tracking-[0.18em] ${skin.muted}`
-  const field = fieldClassName ?? (skin.dark ? 'border-white/15 bg-white/5 placeholder:text-[#6e6e73] focus:border-[#2997ff]' : 'border-black/15 bg-white placeholder:text-[#a1a1a6] focus:border-[#0071e3]')
+  const field = fieldClassName
 
   const submitUrl = (e: FormEvent) => {
     e.preventDefault()
@@ -42,7 +44,7 @@ export function Contact({ skin, ctaClass, onContact, fieldClassName, ownId = tru
       <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
         <m.div className="lg:col-span-8" initial={reduced ? false : { opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-60px' }} transition={{ duration: 0.6, ease: EASE }}>
           <p className={`text-[11px] font-semibold uppercase tracking-[0.2em] ${skin.accent}`}>{c.eyebrow}</p>
-          <h2 id="contact-heading" className="mt-4 max-w-4xl font-sf text-5xl font-semibold leading-[1.02] tracking-[-0.035em] md:text-7xl lg:text-[84px]">
+          <h2 id="contact-heading" className={`mt-4 max-w-4xl ${skin.headingFont} text-5xl font-semibold leading-[1.02] tracking-[-0.035em] md:text-7xl lg:text-[84px]`}>
             <RevealText text={c.title} /> <RevealText text={c.titleAccent} className={skin.muted} delay={0.15} />
           </h2>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed md:text-2xl md:leading-relaxed">{c.lead}</p>

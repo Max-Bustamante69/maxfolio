@@ -689,7 +689,12 @@ function ContactScreen({ chrome, heading, skin, primaryBtn, openContact, t }: { 
       <section className={`relative overflow-clip px-4 py-16 md:py-20 ${surface}`}>
         <ScreenBackdrop screen="contact" isDark={chrome.isDark} accentCls={accentCls} torn />
         <div className={`relative max-w-5xl mx-auto persona-notch border ${line} ${bg} p-6 md:p-12`}>
-          <Contact skin={skin} ctaClass={primaryBtn} onContact={openContact} />
+          <Contact
+            skin={skin}
+            ctaClass={primaryBtn}
+            onContact={openContact}
+            fieldClassName={skin.dark ? 'border-[#f5f2ee]/20 bg-[#f5f2ee]/5 placeholder:text-[#f5f2ee]/40 focus:border-[#c8102e]' : 'border-[#0a0f1a]/20 bg-white placeholder:text-[#0a0f1a]/40 focus:border-[#1c6fb0]'}
+          />
         </div>
       </section>
 

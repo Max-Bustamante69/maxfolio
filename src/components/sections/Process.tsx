@@ -126,7 +126,7 @@ export function Process({ skin, heading, canvas = '' }: ProcessProps) {
               <AnimatePresence initial={false} mode="wait">
                 <m.p
                   key={active}
-                  className="absolute inset-x-0 top-0 font-sf text-[150px] font-semibold leading-none tracking-[-0.06em] tabular-nums"
+                  className={`absolute inset-x-0 top-0 ${skin.headingFont} text-[150px] font-semibold leading-none tracking-[-0.06em] tabular-nums`}
                   initial={reduced ? false : { opacity: 0, y: 40 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: -40, transition: { duration: 0.25, ease: EASE } }}

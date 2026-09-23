@@ -108,6 +108,18 @@ export interface Skin {
   divider: string // divide-y color for those rows
   line: string // hairline border color (editorial rows, stat bands, timelines)
   accentBg: string // accent as a background (indicators, dots, progress)
+  /** Font-family class for oversized display/headline text (Manifesto's lines, and anywhere else
+   *  a section wants the theme's expressive type rather than `title`'s smaller card-heading voice). */
+  headingFont: string
+  /** Background + text for a full-bleed *inverted* band (Manifesto's default when a page doesn't
+   *  pass its own `bandClassName`) — each theme's own palette flipped, never Apple's grays. */
+  invertedBand: string
+  /** Eyebrow/accent color on top of `invertedBand`. */
+  invertedAccent: string
+  /** Shape (radius/border/shadow, never color) for a small white badge that houses a third-party
+   *  logo — e.g. Experience's company-logo chip. Background stays white in every theme (most company
+   *  marks are opaque PNGs drawn for a light background), only the frame around it speaks the theme. */
+  logoChip: string
 }
 
 export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
@@ -128,6 +140,10 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     divider: d ? 'divide-white/10 border-white/10' : 'divide-black/10 border-black/10',
     line: d ? 'border-white/10' : 'border-black/10',
     accentBg: d ? 'bg-[#2997ff]' : 'bg-[#0066cc]',
+    headingFont: 'font-sf',
+    invertedBand: d ? 'bg-[#f5f5f7] text-[#1d1d1f]' : 'bg-[#1d1d1f] text-[#f5f5f7]',
+    invertedAccent: d ? 'text-[#0066cc]' : 'text-[#2997ff]',
+    logoChip: 'rounded-[12px] shadow-[0_1px_6px_rgba(0,0,0,0.08)]',
   }),
   luxury: (d) => ({
     frame: 'luxury',
@@ -145,6 +161,10 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     divider: d ? 'divide-deco-gold/20 border-deco-gold/20' : 'divide-luxury-black/10 border-luxury-black/10',
     line: d ? 'border-deco-gold/20' : 'border-luxury-black/10',
     accentBg: d ? 'bg-deco-gold' : 'bg-luxury-gold',
+    headingFont: 'font-display',
+    invertedBand: d ? 'bg-deco-cream text-luxury-black' : 'bg-luxury-black text-deco-cream',
+    invertedAccent: d ? 'text-luxury-gold' : 'text-deco-gold',
+    logoChip: `rounded-[4px] border ${d ? 'border-deco-gold/40' : 'border-luxury-gold/40'}`,
   }),
   brutalist: (d) => ({
     frame: 'brutalist',
@@ -162,6 +182,10 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     divider: d ? 'divide-stone-700 border-stone-700' : 'divide-stone-900 border-stone-900',
     line: d ? 'border-stone-700' : 'border-stone-900',
     accentBg: 'bg-red-600',
+    headingFont: 'font-editorial italic',
+    invertedBand: d ? 'bg-stone-100 text-stone-900' : 'bg-stone-900 text-stone-100',
+    invertedAccent: 'text-red-600',
+    logoChip: 'rounded-none border-2 border-stone-900',
   }),
   neo: (d) => ({
     frame: 'neo',
@@ -183,6 +207,10 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     divider: d ? 'divide-white/10 border-white/10' : 'divide-black/[0.06] border-black/[0.06]',
     line: d ? 'border-white/10' : 'border-black/[0.08]',
     accentBg: d ? 'bg-neo-darkAccent' : 'bg-neo-accent',
+    headingFont: 'font-neo font-extrabold',
+    invertedBand: d ? 'bg-neo-surface text-neo-ink' : 'bg-neo-dark text-neo-darkInk',
+    invertedAccent: d ? 'text-neo-accent' : 'text-neo-darkAccent',
+    logoChip: 'rounded-[14px] shadow-[0_2px_10px_rgba(0,0,0,0.10)]',
   }),
   // Ice variant is the default (light); Ink is the dark mode. Two-key-color law: ink/paper neutrals
   // plus exactly one hero accent per mode — no diluting sub-colors (wf4-persona.md idea #1).
@@ -206,6 +234,10 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     divider: d ? 'divide-[#f5f2ee]/10 border-[#f5f2ee]/10' : 'divide-[#0a0f1a]/10 border-[#0a0f1a]/10',
     line: d ? 'border-[#f5f2ee]/10' : 'border-[#0a0f1a]/10',
     accentBg: d ? 'bg-[#c8102e]' : 'bg-[#1c6fb0]',
+    headingFont: 'font-persona-display',
+    invertedBand: d ? 'bg-[#f5f2ee] text-[#0a0f1a]' : 'bg-[#0a0f1a] text-[#f5f2ee]',
+    invertedAccent: d ? 'text-[#1c6fb0]' : 'text-[#e8465f]',
+    logoChip: 'persona-skew-btn',
   }),
   // Terminal ("engineer-for-engineers"): a single always-dark register, so `d` is ignored — every
   // color reads from the `--term-*` custom properties defined in terminal.css, which is what lets
@@ -230,5 +262,10 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     divider: 'divide-[var(--term-line)] border-[var(--term-line)]',
     line: 'border-[var(--term-line)]',
     accentBg: 'bg-[var(--term-fill)]',
+    headingFont: 'font-mono',
+    // The one deliberate inversion this always-dark register has: bright phosphor fill, near-black text.
+    invertedBand: 'bg-[var(--term-accent)] text-[var(--term-bg)]',
+    invertedAccent: 'text-[var(--term-bg)]',
+    logoChip: 'rounded-none border border-[var(--term-line)]',
   }),
 }

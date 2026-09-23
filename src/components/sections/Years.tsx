@@ -351,7 +351,7 @@ export function Years({ skin, heading, variant = 'rows', depth = false }: YearsP
               transition={{ duration: 0.6, ease: EASE }}
             >
               <div className="md:col-span-3">
-                <p className="font-sf text-6xl font-semibold leading-none tracking-[-0.05em] tabular-nums md:text-7xl">
+                <p className={`${skin.headingFont} text-6xl font-semibold leading-none tracking-[-0.05em] tabular-nums md:text-7xl`}>
                   <RevealText text={String(entry.year)} />
                 </p>
                 {variant === 'lines' ? (

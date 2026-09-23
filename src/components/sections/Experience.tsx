@@ -89,7 +89,7 @@ export function Experience({ skin, heading, ownId = true }: ExperienceProps) {
             >
               <div className="flex items-start gap-4">
                 {job.logo && (
-                  <div className="h-12 w-12 shrink-0 rounded-[12px] bg-white p-1.5 shadow-[0_1px_6px_rgba(0,0,0,0.08)]">
+                  <div className={`h-12 w-12 shrink-0 bg-white p-1.5 ${skin.logoChip}`}>
                     <CompanyLogo src={job.logo} alt={job.company} />
                   </div>
                 )}

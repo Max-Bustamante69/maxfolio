@@ -503,7 +503,13 @@ function AppleContent() {
             />
             <div className="relative max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
-                <Contact ownId={false} skin={skin} ctaClass={`${primaryBtn} px-7`} onContact={openContact} />
+                <Contact
+                  ownId={false}
+                  skin={skin}
+                  ctaClass={`${primaryBtn} px-7`}
+                  onContact={openContact}
+                  fieldClassName={isDark ? 'border-white/15 bg-white/5 placeholder:text-[#6e6e73] focus:border-[#2997ff]' : 'border-black/15 bg-white placeholder:text-[#a1a1a6] focus:border-[#0071e3]'}
+                />
               </Suspense>
             </div>
           </section>

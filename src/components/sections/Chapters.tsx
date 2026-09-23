@@ -172,7 +172,7 @@ export function Chapters({ skin, heading }: ChaptersProps) {
               data-idx={i}
               className={`w-[80%] shrink-0 snap-center rounded-[22px] border p-6 md:w-[46%] md:snap-start md:p-8 lg:w-[calc((100%-2rem)/3.15)] ${skin.line} ${skin.dark ? 'bg-white/[0.03]' : 'bg-white'}`}
             >
-              <p className="font-sf text-6xl font-semibold leading-none tracking-[-0.05em] tabular-nums md:text-7xl">
+              <p className={`${skin.headingFont} text-6xl font-semibold leading-none tracking-[-0.05em] tabular-nums md:text-7xl`}>
                 <RevealText text={String(entry.year)} trigger="load" />
               </p>
               {y.eras[String(entry.year)] && <p className={`${skin.accent} mt-2 text-sm font-medium`}>{y.eras[String(entry.year)]}</p>}

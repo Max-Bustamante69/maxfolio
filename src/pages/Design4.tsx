@@ -667,7 +667,12 @@ function Design4Content() {
               className={`pointer-events-none absolute inset-0 h-full w-full object-cover ${isDark ? "opacity-[0.05]" : "opacity-[0.04]"}`}
             />
             <div className="relative max-w-5xl mx-auto">
-              <Contact skin={skin} ctaClass={`press inline-flex items-center justify-center gap-2 px-8 py-4 text-sm tracking-[0.2em] uppercase ${isDark ? "bg-deco-gold text-deco-navy" : "bg-luxury-black text-luxury-cream"} hover:opacity-90 transition-all`} onContact={openContact} />
+              <Contact
+                skin={skin}
+                ctaClass={`press inline-flex items-center justify-center gap-2 px-8 py-4 text-sm tracking-[0.2em] uppercase ${isDark ? "bg-deco-gold text-deco-navy" : "bg-luxury-black text-luxury-cream"} hover:opacity-90 transition-all`}
+                onContact={openContact}
+                fieldClassName={isDark ? 'border-deco-gold/30 bg-deco-navy/40 placeholder:text-deco-cream/40 focus:border-deco-gold' : 'border-luxury-gold/30 bg-white placeholder:text-luxury-black/40 focus:border-luxury-gold'}
+              />
             </div>
           </section>
         </main>

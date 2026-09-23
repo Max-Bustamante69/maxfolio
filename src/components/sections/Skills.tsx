@@ -107,7 +107,7 @@ export function Skills({ skin, heading, ownId = true }: SkillsProps) {
           label={sk.eyebrow}
           items={allTools}
           keyOf={(t) => t}
-          itemClassName="shrink-0 whitespace-nowrap px-5 py-2 font-sf text-2xl font-semibold tracking-[-0.02em] md:text-4xl"
+          itemClassName={`shrink-0 whitespace-nowrap px-5 py-2 ${skin.headingFont} text-2xl font-semibold tracking-[-0.02em] md:text-4xl`}
           renderItem={(t) => t}
         />
       </div>
