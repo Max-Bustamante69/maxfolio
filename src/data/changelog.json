@@ -1,5 +1,30 @@
 [
   {
+    "hash": "b226156",
+    "date": "2026-09-23",
+    "subject": "fix(arcade): the inverted band's label keeps the theme red in dark mode"
+  },
+  {
+    "hash": "91a35ae",
+    "date": "2026-09-23",
+    "subject": "fix(review): dedupe the Apple page's #faq id and cap /api/event body size"
+  },
+  {
+    "hash": "9010854",
+    "date": "2026-09-23",
+    "subject": "feat(analytics+quick-wins): first-party event ledger, /stats dashboard, and audit quick wins"
+  },
+  {
+    "hash": "e6d378d",
+    "date": "2026-09-23",
+    "subject": "chore(build): regenerated artifacts for round 44 fixes"
+  },
+  {
+    "hash": "aeba562",
+    "date": "2026-09-23",
+    "subject": "fix(orbit): curved group names are labels again; desktop dots use a 32 px target"
+  },
+  {
     "hash": "d2ad40a",
     "date": "2026-09-23",
     "subject": "fix(terminal-nav): links centered vertically and 16 px clear of the language buttons"
@@ -33,30 +58,5 @@
     "hash": "f81b7d7",
     "date": "2026-09-23",
     "subject": "fix(theme-leakage): shared sections speak each theme's palette, type and radius"
-  },
-  {
-    "hash": "5b61342",
-    "date": "2026-09-23",
-    "subject": "feat(theme-selector): reachable style selector on every theme"
-  },
-  {
-    "hash": "2bbb34f",
-    "date": "2026-09-23",
-    "subject": "fix(nav): center every theme's nav-links group on its container"
-  },
-  {
-    "hash": "ddfa394",
-    "date": "2026-09-23",
-    "subject": "feat(design-mark): shared DesignMark component for every theme's own mark"
-  },
-  {
-    "hash": "9ca2832",
-    "date": "2026-09-11",
-    "subject": "chore(build): regenerated artifacts for round 43"
-  },
-  {
-    "hash": "f67d889",
-    "date": "2026-09-11",
-    "subject": "refactor(options): production ships only the chosen defaults; candidates live on feat/options-showroom"
   }
 ]
