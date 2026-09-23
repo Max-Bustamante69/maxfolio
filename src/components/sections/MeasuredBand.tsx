@@ -138,7 +138,7 @@ function Cell({ children, value, label, valueClassName = '' }: { children: React
  * "The work, in numbers" — moved here from under the hero (2026-09-11, owner feedback: the hero read
  * saturated with the photo block/stat band stacked on top of the lead). Same four ranges the stat band
  * carried (lighthouse, load time, conversion, organic), each redrawn as a small graphic instead of a
- * bare numeral; the two count facts (18+ storefronts, 800+ tests) stay off this band since they already
+ * bare numeral; the two count facts (20+ storefronts, 800+ tests) stay off this band since they already
  * live in the hero CTA and the Digitdeck Apps product copy. `storefronts` and `tests` stay in
  * `StatBand`, which other themes still render in full.
  */

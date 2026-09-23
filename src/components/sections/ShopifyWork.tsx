@@ -211,7 +211,10 @@ export function ShopifyWork({ skin, heading, ownId = true }: ShopifyWorkProps) {
             onClick={() => setTab(k)}
             className={`${tab === k ? skin.chipOn : skin.chip} compact-touch transition-colors`}
           >
-            {k === 'stores' ? `${s.tabStores} · ${registry.stores.length}` : `${s.tabProducts} · ${registry.products.length}`}
+            {/* Round 46: the tab count is the public "20+" claim (`registry.PUBLIC_STORE_COUNT`), not
+                the real, climbing `registry.stores.length` — never a bare literal count next to the
+                word "storefronts" that could read as a different number from the rest of the page. */}
+            {k === 'stores' ? `${s.tabStores} · ${registry.PUBLIC_STORE_COUNT}+` : `${s.tabProducts} · ${registry.products.length}`}
           </button>
         ))}
       </div>
@@ -269,7 +272,7 @@ export function ShopifyWork({ skin, heading, ownId = true }: ShopifyWorkProps) {
             )}
             <div className={`mt-6 ${active ? 'hidden' : ''}`}>
               <button type="button" onClick={() => setShowAll((v) => !v)} aria-expanded={showAll} className={`${showAll ? skin.chip : skin.chipOn} compact-touch press transition-colors`}>
-                {showAll ? s.showLess : s.showAll.replace('{n}', String(registry.stores.length))}
+                {showAll ? s.showLess : s.showAll.replace('{n}', `${registry.PUBLIC_STORE_COUNT}+`)}
                 {!showAll && hidden > 0 ? ' ›' : ''}
               </button>
             </div>

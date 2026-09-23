@@ -2,6 +2,15 @@ import metricsJson from './metrics.json'
 // Untranslated facts. Everything a visitor reads in words lives in src/content/<locale>.ts,
 // keyed by the ids declared here. Dates are YYYY-MM and get formatted per locale by useContent().
 
+// Round 46 (owner call, 2026-09-23): the public storefront-count claim is a fixed "20+" everywhere —
+// not `stores.length` (23 and climbing as the fleet grows), which used to leak through three separate
+// places that each read the real array on their own (this file's CTO `experience` metric and `stats`
+// entry, plus `useContent`'s `{n}` interpolation) and had drifted out of sync with each other (some
+// spots said "18+", others interpolated the live 23). One constant, always ≤ the real count, so the
+// claim never overstates. Bump this by hand when the fleet comfortably clears the next round number —
+// never let a consumer go back to reading `stores.length` directly for copy.
+export const PUBLIC_STORE_COUNT = 20
+
 export type ExperienceId =
   | 'digitdeck-cto'
   | 'ellamau'
@@ -38,7 +47,7 @@ export const experience: ExperienceEntry[] = [
     logo: DIGITDECK_LOGO,
     technologies: ['Shopify', 'Liquid', 'React', 'Remix', 'Vite', 'Tailwind CSS', 'Prisma', 'PostgreSQL', 'BullMQ', 'Playwright', 'GitHub Actions', 'Claude Code'],
     metrics: [
-      { id: 'storefronts', value: '18+' },
+      { id: 'storefronts', value: `${PUBLIC_STORE_COUNT}+` },
       { id: 'modules', value: '5' },
       { id: 'tests', value: '800+' },
     ],
@@ -261,7 +270,7 @@ export const stats: { id: StatId; value: string }[] = [
   { id: 'loadTime', value: '-30–40%' },
   { id: 'conversion', value: '+10–20%' },
   { id: 'organic', value: '+20%' },
-  { id: 'storefronts', value: '18+' },
+  { id: 'storefronts', value: `${PUBLIC_STORE_COUNT}+` },
   { id: 'tests', value: '800+' },
 ]
 
