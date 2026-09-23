@@ -2,6 +2,7 @@ import { m, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { TransitionLink } from './TransitionLink'
+import { DesignMark } from './DesignMark'
 import { useI18n } from '../../hooks'
 import { otherDesigns, MENU } from '../../data/designs'
 
@@ -107,7 +108,7 @@ export function MobileMenuApple({ navItems, isDark, onContactClick, contactLabel
 
             <div className="mt-6">
               <p className={`text-[11px] uppercase tracking-[0.2em] ${muted} mb-3`}>{t('logoSelector.otherExperiences')}</p>
-              <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
+              <div className="flex flex-wrap gap-x-4 gap-y-3 text-sm">
                 {otherDesigns('apple').map((d) => (
                   <TransitionLink
                     key={d.id}
@@ -115,8 +116,9 @@ export function MobileMenuApple({ navItems, isDark, onContactClick, contactLabel
                     transitionColor={d.transitionColor}
                     transitionAccent={d.transitionAccent}
                     transitionLabel={t(d.nameKey)}
-                    className={isDark ? 'text-[#2997ff]' : 'text-[#0071e3]'}
+                    className={`inline-flex items-center gap-2 ${isDark ? 'text-[#2997ff]' : 'text-[#0071e3]'}`}
                   >
+                    <DesignMark id={d.id} size="sm" isDark={isDark} />
                     {t(d.nameKey)} ›
                   </TransitionLink>
                 ))}

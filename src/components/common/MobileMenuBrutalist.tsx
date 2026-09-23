@@ -2,6 +2,7 @@ import { m, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { TransitionLink } from './TransitionLink'
+import { DesignMark } from './DesignMark'
 import { useI18n } from '../../hooks'
 import { otherDesigns, MENU } from '../../data/designs'
 
@@ -149,7 +150,7 @@ export function MobileMenuBrutalist({ navItems, isDark, onContactClick }: Mobile
               <p className={`font-mono text-[10px] uppercase tracking-[0.3em] ${textMuted} mb-4`}>
                 {t('logoSelector.switchExperience')}
               </p>
-              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+              <div className="flex flex-wrap justify-center gap-x-6 gap-y-3">
                 <TransitionLink
                   to={MENU.route}
                   transitionColor={isDark ? '#171717' : '#fafafa'}
@@ -166,8 +167,9 @@ export function MobileMenuBrutalist({ navItems, isDark, onContactClick }: Mobile
                     transitionColor={d.transitionColor}
                     transitionAccent={d.transitionAccent}
                     transitionLabel={t(d.nameKey)}
-                    className={`font-mono text-xs uppercase tracking-wider ${textMuted} hover:text-red-600 transition-colors`}
+                    className={`inline-flex items-center gap-2 font-mono text-xs uppercase tracking-wider ${textMuted} hover:text-red-600 transition-colors`}
                   >
+                    <DesignMark id={d.id} size="sm" isDark={isDark} />
                     {t(d.nameKey)} →
                   </TransitionLink>
                 ))}

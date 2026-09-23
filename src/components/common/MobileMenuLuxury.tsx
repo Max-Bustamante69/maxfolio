@@ -2,6 +2,7 @@ import { m, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { TransitionLink } from './TransitionLink'
+import { DesignMark } from './DesignMark'
 import { useI18n } from '../../hooks'
 import { otherDesigns, MENU } from '../../data/designs'
 
@@ -159,7 +160,7 @@ export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMen
               <p className={`text-[10px] uppercase tracking-[0.3em] ${textMuted} mb-4`}>
                 {t('logoSelector.otherExperiences')}
               </p>
-              <div className="flex flex-wrap justify-center gap-x-4 gap-y-2">
+              <div className="flex flex-wrap justify-center gap-x-4 gap-y-3">
                 <TransitionLink
                   to={MENU.route}
                   transitionColor={isDark ? '#171717' : '#fafafa'}
@@ -170,15 +171,16 @@ export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMen
                   {t(MENU.subtitleKey)}
                 </TransitionLink>
                 {otherDesigns('luxury').map((d) => (
-                  <span key={d.id} className="flex gap-4">
+                  <span key={d.id} className="flex items-center gap-4">
                     <span className={textMuted}>·</span>
                     <TransitionLink
                       to={d.href}
                       transitionColor={d.transitionColor}
                       transitionAccent={d.transitionAccent}
                       transitionLabel={t(d.nameKey)}
-                      className={`text-xs ${textMuted} hover:${accent} transition-colors`}
+                      className={`inline-flex items-center gap-2 text-xs ${textMuted} hover:${accent} transition-colors`}
                     >
+                      <DesignMark id={d.id} size="sm" isDark={isDark} />
                       {t(d.nameKey)}
                     </TransitionLink>
                   </span>
