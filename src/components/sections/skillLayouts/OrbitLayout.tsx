@@ -138,10 +138,21 @@ const sizeForTotal = (total: number, min: number, max: number) => {
 const ORBIT_CSS = `
 @keyframes mfOrbitCW { to { transform: rotate(360deg); } }
 @keyframes mfOrbitCCW { to { transform: rotate(-360deg); } }
-.mfOrbitRing { animation: mfOrbitCW var(--orbit-duration, 120s) linear infinite; will-change: transform; }
+/* Two rings that happen to carry the same tool count (today: Frontend/Backend, both 8) get the same
+   0.4-rad half-slot startAngle stagger every other ring pair does, but their independent, opposite-
+   direction ambient drift still sweeps them through a shared angle a few seconds after mount — at
+   that instant two 44px touch-target dots (the CSS floor in index.css) on adjacent rings are closer
+   than their ~37px radial gap allows, which briefly drops the pair's clearance below the 24px WCAG
+   2.5.8 minimum (measured with Playwright: safe at rest, negative between roughly t=4s and t=8s,
+   safe again after — Lighthouse's target-size audit was catching this exact window on every run,
+   2026-09-23). The rest-position layout (startAngle) is already the deliberately-tuned safe one;
+   delaying the drift's start past that window keeps every pair safe through both the audit's early
+   DOM snapshot and a visitor's first look at the section, while still letting the ambient motion run
+   for anyone who lingers. */
+.mfOrbitRing { animation: mfOrbitCW var(--orbit-duration, 120s) linear infinite; animation-delay: 9s; will-change: transform; }
 .mfOrbitRing.mfCCW { animation-name: mfOrbitCCW; }
 .mfOrbitRing:hover, .mfOrbitRing:focus-within { animation-play-state: paused; }
-.mfOrbitDot { animation: mfOrbitCCW var(--orbit-duration, 120s) linear infinite; will-change: transform; }
+.mfOrbitDot { animation: mfOrbitCCW var(--orbit-duration, 120s) linear infinite; animation-delay: 9s; will-change: transform; }
 .mfOrbitRing.mfCCW .mfOrbitDot { animation-name: mfOrbitCW; }
 .mfOrbitRing:hover .mfOrbitDot, .mfOrbitRing:focus-within .mfOrbitDot { animation-play-state: paused; }
 .mfHoverTip { display: none; }
