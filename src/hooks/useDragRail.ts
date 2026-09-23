@@ -23,9 +23,13 @@ export interface UseDragRailResult {
    *  `handlers` are discarded looks dead — it is not: this is the only wiring that turns on mouse
    *  drag. Touch is unaffected either way (native momentum scroll + CSS scroll-snap keep working). */
   handlers: DragRailHandlers
-  /** True from the first >3px pointer move until the release spring lands. Callers can key off it to
-   *  toggle a `data-dragging` attribute (e.g. for the grab/grabbing cursor swap) — the hook does not
-   *  touch the element's class list itself, only inline `scrollSnapType`/`userSelect` while dragging. */
+  /** True from the first >3px pointer move until the pointer is released (mouseup/pointercancel), not
+   *  until the landing spring finishes settling — the spring can take over a second to reach rest, and
+   *  a cursor/`data-dragging` affordance that stayed "grabbing" for all of that read as stuck. Callers
+   *  can key off it to toggle a `data-dragging` attribute (e.g. for the grab/grabbing cursor swap) — the
+   *  hook does not touch the element's class list itself, only inline `scrollSnapType`/`userSelect`,
+   *  which DO stay put until the spring lands (imperative `scrollLeft` writes still need CSS snap held
+   *  off during that time). */
   isDragging: boolean
 }
 
@@ -136,10 +140,12 @@ export function useDragRail(ref: React.RefObject<HTMLDivElement | null>, options
     [centerSnapBelow],
   )
 
+  // Resets the CSS held off for the duration of the imperative scrollLeft writes (CSS scroll-snap and
+  // text selection). Deliberately does NOT touch `isDragging` — that flips off the instant the pointer
+  // lifts (see `endDrag`), well before the landing spring calls this at `onComplete`/`onStop`.
   const restore = useCallback((rail: HTMLDivElement) => {
     rail.style.scrollSnapType = ''
     rail.style.userSelect = ''
-    setIsDragging(false)
   }, [])
 
   const followLoop = useCallback(() => {
@@ -259,6 +265,10 @@ export function useDragRail(ref: React.RefObject<HTMLDivElement | null>, options
         // capture may already be released by the browser (e.g. pointercancel)
       }
       if (!s.moved) return
+      // Cursor/data-dragging affordance ends here, on the pointer's own release — not at the landing
+      // spring's onComplete, which can take over a second to settle (stiffness 60 / damping 17 / mass 1)
+      // and left the "grabbing" cursor visibly stuck after the mouse button was already up.
+      setIsDragging(false)
       land(rail)
     },
     [land, ref, stopFollowLoop],
