@@ -43,11 +43,11 @@ export function LogoSelectorNeo({ isDark }: { isDark: boolean }) {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-haspopup="menu"
+        aria-label={t('logoSelector.selectYourStyle')}
         className="press flex items-center gap-2.5 shrink-0 !rounded-full px-1 py-1 pr-3"
       >
         <span className={`h-2.5 w-2.5 rounded-full ${isDark ? 'bg-neo-darkAccent' : 'bg-neo-accent'}`} aria-hidden="true" />
-        <span className={`text-sm font-extrabold tracking-tight hidden sm:inline ${text}`}>Maxfolio</span>
-        <span className="sr-only">, open design selector</span>
+        <span className={`text-sm font-extrabold tracking-tight hidden sm:inline ${text}`} aria-hidden="true">Maxfolio</span>
         <svg className={`w-3 h-3 ${muted} transition-transform duration-200 ${open ? 'rotate-180' : ''}`} viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
           <path d="M2.5 4.5 6 8l3.5-3.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
