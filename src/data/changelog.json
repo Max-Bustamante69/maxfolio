@@ -1,62 +1,62 @@
 [
   {
+    "hash": "d2ad40a",
+    "date": "2026-09-23",
+    "subject": "fix(terminal-nav): links centered vertically and 16 px clear of the language buttons"
+  },
+  {
+    "hash": "fe3f2d2",
+    "date": "2026-09-23",
+    "subject": "fix(sections): dedupe wrapper ids on luxury/brutalist/neo, fix hash landing"
+  },
+  {
+    "hash": "077c5e1",
+    "date": "2026-09-23",
+    "subject": "feat(mobile-menu): show each design's brand mark in the switcher list"
+  },
+  {
+    "hash": "ee9c5f3",
+    "date": "2026-09-23",
+    "subject": "fix(nav): replace absolute nav centering with a balanced CSS grid"
+  },
+  {
+    "hash": "9a73cc2",
+    "date": "2026-09-23",
+    "subject": "fix(neo-selector): give the style-selector trigger a real accessible name at mobile widths"
+  },
+  {
+    "hash": "2f70d58",
+    "date": "2026-09-23",
+    "subject": "fix(chapters): rail stops flush with the frame, not past it"
+  },
+  {
+    "hash": "f81b7d7",
+    "date": "2026-09-23",
+    "subject": "fix(theme-leakage): shared sections speak each theme's palette, type and radius"
+  },
+  {
+    "hash": "5b61342",
+    "date": "2026-09-23",
+    "subject": "feat(theme-selector): reachable style selector on every theme"
+  },
+  {
+    "hash": "2bbb34f",
+    "date": "2026-09-23",
+    "subject": "fix(nav): center every theme's nav-links group on its container"
+  },
+  {
+    "hash": "ddfa394",
+    "date": "2026-09-23",
+    "subject": "feat(design-mark): shared DesignMark component for every theme's own mark"
+  },
+  {
+    "hash": "9ca2832",
+    "date": "2026-09-11",
+    "subject": "chore(build): regenerated artifacts for round 43"
+  },
+  {
     "hash": "f67d889",
     "date": "2026-09-11",
     "subject": "refactor(options): production ships only the chosen defaults; candidates live on feat/options-showroom"
-  },
-  {
-    "hash": "3f728fe",
-    "date": "2026-09-11",
-    "subject": "chore(build): regenerated artifacts for round 42"
-  },
-  {
-    "hash": "6168cb6",
-    "date": "2026-09-11",
-    "subject": "fix(skills): fleet numerals sit on one row on phones"
-  },
-  {
-    "hash": "12f3631",
-    "date": "2026-09-11",
-    "subject": "fix(apple): contact wrapper owns the id, the inner section takes ownId={false}"
-  },
-  {
-    "hash": "31a3b68",
-    "date": "2026-09-11",
-    "subject": "fix(review): clear WCAG AA contrast on low-opacity small text"
-  },
-  {
-    "hash": "c1cb262",
-    "date": "2026-09-11",
-    "subject": "fix(apple): settle the organic CountUp before the QA screenshot window"
-  },
-  {
-    "hash": "3b980cd",
-    "date": "2026-09-11",
-    "subject": "feat(review): select a review-checklist direction with ?review=a|b|c|d"
-  },
-  {
-    "hash": "1777eae",
-    "date": "2026-09-11",
-    "subject": "feat(review): four genuinely different review-checklist directions"
-  },
-  {
-    "hash": "01a3309",
-    "date": "2026-09-11",
-    "subject": "content(review): new copy and labels for four review-checklist directions"
-  },
-  {
-    "hash": "43e04f9",
-    "date": "2026-09-11",
-    "subject": "fix(apple): declutter the hero, move the stat band into a measured graphic band"
-  },
-  {
-    "hash": "f959fa6",
-    "date": "2026-09-11",
-    "subject": "fix(skills): stop the constellation zoom transition overlapping content"
-  },
-  {
-    "hash": "e2a4ef8",
-    "date": "2026-09-11",
-    "subject": "fix(skills): give the rail mobile candidate a filter bar"
   }
 ]
