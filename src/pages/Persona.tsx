@@ -1,14 +1,14 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { m, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { ThemeProvider, useTheme } from '../context/ThemeContext'
-import { SEOHead, TransitionLink, Magnetic, Ticker, LanguageSelectorMenu, SmoothScroll, useLenis } from '../components/common'
+import { SEOHead, TransitionLink, Magnetic, Ticker, LanguageSelectorMenu, SmoothScroll, useLenis, DesignMark } from '../components/common'
 import { ContactFormModal } from '../components/modals'
 import { MenuPreview } from '../components/previews'
 import { StatBand } from '../components/sections/StatBand'
 import { Experience } from '../components/sections/Experience'
 import { skins } from '../components/gallery/skins'
 import { useDynamicFavicon, useI18n, useContent } from '../hooks'
-import { designById, otherDesigns, MENU } from '../data/designs'
+import { designs, designById, otherDesigns, MENU } from '../data/designs'
 import { personaArt } from '../data/personaArt'
 import '../styles/persona.css'
 
@@ -372,6 +372,14 @@ function ArcadeMenu({
   useEffect(() => {
     if (suspended) return
     function onKey(e: KeyboardEvent) {
+      // This is a page-wide "game controller" nav (arrows move the selection, Enter confirms) even
+      // without DOM focus on one of its own buttons — intentional, so hovering/mousing around the
+      // arcade menu still responds to the keyboard. But that means it must yield when some OTHER
+      // focusable control already has focus (e.g. the style selector, language selector, any button
+      // reached by Tab) — otherwise it swallows that control's own Enter/Space/Arrow keys, which is
+      // exactly what made the style selector's trigger un-openable by keyboard (measured).
+      const active = document.activeElement
+      if (active && active !== document.body && !navRef.current?.contains(active)) return
       if (e.key === 'ArrowDown') {
         e.preventDefault()
         move((index + 1) % items.length)
@@ -743,13 +751,46 @@ function PersonaFooter({ chrome, self, t }: { chrome: SkinLike; self: ReturnType
 // but never pinned mid-content: it never intercepts or transforms the scrolling column beneath it.
 // ---------------------------------------------------------------------------
 /** Reach every other experience from the Arcade chrome (the owner could not leave the theme before). */
+// Persona's design selector — already existed as a chip that listed the other experiences, but
+// without DesignMark icons and without Escape/outside-click handling. Both are added here to match
+// the contract every other theme's selector already has (LogoSelectorApple et al.); the list now
+// also includes the current design (marked, matching the other selectors) instead of only the others.
 function ThemeSwitch({ chrome, t }: { chrome: SkinLike; t: ReturnType<typeof useI18n>['t'] }) {
   const [open, setOpen] = useState(false)
   const { line, muted, isDark, accentBg, accentCls } = chrome
-  const item = `persona-hover-flash block px-3 py-2 font-persona-label text-xs font-semibold uppercase tracking-[0.12em] overflow-hidden ${isDark ? 'hover:bg-[#f5f2ee]/10' : 'hover:bg-[#0a0f1a]/5'}`
+  const ref = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const item = `persona-hover-flash flex items-center gap-3 px-3 py-2 font-persona-label text-xs font-semibold uppercase tracking-[0.12em] overflow-hidden ${isDark ? 'hover:bg-[#f5f2ee]/10' : 'hover:bg-[#0a0f1a]/5'}`
+
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        // Stop this Escape from also reaching the page-level "Escape returns to the arcade menu"
+        // listener (a separate `window` keydown handler) — otherwise closing the popover on a
+        // sub-screen would also navigate away in the same keypress. The innermost layer closes first.
+        e.stopPropagation()
+        setOpen(false)
+        triggerRef.current?.focus()
+      }
+    }
+    const onDown = (e: MouseEvent | TouchEvent) => {
+      if (ref.current && e.target instanceof Node && !ref.current.contains(e.target)) setOpen(false)
+    }
+    document.addEventListener('keydown', onKey)
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('touchstart', onDown)
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('touchstart', onDown)
+    }
+  }, [open])
+
   return (
-    <div className="relative">
+    <div ref={ref} className="relative">
       <button
+        ref={triggerRef}
         type="button"
         data-theme-switcher
         onClick={() => setOpen((o) => !o)}
@@ -760,13 +801,28 @@ function ThemeSwitch({ chrome, t }: { chrome: SkinLike; t: ReturnType<typeof use
         {t(MENU.labelKey)}
       </button>
       {open && (
-        <div role="menu" className={`absolute right-0 top-full mt-2 w-60 border ${line} ${isDark ? 'bg-[#111013]' : 'bg-[#eef3f7]'} p-1.5 shadow-2xl`}>
-          {otherDesigns('persona').map((d) => (
-            <TransitionLink key={d.id} to={d.href} transitionColor={d.transitionColor} transitionAccent={d.transitionAccent} transitionLabel={t(d.nameKey)} className={item}>
-              {t(d.nameKey)}
-              <span className={`block text-[10px] normal-case tracking-normal ${muted}`}>{t(d.subtitleKey)}</span>
-            </TransitionLink>
-          ))}
+        <div role="menu" className={`absolute right-0 top-full mt-2 w-64 border ${line} ${isDark ? 'bg-[#111013]' : 'bg-[#eef3f7]'} p-1.5 shadow-2xl`}>
+          {designs.map((d) => {
+            const current = d.id === 'persona'
+            const inner = (
+              <>
+                <DesignMark id={d.id} size="sm" isDark={isDark} />
+                <span className="min-w-0 flex-1 text-left">
+                  {t(d.nameKey)}
+                  <span className={`block text-[10px] normal-case tracking-normal ${muted}`}>{t(d.subtitleKey)}</span>
+                </span>
+              </>
+            )
+            return current ? (
+              <div key={d.id} role="menuitem" aria-current="page" className={`${item} ${accentCls}`}>
+                {inner}
+              </div>
+            ) : (
+              <TransitionLink key={d.id} to={d.href} transitionColor={d.transitionColor} transitionAccent={d.transitionAccent} transitionLabel={t(d.nameKey)} className={item}>
+                {inner}
+              </TransitionLink>
+            )
+          })}
           <TransitionLink to={MENU.route} transitionColor={isDark ? '#171717' : '#fafafa'} transitionAccent={isDark ? '#ffffff' : '#171717'} transitionLabel={t(MENU.labelKey)} className={`${item} ${accentCls}`}>
             {t(MENU.subtitleKey)}
           </TransitionLink>

@@ -4,7 +4,7 @@ import { ThemeProvider, useTheme } from '../context/ThemeContext'
 import { useLanguage, supportedLocales } from '../context/LanguageContext'
 import '../styles/neo.css'
 // Direct imports (not the component barrels) so the main chunk carries only what this route needs.
-import { SEOHead, TransitionLink, ThemeToggle, Magnetic, RevealText, Ticker, ScrollObject } from '../components/common'
+import { SEOHead, TransitionLink, ThemeToggle, Magnetic, RevealText, Ticker, ScrollObject, LogoSelectorNeo } from '../components/common'
 import { ContactFormModal } from '../components/modals'
 import { StatBand } from '../components/sections/StatBand'
 import { Experience } from '../components/sections/Experience'
@@ -212,13 +212,12 @@ function NeoContent() {
         {/* Nav — restraint pass: a flat hairline bar (the extrusion stays reserved for controls) */}
         <nav className="fixed top-0 inset-x-0 z-40 px-3 pt-3" aria-label="Main navigation">
           <div
-            className={`border backdrop-blur-md !rounded-[20px] max-w-5xl mx-auto h-14 px-4 flex items-center justify-between gap-3 ${isDark ? 'bg-neo-dark/85 border-white/10' : 'bg-neo-surfaceRaised/85 border-black/[0.08]'}`}
+            className={`relative border backdrop-blur-md !rounded-[20px] max-w-5xl mx-auto h-14 px-4 flex items-center justify-between gap-3 ${isDark ? 'bg-neo-dark/85 border-white/10' : 'bg-neo-surfaceRaised/85 border-black/[0.08]'}`}
           >
-            <TransitionLink to="/neo" transitionColor="#e6e9ef" transitionAccent="#4453d9" transitionLabel="Neo" className="flex items-center gap-2.5 shrink-0">
-              <span className={`h-2.5 w-2.5 rounded-full ${skin.accentBg}`} aria-hidden="true" />
-              <span className="text-sm font-extrabold tracking-tight hidden sm:inline">Maxfolio</span>
-            </TransitionLink>
-            <div className="hidden md:flex items-center gap-1 text-xs font-semibold">
+            <LogoSelectorNeo isDark={isDark} />
+            {/* Absolutely centered on the container — see Apple/Terminal's nav for why a grid
+                `1fr auto 1fr` track layout doesn't do this when the two side clusters differ in width. */}
+            <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 md:flex items-center gap-1 text-xs font-semibold">
               {nav.map(([href, label]) => (
                 <a key={href} href={href} className={`inline-flex items-center h-8 px-3 rounded-full ${muted} hover:${accent} transition-colors duration-150`}>
                   {label}

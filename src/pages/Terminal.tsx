@@ -1,14 +1,14 @@
-import { lazy, Suspense, useEffect, useState, type CSSProperties, type ReactNode } from 'react'
-import { m, useReducedMotion } from 'framer-motion'
+import { lazy, Suspense, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { useLanguage, supportedLocales, type Locale } from '../context/LanguageContext'
 import '../styles/terminal.css'
-import { SEOHead, TransitionLink, RevealText, Ticker } from '../components/common'
+import { SEOHead, TransitionLink, RevealText, Ticker, DesignMark } from '../components/common'
 import { ContactFormModal } from '../components/modals'
 import { StatBand } from '../components/sections/StatBand'
 import { Experience } from '../components/sections/Experience'
 import { skins } from '../components/gallery/skins'
 import { useDynamicFavicon, useI18n, useContent } from '../hooks'
-import { otherDesigns, MENU } from '../data/designs'
+import { designs, otherDesigns, MENU } from '../data/designs'
 import { fleetLiquidLines, fleetIslandLines, fleetStoreCount } from '../data/skillUsage'
 import changelogData from '../data/changelog.json'
 
@@ -147,6 +147,118 @@ const Icon = {
       <path strokeLinecap="round" strokeLinejoin="round" d="M12 5v14m0 0-6-6m6 6 6-6" />
     </svg>
   ),
+}
+
+/**
+ * `[ theme ]` — a monospace popover listing every experience, terminal's answer to the other
+ * themes' logo-triggered design selector (none existed here before). Keyboard-operable (Escape
+ * closes and returns focus to the trigger, outside click/tap closes), aria-expanded on the
+ * trigger, role="menu"/"menuitem" on the list — same contract as LogoSelectorApple.
+ *
+ * A module-scope component, not a function nested inside `TerminalContent`: this page re-renders
+ * on its own 1s clock tick (`useBogotaClock`) and other timers, and a component *defined inside*
+ * a re-rendering parent gets a fresh function identity every render — React then treats it as a
+ * different component type on each parent re-render and remounts it, silently resetting `open`
+ * back to `false` within about a second of it being opened. Living at module scope keeps its
+ * identity — and its state — stable across every parent re-render.
+ */
+function StyleSelectorTerminal() {
+  const { t } = useI18n()
+  const skin = skins.terminal(true)
+  const muted = skin.muted
+  const accentCls = skin.accent
+  const [open, setOpen] = useState(false)
+  const wrapRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false)
+        triggerRef.current?.focus()
+      }
+    }
+    const onDown = (e: MouseEvent | TouchEvent) => {
+      if (wrapRef.current && e.target instanceof Node && !wrapRef.current.contains(e.target)) setOpen(false)
+    }
+    document.addEventListener('keydown', onKey)
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('touchstart', onDown)
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('touchstart', onDown)
+    }
+  }, [open])
+
+  return (
+    <div ref={wrapRef} className="relative">
+      <button
+        ref={triggerRef}
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        aria-haspopup="menu"
+        aria-label={t('logoSelector.selectYourStyle')}
+        className={`inline-flex items-center gap-1 border border-[var(--term-line)] px-2 py-1 text-[10px] font-mono uppercase ${muted}`}
+      >
+        <span aria-hidden="true">[</span>
+        <span className="hidden sm:inline">theme</span>
+        <span aria-hidden="true" className={`transition-transform duration-150 ${open ? '-rotate-180' : ''}`}>▾</span>
+        <span aria-hidden="true">]</span>
+      </button>
+      <AnimatePresence>
+        {open && (
+          <m.div
+            role="menu"
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4, transition: { duration: 0.1 } }}
+            transition={{ duration: 0.15 }}
+            className="absolute right-0 top-full z-50 mt-2 w-64 border border-[var(--term-line)] bg-[var(--term-panel)] p-1 font-mono"
+          >
+            {designs.map((d) => {
+              const current = d.id === 'terminal'
+              const row = (
+                <div className="flex items-center gap-2 px-2 py-1.5">
+                  <DesignMark id={d.id} size="sm" isDark />
+                  <span className="min-w-0 flex-1 truncate text-xs">{t(d.nameKey)}</span>
+                  {current && <span className={`text-xs ${accentCls}`} aria-hidden="true">*</span>}
+                </div>
+              )
+              return current ? (
+                <div key={d.id} role="menuitem" aria-current="page" className="opacity-70">
+                  {row}
+                </div>
+              ) : (
+                <TransitionLink
+                  key={d.id}
+                  to={d.href}
+                  transitionColor={d.transitionColor}
+                  transitionAccent={d.transitionAccent}
+                  transitionLabel={t(d.nameKey)}
+                  className="block hover:bg-white/5"
+                >
+                  {row}
+                </TransitionLink>
+              )
+            })}
+            <div className="my-1 h-px bg-[var(--term-line)]" />
+            <TransitionLink
+              to={MENU.route}
+              transitionColor="#171717"
+              transitionAccent="#ffffff"
+              transitionLabel={t(MENU.labelKey)}
+              className={`block px-2 py-1.5 text-xs hover:bg-white/5 ${accentCls}`}
+            >
+              {t(MENU.subtitleKey)} ›
+            </TransitionLink>
+          </m.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
 }
 
 /**
@@ -329,6 +441,7 @@ function TerminalContent() {
                   </button>
                 ))}
               </div>
+              <StyleSelectorTerminal />
               <button
                 type="button"
                 onClick={() => setAccent(accent === 'green' ? 'amber' : 'green')}
