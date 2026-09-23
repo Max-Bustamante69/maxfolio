@@ -1,48 +1,12 @@
 import { m, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from "react";
 import { TransitionLink } from "./TransitionLink";
+import { DesignMark } from "./DesignMark";
 import { useI18n } from "../../hooks/useI18n";
-import { designs, MENU, type DesignId } from "../../data/designs";
+import { designs, MENU } from "../../data/designs";
 
 interface LogoSelectorBrutalistProps {
   isDark: boolean;
-}
-
-/** Small mark for each design, in the Brutalist menu's language. */
-function DesignMark({ id }: { id: DesignId }) {
-  if (id === "brutalist") {
-    return (
-      <m.div
-        className="w-14 h-14 relative flex-shrink-0 flex items-center justify-center bg-red-600"
-        animate={{ boxShadow: ["4px 4px 0 0 rgba(220, 38, 38, 0.3)", "6px 6px 0 0 rgba(220, 38, 38, 0.4)", "4px 4px 0 0 rgba(220, 38, 38, 0.3)"] }}
-        transition={{ repeat: Infinity, duration: 1.5 }}
-      >
-        <div className="absolute -bottom-1 -right-1 w-full h-full border-2 border-red-600/40" />
-        <div className="flex flex-col items-center leading-none">
-          <span className="font-mono text-base font-bold text-white">M</span>
-          <span className="font-mono text-base font-bold text-white -mt-1">B</span>
-        </div>
-      </m.div>
-    );
-  }
-  if (id === "apple") {
-    return (
-      <div className="w-14 h-14 relative flex-shrink-0 flex items-center justify-center bg-[#fbfbfd] border-2 border-black/10 group-hover:border-[#0071e3] transition-colors">
-        <span className="text-sm font-semibold text-[#1d1d1f]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, sans-serif' }}>MB</span>
-      </div>
-    );
-  }
-  return (
-    <div className="w-14 h-14 relative flex-shrink-0 flex items-center justify-center bg-luxury-cream group-hover:bg-luxury-cream/90 transition-colors">
-      <svg viewBox="0 0 56 56" className="absolute inset-0 w-full h-full" fill="none">
-        <path d="M0 10 L0 0 L10 0" stroke="#C9A962" strokeWidth="2" />
-        <path d="M46 0 L56 0 L56 10" stroke="#C9A962" strokeWidth="2" />
-        <path d="M56 46 L56 56 L46 56" stroke="#C9A962" strokeWidth="2" />
-        <path d="M10 56 L0 56 L0 46" stroke="#C9A962" strokeWidth="2" />
-      </svg>
-      <span className="font-display text-sm tracking-wider text-luxury-black">MB</span>
-    </div>
-  );
 }
 
 export function LogoSelectorBrutalist({ isDark }: LogoSelectorBrutalistProps) {
@@ -215,7 +179,7 @@ export function LogoSelectorBrutalist({ isDark }: LogoSelectorBrutalistProps) {
                       transition={{ delay: 0.1 + index * 0.05 }}
                       whileHover={isCurrent ? undefined : { x: 8 }}
                     >
-                      <DesignMark id={d.id} />
+                      <DesignMark id={d.id} size="lg" isDark={isDark} />
                       <div className="flex-1">
                         <p
                           className={`font-editorial text-xl italic ${isCurrent ? "text-red-600" : textPrimary} transition-colors`}

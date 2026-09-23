@@ -1,45 +1,12 @@
 import { m, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from "react";
 import { TransitionLink } from "./TransitionLink";
+import { DesignMark } from "./DesignMark";
 import { useI18n } from "../../hooks/useI18n";
-import { designs, MENU, type DesignId } from "../../data/designs";
+import { designs, MENU } from "../../data/designs";
 
 interface LogoSelectorLuxuryProps {
   isDark: boolean;
-}
-
-/** Small mark for each design, in the Luxury menu's language. */
-function DesignMark({ id, isDark, accentHex, textPrimary }: { id: DesignId; isDark: boolean; accentHex: string; textPrimary: string }) {
-  if (id === "brutalist") {
-    return (
-      <div className="w-12 h-12 relative flex-shrink-0 flex items-center justify-center bg-red-600 group-hover:bg-red-500 transition-colors">
-        <div className="absolute -bottom-1 -right-1 w-full h-full border-2 border-red-600/30" />
-        <div className="flex flex-col items-center leading-none">
-          <span className="font-mono text-sm font-bold text-white">M</span>
-          <span className="font-mono text-sm font-bold text-white -mt-1">B</span>
-        </div>
-      </div>
-    );
-  }
-  if (id === "apple") {
-    return (
-      <div className="w-12 h-12 relative flex-shrink-0 flex items-center justify-center rounded-[12px] bg-white shadow-[0_2px_10px_rgba(0,0,0,0.12)]">
-        <span className="text-[13px] font-semibold text-[#1d1d1f]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, sans-serif' }}>MB</span>
-      </div>
-    );
-  }
-  return (
-    <div className="w-12 h-12 relative flex-shrink-0 flex items-center justify-center">
-      <svg viewBox="0 0 48 48" className="absolute inset-0 w-full h-full" fill="none">
-        <path d="M0 8 L0 0 L8 0" stroke={accentHex} strokeWidth="2" />
-        <path d="M40 0 L48 0 L48 8" stroke={accentHex} strokeWidth="2" />
-        <path d="M48 40 L48 48 L40 48" stroke={accentHex} strokeWidth="2" />
-        <path d="M8 48 L0 48 L0 40" stroke={accentHex} strokeWidth="2" />
-        <path d="M24 10 L38 24 L24 38 L10 24 Z" stroke={accentHex} strokeWidth="0.5" opacity="0.5" />
-      </svg>
-      <span className={`font-display text-sm tracking-wider ${isDark ? "text-deco-cream" : textPrimary}`}>MB</span>
-    </div>
-  );
 }
 
 export function LogoSelectorLuxury({ isDark }: LogoSelectorLuxuryProps) {
@@ -241,7 +208,7 @@ export function LogoSelectorLuxury({ isDark }: LogoSelectorLuxuryProps) {
                       transition={{ delay: 0.1 + index * 0.05 }}
                       whileHover={isCurrent ? undefined : { x: 5 }}
                     >
-                      <DesignMark id={d.id} isDark={isDark} accentHex={accentHex} textPrimary={textPrimary} />
+                      <DesignMark id={d.id} size="md" isDark={isDark} />
                       <div className="flex-1">
                         <p className={`font-display text-base ${isCurrent ? accent : textPrimary} transition-colors`}>
                           {t(d.nameKey)}

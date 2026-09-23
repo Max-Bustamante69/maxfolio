@@ -1,5 +1,5 @@
 // Common components
-export { ThemeToggle, FadeInUp, CompanyLogo, TransitionLink, MobileMenuLuxury, MobileMenuBrutalist, LogoSelectorLuxury, LogoSelectorBrutalist, SkipLink, SEOHead, LanguageSelectorLuxury, LanguageSelectorBrutalist, LanguageSelectorMenu, LanguageSelectorApple, MobileMenuApple, LogoSelectorApple, SmoothScroll, useLenis, ScrollRail, RevealText, Magnetic, Ticker, ScrollObject } from './common'
+export { ThemeToggle, FadeInUp, CompanyLogo, TransitionLink, MobileMenuLuxury, MobileMenuBrutalist, LogoSelectorLuxury, LogoSelectorBrutalist, SkipLink, SEOHead, LanguageSelectorLuxury, LanguageSelectorBrutalist, LanguageSelectorMenu, LanguageSelectorApple, MobileMenuApple, LogoSelectorApple, LogoSelectorNeo, SmoothScroll, useLenis, ScrollRail, RevealText, Magnetic, Ticker, ScrollObject, DesignMark } from './common'
 export type { RailSection, TickerVariant, ScrollObjectVariant } from './common'
 
 // Preview components
