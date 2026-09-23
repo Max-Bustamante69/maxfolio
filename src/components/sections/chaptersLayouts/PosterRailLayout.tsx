@@ -94,6 +94,7 @@ export function PosterRailLayout({ skin }: Props) {
               layout
               onClick={() => setExpanded(entry.year)}
               aria-label={c.expandAria.replace('{year}', String(entry.year))}
+              aria-expanded={isOpen}
               animate={{ opacity: dim ? 0.35 : 1, x: reduced ? 0 : (i - active) * 4 }}
               transition={{ opacity: { duration: 0.25 }, x: { type: 'spring', bounce: 0, duration: 0.5 } }}
               className={`w-[80%] shrink-0 snap-center overflow-hidden rounded-[22px] border p-6 text-left md:w-[46%] md:snap-start md:p-8 lg:w-[calc((100%-2rem)/3.15)] ${skin.line} ${isOpen ? 'invisible' : ''}`}
