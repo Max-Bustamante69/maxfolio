@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { m, useReducedMotion } from 'framer-motion'
 import { useContent, useDragRail } from '../../hooks'
 import { RevealText } from '../common'
@@ -12,6 +12,19 @@ interface ChaptersProps {
 }
 
 const EASE = [0.23, 1, 0.32, 1] as const
+
+function nearestPositionIndex(positions: number[], scrollLeft: number): number {
+  let best = 0
+  let bestDist = Infinity
+  for (let i = 0; i < positions.length; i++) {
+    const d = Math.abs(positions[i] - scrollLeft)
+    if (d < bestDist) {
+      bestDist = d
+      best = i
+    }
+  }
+  return best
+}
 
 /** Up to 3 real, named things that touched a year — stores first (the most concrete build), then roles, then products. */
 function useHighlights() {
@@ -52,8 +65,17 @@ export function Chapters({ skin, heading }: ChaptersProps) {
   const highlights = useHighlights()
   // Newest first: the current year is the most important card, the rail moves back in time.
   const years = [...timeline].reverse()
-  const total = years.length
+  const cardCount = years.length
   const [active, setActive] = useState(0)
+  // Reachable rest positions — NOT one per card. Desktop shows several whole cards at once
+  // (`lg:w-[calc((100%-2rem)/3.15)]`), so once the tail cards' own frame-line targets exceed the
+  // rail's actual max scroll (`scrollWidth - clientWidth`), they all clamp to the SAME position —
+  // the one where the last card's right edge sits flush with the frame's right edge. Counting one
+  // position per card there would claim reachable positions (e.g. "5/5") that don't visually exist;
+  // this list is the deduped, clamped set of positions the rail can really rest at. Mobile normally
+  // keeps one position per card (each centers individually via `snap-center`).
+  const [positions, setPositions] = useState<number[]>(() => years.map((_, i) => i))
+  const total = positions.length || cardCount
   const railRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   const { handlers: dragHandlers, isDragging } = useDragRail(railRef, { centerSnapBelow: 768 })
@@ -61,49 +83,75 @@ export function Chapters({ skin, heading }: ChaptersProps) {
   const kindFill: Record<WorkKind, string> = { stores: skin.accentBg, work: `${skin.accentBg} opacity-70`, products: `${skin.accentBg} opacity-45`, personal: `${skin.accentBg} opacity-25` }
   const kindLabel: Record<WorkKind, string> = { stores: y.shipped, work: y.work, products: y.products, personal: y.side }
 
-  useEffect(() => {
+  // Same viewport-relative measurement useDragRail's own `slideTargets` uses (see its note on why
+  // never offsetLeft/offsetParent), plus the clamp+dedupe that turns raw per-card targets into the
+  // actual reachable position list.
+  const measurePositions = useCallback(() => {
     const rail = railRef.current
     if (!rail) return
-    const ratios = new Map<number, number>()
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const idx = Number((entry.target as HTMLElement).dataset.idx)
-          // Round off sub-pixel layout noise (a fractional card width can leave a fully-visible card
-          // reading e.g. 0.9997 instead of 1) so it doesn't lose a tie it should win.
-          ratios.set(idx, Math.round(entry.intersectionRatio * 100) / 100)
-        }
-        let best = 0
-        let bestRatio = 0
-        // Desktop shows several whole cards at once, so more than one can genuinely tie at ratio 1 —
-        // on a tie the leftmost (lowest index) wins, since that's the card snapped to the frame line.
-        // Ascending iteration + a strict `>` already keeps the first (lowest-index) max; only the
-        // rounding above was letting a near-tie slip through to a higher index.
-        ratios.forEach((ratio, idx) => {
-          if (ratio > bestRatio) {
-            bestRatio = ratio
-            best = idx
-          }
-        })
-        if (bestRatio > 0) setActive(best)
-      },
-      { root: rail, threshold: [0, 0.25, 0.5, 0.75, 1] },
-    )
-    cardRefs.current.forEach((el) => el && observer.observe(el))
-    return () => observer.disconnect()
+    const centered = window.innerWidth < 768
+    const railRect = rail.getBoundingClientRect()
+    const max = Math.max(0, rail.scrollWidth - rail.clientWidth)
+    const raw = cardRefs.current.map((el) => {
+      if (!el) return 0
+      const base = el.getBoundingClientRect().left - railRect.left + rail.scrollLeft
+      const target = centered ? base - (rail.clientWidth - el.offsetWidth) / 2 : base
+      return Math.max(0, Math.min(max, target))
+    })
+    const deduped: number[] = []
+    for (const t of raw) {
+      const rounded = Math.round(t)
+      const lastIdx = deduped.length - 1
+      if (lastIdx < 0 || Math.abs(deduped[lastIdx] - rounded) >= 2) deduped.push(rounded)
+    }
+    setPositions(deduped)
   }, [])
+
+  useLayoutEffect(() => {
+    measurePositions()
+    const rail = railRef.current
+    if (!rail || typeof ResizeObserver === 'undefined') return
+    const ro = new ResizeObserver(() => measurePositions())
+    ro.observe(rail)
+    return () => ro.disconnect()
+  }, [measurePositions])
+
+  // `active` tracks which entry of `positions` the rail currently rests nearest to — driven directly
+  // by `scrollLeft`, not by IntersectionObserver ratios. Ratios were tried first and measured
+  // unreliable here specifically because desktop shows ~3 cards at once: the card common to two
+  // consecutive positions (e.g. card 2 of 5, visible in both "cards 1-3" and "cards 2-4") can sit at
+  // ratio 1 in both, so a real position change sometimes crosses no observed threshold for THAT card
+  // and the observer's last snapshot still picks it as "best" — landing `active` on the wrong
+  // (already-passed) position after a prev/next click. Reading `scrollLeft` against the known
+  // `positions` list has no such ambiguity: whatever the rail is doing (drag, flick, native touch
+  // scroll, or a `goTo` smooth-scroll), the nearest position to the CURRENT scroll offset is always
+  // the unambiguous right answer, including mid-gesture.
+  useEffect(() => {
+    const rail = railRef.current
+    if (!rail || positions.length === 0) return
+    let raf = 0
+    const sync = () => {
+      raf = 0
+      setActive(nearestPositionIndex(positions, rail.scrollLeft))
+    }
+    const onScroll = () => {
+      if (raf) return
+      raf = requestAnimationFrame(sync)
+    }
+    rail.addEventListener('scroll', onScroll, { passive: true })
+    sync()
+    return () => {
+      rail.removeEventListener('scroll', onScroll)
+      if (raf) cancelAnimationFrame(raf)
+    }
+  }, [positions])
 
   const goTo = (i: number) => {
     const clamped = Math.max(0, Math.min(total - 1, i))
-    const el = cardRefs.current[clamped]
+    const target = positions[clamped]
     const rail = railRef.current
-    if (!el || !rail) return
-    // getBoundingClientRect, not offsetLeft/offsetParent — see the matching note in useDragRail.ts's
-    // slideTargets: offsetLeft is only safe when the caller can guarantee nothing in the chain ever
-    // gains a transform. This rail doesn't, but the sibling storyboard rail does, and the two share the
-    // same landing-math contract, so both goTo()s use the same viewport-relative measurement.
-    const left = el.getBoundingClientRect().left - rail.getBoundingClientRect().left + rail.scrollLeft
-    rail.scrollTo({ left, behavior: reduced ? 'auto' : 'smooth' })
+    if (target === undefined || !rail) return
+    rail.scrollTo({ left: target, behavior: reduced ? 'auto' : 'smooth' })
   }
 
   return (
@@ -207,10 +255,6 @@ export function Chapters({ skin, heading }: ChaptersProps) {
             </div>
           )
         })}
-        {/* Trailing spacer, not a slide (no data-idx, never a snap/landing target): without it the last
-            card can't reach the desktop frame line — there isn't enough real content after it to give
-            the rail room to scroll that far. */}
-        <div aria-hidden="true" className="w-[75%] shrink-0" />
       </div>
     </section>
   )
