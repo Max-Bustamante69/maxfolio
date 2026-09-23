@@ -90,6 +90,17 @@ export const es: PortfolioContent = {
         { title: 'Entrega', body: 'La tienda queda en tus manos: cada ajuste vive en el editor y cada decisión en la documentación.', deliverable: 'El editor, la documentación y los números. Nada depende de mí.' },
       ],
     },
+    engagement: {
+      eyebrow: 'Cómo podríamos trabajar juntos',
+      title: 'Cómo',
+      titleAccent: 'trabajamos juntos',
+      lead: 'Tres formas de empezar, ya implícitas en esta página. Elige la que calce con el punto en el que está tu tienda hoy.',
+      models: [
+        { title: 'Revisión gratis', body: 'Veinte minutos mirando tu tienda con números reales: sin discurso de venta ni contrato.' },
+        { title: 'Construcción de proyecto', body: 'El diagnóstico termina con una ventana por escrito, y luego una corrida de QA en Playwright antes de publicar.' },
+        { title: 'Colaboración continua', body: 'Te quedas con el editor y el contenido; yo mantengo la ingeniería medida.' },
+      ],
+    },
     faq: {
       eyebrow: 'Antes de escribir',
       title: 'Preguntas que recibo',

@@ -90,6 +90,17 @@ export const en: PortfolioContent = {
         { title: 'Handoff', body: 'The store is yours to run: every setting lives in the editor, every decision in the docs.', deliverable: 'The editor, the docs and the numbers. Nothing depends on me.' },
       ],
     },
+    engagement: {
+      eyebrow: 'How we could work together',
+      title: 'How we',
+      titleAccent: 'work together',
+      lead: 'Three ways in, all already on this page. Pick the one that matches where your store is today.',
+      models: [
+        { title: 'Free review', body: 'A 20-minute look at your store with real numbers — no pitch, no contract.' },
+        { title: 'Project build', body: 'Discovery ends with a written window, then a Playwright QA run before anything ships.' },
+        { title: 'Ongoing collaboration', body: 'You keep the editor and the content; I keep the engineering measured.' },
+      ],
+    },
     faq: {
       eyebrow: 'Before you write',
       title: 'Questions I get',
