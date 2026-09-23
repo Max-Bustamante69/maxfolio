@@ -385,11 +385,11 @@ function TerminalContent() {
   ]
 
   const BracketNav = ({ size = 'md' }: { size?: 'sm' | 'md' }) => (
-    <nav aria-label="Section navigation" className={`flex flex-wrap items-center ${size === 'sm' ? 'gap-x-4 gap-y-1 text-xs' : 'gap-x-3 gap-y-2 text-sm sm:gap-x-6 md:text-base'}`}>
+    <nav aria-label="Section navigation" className={`flex flex-wrap items-center ${size === 'sm' ? 'gap-x-3 gap-y-1 text-xs' : 'gap-x-3 gap-y-2 text-sm sm:gap-x-6 md:text-base'}`}>
       {navItems.map((item) => {
         const active = activeNav === item.id
         return (
-          <a key={item.id} href={`#${item.id}`} className="term-bracket font-mono whitespace-nowrap transition-colors" data-active={active}>
+          <a key={item.id} href={`#${item.id}`} className="term-bracket inline-flex items-center font-mono whitespace-nowrap transition-colors" data-active={active}>
             [{active ? '·' : ' '}] {item.label.toUpperCase()}
           </a>
         )
@@ -434,7 +434,7 @@ function TerminalContent() {
               toggle + CTA) too wide to ever balance inside `max-w-5xl`; the accent toggle now lives in
               the style popover instead (see `StyleSelectorTerminal`), narrowing this cluster enough
               that the grid centers correctly at 1440/1920. */}
-          <div className="max-w-5xl mx-auto grid h-14 grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)] items-center px-4 gap-2">
+          <div className="max-w-5xl mx-auto grid h-14 grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)] items-center px-4 gap-4">
             <div className="justify-self-start min-w-0">
               <TransitionLink to="/terminal" transitionColor="#0a0d0a" transitionAccent="#39ff88" transitionLabel="Terminal" className={`text-sm font-bold ${accentCls}`}>
                 MB<span className={muted}>$</span>
@@ -463,7 +463,7 @@ function TerminalContent() {
                 ))}
               </div>
               <StyleSelectorTerminal accent={accent} onToggleAccent={() => setAccent(accent === 'green' ? 'amber' : 'green')} />
-              <button type="button" onClick={() => openContact()} aria-label={c.hero.ctaContact} className={`inline-flex items-center gap-1.5 border border-[var(--term-accent)] px-2 sm:px-3 py-1.5 text-xs font-semibold ${accentCls}`}>
+              <button type="button" onClick={() => openContact()} aria-label={c.hero.ctaContact} className={`inline-flex items-center gap-1.5 border border-[var(--term-accent)] px-2 sm:px-2.5 py-1.5 text-xs font-semibold ${accentCls}`}>
                 {Icon.mail} <span className="hidden sm:inline">{c.hero.ctaContact}</span>
               </button>
             </div>
