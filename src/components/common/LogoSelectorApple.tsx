@@ -4,6 +4,7 @@ import { TransitionLink } from './TransitionLink'
 import { DesignMark } from './DesignMark'
 import { useI18n } from '../../hooks/useI18n'
 import { designs, MENU } from '../../data/designs'
+import { track } from '../../lib/track'
 
 const EASE = [0.23, 1, 0.32, 1] as const
 
@@ -93,6 +94,7 @@ export function LogoSelectorApple({ isDark }: { isDark: boolean }) {
                   transitionColor={d.transitionColor}
                   transitionAccent={d.transitionAccent}
                   transitionLabel={t(d.nameKey)}
+                  onClick={() => track('theme_switch', { to: d.id })}
                   className={`block rounded-[12px] px-3 py-2 ${rowHover} transition-colors`}
                 >
                   {row}

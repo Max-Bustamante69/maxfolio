@@ -68,6 +68,21 @@
   }
 }
 
+/* Gallery's carousel view rests flush left on desktop (Carousel's `desktopSnap="start"` in
+   Gallery.tsx), so the first slide always starts with a hard edge and only the RIGHT edge ever
+   shows a partial next slide cut off by the track's own overflow — a plain hard clip there read as
+   an accidental cut, not a deliberate "there's more" affordance (themes audit, 2026-09-23). Applied
+   to the scrollable track only (`trackClassName`), never the outer rail that also carries the
+   prev/next arrow controls, so the fade never dims a control. One-sided and gated to the same
+   >=1024px breakpoint as the "rests left" desktop behavior itself — mobile's centered snap peeks on
+   both sides symmetrically and needs no correction. */
+@media (min-width: 1024px) {
+  .rail-fade-end {
+    -webkit-mask-image: linear-gradient(to right, #000 0%, #000 94%, transparent 100%);
+    mask-image: linear-gradient(to right, #000 0%, #000 94%, transparent 100%);
+  }
+}
+
 /* The page draws its own scrollbar (ScrollRail) on pointer devices ≥ lg; the native one hides there
    and only there, so keyboard, wheel and drag-to-scroll behave exactly as before. */
 @media (hover: hover) and (min-width: 1024px) {

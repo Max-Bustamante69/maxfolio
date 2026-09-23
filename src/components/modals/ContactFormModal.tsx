@@ -4,6 +4,7 @@ import { config } from '../../config'
 import { currentVariant, recordAb } from '../../ab'
 import { personal as personalInfo } from '../../data/registry'
 import { useI18n } from '../../hooks'
+import { track } from '../../lib/track'
 
 interface ContactFormModalProps {
   isOpen: boolean
@@ -32,6 +33,12 @@ export function ContactFormModal({
   useEffect(() => {
     if (isOpen && initialMessage) setFormData((prev) => (prev.message ? prev : { ...prev, message: initialMessage }))
   }, [isOpen, initialMessage])
+  // One shared modal instance per page, so `isOpen` going true is always a genuine open, never a
+  // re-render — every theme's "Get in touch" trigger routes through this same component.
+  useEffect(() => {
+    if (isOpen) track('contact_open', { theme: variant })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen])
   useEffect(() => {
     if (!isOpen) return
     const onKey = (e: KeyboardEvent) => {
@@ -68,6 +75,7 @@ export function ContactFormModal({
       if (result.success) {
         setStatus('success')
         recordAb('contact', { theme: variant })
+        track('contact_submit', { theme: variant })
         setFormData({ name: '', email: '', subject: '', message: '' })
         setTimeout(() => {
           onClose()

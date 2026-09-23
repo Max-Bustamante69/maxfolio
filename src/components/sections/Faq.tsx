@@ -7,8 +7,10 @@ import type { SectionHeading } from './Gallery'
 interface FaqProps {
   skin: Skin
   heading: SectionHeading
-  /** false when the page's own wrapper section already owns `id="faq"` (see Apple's Experience/Skills
-   *  for the same contract) — avoids a duplicate DOM id when this section is nested inside one. */
+  /** False when the page's own non-lazy wrapper already owns `id="faq"` (Apple.tsx, so a hash link
+   *  lands before this chunk mounts) — avoids a duplicate id in the DOM. Defaults true so every other
+   *  caller (Design4/Design1/Neo/Persona/Terminal, none of which wrap this in their own `#faq`) keeps
+   *  working exactly as before. */
   ownId?: boolean
 }
 

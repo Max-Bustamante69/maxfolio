@@ -1,6 +1,7 @@
 import { lazy, Suspense, useMemo, useState, type ReactNode } from 'react'
 import { m } from 'framer-motion'
 import { useContent, useSheetHistory } from '../../hooks'
+import { track } from '../../lib/track'
 import { ProjectFrame, GlassControls, carouselTokens, type Skin, type FrameShots, type LightboxItem, type CaseStudyData } from '../gallery'
 import type { CaseStudyLabels } from '../gallery/ProjectModal'
 import { Carousel } from '../../vendor/carousel'
@@ -146,6 +147,7 @@ export function caseStudyFor(
   const cs = strings.sections.caseStudy
   return {
     name: st.name,
+    slug: st.slug,
     url: st.url || undefined,
     meta: `${c?.industry ?? ''} · ${st.year} · ${strings.badges.roles[st.role]}`,
     badge: { text: st.status === 'live' ? strings.badges.live : strings.badges.dev, className: st.status === 'live' ? skin.badgeLive : skin.badgeDev },
@@ -179,6 +181,7 @@ export function Gallery({ skin, heading, ownId = true }: GalleryProps) {
   const openSheet = (slug: string) => {
     setSheetLoaded(true)
     setOpenSlug(slug)
+    track('store_sheet_open', { store: slug })
   }
 
   useSheetHistory(openSlug, () => setOpenSlug(null), { param: 'store' })
@@ -233,7 +236,17 @@ export function Gallery({ skin, heading, ownId = true }: GalleryProps) {
       <div className="mb-8 flex flex-wrap items-center gap-x-5 gap-y-3">
         <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label={g.eyebrow}>
           {(['all', 'live', 'dev'] as Filter[]).map((f) => (
-            <button key={f} type="button" role="tab" aria-selected={filter === f} onClick={() => setFilter(f)} className={chip(filter === f)}>
+            <button
+              key={f}
+              type="button"
+              role="tab"
+              aria-selected={filter === f}
+              onClick={() => {
+                setFilter(f)
+                track('filter_change', { kind: 'gallery', value: f })
+              }}
+              className={chip(filter === f)}
+            >
               {f === 'all' ? g.filterAll : f === 'live' ? g.filterLive : g.filterDev}
             </button>
           ))}
@@ -259,7 +272,7 @@ export function Gallery({ skin, heading, ownId = true }: GalleryProps) {
             slidesPerView={{ base: 1, md: 2, lg: 2, xl: 3 }}
             gap={24}
             desktopSnap="start"
-            trackClassName="py-10 -my-10"
+            trackClassName="py-10 -my-10 rail-fade-end"
             ariaLabel={g.eyebrow}
             renderControls={(state) => <GlassControls state={state} skin={skin} labels={{ prev: cs.prev, next: cs.next }} />}
           >

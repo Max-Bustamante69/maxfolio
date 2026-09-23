@@ -8,6 +8,7 @@ import { lightboxItems, caseStudyFor, caseStudyLabels, ProjectModal, type Sectio
 import type { StoreEntry, ProductEntry } from '../../data/registry'
 import { conversionSeries } from '../../data/illustrative'
 import { onRequestProduct, onRequestStore, scrollToSection, setCaseStudyVisible } from '../../lib/sectionLinks'
+import { track } from '../../lib/track'
 
 /** How long a row's accent flash stays visible after the orbit links here — long enough to read as
  *  "this is the one that just opened", short enough to not linger once the shopper has moved on. */
@@ -51,7 +52,10 @@ export function ShopifyWork({ skin, heading, ownId = true }: ShopifyWorkProps) {
   const [openStore, setOpenStoreState] = useState<StoreEntry | null>(null)
   const [sheetLoaded, setSheetLoaded] = useState(false)
   const setOpenStore = (st: StoreEntry | null) => {
-    if (st) setSheetLoaded(true)
+    if (st) {
+      setSheetLoaded(true)
+      track('store_sheet_open', { store: st.slug })
+    }
     setOpenStoreState(st)
   }
   const [openProduct, setOpenProduct] = useState<ProductEntry | null>(null)
@@ -176,7 +180,13 @@ export function ShopifyWork({ skin, heading, ownId = true }: ShopifyWorkProps) {
               {cs.open} ›
             </button>
             {st.url && (
-              <a href={st.url} target="_blank" rel="noopener noreferrer" className={`${skin.accent} compact-touch inline-flex items-center whitespace-nowrap`}>
+              <a
+                href={st.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => track('outbound_store_click', { store: st.slug })}
+                className={`${skin.accent} compact-touch inline-flex items-center whitespace-nowrap`}
+              >
                 {s.visit} ›
               </a>
             )}
@@ -208,11 +218,31 @@ export function ShopifyWork({ skin, heading, ownId = true }: ShopifyWorkProps) {
 
       {tab === 'stores' && (
         <div className="mb-6 flex flex-wrap items-center gap-2" role="radiogroup" aria-label={s.tabStores}>
-          <button type="button" role="radio" aria-checked={feature === null} onClick={() => setFeature(null)} className={chipFor(feature === null)}>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={feature === null}
+            onClick={() => {
+              setFeature(null)
+              track('filter_change', { kind: 'stores', value: 'all' })
+            }}
+            className={chipFor(feature === null)}
+          >
             {s.filterAll}
           </button>
           {FEATURES.filter((f) => registry.stores.some((st) => st.stack.some((t) => f.test.test(t)))).map((f) => (
-            <button key={f.id} type="button" role="radio" aria-checked={feature === f.id} onClick={() => setFeature(feature === f.id ? null : f.id)} className={chipFor(feature === f.id)}>
+            <button
+              key={f.id}
+              type="button"
+              role="radio"
+              aria-checked={feature === f.id}
+              onClick={() => {
+                const next = feature === f.id ? null : f.id
+                setFeature(next)
+                track('filter_change', { kind: 'stores', value: next ?? 'all' })
+              }}
+              className={chipFor(feature === f.id)}
+            >
               {s.filters[f.id]}
             </button>
           ))}
