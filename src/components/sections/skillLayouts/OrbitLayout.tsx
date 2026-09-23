@@ -70,15 +70,46 @@ const DURATIONS = [90, 102, 114, 126, 138, 150]
 // ring, comfortably short of wrapping.
 const LABEL_HALF_SPAN = (75 * Math.PI) / 180
 
-/** Static, invisible arc a ring's group-name text rides via <textPath>, centered on 12 o'clock. */
-const textArcPath = (r: number) => {
-  const a0 = -Math.PI / 2 - LABEL_HALF_SPAN
-  const a1 = -Math.PI / 2 + LABEL_HALF_SPAN
+/** Static, invisible arc a ring's group-name text rides via <textPath>, centered on `center` (radians,
+ *  0 = 3 o'clock, -PI/2 = 12 o'clock — see `labelCenterAngle` for how each ring picks its own). */
+const textArcPath = (r: number, center: number) => {
+  const a0 = center - LABEL_HALF_SPAN
+  const a1 = center + LABEL_HALF_SPAN
   const x0 = 50 + r * Math.cos(a0)
   const y0 = 50 + r * Math.sin(a0)
   const x1 = 50 + r * Math.cos(a1)
   const y1 = 50 + r * Math.sin(a1)
   return `M ${x0},${y0} A ${r},${r} 0 0,1 ${x1},${y1}`
+}
+
+// A ring's own dots sit at evenly-spaced angles starting at `startAngle + PI/n` (half a slot in); the
+// midpoints BETWEEN dots therefore fall at `startAngle + 2*PI*k/n` for every integer k. A ring whose
+// tool count divides 360 into a slot straddling 12 o'clock (true for several groups at rest, since
+// every ring's `startAngle` only varies by 0.4 rad from the next) puts a dot directly under the label's
+// fixed reading position — confirmed in the 1440 audit screenshot for "AI ENGINEERING". Picking the
+// dot-free midpoint closest to 12 o'clock keeps the label visually "at the top" (never past 3/9
+// o'clock, which would read the arc upside down) while guaranteeing no dot starts underneath it; the
+// ambient rotation still sweeps dots through the label's position over the course of a cycle (the
+// z-order trick above keeps the label legible then), but the at-rest layout every screenshot actually
+// shows is now clean.
+const labelCenterAngle = (startAngle: number, n: number) => {
+  const top = -Math.PI / 2
+  let best = top
+  let bestDist = Infinity
+  for (let k = 0; k < n; k++) {
+    const a = startAngle + (Math.PI * 2 * k) / n
+    // Angular distance from 12 o'clock, normalized to (-PI, PI] before taking the magnitude — JS's
+    // `%` keeps the dividend's sign, so the raw difference needs both wrap-arounds handled by hand.
+    let diff = (a - top) % (Math.PI * 2)
+    if (diff > Math.PI) diff -= Math.PI * 2
+    if (diff < -Math.PI) diff += Math.PI * 2
+    const d = Math.abs(diff)
+    if (d < bestDist) {
+      bestDist = d
+      best = a
+    }
+  }
+  return best
 }
 
 /** Rough centering for the arc label: nudge the text's start so its estimated length centers on the
@@ -133,6 +164,7 @@ interface RingSpec {
   duration: number
   ccw: boolean
   startAngle: number
+  labelCenter: number
 }
 
 export function OrbitLayout({ data }: SkillsLayoutProps) {
@@ -188,14 +220,18 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
     return <LedgerLayout data={data} />
   }
 
-  const ringSpecs: RingSpec[] = ringOrder.map((g, ri) => ({
-    group: g,
-    tools: toolsByGroup[g],
-    radius: RADII[ri],
-    duration: DURATIONS[ri],
-    ccw: ri % 2 === 1,
-    startAngle: ri * 0.4 - Math.PI / 2,
-  }))
+  const ringSpecs: RingSpec[] = ringOrder.map((g, ri) => {
+    const startAngle = ri * 0.4 - Math.PI / 2
+    return {
+      group: g,
+      tools: toolsByGroup[g],
+      radius: RADII[ri],
+      duration: DURATIONS[ri],
+      ccw: ri % 2 === 1,
+      startAngle,
+      labelCenter: labelCenterAngle(startAngle, toolsByGroup[g].length),
+    }
+  })
 
   const onPointerMove = (e: PointerEvent<HTMLDivElement>) => {
     const el = tiltRef.current
@@ -288,7 +324,7 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
               )
             })}
             {ringSpecs.map((ring) => (
-              <path key={`guide-${ring.group}`} id={`mf-orbit-arc-${ring.group}`} d={textArcPath(ring.radius)} fill="none" opacity="0" />
+              <path key={`guide-${ring.group}`} id={`mf-orbit-arc-${ring.group}`} d={textArcPath(ring.radius, ring.labelCenter)} fill="none" opacity="0" />
             ))}
           </svg>
 

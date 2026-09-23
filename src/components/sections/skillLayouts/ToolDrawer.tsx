@@ -31,6 +31,7 @@ import type { RoleWorkId, SkillGroupId } from '../../../data/registry'
 import { fleetIslandLines, fleetLiquidLines, fleetProductCount, fleetStoreCount, type ToolUsage } from '../../../data/skillUsage'
 import { galleryCapture, toolRoleLines, toolThumbs, type ToolThumb } from '../../../lib/toolLinks'
 import { onCaseStudyVisibleChange, requestProduct, requestRole, requestStore, scrollToSection } from '../../../lib/sectionLinks'
+import { track } from '../../../lib/track'
 import { sheetTokens, type Skin } from '../../gallery'
 import { CountUp } from '../../gallery/charts'
 import { monogram, toolIcon, ToolMark } from '../skillIcons'
@@ -305,6 +306,14 @@ export function ToolDrawer({ skin, sk, groupLabel, formatTool, tool, open, onClo
   const drag = useDragControls()
   const closeRef = useRef(onClose)
   closeRef.current = onClose
+
+  // Fires once per real open (including a page loaded straight from a `?tool=` deep link, since that
+  // also flows through this same `open`/`tool` pair) — never on the exit animation's own trailing
+  // render, which keeps `open` false while `tool` still holds the last value for `AnimatePresence`.
+  useEffect(() => {
+    if (open && tool) track('tool_drawer_open', { tool: tool.tool })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, tool?.tool])
 
   // True while the real case-study sheet (`ProjectModal`, opened by a capture tile below) is up. The
   // drawer's own `open`/`tool` state — and the `?tool=` history entry it made — never changes for

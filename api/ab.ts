@@ -2,32 +2,14 @@
 // (totals and per day) in the KV store Vercel exposes as KV_REST_API_URL / KV_REST_API_TOKEN (Upstash
 // Redis from the Marketplace). GET returns the totals and the last 30 days so a private dashboard can read
 // the conversion per variant. Without a store both are harmless no-ops, so the site never depends on it.
+// Its own event, apart from the general taxonomy in `api/event.ts` (see docs/analytics.md) — this
+// ledger predates that one and stays variant-keyed for the landing-page A/B test specifically.
 export const config = { runtime: 'edge' }
+import { kv, pipeline, json } from './_kv'
 
 const VARIANTS = ['apple', 'neo', 'persona']
 const TYPES = ['view', 'contact']
 const THEMES = ['apple', 'luxury', 'brutalist', 'neo', 'persona', 'menu']
-
-const kv = () => {
-  const url = process.env.KV_REST_API_URL
-  const token = process.env.KV_REST_API_TOKEN
-  return url && token ? { url, token } : null
-}
-
-async function pipeline(cmds: (string | number)[][]) {
-  const store = kv()
-  if (!store) return null
-  const res = await fetch(`${store.url}/pipeline`, {
-    method: 'POST',
-    headers: { authorization: `Bearer ${store.token}`, 'content-type': 'application/json' },
-    body: JSON.stringify(cmds),
-  })
-  if (!res.ok) throw new Error(`kv ${res.status}`)
-  return (await res.json()) as { result: unknown }[]
-}
-
-const json = (data: unknown, status = 200) =>
-  new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } })
 
 export default async function handler(req: Request) {
   if (req.method === 'GET') {

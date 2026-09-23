@@ -1,5 +1,6 @@
 import { supportedLocales, useLanguage, type Locale } from '../../context/LanguageContext'
 import { useI18n } from '../../hooks/useI18n'
+import { track } from '../../lib/track'
 
 const LABEL: Record<Locale, string> = { en: 'EN', es: 'ES', ja: 'JA' }
 
@@ -22,7 +23,10 @@ export function LanguageSelectorApple({ isDark }: { isDark: boolean }) {
             type="button"
             role="radio"
             aria-checked={active}
-            onClick={() => setLocale(opt)}
+            onClick={() => {
+              if (opt !== locale) track('locale_switch', { to: opt })
+              setLocale(opt)
+            }}
             className={`press compact-touch h-7 lg:h-8 min-w-[34px] px-2 lg:px-2.5 rounded-full text-[11px] font-semibold tracking-wide ${
               active
                 ? isDark

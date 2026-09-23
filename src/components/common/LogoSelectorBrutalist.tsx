@@ -4,6 +4,7 @@ import { TransitionLink } from "./TransitionLink";
 import { DesignMark } from "./DesignMark";
 import { useI18n } from "../../hooks/useI18n";
 import { designs, MENU } from "../../data/designs";
+import { track } from "../../lib/track";
 
 interface LogoSelectorBrutalistProps {
   isDark: boolean;
@@ -230,6 +231,7 @@ export function LogoSelectorBrutalist({ isDark }: LogoSelectorBrutalistProps) {
                       transitionColor={d.transitionColor}
                       transitionAccent={d.transitionAccent}
                       transitionLabel={t(d.nameKey)}
+                      onClick={() => track('theme_switch', { to: d.id })}
                       className="block mx-3 my-2 px-4 py-5 hover:bg-red-600/5 transition-all cursor-pointer group border-l-4 border-transparent hover:border-stone-400"
                     >
                       {inner}

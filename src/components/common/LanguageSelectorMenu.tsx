@@ -2,6 +2,7 @@ import { AnimatePresence, m } from 'framer-motion'
 import { useMemo, useState } from 'react'
 import { supportedLocales, useLanguage, Locale } from '../../context/LanguageContext'
 import { useI18n } from '../../hooks/useI18n'
+import { track } from '../../lib/track'
 
 function localeLabel(locale: Locale) {
   if (locale === 'en') return 'EN'
@@ -84,6 +85,7 @@ export function LanguageSelectorMenu({ size = 'md' }: { size?: 'sm' | 'md' }) {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: idx * 0.04 }}
                       onClick={() => {
+                        if (opt !== locale) track('locale_switch', { to: opt })
                         setLocale(opt)
                         setOpen(false)
                       }}

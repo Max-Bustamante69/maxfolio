@@ -4,6 +4,7 @@ import { TransitionLink } from "./TransitionLink";
 import { DesignMark } from "./DesignMark";
 import { useI18n } from "../../hooks/useI18n";
 import { designs, MENU } from "../../data/designs";
+import { track } from "../../lib/track";
 
 interface LogoSelectorLuxuryProps {
   isDark: boolean;
@@ -251,6 +252,7 @@ export function LogoSelectorLuxury({ isDark }: LogoSelectorLuxuryProps) {
                       transitionColor={d.transitionColor}
                       transitionAccent={d.transitionAccent}
                       transitionLabel={t(d.nameKey)}
+                      onClick={() => track('theme_switch', { to: d.id })}
                       className={`block mx-3 mt-2 px-4 py-4 rounded-sm hover:${isDark ? "bg-white/5" : "bg-black/5"} transition-all cursor-pointer group`}
                     >
                       {inner}

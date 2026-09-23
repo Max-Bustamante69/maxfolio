@@ -10,6 +10,7 @@ import { Experience } from '../components/sections/Experience'
 import { skins } from '../components/gallery/skins'
 import { useDynamicFavicon, useI18n, useContent } from '../hooks'
 import { defaultDesign, otherDesigns, MENU } from '../data/designs'
+import { track, useSectionViewTracking } from '../lib/track'
 
 // Below the fold, each section arrives as its own chunk so the hero paints off a smaller bundle.
 const Chapters = lazy(() => import('../components/sections/Chapters').then((mod) => ({ default: mod.Chapters })))
@@ -173,6 +174,10 @@ function AppleContent() {
     setContactOpen(true)
   }
   useDynamicFavicon('apple')
+  // `contact_open` itself fires from inside `ContactFormModal` (one shared component, every theme) —
+  // this page only needs `section_view` wired at the page level, and `data-track-section` on each
+  // section id below is what feeds it.
+  useSectionViewTracking()
 
   const skin = skins.apple(isDark)
   const bg = isDark ? 'bg-apple-dark text-apple-darkText' : 'bg-apple-bg text-apple-text'
@@ -201,7 +206,10 @@ function AppleContent() {
   )
 
   const primaryBtn = 'press inline-flex items-center justify-center rounded-full bg-apple-blue px-6 py-3 text-sm font-medium text-white hover:bg-apple-blueHover'
-  const activeSection = useActiveSection(nav.map(([href]) => href.slice(1)))
+  // Tracks more bands than the nav shows links for (skills, review, faq) so "Projects" doesn't stay
+  // lit through them (the nav's `on` check only matches the 6 href ids below, so an id outside that
+  // list simply shows nothing active — which is the fix: no longer the *wrong* thing staying active).
+  const activeSection = useActiveSection([...nav.map(([href]) => href.slice(1)), 'skills', 'review', 'faq'])
   const liveCount = registry.stores.filter((s) => s.status === 'live').length
   const devCount = registry.stores.filter((s) => s.status === 'dev').length
 
@@ -268,14 +276,20 @@ function AppleContent() {
               </button>
               <button
                 type="button"
-                onClick={() => setContactOpen(true)}
+                onClick={() => {
+                  track('cta_click', { cta: 'contact', position: 'nav' })
+                  setContactOpen(true)
+                }}
                 className="press compact-touch hidden sm:inline-flex h-8 lg:h-9 items-center rounded-full bg-apple-blue px-3.5 lg:px-4 text-xs font-medium text-white hover:bg-apple-blueHover"
               >
                 {c.hero.ctaContact}
               </button>
               <MobileMenuApple
                 isDark={isDark}
-                onContactClick={() => setContactOpen(true)}
+                onContactClick={() => {
+                  track('cta_click', { cta: 'contact', position: 'mobile' })
+                  setContactOpen(true)
+                }}
                 contactLabel={c.hero.ctaContact}
                 navItems={nav.map(([href, label]) => ({ href, label }))}
               />
@@ -285,7 +299,7 @@ function AppleContent() {
 
         <main id="main-content" className="pt-11 lg:pt-14">
           {/* Hero — typographic */}
-          <section id="hero" className="px-4 pt-16 md:pt-24 pb-14 md:pb-20 text-center scroll-mt-20 lg:scroll-mt-[92px]" aria-labelledby="hero-heading">
+          <section id="hero" data-track-section="hero" className="px-4 pt-16 md:pt-24 pb-14 md:pb-20 text-center scroll-mt-20 lg:scroll-mt-[92px]" aria-labelledby="hero-heading">
             <p className={`text-sm font-semibold ${blue}`}>{c.hero.eyebrow}</p>
             {/* The LCP element stays static: an entrance fade would delay the first meaningful paint. */}
             <h1
@@ -303,14 +317,26 @@ function AppleContent() {
             {/* Static (no entrance): index.html carries the same hero markup before React mounts, so an entrance fade would flash. */}
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
               <Magnetic>
-                <button type="button" onClick={() => openContact()} className={primaryBtn}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    track('cta_click', { cta: 'store-review', position: 'hero' })
+                    openContact()
+                  }}
+                  className={primaryBtn}
+                >
                   {c.hero.ctaPrimary}
                 </button>
               </Magnetic>
               <a href="#shopify" className={`${blue} inline-flex items-center gap-1.5 text-sm font-medium`}>
                 {c.hero.ctaSecondary} {Icon.down}
               </a>
-              <a href={registry.personal.cv} download className={`${muted} text-sm font-medium`}>
+              <a
+                href={registry.personal.cv}
+                download
+                onClick={() => track('cv_download', { theme: 'apple' })}
+                className={`${muted} text-sm font-medium`}
+              >
                 {c.hero.ctaCv} ›
               </a>
             </div>
@@ -366,7 +392,7 @@ function AppleContent() {
 
           {/* Experience — split 50/50, with an optional subway-map view of the same roles */}
           {/* This non-lazy wrapper owns id="experience" (so a hash link lands before the chunk mounts) and the Apple-only lg offset; the inner section renders no id here. */}
-          <section id="experience" className={`px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
+          <section id="experience" data-track-section="experience" className={`px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
             <div className="max-w-5xl mx-auto">
               <Experience ownId={false} skin={skin} heading={Heading} />
               <div className="mt-10 md:mt-14">
@@ -411,7 +437,7 @@ function AppleContent() {
           </section>
 
           {/* Shopify work — the index */}
-          <section id="shopify" className="px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
+          <section id="shopify" data-track-section="shopify" className="px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
             <div className="max-w-5xl mx-auto">
               {/* Measured ranges — the hero's old stat band, moved here and re-drawn as small graphics:
                   where "See the storefronts" actually lands, not stacked on top of the hero's own claim. */}
@@ -425,7 +451,7 @@ function AppleContent() {
           </section>
 
           {/* Gallery — media carousel. content-visibility:auto tried and reverted — docs/seo.md. */}
-          <section id="gallery" className={`px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
+          <section id="gallery" data-track-section="gallery" className={`px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Gallery ownId={false} skin={skin} heading={Heading} />
@@ -453,7 +479,7 @@ function AppleContent() {
           <Testimonials skin={skin} heading={Heading} />
 
           {/* Projects — index list. content-visibility:auto tried and reverted — docs/seo.md. */}
-          <section id="projects" className="px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
+          <section id="projects" data-track-section="projects" className="px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Projects ownId={false} skin={skin} heading={Heading} />
@@ -463,7 +489,7 @@ function AppleContent() {
 
           {/* Skills — narrative with inline chips. content-visibility:auto tried and reverted — docs/seo.md. */}
           {/* This non-lazy wrapper owns id="skills" (so a hash link lands before the chunk mounts) and the Apple-only lg offset; the inner section renders no id here. */}
-          <section id="skills" className={`px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
+          <section id="skills" data-track-section="skills" className={`px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <Skills ownId={false} skin={skin} heading={Heading} />
@@ -471,8 +497,9 @@ function AppleContent() {
             </div>
           </section>
 
-          {/* Review checklist — what the free review's Playwright harness actually checks */}
-          <section className="px-4 py-14 md:py-20">
+          {/* Review checklist — what the free review's Playwright harness actually checks. Owns its
+              own id so useActiveSection can track it separately from Projects above it. */}
+          <section id="review" data-track-section="review" className="px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <ReviewChecklist skin={skin} heading={Heading} onCta={() => openContact()} />
@@ -480,8 +507,8 @@ function AppleContent() {
             </div>
           </section>
 
-          {/* FAQ — the objections, answered before the ask */}
-          <section className="px-4 py-14 md:py-20">
+          {/* FAQ — the objections, answered before the ask. Owns its own id for the same reason. */}
+          <section id="faq" data-track-section="faq" className="px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending h="min-h-[40vh]" />}>
                 <Faq skin={skin} heading={Heading} />
@@ -490,7 +517,7 @@ function AppleContent() {
           </section>
 
           {/* Contact — typographic close, a mesh gradient at 30% opacity so the last section isn't flat */}
-          <section id="contact" className={`relative overflow-hidden px-4 py-24 md:py-32 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
+          <section id="contact" data-track-section="contact" className={`relative overflow-hidden px-4 py-24 md:py-32 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
             <img
               src="/art/apple/mesh.webp"
               alt=""
@@ -515,7 +542,7 @@ function AppleContent() {
           </section>
 
           {/* Explore */}
-          <section id="explore" className="px-4 py-20 scroll-mt-20 lg:scroll-mt-[92px]">
+          <section id="explore" data-track-section="explore" className="px-4 py-20 scroll-mt-20 lg:scroll-mt-[92px]">
             <div className="max-w-5xl mx-auto">
               {Heading(c.sections.explore.eyebrow, c.sections.explore.title, '', c.sections.explore.lead)}
               <div className="grid sm:grid-cols-3 gap-3">
@@ -576,7 +603,10 @@ function AppleContent() {
         {/* Mobile contact FAB */}
         <button
           type="button"
-          onClick={() => setContactOpen(true)}
+          onClick={() => {
+            track('cta_click', { cta: 'contact', position: 'fab' })
+            setContactOpen(true)
+          }}
           aria-label="Open contact form"
           className="press fixed bottom-6 right-6 md:hidden w-14 h-14 rounded-full bg-apple-blue text-white shadow-[0_10px_30px_rgba(0,113,227,0.35)] z-30 flex items-center justify-center"
         >

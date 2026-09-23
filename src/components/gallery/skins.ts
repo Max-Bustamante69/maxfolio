@@ -116,10 +116,16 @@ export interface Skin {
   invertedBand: string
   /** Eyebrow/accent color on top of `invertedBand`. */
   invertedAccent: string
-  /** Shape (radius/border/shadow, never color) for a small white badge that houses a third-party
-   *  logo — e.g. Experience's company-logo chip. Background stays white in every theme (most company
-   *  marks are opaque PNGs drawn for a light background), only the frame around it speaks the theme. */
+  /** Shape (radius/border/shadow, never color) for a small light badge that houses a third-party
+   *  logo — e.g. Experience's company-logo chip. Only the frame around it speaks the theme; the fill
+   *  itself is `logoChipBg`, kept as a separate token because most company marks are opaque PNGs
+   *  drawn for a light background and stay legible on any light fill, not only pure white. */
   logoChip: string
+  /** Fill for the logo badge above. Plain white in every theme whose darkest surface is still a
+   *  midtone (Apple/Luxury/Brutalist/Neo); Persona's dark ("Arcade") register goes near-black, where
+   *  a literal `bg-white` box read as an unthemed foreign rectangle (2026-09-23 themes audit) — its
+   *  dark value reuses the theme's own paper token (`invertedBand`'s light fill) instead. */
+  logoChipBg: string
 }
 
 export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
@@ -144,6 +150,7 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     invertedBand: d ? 'bg-[#f5f5f7] text-[#1d1d1f]' : 'bg-[#1d1d1f] text-[#f5f5f7]',
     invertedAccent: d ? 'text-[#0066cc]' : 'text-[#2997ff]',
     logoChip: 'rounded-[12px] shadow-[0_1px_6px_rgba(0,0,0,0.08)]',
+    logoChipBg: 'bg-white',
   }),
   luxury: (d) => ({
     frame: 'luxury',
@@ -165,6 +172,7 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     invertedBand: d ? 'bg-deco-cream text-luxury-black' : 'bg-luxury-black text-deco-cream',
     invertedAccent: d ? 'text-luxury-gold' : 'text-deco-gold',
     logoChip: `rounded-[4px] border ${d ? 'border-deco-gold/40' : 'border-luxury-gold/40'}`,
+    logoChipBg: 'bg-white',
   }),
   brutalist: (d) => ({
     frame: 'brutalist',
@@ -186,6 +194,7 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     invertedBand: d ? 'bg-stone-100 text-stone-900' : 'bg-stone-900 text-stone-100',
     invertedAccent: 'text-red-600',
     logoChip: 'rounded-none border-2 border-stone-900',
+    logoChipBg: 'bg-white',
   }),
   neo: (d) => ({
     frame: 'neo',
@@ -211,6 +220,7 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     invertedBand: d ? 'bg-neo-surface text-neo-ink' : 'bg-neo-dark text-neo-darkInk',
     invertedAccent: d ? 'text-neo-accent' : 'text-neo-darkAccent',
     logoChip: 'rounded-[14px] shadow-[0_2px_10px_rgba(0,0,0,0.10)]',
+    logoChipBg: 'bg-white',
   }),
   // Ice variant is the default (light); Ink is the dark mode. Two-key-color law: ink/paper neutrals
   // plus exactly one hero accent per mode — no diluting sub-colors (wf4-persona.md idea #1).
@@ -238,6 +248,11 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     invertedBand: d ? 'bg-[#f5f2ee] text-[#0a0f1a]' : 'bg-[#0a0f1a] text-[#f5f2ee]',
     invertedAccent: d ? 'text-[#1c6fb0]' : 'text-[#e8465f]',
     logoChip: 'persona-skew-btn',
+    // Persona's dark register ("Arcade") is near-black — a literal white plate there read as a
+    // foreign unthemed rectangle (2026-09-23 themes audit, confirmed on the Experience section).
+    // The theme already has a light "paper" fill for exactly this situation (`invertedBand`'s dark-
+    // mode value below); reusing it here keeps the badge legible without importing a raw white.
+    logoChipBg: d ? 'bg-[#f5f2ee]' : 'bg-white',
   }),
   // Terminal ("engineer-for-engineers"): a single always-dark register, so `d` is ignored — every
   // color reads from the `--term-*` custom properties defined in terminal.css, which is what lets
@@ -267,5 +282,6 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     invertedBand: 'bg-[var(--term-accent)] text-[var(--term-bg)]',
     invertedAccent: 'text-[var(--term-bg)]',
     logoChip: 'rounded-none border border-[var(--term-line)]',
+    logoChipBg: 'bg-white',
   }),
 }

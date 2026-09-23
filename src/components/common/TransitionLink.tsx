@@ -12,6 +12,10 @@ interface TransitionLinkProps {
   transitionLabel?: string
   onMouseEnter?: () => void
   onMouseLeave?: () => void
+  /** Fired once the click is accepted (before the transition/navigate), never on a click the
+   *  in-flight-transition guard below swallows — analytics call sites (e.g. `theme_switch`) attach
+   *  here instead of a second, separately-guarded `onClick` on the anchor. */
+  onClick?: () => void
 }
 
 export function TransitionLink({
@@ -24,6 +28,7 @@ export function TransitionLink({
   transitionLabel = 'Loading',
   onMouseEnter,
   onMouseLeave,
+  onClick,
 }: TransitionLinkProps) {
   const navigate = useNavigate()
   const { startTransition, isTransitioning } = usePageTransition()
@@ -31,7 +36,8 @@ export function TransitionLink({
   const handleClick = (e: MouseEvent) => {
     e.preventDefault()
     if (isTransitioning) return
-    
+    onClick?.()
+
     startTransition(
       {
         color: transitionColor,

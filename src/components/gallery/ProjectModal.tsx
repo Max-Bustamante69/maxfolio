@@ -7,6 +7,7 @@ import { carouselTokens, sheetTokens, type Skin } from './skins'
 import type { FrameShots } from './ProjectFrame'
 import { Carousel } from '../../vendor/carousel'
 import { CountUp, goodText, IndexAreaLine, LoadTimePairedBar, PerfDualRing, ScoreRingsRow, type RingMetric } from './charts'
+import { track } from '../../lib/track'
 
 /**
  * "Impact" — the sheet's entire numbers story (2026-09-10 restructure): header → captures →
@@ -32,6 +33,9 @@ export interface ImpactCharts {
 
 export interface CaseStudyData {
   name: string
+  /** The registry slug — only used for `outbound_store_click` tracking on the "Visit store" link
+   *  below, never rendered. */
+  slug?: string
   url?: string
   meta: string // "Specialty coffee · 2026 · Built"
   badge: { text: string; className: string }
@@ -490,7 +494,13 @@ export function ProjectModal({ open, data, skin, labels, onClose, onPrev, onNext
               </div>
 
               {data.url && (
-                <a href={data.url} target="_blank" rel="noopener noreferrer" className={`${skin.accent} mt-6 inline-block text-sm font-medium`}>
+                <a
+                  href={data.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => data.slug && track('outbound_store_click', { store: data.slug })}
+                  className={`${skin.accent} mt-6 inline-block text-sm font-medium`}
+                >
                   {labels.visit} ›
                 </a>
               )}

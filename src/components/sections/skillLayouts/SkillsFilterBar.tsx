@@ -13,6 +13,7 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type KeyboardEvent, type ReactNode } from 'react'
 import { useMediaQuery } from '../../../hooks'
 import type { SkillGroupId } from '../../../data/registry'
+import { track } from '../../../lib/track'
 import type { ToolUsage } from '../../../data/skillUsage'
 import { CountUp } from '../../gallery/charts'
 import type { Skin } from '../../gallery'
@@ -188,7 +189,10 @@ export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, fo
                 type="button"
                 aria-pressed={on}
                 aria-label={chipAriaLabel}
-                onClick={() => filter.toggleGroup(g)}
+                onClick={() => {
+                  filter.toggleGroup(g)
+                  track('filter_change', { kind: 'skills', value: g })
+                }}
                 onMouseEnter={() => onHoverGroup?.(g)}
                 onMouseLeave={() => onHoverGroup?.(null)}
                 onFocus={() => onHoverGroup?.(g)}
@@ -210,7 +214,10 @@ export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, fo
                 role="radio"
                 aria-checked={filter.surface === null}
                 tabIndex={filter.surface === null ? 0 : -1}
-                onClick={() => filter.setSurface(null)}
+                onClick={() => {
+                  filter.setSurface(null)
+                  track('filter_change', { kind: 'skills', value: 'all' })
+                }}
                 className={`${CHIP} ${filter.surface === null ? skin.chipOn : skin.chip}`}
               >
                 {sk.layoutExtra.allLabel}
@@ -222,7 +229,10 @@ export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, fo
                   role="radio"
                   aria-checked={filter.surface === s}
                   tabIndex={filter.surface === s ? 0 : -1}
-                  onClick={() => filter.setSurface(s)}
+                  onClick={() => {
+                    filter.setSurface(s)
+                    track('filter_change', { kind: 'skills', value: s })
+                  }}
                   className={`${CHIP} ${filter.surface === s ? skin.chipOn : skin.chip}`}
                 >
                   {ob[SURFACE_LABEL[s]]}
