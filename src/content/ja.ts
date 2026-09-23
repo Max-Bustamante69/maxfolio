@@ -119,6 +119,8 @@ export const ja: PortfolioContent = {
       prevAria: '前の年',
       nextAria: '次の年',
       highlightsLabel: 'ハイライト',
+      expandAria: '{year}を展開',
+      collapseAria: '{year}を折りたたむ',
     },
     featuredBuild: {
       eyebrow: '1つのbuildを、丸ごと',

@@ -119,6 +119,8 @@ export const en: PortfolioContent = {
       prevAria: 'Previous year',
       nextAria: 'Next year',
       highlightsLabel: 'Highlights',
+      expandAria: 'Expand {year}',
+      collapseAria: 'Collapse {year}',
     },
     featuredBuild: {
       eyebrow: 'One build, in full',

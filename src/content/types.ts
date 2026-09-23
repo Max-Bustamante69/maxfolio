@@ -75,6 +75,8 @@ export interface PortfolioContent {
       prevAria: string
       nextAria: string
       highlightsLabel: string
+      expandAria: string // '{year}' — poster-rail direction's expand button
+      collapseAria: string // '{year}' — poster-rail direction's collapse button
     }
     /** Apple's featured-build section for one storefront (FeaturedBuild.tsx + featuredLayouts/*) — the
      *  "split story" layout over real registry/commerce/telemetry data. */
