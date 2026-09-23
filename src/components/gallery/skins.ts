@@ -246,7 +246,7 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     accentBg: d ? 'bg-[#c8102e]' : 'bg-[#1c6fb0]',
     headingFont: 'font-persona-display',
     invertedBand: d ? 'bg-[#f5f2ee] text-[#0a0f1a]' : 'bg-[#0a0f1a] text-[#f5f2ee]',
-    invertedAccent: d ? 'text-[#1c6fb0]' : 'text-[#e8465f]',
+    invertedAccent: d ? 'text-[#c21e3a]' : 'text-[#e8465f]',
     logoChip: 'persona-skew-btn',
     // Persona's dark register ("Arcade") is near-black — a literal white plate there read as a
     // foreign unthemed rectangle (2026-09-23 themes audit, confirmed on the Experience section).
