@@ -14,6 +14,11 @@ analytics vendor beyond Vercel's own page-view Web Analytics, which this doesn't
 Without a KV store connected, every POST to either endpoint is a harmless 204 no-op and every GET
 reports `{ configured: false }` — the site never depends on either ledger existing.
 
+A third function, `api/psi.ts`, is unrelated to the KV ledgers above (it proxies Google PageSpeed
+Insights for the Apple page's "Measure your store, right now" section) but reuses `api/_kv.ts`'s
+`kv()`/`pipeline()` for one thing: a soft per-IP rate limit, itself optional — see its own header
+comment and the README note on `PSI_KEY`.
+
 ## Turning it on (two steps, both in the Vercel project)
 
 1. **Storage → Marketplace → add Upstash Redis** (free tier). This sets `KV_REST_API_URL` and
@@ -44,6 +49,7 @@ anywhere.
 | `outbound_store_click` | `store` (registry slug) | A real "Visit store" link to the store's own domain. |
 | `tool_drawer_open` | `tool` (slug) | The skills section's `ToolDrawer`, wired once in that shared component so both the orbit and ledger layouts feed it. |
 | `filter_change` | `kind` (`stores\|skills\|gallery`), `value` (slug) | |
+| `psi_check` | `host?` (the measured store's hostname only, never the full URL) | Fires from `StoreCheck.tsx` after a successful `api/psi.ts` run. The one event whose per-value breakdown isn't a closed set — see that file's own comment. |
 
 Storage: `HINCRBY` on one all-time hash (`ev:totals`) and one same-day hash (`ev:day:<yyyy-mm-dd>`),
 one field per event or per event+prop worth ranking on its own (`cta_click:hero:store-review`,

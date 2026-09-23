@@ -63,3 +63,19 @@ bun run build    # tsc -b && vite build
 ```
 
 Contact form uses Web3Forms: set `VITE_WEB3FORMS_KEY` in `.env`.
+
+**For Max — the "Measure your store, right now" section (Apple page, `api/psi.ts`):** it works
+without any setup, using Google PageSpeed Insights' small anonymous quota. To raise that quota:
+
+1. In [Google Cloud Console](https://console.cloud.google.com/apis/credentials), create an API key
+   and restrict it to the **PageSpeed Insights API** only (Credentials → your key → API
+   restrictions).
+2. In the Vercel project → **Settings → Environment Variables**, add `PSI_KEY` with that value.
+   No `VITE_` prefix — this one stays server-side only, read by `api/psi.ts`, never sent to the
+   browser.
+3. Redeploy for the new env var to reach the function.
+
+Without `PSI_KEY` the section still works on the anonymous quota, shared with everyone else on the
+internet calling PSI without a key — it can run out for a while under load (the section's own error
+copy covers that case). `api/psi.ts` also rate-limits itself per IP and caches each store's result
+for 6 hours, so either way the quota goes further than one call per check.

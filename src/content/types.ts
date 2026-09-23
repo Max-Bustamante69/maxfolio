@@ -97,24 +97,39 @@ export interface PortfolioContent {
         lighthouseCaption: string // what/where/when for the rings + LCP + TBT + CLS tiles
       }
     }
-    /** Apple's new section listing what the Playwright QA harness actually checks (ReviewChecklist.tsx). */
-    reviewChecklist: SectionHeading & {
+    /** Apple's live-measurement section (StoreCheck.tsx, round 46): a real URL field that calls
+     *  Google PageSpeed Insights through the server proxy `api/psi.ts` (no API key ever reaches the
+     *  client) and renders the visitor's own real mobile scores. Replaces the old review-checklist
+     *  replay. The server returns only category scores plus LCP/CLS/TBT — no field/CrUX data, no
+     *  audit-level opportunities — so this type carries nothing for either. */
+    storeCheck: SectionHeading & {
       lead: string
-      countLabel: string // '{n}+ automated checks'
+      inputLabel: string
+      inputPlaceholder: string
+      submitLabel: string
+      cancelLabel: string
+      /** '{s}' replaced with whole elapsed seconds. */
+      runningLabel: string
+      /** Rotating "what's happening" lines shown while the server call is in flight, timed off elapsed seconds, not off any real progress the API reports mid-run. */
+      phases: string[]
+      errorInvalid: string
+      errorQuota: string
+      errorTimeout: string
+      errorGeneric: string
+      errorCta: string
+      perfLabel: string
+      a11yLabel: string
+      bestPracticesLabel: string
+      seoLabel: string
+      labCaption: string
+      lcpLabel: string
+      clsLabel: string
+      tbtLabel: string
+      addsHeading: string
+      addsLines: string[]
       cta: string
-      groups: { label: string; items: string[] }[]
-      /** Sits under the visual run: states plainly that this replays the check list, never a live result. */
-      runCaption: string
-      /** A group tile's status while its items are still being marked off. */
-      statusChecking: string
-      /** A group tile's status once every one of its items is marked off. */
-      statusDone: string
-      /** Alt text for the home-page capture inside the device frame, names the store. */
-      screenshotAlt: string
-      /** aria-label for each hotspot marker over the capture; '{group}' is replaced with that group's label. */
-      hotspotAria: string
-      /** aria-valuetext for a group's progress meter; '{done}' and '{total}' are replaced with counts. */
-      progressAria: string
+      /** '{url}', '{score}' (performance) and '{date}' replaced when prefilling the contact form after a run. */
+      prefillTemplate: string
     }
     /** Luxury's Years intro: the unit chart re-narrated as one composed sentence per year. */
     fiveLines: {
