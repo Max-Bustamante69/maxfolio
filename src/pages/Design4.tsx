@@ -21,6 +21,7 @@ import {
   Ticker,
   RevealText,
   ScrollObject,
+  SmoothScroll,
 } from "../components";
 import { skins } from "../components/gallery";
 import { Years } from "../components/sections/Years";
@@ -396,7 +397,7 @@ function Design4Content() {
             </div>
           </section>
 
-          <section id="experience" className={`py-14 md:py-20 px-6 md:px-16 ${bgSecondary} ${isDark ? "text-deco-cream" : "text-luxury-cream"}`}>
+          <section id="experience" className={`py-14 md:py-20 px-6 md:px-16 scroll-mt-[92px] ${bgSecondary} ${isDark ? "text-deco-cream" : "text-luxury-cream"}`}>
             <div className="max-w-7xl mx-auto">
               <FadeInUp>
                 <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16">
@@ -660,7 +661,7 @@ function Design4Content() {
           </section>
 
           {/* Contact Section — a whisper of gold foil grounding the close */}
-          <section id="contact" className={`relative overflow-hidden py-14 md:py-20 px-6 md:px-16 ${bgPrimary}`}>
+          <section id="contact" className={`relative overflow-hidden py-14 md:py-20 px-6 md:px-16 scroll-mt-[92px] ${bgPrimary}`}>
             <img
               src="/art/luxury/foil.webp"
               alt=""
@@ -671,6 +672,7 @@ function Design4Content() {
             />
             <div className="relative max-w-5xl mx-auto">
               <Contact
+                ownId={false}
                 skin={skin}
                 ctaClass={`press inline-flex items-center justify-center gap-2 px-8 py-4 text-sm tracking-[0.2em] uppercase ${isDark ? "bg-deco-gold text-deco-navy" : "bg-luxury-black text-luxury-cream"} hover:opacity-90 transition-all`}
                 onContact={openContact}
@@ -767,7 +769,12 @@ function Design4Content() {
 export default function Design4() {
   return (
     <ThemeProvider storageKey="luxury-theme" defaultTheme="light">
-      <Design4Content />
+      {/* No section here carries its own `scroll-mt-*` (unlike Apple/Neo), so this flat offset is
+          what actually places a hash-linked section under the fixed nav (~88px tall at md+: py-6 +
+          the h-10 logo row), landing inside the 60-100px band. */}
+      <SmoothScroll offset={92}>
+        <Design4Content />
+      </SmoothScroll>
     </ThemeProvider>
   );
 }

@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useRef, useState, type CSSProperties, type R
 import { m, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { useLanguage, supportedLocales, type Locale } from '../context/LanguageContext'
 import '../styles/terminal.css'
-import { SEOHead, TransitionLink, RevealText, Ticker, DesignMark } from '../components/common'
+import { SEOHead, TransitionLink, RevealText, Ticker, DesignMark, SmoothScroll } from '../components/common'
 import { ContactFormModal } from '../components/modals'
 import { StatBand } from '../components/sections/StatBand'
 import { Experience } from '../components/sections/Experience'
@@ -734,5 +734,11 @@ function TerminalContent() {
 }
 
 export default function Terminal() {
-  return <TerminalContent />
+  return (
+    // No section here carries its own `scroll-mt-*`, so this flat offset is what actually places a
+    // hash-linked section under the fixed header (56px tall), landing inside the 60-100px band.
+    <SmoothScroll offset={80}>
+      <TerminalContent />
+    </SmoothScroll>
+  )
 }

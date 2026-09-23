@@ -19,6 +19,7 @@ import {
   Skills,
   Ticker,
   ScrollObject,
+  SmoothScroll,
 } from '../components'
 import { skins } from '../components/gallery'
 import { Years } from '../components/sections/Years'
@@ -344,7 +345,7 @@ function Design1Content() {
           </section>
 
           {/* Work Section */}
-          <section id="work" className={`py-12 md:py-16 border-t-4 ${borderStrong}`}>
+          <section id="work" className={`py-12 md:py-16 border-t-4 scroll-mt-20 ${borderStrong}`}>
             <div className="max-w-[1800px] mx-auto px-4 md:px-6">
               <m.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mb-12 md:mb-16">
                 <span className={`font-mono text-xs uppercase tracking-[0.5em] ${textMuted}`}>{nextSection()}</span>
@@ -523,7 +524,7 @@ function Design1Content() {
           <Manifesto skin={skin} backdropSrc="/art/brutalist/concrete-tape.webp" />
 
           {/* Skills Section — the ledger + narrative sentences */}
-          <section id="about" className={`py-12 md:py-16 border-t-4 ${borderStrong}`}>
+          <section id="about" className={`py-12 md:py-16 border-t-4 scroll-mt-20 ${borderStrong}`}>
             <div className="max-w-[1800px] mx-auto px-4 md:px-6">
               <Skills skin={skin} heading={(e, ti, a, l) => BrutalHeading(nextSection() + ' · ' + e, ti, a, l)} />
             </div>
@@ -537,7 +538,7 @@ function Design1Content() {
           </section>
 
           {/* Contact Section */}
-          <section id="contact" className={`relative overflow-hidden py-12 md:py-16 border-t-4 ${borderStrong} bg-red-600 text-white`}>
+          <section id="contact" className={`relative overflow-hidden py-12 md:py-16 border-t-4 scroll-mt-20 ${borderStrong} bg-red-600 text-white`}>
             <img
               src="/art/brutalist/spray.webp"
               alt=""
@@ -550,6 +551,7 @@ function Design1Content() {
             />
             <div className="relative max-w-[1800px] mx-auto px-4 md:px-6">
               <Contact
+                ownId={false}
                 skin={{ ...skin, title: 'text-white', body: 'text-red-50', muted: 'text-red-100', accent: 'text-white underline', line: 'border-red-300/40', accentBg: 'bg-stone-900' }}
                 ctaClass="press inline-flex items-center justify-center font-mono text-sm uppercase tracking-wider bg-white text-red-600 px-8 py-4 hover:bg-stone-900 hover:text-white transition-colors"
                 onContact={openContact}
@@ -603,7 +605,12 @@ function Design1Content() {
 export default function Design1() {
   return (
     <ThemeProvider storageKey="brutalist-theme" defaultTheme="dark">
-      <Design1Content />
+      {/* No section here carries its own `scroll-mt-*` (unlike Apple/Neo), so this flat offset is
+          what actually places a hash-linked section under the fixed nav (~76px tall: border-b-4 +
+          py-4 + the h-10 logo button) with room to spare, landing inside the 60-100px band. */}
+      <SmoothScroll offset={84}>
+        <Design1Content />
+      </SmoothScroll>
     </ThemeProvider>
   )
 }

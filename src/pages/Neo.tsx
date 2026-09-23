@@ -4,7 +4,7 @@ import { ThemeProvider, useTheme } from '../context/ThemeContext'
 import { useLanguage, supportedLocales } from '../context/LanguageContext'
 import '../styles/neo.css'
 // Direct imports (not the component barrels) so the main chunk carries only what this route needs.
-import { SEOHead, TransitionLink, ThemeToggle, Magnetic, RevealText, Ticker, ScrollObject, LogoSelectorNeo } from '../components/common'
+import { SEOHead, TransitionLink, ThemeToggle, Magnetic, RevealText, Ticker, ScrollObject, LogoSelectorNeo, SmoothScroll } from '../components/common'
 import { ContactFormModal } from '../components/modals'
 import { StatBand } from '../components/sections/StatBand'
 import { Experience } from '../components/sections/Experience'
@@ -451,7 +451,7 @@ function NeoContent() {
               as its own surface; the rail's active tab already reads as pressed via the accent underline */}
           <section id="experience" className={`px-4 py-14 md:py-20 scroll-mt-24 ${isDark ? 'bg-neo-darkSurfaceRaised' : 'bg-neo-surfaceRaised'}`}>
             <div className="max-w-5xl mx-auto">
-              <Experience skin={skin} heading={Heading} />
+              <Experience ownId={false} skin={skin} heading={Heading} />
             </div>
           </section>
 
@@ -476,7 +476,7 @@ function NeoContent() {
           <section id="shopify" className="px-4 py-14 md:py-20 scroll-mt-24">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
-                <ShopifyWork skin={skin} heading={Heading} />
+                <ShopifyWork ownId={false} skin={skin} heading={Heading} />
               </Suspense>
             </div>
           </section>
@@ -497,7 +497,7 @@ function NeoContent() {
             <div className="absolute inset-0" style={{ background: 'var(--neo-surface)', opacity: 0.55 }} aria-hidden="true" />
             <div className="relative max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
-                <Gallery skin={skin} heading={Heading} />
+                <Gallery ownId={false} skin={skin} heading={Heading} />
               </Suspense>
             </div>
           </section>
@@ -511,7 +511,7 @@ function NeoContent() {
           <section id="projects" className="px-4 py-14 md:py-20 scroll-mt-24">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
-                <Projects skin={skin} heading={Heading} />
+                <Projects ownId={false} skin={skin} heading={Heading} />
               </Suspense>
             </div>
           </section>
@@ -526,10 +526,10 @@ function NeoContent() {
           </section>
 
           {/* FAQ — restraint pass: plain page ground, the rows are already a hairline accordion */}
-          <section id="faq" className="px-4 py-14 md:py-20">
+          <section id="faq" className="px-4 py-14 md:py-20 scroll-mt-24">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending h="min-h-[40vh]" />}>
-                <Faq skin={skin} heading={Heading} />
+                <Faq ownId={false} skin={skin} heading={Heading} />
               </Suspense>
             </div>
           </section>
@@ -546,7 +546,7 @@ function NeoContent() {
             />
             <div className="relative max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
-                <Contact skin={skin} ctaClass={`${primaryBtn} !px-7`} onContact={openContact} fieldClassName={contactField} />
+                <Contact ownId={false} skin={skin} ctaClass={`${primaryBtn} !px-7`} onContact={openContact} fieldClassName={contactField} />
               </Suspense>
             </div>
           </section>
@@ -622,7 +622,11 @@ function NeoContent() {
 export default function Neo() {
   return (
     <ThemeProvider storageKey="neo-theme" defaultTheme="light">
-      <NeoContent />
+      {/* Every section already carries its own `scroll-mt-24` (96px); this offset is only the
+          fallback for the rare id-bearing element that doesn't (matches the nav's own ~72px). */}
+      <SmoothScroll offset={96}>
+        <NeoContent />
+      </SmoothScroll>
     </ThemeProvider>
   )
 }
