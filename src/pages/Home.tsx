@@ -36,7 +36,10 @@ function HomeContent() {
 
   const bg = isDark ? 'bg-neutral-950' : 'bg-neutral-50'
   const text = isDark ? 'text-white' : 'text-neutral-900'
-  const textMuted = isDark ? 'text-neutral-500' : 'text-neutral-500'
+  // Both modes read the same neutral-500 — dark measures ~4.2:1 on neutral-950 (Lighthouse
+  // `color-contrast`, 2026-09-23 audit), short of AA's 4.5:1. neutral-400/600 clear it with margin,
+  // matching textSecondary's own already-safe mode split below.
+  const textMuted = isDark ? 'text-neutral-400' : 'text-neutral-600'
   const textSecondary = isDark ? 'text-neutral-400' : 'text-neutral-600'
   const border = isDark ? 'border-neutral-800' : 'border-neutral-200'
   const cardBg = isDark ? 'bg-neutral-900/50' : 'bg-white'

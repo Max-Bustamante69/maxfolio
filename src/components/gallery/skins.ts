@@ -158,7 +158,10 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     card: `border ${d ? 'border-deco-gold/20 bg-deco-navy/30' : 'border-luxury-black/10 bg-white/60'}`,
     title: `font-display ${d ? 'text-deco-cream' : 'text-luxury-black'}`,
     body: d ? 'text-deco-cream/80' : 'text-luxury-black/80',
-    muted: d ? 'text-deco-cream/50' : 'text-luxury-black/50',
+    // Light-mode /50 measured 3.3:1 on the page's cream bg (Lighthouse `color-contrast`,
+    // 2026-09-23 accessibility audit) — short of AA's 4.5:1. /65 measures 5.2:1 (see
+    // SkillPanel.tsx's own local override of this same token, same reasoning).
+    muted: d ? 'text-deco-cream/50' : 'text-luxury-black/65',
     accent: d ? 'text-deco-gold' : 'text-luxury-gold',
     chip: `border px-2 py-0.5 text-[10px] tracking-[0.15em] uppercase ${d ? 'border-deco-gold/20 text-deco-cream/60' : 'border-luxury-black/10 text-luxury-black/60'}`,
     chipOn: `border px-2 py-0.5 text-[10px] tracking-[0.15em] uppercase ${d ? 'bg-deco-gold text-deco-navy border-deco-gold' : 'bg-luxury-black text-luxury-cream border-luxury-black'}`,
@@ -180,7 +183,10 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     card: `border-2 ${d ? 'border-stone-700 bg-stone-900' : 'border-stone-900 bg-stone-100'}`,
     title: `font-editorial italic ${d ? 'text-stone-100' : 'text-stone-900'}`,
     body: d ? 'text-stone-300' : 'text-stone-700',
-    muted: 'text-stone-500',
+    // Unlike every other skin's `muted`, this wasn't mode-aware — text-stone-500 measures ~4.1:1
+    // on the dark register's stone-950 (Lighthouse `color-contrast`, 2026-09-23 audit; SkillPanel's
+    // own comment already flagged this exact gap). stone-400/stone-600 both clear AA with margin.
+    muted: d ? 'text-stone-400' : 'text-stone-600',
     accent: 'text-red-600',
     chip: `font-mono text-[10px] px-2 py-1 ${d ? 'bg-stone-800 text-stone-400' : 'bg-stone-200 text-stone-600'}`,
     chipOn: 'font-mono text-[10px] px-2 py-1 bg-red-600 text-white',

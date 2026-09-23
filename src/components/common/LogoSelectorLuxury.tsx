@@ -51,7 +51,8 @@ export function LogoSelectorLuxury({ isDark }: LogoSelectorLuxuryProps) {
 
   const menuBg = isDark ? "bg-deco-navy" : "bg-luxury-cream";
   const textPrimary = isDark ? "text-deco-cream" : "text-luxury-black";
-  const textMuted = isDark ? "text-deco-cream/50" : "text-luxury-black/50";
+  // Light-mode /50 measured 3.3:1 (Lighthouse `color-contrast`, 2026-09-23) — /65 clears AA at 5.2:1.
+  const textMuted = isDark ? "text-deco-cream/50" : "text-luxury-black/65";
   const accent = isDark ? "text-deco-gold" : "text-luxury-gold";
   const accentHex = isDark ? "#d4af37" : "#C9A962";
   const borderColor = isDark ? "border-deco-gold/20" : "border-luxury-black/10";
