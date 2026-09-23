@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react'
-import { m, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform, type MotionValue } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
+import { animate, m, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform, type MotionValue } from 'framer-motion'
 import { useContent, useMediaQuery } from '../../../hooks'
 import { RevealText } from '../../common'
 import type { Skin } from '../../gallery'
@@ -150,12 +150,63 @@ export function OdometerLayout({ skin }: Props) {
   const { scrollYProgress } = useScroll({ target: wrapRef, offset: ['start start', 'end end'] })
   const smooth = useSpring(scrollYProgress, { stiffness: 90, damping: 22, mass: 0.5 })
   const rawIndex = useTransform(smooth, [0, 1], [0, total - 1])
-  const yearFloat = useTransform(rawIndex, (v) => years[0].year - v)
-  const [active, setActive] = useState(0)
+
+  // The numeral follows `rawIndex` directly while the visitor is actively scrolling, but once
+  // scrolling stops it snaps to the nearest whole year over a short spring. Without this, resting
+  // scroll position (this pinned section exists precisely so people can pause and read the era/
+  // highlights beside it) leaves the ones-digit roller frozen mid-flip: each digit glyph is
+  // centered with padding inside its own 1.3em cell (needed to stop neighbor-glyph bleed — see
+  // DIGIT_CELL_EM), so a non-integer rest value shows two small disconnected glyph fragments with
+  // a dead gap between them instead of a legible digit — a real odometer's wheels always come to
+  // rest aligned, never frozen between two numbers.
+  const displayIndex = useMotionValue(rawIndex.get())
+  // `rawIndex` keeps emitting 'change' events for as long as ITS OWN backing spring (`smooth`) is
+  // still converging — that has nothing to do with whether the visitor is still scrolling. Forwarding
+  // it unconditionally would fight the snap spring below forever (each rawIndex frame re-pulls
+  // displayIndex toward the raw fractional target right after we start animating it to an integer),
+  // so forwarding is gated off for as long as we're in "settled" mode.
+  const followingRawRef = useRef(true)
   useMotionValueEvent(rawIndex, 'change', (v) => {
+    if (!reduced && followingRawRef.current) displayIndex.set(v)
+  })
+  // `active` (era, highlights, unit chart, counters, the sidebar tick) is derived from `displayIndex`
+  // — the SAME value the giant numeral reads — never from `rawIndex` directly. Two independent
+  // roundings of two values that can differ by a frame or a fraction (one is a live physics spring,
+  // the other a snap-settled one) previously let the numeral show one year while every other piece
+  // of text on screen showed the adjacent one.
+  const [active, setActive] = useState(0)
+  useMotionValueEvent(displayIndex, 'change', (v) => {
     const clamped = Math.round(Math.max(0, Math.min(total - 1, v)))
     setActive((prev) => (prev === clamped ? prev : clamped))
   })
+  useEffect(() => {
+    if (reduced) return
+    let idleTimer: ReturnType<typeof setTimeout>
+    let controls: ReturnType<typeof animate> | undefined
+    const settle = () => {
+      idleTimer = setTimeout(() => {
+        followingRawRef.current = false
+        controls?.stop()
+        const nearest = Math.round(displayIndex.get())
+        controls = animate(displayIndex, nearest, { type: 'spring', bounce: 0, duration: 0.4 })
+      }, 160)
+    }
+    const onScroll = () => {
+      followingRawRef.current = true
+      controls?.stop()
+      clearTimeout(idleTimer)
+      settle()
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    settle()
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      clearTimeout(idleTimer)
+      controls?.stop()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduced])
+  const yearFloat = useTransform(displayIndex, (v) => years[0].year - v)
 
   const pinned = wide && !reduced
 

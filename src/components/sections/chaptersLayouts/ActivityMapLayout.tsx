@@ -85,8 +85,11 @@ export function ActivityMapLayout({ skin }: Props) {
         </div>
       </div>
 
+      {/* `ys.legend` ("Build or role active") is Brutalist's Year Strip caption/aria-label text, not a
+          swatch label — reusing it here as visible text next to `ys.activeState` (the same phrase,
+          lowercased) would read as the same words printed twice in a row. It's already carried as the
+          row group's aria-label above, so the visible strip only needs the two swatches. */}
       <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1.5">
-        <p className={`text-[11px] ${skin.muted}`}>{ys.legend}</p>
         <div className="flex items-center gap-1.5">
           <span className={`h-2.5 w-2.5 rounded-[2px] ${skin.dark ? 'bg-white/10' : 'bg-black/[0.06]'}`} aria-hidden="true" />
           <span className={`text-[11px] ${skin.muted}`}>{ys.inactiveState}</span>
