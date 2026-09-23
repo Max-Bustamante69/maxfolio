@@ -169,11 +169,14 @@ function Design1Content() {
           role="navigation"
           aria-label="Main navigation"
         >
-          <div className="max-w-[1800px] mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
+          {/* Nav links are absolutely centered on this row — see Terminal/Apple/Luxury's nav for why
+              a flex/grid "equal track" layout doesn't do this when the two side clusters differ in
+              width (measured). */}
+          <div className="relative max-w-[1800px] mx-auto px-4 md:px-6 py-4 flex justify-between items-center">
             <div className="flex items-center gap-4">
               <LogoSelectorBrutalist isDark={isDark} />
             </div>
-            <div className="hidden lg:flex items-center gap-8 font-mono text-xs uppercase tracking-[0.2em] h-10">
+            <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 lg:flex items-center gap-8 font-mono text-xs uppercase tracking-[0.2em] h-10">
               {navItems.slice(0, 5).map((item) => (
                 <a key={item.href} href={item.href} className={`inline-flex items-center h-10 leading-none ${textMuted} hover:text-red-600 transition-colors`}>
                   {item.label}

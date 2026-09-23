@@ -207,9 +207,13 @@ function Design4Content() {
           aria-label="Main navigation"
         >
           <div className="max-w-7xl mx-auto px-6 md:px-16 py-4 md:py-6">
-            <div className="flex justify-between items-center">
+            {/* Nav links are absolutely centered on this row rather than a flex `1fr`-style track —
+                the logo and the right cluster (contact pill + selectors) are different widths, so a
+                naive equal-track layout centers on the wrong point (measured, see Terminal's nav for
+                the same bug + fix). */}
+            <div className="relative flex justify-between items-center">
               <LogoSelectorLuxury isDark={isDark} />
-              <div className="hidden lg:flex items-center gap-8 h-10">
+              <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 lg:flex items-center gap-8 h-10">
                 {navItems.map((item) => (
                   <a
                     key={item.href}

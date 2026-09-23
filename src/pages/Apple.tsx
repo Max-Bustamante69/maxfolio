@@ -227,9 +227,14 @@ function AppleContent() {
           className={`fixed top-0 inset-x-0 z-40 h-11 lg:h-14 ${isDark ? 'bg-black/70' : 'bg-white/70'} backdrop-blur-xl border-b ${isDark ? 'border-white/10' : 'border-black/5'}`}
           aria-label="Main navigation"
         >
-          <div className="max-w-5xl mx-auto h-full px-4 lg:px-6 flex items-center justify-between gap-3">
+          {/* The nav-links group is absolutely centered on this (relatively positioned) container
+              rather than sized as a flex `1fr` track — the left (logo) and right (lang/theme/CTA)
+              clusters are very different widths, and a grid `1fr auto 1fr` layout resolves its two
+              "equal" tracks to each side's own min-content floor first, so they end up unequal and
+              the middle stays off-center (measured, see Terminal's nav for the same bug + fix). */}
+          <div className="relative max-w-5xl mx-auto h-full px-4 lg:px-6 flex items-center justify-between gap-3">
             <LogoSelectorApple isDark={isDark} />
-            <div className="hidden md:flex items-center gap-6 lg:gap-8 text-xs lg:text-[13px]">
+            <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 md:flex items-center gap-6 lg:gap-8 text-xs lg:text-[13px]">
               {nav.map(([href, label]) => {
                 const on = activeSection === href.slice(1)
                 return (

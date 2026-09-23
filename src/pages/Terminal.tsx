@@ -297,14 +297,21 @@ function TerminalContent() {
         {/* Top bar: brand mark, bracket nav (desktop), language + accent toggle + contact CTA. The
             same bracket nav repeats, smaller, on its own scrollable row for phones. */}
         <header className="fixed top-0 inset-x-0 z-40 border-b border-[var(--term-line)] bg-[var(--term-bg)]/95 backdrop-blur-sm">
-          <div className="max-w-5xl mx-auto flex h-14 items-center justify-between gap-4 px-4">
+          {/* Logo | absolutely-centered links | right cluster. A `grid-cols-[1fr_auto_1fr]` layout
+              was tried first, but CSS grid's `1fr` tracks size to each side's own min-content floor
+              before splitting remaining space — since the right cluster (several controls, `shrink-0`)
+              is much wider than the logo, the two "equal" tracks resolved to very different widths
+              (measured 238px vs 399px) and the links group stayed off-center. Absolute-centering the
+              links group on the (relatively positioned) container is unaffected by that: it centers
+              on the container's true midpoint regardless of how wide either side cluster is. */}
+          <div className="relative max-w-5xl mx-auto flex h-14 items-center px-4">
             <TransitionLink to="/terminal" transitionColor="#0a0d0a" transitionAccent="#39ff88" transitionLabel="Terminal" className={`text-sm font-bold ${accentCls}`}>
               MB<span className={muted}>$</span>
             </TransitionLink>
-            <div className="hidden md:block">
+            <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 md:block">
               <BracketNav size="sm" />
             </div>
-            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div className="ml-auto flex items-center gap-2 sm:gap-3 shrink-0">
               {/* Language selector stays visible at every width (390px included) — a phone visitor
                   can switch locale exactly like a desktop one; only the accent label and the
                   contact CTA's text shrink away below `sm` to keep the row on one line. */}
