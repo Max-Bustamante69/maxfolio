@@ -173,7 +173,9 @@ export function ContactFormModal({
       : 'bg-[#0a0f1a]/[0.03] border-[#0a0f1a]/15 text-[#0a0f1a] placeholder:text-[#0a0f1a]/40 focus:border-[#1c6fb0]',
     textPrimary: isDark ? 'text-[#f5f2ee]' : 'text-[#0a0f1a]',
     textSecondary: isDark ? 'text-[#f5f2ee]/70' : 'text-[#0a0f1a]/70',
-    textMuted: isDark ? 'text-[#f5f2ee]/45' : 'text-[#0a0f1a]/45',
+    // /55 (dark) and /60 (light) — /45 measured ~4.18:1 / ~3.02:1 against this modal's bgModal,
+    // short of AA's 4.5:1 floor for the text-xs "or email directly" line; these clear it (~5.7:1 / ~4.9:1).
+    textMuted: isDark ? 'text-[#f5f2ee]/55' : 'text-[#0a0f1a]/60',
     // #e8465f (not #c8102e) for text on ink: the deep red only clears ~3.2:1 there, short of AA.
     accent: isDark ? 'text-[#e8465f]' : 'text-[#1c6fb0]',
     btnPrimary: isDark ? 'bg-[#c8102e] text-[#f5f2ee] hover:bg-[#8f0b1f]' : 'bg-[#1c6fb0] text-white hover:bg-[#0a0f1a]',

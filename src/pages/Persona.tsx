@@ -544,7 +544,11 @@ function HomeScreen({ chrome, openContact, skin }: { chrome: SkinLike; openConta
               <span className="w-2 h-2 rounded-full bg-[#34c759]" aria-hidden="true" />
               {c.hero.availability}
             </span>
-            <span className={`inline-flex items-center gap-2 skew-chip px-3.5 py-1.5 font-persona-label uppercase tracking-[0.1em] ${surface} border ${line} ${muted}`}>{c.hero.location}</span>
+            {/* clip-corner-sm (fixed 14px corner nick), not skew-chip (a percentage-based diagonal): this
+                pill's copy is long enough to wrap to two lines at 390px, and skew-chip's cut grows with
+                the box height, clipping into the wrapped text itself — clip-corner-sm's nick stays a
+                small fixed size regardless of how tall the pill gets. */}
+            <span className={`inline-flex items-center gap-2 clip-corner-sm px-3.5 py-1.5 font-persona-label uppercase tracking-[0.1em] ${surface} border ${line} ${muted}`}>{c.hero.location}</span>
           </div>
         </div>
       </section>
