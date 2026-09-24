@@ -136,8 +136,17 @@ function Design4Content() {
   const bgSecondary = isDark ? "bg-slate-950" : "bg-luxury-black";
   const textPrimary = isDark ? "text-deco-cream" : "text-luxury-black";
   const textSecondary = isDark ? "text-deco-cream/70" : "text-luxury-black/70";
-  const textMuted = isDark ? "text-deco-cream/50" : "text-luxury-black/50";
-  const accentCls = isDark ? "text-deco-gold" : "text-luxury-gold";
+  // Light-mode /50 measured 3.3:1 (Lighthouse `color-contrast`, 2026-09-23) — /65 clears AA at 5.2:1.
+  const textMuted = isDark ? "text-deco-cream/50" : "text-luxury-black/65";
+  // Light-mode 'text-luxury-gold' measured 2.0-2.1:1 as text on the page's light (cream)
+  // backgrounds (Lighthouse `color-contrast`, 2026-09-23) — #6b5730 is the darker "text-safe" gold
+  // already used for this in SkillPanel.tsx (measures 4.6:1). But the Ticker strip and the whole
+  // #experience section sit on this page's own dark "inverted" band (`bgSecondary`) even in light
+  // mode, where the ORIGINAL brighter gold clears AA easily (7.3:1) and the darker one would fail —
+  // `accentOnDark` (unchanged) is for those spots specifically; `accentCls` (darkened) is the
+  // default for everywhere else, which is the vast majority of its call sites.
+  const accentCls = isDark ? "text-deco-gold" : "text-[#6b5730]";
+  const accentOnDark = isDark ? "text-deco-gold" : "text-luxury-gold";
   const accentBg = isDark ? "bg-deco-gold" : "bg-luxury-gold";
   const borderColor = isDark ? "border-deco-gold/20" : "border-luxury-black/10";
   const borderAccent = isDark ? "border-deco-gold" : "border-luxury-gold";
@@ -383,7 +392,7 @@ function Design4Content() {
               renderItem={(st) => (
                 <>
                   <span className={`font-display text-2xl italic md:text-4xl ${isDark ? 'text-deco-cream' : 'text-luxury-cream'}`}>{st.name}</span>
-                  <span className={`text-xs uppercase tracking-[0.3em] ${accentCls}`}>{st.status === 'live' ? c.badges.live : c.badges.dev}</span>
+                  <span className={`text-xs uppercase tracking-[0.3em] ${accentOnDark}`}>{st.status === 'live' ? c.badges.live : c.badges.dev}</span>
                 </>
               )}
             />
@@ -402,9 +411,9 @@ function Design4Content() {
               <FadeInUp>
                 <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-16">
                   <div>
-                    <p className={`text-xs tracking-[0.5em] uppercase ${accentCls} mb-4`}>{c.sections.experience.eyebrow}</p>
+                    <p className={`text-xs tracking-[0.5em] uppercase ${accentOnDark} mb-4`}>{c.sections.experience.eyebrow}</p>
                     <h2 className="font-display text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
-                      {c.sections.experience.title} <span className={`italic ${accentCls}`}>{c.sections.experience.titleAccent}</span>
+                      {c.sections.experience.title} <span className={`italic ${accentOnDark}`}>{c.sections.experience.titleAccent}</span>
                     </h2>
                   </div>
                   <div className={`hidden md:block w-24 h-px ${accentBg}`} />
@@ -461,8 +470,14 @@ function Design4Content() {
                             <div className={`w-3 h-3 rounded-full mt-1 flex-shrink-0 ${job.end === null ? "bg-green-500 animate-pulse" : accentBg}`} />
                             <div className="min-w-0 flex-1">
                               <h3 className="font-semibold mb-1 text-sm md:text-base">{c.experience[job.id].title}</h3>
-                              <p className={`${accentCls} text-sm`}>{job.company}</p>
-                              <p className={`text-xs ${isDark ? "text-deco-cream/40" : "text-white/40"} mt-1`}>{formatPeriod(job.start, job.end)}</p>
+                              <p className={`${accentOnDark} text-sm`}>{job.company}</p>
+                              {/* This list sits inside the section's own dark "inverted" band
+                                  (`bgSecondary` = luxury-black even in light mode) — the light-mode
+                                  branch used generic 'text-white/40' instead of the theme's own cream
+                                  token, and measured 3.6-3.8:1 on the band's near-black background
+                                  (Lighthouse `color-contrast`, 2026-09-23). /60 of the theme's actual
+                                  cream clears AA with margin. */}
+                              <p className={`text-xs ${isDark ? "text-deco-cream/40" : "text-luxury-cream/60"} mt-1`}>{formatPeriod(job.start, job.end)}</p>
                             </div>
                           </div>
                         </m.button>
@@ -508,7 +523,7 @@ function Design4Content() {
                                   href={selectedJob.website}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className={`${accentCls} text-sm hover:underline mt-1 inline-block`}
+                                  className={`${accentOnDark} text-sm hover:underline mt-1 inline-block`}
                                 >
                                   {c.sections.experience.visit} →
                                 </a>
@@ -523,7 +538,7 @@ function Design4Content() {
                           <div className="grid grid-cols-3 gap-2 md:gap-4 mb-6 md:mb-8">
                             {selectedJob.metrics.map((metric) => (
                               <div key={metric.id} className={`text-center p-3 md:p-4 ${isDark ? "bg-deco-navy/50" : "bg-white/5"} rounded-lg`}>
-                                <div className={`text-lg md:text-2xl font-display ${accentCls}`}>{metric.value}</div>
+                                <div className={`text-lg md:text-2xl font-display ${accentOnDark}`}>{metric.value}</div>
                                 <div className={`text-xs ${isDark ? "text-deco-cream/50" : "text-white/50"}`}>
                                   {c.experience[selectedJob.id].metricLabels[metric.id]}
                                 </div>
@@ -532,7 +547,7 @@ function Design4Content() {
                           </div>
 
                           <div className="mb-6 md:mb-8">
-                            <h4 className={`text-xs tracking-[0.2em] uppercase ${accentCls} mb-4`}>{c.sections.experience.achievements}</h4>
+                            <h4 className={`text-xs tracking-[0.2em] uppercase ${accentOnDark} mb-4`}>{c.sections.experience.achievements}</h4>
                             <ul className="space-y-2 md:space-y-3">
                               {c.experience[selectedJob.id].highlights.map((highlight) => (
                                 <li key={highlight} className="flex items-start gap-2 md:gap-3">
@@ -544,7 +559,7 @@ function Design4Content() {
                           </div>
 
                           <div>
-                            <h4 className={`text-xs tracking-[0.2em] uppercase ${accentCls} mb-4`}>{c.sections.experience.technologies}</h4>
+                            <h4 className={`text-xs tracking-[0.2em] uppercase ${accentOnDark} mb-4`}>{c.sections.experience.technologies}</h4>
                             <div className="flex flex-wrap gap-2">
                               {selectedJob.technologies.map((tech) => (
                                 <span key={tech} className={`text-xs px-2 md:px-3 py-1 border ${borderColor} ${isDark ? "text-deco-cream/60" : "text-white/60"}`}>

@@ -26,7 +26,12 @@ export function ApplePreview({ isHovered = false, size = 'md' }: ApplePreviewPro
           MB
         </m.div>
         <p className="text-[#1d1d1f] text-sm font-semibold tracking-tight">Apple Clean</p>
-        <m.p className="text-[10px] text-[#0071e3]" animate={{ opacity: isHovered ? 1 : 0.7, x: isHovered ? 2 : 0 }}>
+        {/* #0066cc (not the page's #0071e3) is the "text-safe" Apple blue this codebase already
+            uses for small text on white (5.1:1, per skins.ts) — #0071e3 only clears AA at full
+            opacity, and this label used to fade to 0.7 at rest (idle, non-hovered — the state
+            Lighthouse's static DOM scan always sees), measuring ~2.8:1. Full opacity always now;
+            hover only nudges the chevron via `x`. */}
+        <m.p className="text-[10px] text-[#0066cc]" animate={{ x: isHovered ? 2 : 0 }}>
           Learn more ›
         </m.p>
       </div>

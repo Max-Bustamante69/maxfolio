@@ -7,8 +7,17 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        'display': ['Playfair Display', 'serif'],
-        'body': ['DM Sans', 'sans-serif'],
+        // 'Georgia' (then 'Cambria' on Windows without it) sits between the generic 'serif' resolution
+        // (Times New Roman on most desktops) and Playfair Display's own tall, wide proportions — a
+        // closer-shaped placeholder for the ~1s the deferred Google Fonts stylesheet takes to apply
+        // (index.html loads it via the non-blocking media=print swap trick). Measured contributors to
+        // /luxury's CLS (PerformanceObserver `layout-shift` probe, 2026-09-23): the hero stat numbers
+        // and the fleet-name ticker, both set in `font-display` at 2xl-5xl — the two places a serif's
+        // fallback-to-webfont width/line-height delta is most visible.
+        'display': ['Playfair Display', 'Georgia', 'Cambria', 'serif'],
+        // Same reasoning as 'display' above — 'sans-serif' alone can resolve to fonts further from
+        // DM Sans's own width than the system faces it's actually paired with almost everywhere.
+        'body': ['DM Sans', 'Helvetica Neue', 'Arial', 'sans-serif'],
         'mono': ['JetBrains Mono', 'monospace'],
         'editorial': ['Instrument Serif', 'serif'],
         'grotesk': ['Clash Display', 'sans-serif'],

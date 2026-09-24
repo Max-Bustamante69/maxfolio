@@ -27,7 +27,9 @@ export function LanguageSelectorLuxury({
   const menuBg = isDark ? 'bg-deco-navy' : 'bg-luxury-cream'
   const textPrimary = isDark ? 'text-deco-cream' : 'text-luxury-black'
   const textMuted = isDark ? 'text-deco-cream/60' : 'text-luxury-black/60'
-  const accent = isDark ? 'text-deco-gold' : 'text-luxury-gold'
+  // Light-mode 'text-luxury-gold' measured 2.0-2.1:1 as text elsewhere on this page (Lighthouse
+  // `color-contrast`, 2026-09-23) — #6b5730 is the darker "text-safe" gold already used for this.
+  const accent = isDark ? 'text-deco-gold' : 'text-[#6b5730]'
   const borderColor = isDark ? 'border-deco-gold/20' : 'border-luxury-gold/20'
   const buttonBg = isDark ? 'bg-deco-navy/40' : 'bg-luxury-cream/70'
   const buttonBorder = isDark ? 'border-deco-gold/30' : 'border-luxury-gold/30'
@@ -40,7 +42,6 @@ export function LanguageSelectorLuxury({
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={`relative ${buttonSize} flex items-center justify-center group`}
-        aria-label={t('language.selector.ariaLabel')}
         aria-expanded={open}
         aria-haspopup="menu"
       >
@@ -63,6 +64,8 @@ export function LanguageSelectorLuxury({
 
         <span className={`relative z-10 ${textSize} font-display tracking-[0.25em] ${textPrimary}`}>
           {localeLabel(locale)}
+          {/* the accessible name keeps the visible text and adds the purpose (matches LogoSelectorApple) */}
+          <span className="sr-only">, {t('language.selector.ariaLabel')}</span>
         </span>
 
         <AnimatePresence>

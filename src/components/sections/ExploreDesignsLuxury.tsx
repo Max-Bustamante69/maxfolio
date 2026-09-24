@@ -13,10 +13,14 @@ export function ExploreDesignsLuxury({ isDark }: ExploreDesignsLuxuryProps) {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
   const { t } = useI18n()
 
-  const accent = isDark ? 'text-deco-gold' : 'text-luxury-gold'
+  // Light-mode 'text-luxury-gold' measured 2.0-2.1:1 as text (Lighthouse `color-contrast`,
+  // 2026-09-23) — #6b5730 is the darker "text-safe" gold already used for this in SkillPanel.tsx.
+  const accent = isDark ? 'text-deco-gold' : 'text-[#6b5730]'
   const textPrimary = isDark ? 'text-deco-cream' : 'text-luxury-black'
-  const textSecondary = isDark ? 'text-deco-cream/60' : 'text-luxury-black/60'
-  const textMuted = isDark ? 'text-deco-cream/40' : 'text-luxury-black/40'
+  // Light-mode /60 and /40 measured 4.43:1 and 2.46:1 as text (Lighthouse `color-contrast`,
+  // 2026-09-23) — both short of AA's 4.5:1. /65 (this skin's own established safe value) clears both.
+  const textSecondary = isDark ? 'text-deco-cream/60' : 'text-luxury-black/65'
+  const textMuted = isDark ? 'text-deco-cream/40' : 'text-luxury-black/65'
   const borderColor = isDark ? 'border-deco-gold/20' : 'border-luxury-black/10'
   const cardBg = isDark ? 'bg-deco-navy/30' : 'bg-white/60'
   const sectionBg = isDark ? 'bg-slate-950/50' : 'bg-luxury-black/[0.02]'

@@ -205,11 +205,15 @@ function StyleSelectorTerminal({ accent, onToggleAccent }: { accent: Accent; onT
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-haspopup="menu"
-        aria-label={t('logoSelector.selectYourStyle')}
         className={`inline-flex items-center gap-1 border border-[var(--term-line)] px-2 py-1 text-[10px] font-mono uppercase ${muted}`}
       >
         <span aria-hidden="true">[</span>
-        <span className="hidden sm:inline">theme</span>
+        <span className="hidden sm:inline">
+          theme
+          {/* the accessible name keeps the visible text and adds the purpose (matches LogoSelectorApple) */}
+          <span className="sr-only normal-case">, {t('logoSelector.selectYourStyle')}</span>
+        </span>
+        <span className="sm:hidden sr-only">{t('logoSelector.selectYourStyle')}</span>
         <span aria-hidden="true" className={`transition-transform duration-150 ${open ? '-rotate-180' : ''}`}>▾</span>
         <span aria-hidden="true">]</span>
       </button>
@@ -484,11 +488,21 @@ function TerminalContent() {
                   <h1 id="hero-heading" className="sr-only">
                     {registry.personal.name} — {c.hero.eyebrow}
                   </h1>
-                  {!bootDone && (
-                    <button type="button" onClick={skipBoot} className={`mb-4 border border-[var(--term-line)] px-2 py-1 text-[11px] uppercase ${muted}`}>
-                      [skip]
-                    </button>
-                  )}
+                  {/* Always mounted (never conditionally unmounted) — this used to be `{!bootDone &&
+                      ...}`, so finishing the boot sequence removed its ~60px (button + `mb-4`) from
+                      above the boot lines and shifted them, and every section below, up by that same
+                      amount (measured: 0.0207 of /terminal's 0.0217 total CLS, PerformanceObserver
+                      `layout-shift` probe, 2026-09-23). Toggling opacity/pointer-events instead reserves
+                      the space, matching the sibling post-boot block's own opacity-toggle just below. */}
+                  <button
+                    type="button"
+                    onClick={skipBoot}
+                    tabIndex={bootDone ? -1 : 0}
+                    aria-hidden={bootDone || undefined}
+                    className={`mb-4 border border-[var(--term-line)] px-2 py-1 text-[11px] uppercase transition-opacity duration-300 ${muted} ${bootDone ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+                  >
+                    [skip]
+                  </button>
                   <div className="space-y-2.5 text-lg md:text-xl" aria-label={`${registry.personal.name}. ${c.hero.eyebrow}. Medellín, CO. ${c.hero.availability}.`}>
                     {bootLines.map((line, i) => {
                       const revealed = i < revealCount

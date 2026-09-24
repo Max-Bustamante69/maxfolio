@@ -24,7 +24,6 @@ export function LanguageSelectorMenu({ size = 'md' }: { size?: 'sm' | 'md' }) {
       <m.button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        aria-label={t('language.selector.ariaLabel')}
         aria-expanded={open}
         aria-haspopup="menu"
         className={`relative ${buttonClass} flex items-center justify-center border border-neutral-300/70 rounded-full overflow-hidden backdrop-blur-sm hover:border-neutral-900/50 transition-colors bg-white/70 dark:bg-neutral-950/30`}
@@ -44,6 +43,8 @@ export function LanguageSelectorMenu({ size = 'md' }: { size?: 'sm' | 'md' }) {
         />
         <span className="relative z-10 font-mono font-bold uppercase tracking-wider text-neutral-900 dark:text-neutral-100">
           {localeLabel(locale)}
+          {/* the accessible name keeps the visible text and adds the purpose (matches LogoSelectorApple) */}
+          <span className="sr-only">, {t('language.selector.ariaLabel')}</span>
         </span>
       </m.button>
 

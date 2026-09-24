@@ -140,6 +140,12 @@ export function ShopifyWork({ skin, heading, ownId = true }: ShopifyWorkProps) {
     e.currentTarget.style.setProperty('--spot-y', `${e.clientY - r.top}px`)
   }
   const spotColor = skin.dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)'
+  // Luxury's `skin.accent` (#c9a962) is tuned for its own dark surfaces (7.3:1 there) — this list's
+  // rows sit on the page's light cream instead, where it measures 2.1:1 as text (Lighthouse
+  // `color-contrast`, 2026-09-23). #6b5730 is the darker "text-safe" gold SkillPanel.tsx already
+  // uses for the same reason; kept scoped to this row's own CTA text, not the shared token, since
+  // other Luxury surfaces (Design4's dark "inverted" band) still need the brighter original.
+  const ctaAccent = skin.frame === 'luxury' && !skin.dark ? 'text-[#6b5730]' : skin.accent
 
   const StoreRow = ({ st }: { st: StoreEntry }) => {
     const c = strings.stores[st.slug]
@@ -176,7 +182,7 @@ export function ShopifyWork({ skin, heading, ownId = true }: ShopifyWorkProps) {
           </div>
           <p className={`${skin.body} text-sm leading-snug md:col-span-5 md:line-clamp-2`}>{c?.tagline}</p>
           <div className="flex items-center gap-x-4 text-sm md:col-span-3 md:justify-end">
-            <button type="button" onClick={() => setOpenStore(st)} className={`${skin.accent} press compact-touch inline-flex items-center whitespace-nowrap`}>
+            <button type="button" onClick={() => setOpenStore(st)} className={`${ctaAccent} press compact-touch inline-flex items-center whitespace-nowrap`}>
               {cs.open} ›
             </button>
             {st.url && (
@@ -185,7 +191,7 @@ export function ShopifyWork({ skin, heading, ownId = true }: ShopifyWorkProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => track('outbound_store_click', { store: st.slug })}
-                className={`${skin.accent} compact-touch inline-flex items-center whitespace-nowrap`}
+                className={`${ctaAccent} compact-touch inline-flex items-center whitespace-nowrap`}
               >
                 {s.visit} ›
               </a>
