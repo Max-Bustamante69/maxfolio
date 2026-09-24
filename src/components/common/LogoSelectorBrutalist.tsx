@@ -105,7 +105,12 @@ export function LogoSelectorBrutalist({ isDark }: LogoSelectorBrutalistProps) {
       <AnimatePresence>
         {showHint && !isOpen && (
           <m.div
-            className="flex items-center gap-1 text-red-600"
+            // text-red-600 (#dc2626) on this nav's dark register (bg-stone-950/90) measured 4.09:1
+            // (Lighthouse color-contrast, desktop, 2026-09-24) -- same shortfall the "QUICK EMAIL"
+            // nav button had, fixed the same way: the isDark-aware red already used elsewhere on
+            // this page for dark-register text (red-400 clears 4.5+ there; light register keeps
+            // red-600 against the light nav bg, where it already passes).
+            className={`flex items-center gap-1 ${isDark ? "text-red-400" : "text-red-600"}`}
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -8 }}
@@ -121,11 +126,13 @@ export function LogoSelectorBrutalist({ isDark }: LogoSelectorBrutalistProps) {
                 />
               ))}
             </div>
-            <m.span
-              className="hidden sm:block font-mono text-[9px] uppercase tracking-wider whitespace-nowrap"
-              animate={{ opacity: [0.5, 1, 0.5] }}
-              transition={{ repeat: Infinity, duration: 1.5 }}
-            >
+            {/* Was `animate={{ opacity: [0.5, 1, 0.5] }}` — dipping this text-red-600-on-stone-950
+                span to 50% opacity blends it toward the dark bg (~#af2020 at axe's sampled frame,
+                Lighthouse `color-contrast`, desktop, 2026-09-24), the same opacity-dims-text-below-AA
+                shape already fixed twice elsewhere in this round (ApplePreview idle fade,
+                ExploreDesignsBrutalist preview tile). Full opacity always; the pulse still reads via
+                the bars beside it, which are decorative (non-text) and unaffected by this rule. */}
+            <m.span className="hidden sm:block font-mono text-[9px] uppercase tracking-wider whitespace-nowrap">
               Styles
             </m.span>
           </m.div>
