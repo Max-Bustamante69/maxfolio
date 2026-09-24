@@ -23,7 +23,7 @@ const TOKEN_KEY = 'mf-stats-token'
 // Page order on the Apple landing (the only page `data-track-section` is wired on today) — the
 // funnel below reads `section_view:<id>` in exactly this order so it reads top-to-bottom like the
 // page itself scrolls.
-const SECTION_ORDER = ['hero', 'experience', 'shopify', 'gallery', 'projects', 'skills', 'review', 'faq', 'contact', 'explore']
+const SECTION_ORDER = ['hero', 'experience', 'shopify', 'gallery', 'projects', 'skills', 'proof', 'faq', 'contact', 'explore']
 
 function readToken(): string {
   try {

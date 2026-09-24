@@ -48,6 +48,11 @@ const EVENTS: Record<string, EventSpec> = {
   filter_change: {
     fields: (p) => (isEnum(p.kind, FILTER_KINDS) && isSlug(p.value, 24) ? [`filter_change:${p.kind}:${p.value}`] : false),
   },
+  // The live-measurement section (StoreCheck.tsx / api/psi.ts). `host` is the target store's own
+  // hostname only — never the full URL, path or query — so this is the one event in the taxonomy
+  // whose per-value breakdown isn't a closed set: any hostname a visitor measures gets its own field.
+  // Fine at this site's traffic; worth collapsing to the bare total if that ever grows unbounded.
+  psi_check: { fields: (p) => (isSlug(p.host, 64) ? ['psi_check', `psi_check:host:${p.host}`] : ['psi_check']) },
 }
 
 const last30Days = () => Array.from({ length: 30 }, (_, i) => new Date(Date.now() - i * 86400000).toISOString().slice(0, 10)).reverse()

@@ -24,9 +24,9 @@ const FeaturedBuild = lazy(() => import('../components/sections/FeaturedBuild').
 const Manifesto = lazy(() => import('../components/sections/Manifesto').then((mod) => ({ default: mod.Manifesto })))
 const Projects = lazy(() => import('../components/sections/Projects').then((mod) => ({ default: mod.Projects })))
 const Skills = lazy(() => import('../components/sections/Skills').then((mod) => ({ default: mod.Skills })))
-const ReviewChecklist = lazy(() => import('../components/sections/ReviewChecklist').then((mod) => ({ default: mod.ReviewChecklist })))
 // "How we could work together" — round 44 prototype (?proposal=models-a|b), round 46 lane "extras" made it the only implementation.
 const EngagementModels = lazy(() => import('../components/sections/EngagementModels').then((mod) => ({ default: mod.EngagementModels })))
+const StoreCheck = lazy(() => import('../components/sections/StoreCheck').then((mod) => ({ default: mod.StoreCheck })))
 const Faq = lazy(() => import('../components/sections/Faq').then((mod) => ({ default: mod.Faq })))
 const Contact = lazy(() => import('../components/sections/Contact').then((mod) => ({ default: mod.Contact })))
 const CareerSubway = lazy(() => import('../components/sections/CareerSubway').then((mod) => ({ default: mod.CareerSubway })))
@@ -208,10 +208,11 @@ function AppleContent() {
   )
 
   const primaryBtn = 'press inline-flex items-center justify-center rounded-full bg-apple-blue px-6 py-3 text-sm font-medium text-white hover:bg-apple-blueHover'
-  // Tracks more bands than the nav shows links for (skills, review, faq) so "Projects" doesn't stay
-  // lit through them (the nav's `on` check only matches the 6 href ids below, so an id outside that
-  // list simply shows nothing active — which is the fix: no longer the *wrong* thing staying active).
-  const activeSection = useActiveSection([...nav.map(([href]) => href.slice(1)), 'skills', 'review', 'engagement', 'faq'])
+  // Tracks more bands than the nav shows links for (skills, proof, engagement, faq) so "Projects"
+  // doesn't stay lit through them (the nav's `on` check only matches the 6 href ids below, so an id
+  // outside that list simply shows nothing active — which is the fix: no longer the *wrong* thing
+  // staying active).
+  const activeSection = useActiveSection([...nav.map(([href]) => href.slice(1)), 'skills', 'proof', 'engagement', 'faq'])
   const liveCount = registry.stores.filter((s) => s.status === 'live').length
   const devCount = registry.stores.filter((s) => s.status === 'dev').length
 
@@ -504,12 +505,13 @@ function AppleContent() {
             </div>
           </section>
 
-          {/* Review checklist — what the free review's Playwright harness actually checks. Owns its
-              own id so useActiveSection can track it separately from Projects above it. */}
-          <section id="review" data-track-section="review" className="px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
+          {/* Store check — a real URL field that measures the visitor's own store live via the
+              server-side PSI proxy. Owns its own id so useActiveSection can track it separately from
+              Projects above it (round 46, replaces the old review-checklist replay). */}
+          <section id="proof" data-track-section="proof" className="px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
-                <ReviewChecklist skin={skin} heading={Heading} onCta={() => openContact()} />
+                <StoreCheck skin={skin} heading={Heading} onCta={(prefill) => openContact(prefill)} />
               </Suspense>
             </div>
           </section>
