@@ -1,62 +1,62 @@
 [
   {
-    "hash": "91f452b",
+    "hash": "26dd1b7",
     "date": "2026-09-23",
-    "subject": "fix(proof): stale id comment and a missing status live-region"
+    "subject": "chore(build): regenerate changelog after the brutalist a11y fix"
   },
   {
-    "hash": "32a43af",
+    "hash": "da7b64a",
     "date": "2026-09-23",
-    "subject": "test(proof): Playwright probe for the store-check section + regenerated changelog"
+    "subject": "fix(a11y): clear /brutalist's real 97-100 gap -- a 4th, unmeasured color-contrast node"
   },
   {
-    "hash": "a41f89b",
+    "hash": "99a3d86",
     "date": "2026-09-23",
-    "subject": "feat(proof): ship the live store-check section on Apple"
+    "subject": "chore(build): regenerate changelog after the fonts/a11y fixes"
   },
   {
-    "hash": "fd8f31d",
+    "hash": "cae8362",
     "date": "2026-09-23",
-    "subject": "chore(build): regenerated artifacts for round 44 ship lane"
+    "subject": "fix(a11y): clear /brutalist's desktop-only Lighthouse failures (97 - 100)"
   },
   {
-    "hash": "b226156",
+    "hash": "d1fac65",
     "date": "2026-09-23",
-    "subject": "fix(arcade): the inverted band's label keeps the theme red in dark mode"
+    "subject": "perf(fonts): stop loading Arcade's Anton/Rajdhani on every route"
   },
   {
-    "hash": "91a35ae",
+    "hash": "cf2a066",
     "date": "2026-09-23",
-    "subject": "fix(review): dedupe the Apple page's #faq id and cap /api/event body size"
+    "subject": "fix(a11y): bring /neo and /brutalist Lighthouse accessibility + brutalist best-practices to 100"
   },
   {
-    "hash": "9010854",
+    "hash": "f1f8d00",
     "date": "2026-09-23",
-    "subject": "feat(analytics+quick-wins): first-party event ledger, /stats dashboard, and audit quick wins"
+    "subject": "fix(terminal): shrink the boot-skip control's permanent CLS-reservation box"
   },
   {
-    "hash": "e6d378d",
+    "hash": "d93a142",
     "date": "2026-09-23",
-    "subject": "chore(build): regenerated artifacts for round 44 fixes"
+    "subject": "fix(a11y): contain the skills-chip accessible-name span (390px header-region overflow regression)"
   },
   {
-    "hash": "aeba562",
+    "hash": "32a7219",
     "date": "2026-09-23",
-    "subject": "fix(orbit): curved group names are labels again; desktop dots use a 32 px target"
+    "subject": "chore(build): regenerated changelog for round 46 experience lane fix"
   },
   {
-    "hash": "d2ad40a",
+    "hash": "c75d9c4",
     "date": "2026-09-23",
-    "subject": "fix(terminal-nav): links centered vertically and 16 px clear of the language buttons"
+    "subject": "fix(experience): restore the per-skin logoChipBg fix the p44 port dropped"
   },
   {
-    "hash": "fe3f2d2",
+    "hash": "515a6b6",
     "date": "2026-09-23",
-    "subject": "fix(sections): dedupe wrapper ids on luxury/brutalist/neo, fix hash landing"
+    "subject": "chore(build): regenerated changelog for round 46 experience lane"
   },
   {
-    "hash": "077c5e1",
+    "hash": "2ad6003",
     "date": "2026-09-23",
-    "subject": "feat(mobile-menu): show each design's brand mark in the switcher list"
+    "subject": "test(experience): Playwright probe for the Métricas vivas layout"
   }
 ]
