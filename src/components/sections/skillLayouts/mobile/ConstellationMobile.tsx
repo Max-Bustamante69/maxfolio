@@ -127,7 +127,12 @@ export function ConstellationMobile({ data }: SkillsLayoutProps) {
                   layoutId={`cluster-${g}`}
                   type="button"
                   aria-expanded={false}
-                  aria-label={fill(sk.mobile.openCluster, { group: groupLabel[g] })}
+                  // No `aria-label` override: it replaced the visible group name + tool preview with
+                  // unrelated wording, which axe's `label-content-name-mismatch` flags since neither
+                  // visible line was a substring of it (round-45 fix pattern — see LedgerLayout.tsx's
+                  // own comment on the same bug). The visible text below is the accessible name; the
+                  // `sr-only` span on the group name adds the "open" purpose `aria-expanded` alone
+                  // doesn't spell out, without displacing anything the eye already reads.
                   // A filter that leaves nothing in this cluster can't be tapped into an empty panel —
                   // same "can't open" convention `OrbitLayout`'s own filtered-out dots follow (see this
                   // file's header comment / that file's 2026-09-11 review fix), so it also leaves the
@@ -161,7 +166,10 @@ export function ConstellationMobile({ data }: SkillsLayoutProps) {
                     </AnimatePresence>
                   </svg>
                   <div className="relative z-10">
-                    <p className={`text-[10px] font-semibold uppercase tracking-[0.12em] transition-opacity duration-300 ${allFiltered ? 'opacity-30' : 'opacity-100'} ${skin.title}`}>{groupLabel[g]}</p>
+                    <p className={`text-[10px] font-semibold uppercase tracking-[0.12em] transition-opacity duration-300 ${allFiltered ? 'opacity-30' : 'opacity-100'} ${skin.title}`}>
+                      {groupLabel[g]}
+                      <span className="sr-only"> — {fill(sk.mobile.openCluster, { group: groupLabel[g] })}</span>
+                    </p>
                     <p className={`mt-0.5 text-[9px] leading-tight ${skin.muted}`}>{top2.map((u) => u.tool).join(' · ')}</p>
                   </div>
                 </m.button>

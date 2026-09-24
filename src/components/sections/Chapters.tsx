@@ -15,6 +15,17 @@ interface ChaptersProps {
 const EASE = [0.23, 1, 0.32, 1] as const
 const PIN_VH = 340
 
+/** The year-strip pill's idle text sits on the pill's own faint fill (`bg-black/5` light / `bg-white/5`
+ *  dark), not the page background `skin.muted` was tuned against. Apple light's shared `#6e6e73`
+ *  measures 4.37:1 there (Lighthouse `color-contrast`, 2026-09-24 audit) — short of AA's 4.5:1 for
+ *  this 11px label. Same local-override value as MetricCard.tsx/SkillPanel.tsx's own Apple-light fix
+ *  (`#5c5c62`, measured 5.73:1 on this pill); this component only ever renders for Apple today, so
+ *  every other frame keeps `skin.muted` unchanged.
+ */
+function yearPillMuted(skin: Skin): string {
+  return skin.frame === 'apple' && !skin.dark ? 'text-[#5c5c62]' : skin.muted
+}
+
 /** Up to 3 real, named things that touched a year — stores first (the most concrete build), then roles, then products. */
 function useHighlights() {
   const { strings, registry } = useContent()
@@ -370,7 +381,7 @@ export function Chapters({ skin, heading }: ChaptersProps) {
                       onClick={() => goTo(i)}
                       aria-current={i === active}
                       aria-label={e.year.toString()}
-                      className={`press flex h-8 w-8 items-center justify-center rounded-full text-[11px] font-semibold tabular-nums transition-colors duration-150 ${i === active ? `${skin.accentBg} text-white` : `${skin.muted} ${skin.dark ? 'bg-white/5' : 'bg-black/5'}`}`}
+                      className={`press flex h-8 w-8 items-center justify-center rounded-full text-[11px] font-semibold tabular-nums transition-colors duration-150 ${i === active ? `${skin.accentBg} text-white` : `${yearPillMuted(skin)} ${skin.dark ? 'bg-white/5' : 'bg-black/5'}`}`}
                     >
                       {String(e.year).slice(2)}
                     </button>

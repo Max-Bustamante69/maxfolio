@@ -83,7 +83,27 @@ export default function ScrollObjectScene({ variant, active }: Props) {
     let width = container.clientWidth || 1
     let height = container.clientHeight || 1
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' })
+    // Some browsers/environments (GPU blocklisted, hardware acceleration off, headless test runners,
+    // some privacy extensions) can't create a WebGL context. Probe with a bare canvas first: THREE's
+    // own `WebGLRenderer` constructor does the same underlying `getContext` call, but also
+    // `console.error`s before it throws — probing separately skips that noise entirely instead of
+    // triggering and then catching it. Uncaught, that throw happens inside a passive effect with no
+    // error boundary above it, which crashes the WHOLE app to a blank page (measured: a headless
+    // Chrome run without GPU support, 2026-09-24 accessibility audit — `landmark-one-main` and
+    // `skip-link` both failed because the entire React tree had unmounted, and the logged errors alone
+    // failed `best-practices`' `errors-in-console`). This object is purely decorative (`ScrollObject`'s
+    // own comment: the theme's static art stays visible underneath), so a failure here must be
+    // invisible, not fatal — bail out and render nothing instead.
+    const probe = document.createElement('canvas')
+    const hasWebGL = !!(probe.getContext('webgl2') || probe.getContext('webgl'))
+    if (!hasWebGL) return
+
+    let renderer: THREE.WebGLRenderer
+    try {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' })
+    } catch {
+      return
+    }
     renderer.setPixelRatio(1) // cap at 1x DPR
     renderer.setSize(width, height)
     renderer.setClearColor(0x000000, 0)

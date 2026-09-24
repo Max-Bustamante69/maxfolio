@@ -88,6 +88,22 @@ export interface MetricCardProps {
 
 const numeral = 'text-[1.6rem] font-semibold leading-none tracking-[-0.03em] tabular-nums'
 
+/** The 11px caption at the card's foot sits on the card's own faint tint (`surface` below — 2%/4%
+ *  black/white over the page bg), not the flat page background each skin's shared `muted` was tuned
+ *  against. Two of the five skins that render this card come up short there: Apple's light `#6e6e73`
+ *  measures 4.45:1 on that tint (Lighthouse `color-contrast`, 2026-09-24 audit) and Neo's dark
+ *  `#9aa0ac` measures 4.47:1 — both under AA's 4.5:1 for text this size. Same local-override pattern
+ *  as SkillPanel.tsx's own `panelTone` (and this file's Apple value matches that one): a small,
+ *  measured darken/lighten scoped to this card, not a change to the shared token everywhere else
+ *  already clears. Apple dark, Neo light, Terminal and Persona (both modes) all measure ≥4.9:1 on
+ *  this same tint and keep `skin.muted` unchanged.
+ */
+function labelMuted(skin: Skin): string {
+  if (skin.frame === 'apple' && !skin.dark) return 'text-[#5c5c62]'
+  if (skin.frame === 'neo' && skin.dark) return 'text-[#a3a9b5]'
+  return skin.muted
+}
+
 export function MetricCard({ skin, id, label, value, delay = 0, className = '' }: MetricCardProps) {
   const dark = skin.dark
   const accent = sheetTokens(skin).accent
@@ -145,7 +161,7 @@ export function MetricCard({ skin, id, label, value, delay = 0, className = '' }
       )}
       {parsed.kind === 'signedPct' && <MetricBar pct={((parsed.value ?? 0) / Math.max((parsed.value ?? 0) * 1.6, 30)) * 100} color={accent} dark={dark} delay={delay + 0.15} />}
 
-      <p className={`text-[11px] font-medium leading-tight ${skin.muted}`}>{label}</p>
+      <p className={`text-[11px] font-medium leading-tight ${labelMuted(skin)}`}>{label}</p>
     </div>
   )
 }
