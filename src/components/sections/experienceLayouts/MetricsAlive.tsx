@@ -111,7 +111,7 @@ export function MetricsAlive({ skin }: MetricsAliveProps) {
             >
               <div className="flex items-start gap-4">
                 {job.logo && (
-                  <div className={`h-12 w-12 shrink-0 bg-white p-1.5 ${skin.logoChip}`}>
+                  <div className={`h-12 w-12 shrink-0 p-1.5 ${skin.logoChipBg} ${skin.logoChip}`}>
                     <CompanyLogo src={job.logo} alt={job.company} />
                   </div>
                 )}
