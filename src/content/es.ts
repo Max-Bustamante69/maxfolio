@@ -126,10 +126,6 @@ export const es: PortfolioContent = {
       title: 'Cinco años,',
       titleAccent: 'una sola dirección',
       lead: 'De componentes React en 2022 a una flota de tiendas Shopify y la plataforma detrás. Cada tarjeta sale de los mismos registros que el resto del sitio.',
-      chapterOf: '{n} / {total}',
-      prevAria: 'Año anterior',
-      nextAria: 'Año siguiente',
-      highlightsLabel: 'Lo más destacado',
     },
     featuredBuild: {
       eyebrow: 'Un build, completo',

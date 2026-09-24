@@ -1,28 +1,18 @@
 [
   {
-    "hash": "80dfa98",
+    "hash": "ded6717",
     "date": "2026-09-23",
-    "subject": "fix(process): clear ScrollRail's progress bar with the mobile pinned rail"
+    "subject": "chore(build): regenerated artifacts for round 46 chapters lane"
   },
   {
-    "hash": "e931a4f",
+    "hash": "8dfd485",
     "date": "2026-09-23",
-    "subject": "chore(build): regenerated changelog for round 46 extras lane (final)"
+    "subject": "polish(chapters): velocity-scaled blur through the digit gutter"
   },
   {
-    "hash": "7d2b740",
+    "hash": "dbcfca8",
     "date": "2026-09-23",
-    "subject": "fix(content): drop the em dash from the free-review card, add the r46 extras probe"
-  },
-  {
-    "hash": "82ab236",
-    "date": "2026-09-23",
-    "subject": "chore(build): regenerated changelog for round 46 extras lane"
-  },
-  {
-    "hash": "076440d",
-    "date": "2026-09-23",
-    "subject": "feat(apple+process): ship round-44 extras picks — engagement models + pinned mobile process rail"
+    "subject": "feat(chapters): pinned year odometer replaces the drag rail on Apple"
   },
   {
     "hash": "fd8f31d",
@@ -58,5 +48,15 @@
     "hash": "d2ad40a",
     "date": "2026-09-23",
     "subject": "fix(terminal-nav): links centered vertically and 16 px clear of the language buttons"
+  },
+  {
+    "hash": "fe3f2d2",
+    "date": "2026-09-23",
+    "subject": "fix(sections): dedupe wrapper ids on luxury/brutalist/neo, fix hash landing"
+  },
+  {
+    "hash": "077c5e1",
+    "date": "2026-09-23",
+    "subject": "feat(mobile-menu): show each design's brand mark in the switcher list"
   }
 ]

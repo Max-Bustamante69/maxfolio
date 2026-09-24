@@ -359,13 +359,6 @@
 /* House carousel track (vendored from Digitdeck components) */
 .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 
-/* Drag rail — grab/grabbing cursor only for a mouse that can actually hover (useDragRail.ts drives the
- * scroll itself; touch and keyboard get no cursor affordance and don't need one). */
-@media (hover: hover) and (pointer: fine) {
-  .drag-rail:hover { cursor: grab; }
-  .drag-rail[data-dragging='true'] { cursor: grabbing; }
-}
-
 /* Luxury (Design4) — a thin gold light travels the border of the one "featured" surface on screen
  * (the active job's detail panel). Ring-only via mask-composite: exclude, so it needs no extra markup
  * and never fights the panel's own border-color. One instance on screen at a time (perf note in

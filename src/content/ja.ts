@@ -126,10 +126,6 @@ export const ja: PortfolioContent = {
       title: '5年間、',
       titleAccent: 'ひとつの方向へ',
       lead: '2022年のReactコンポーネントから、Shopifyストア群とその裏側のプラットフォームまで。各カードはサイト全体と同じ記録から生成しています。',
-      chapterOf: '{n} / {total}',
-      prevAria: '前の年',
-      nextAria: '次の年',
-      highlightsLabel: 'ハイライト',
     },
     featuredBuild: {
       eyebrow: '1つのbuildを、丸ごと',
