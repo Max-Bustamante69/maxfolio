@@ -79,12 +79,22 @@ export function LedgerLayout({ data }: SkillsLayoutProps) {
                           aria-pressed={isOpen}
                           aria-expanded={isOpen}
                           aria-controls={DRAWER_ID}
-                          aria-label={`${u.tool} — ${isOpen ? sk.orbit.collapseRow : sk.orbit.expandRow}`}
                           onClick={() => setOpenTool((prev) => (prev === u.tool ? null : u.tool))}
-                          className={`flex w-full items-baseline justify-between gap-3 border-b py-2 text-left ${skin.line} ${isOpen ? skin.accent : skin.body}`}
+                          // `relative`: the row's own accessible-name span below is an absolutely-positioned
+                          // `sr-only` node (see the same fix and its comment in SkillsFilterBar.tsx's CHIP) —
+                          // without a positioned ancestor it would escape this button's box entirely.
+                          className={`relative flex w-full items-baseline justify-between gap-3 border-b py-2 text-left ${skin.line} ${isOpen ? skin.accent : skin.body}`}
                         >
-                          <span className="truncate text-sm">{u.tool}</span>
-                          <span className={`shrink-0 text-xs tabular-nums ${isOpen ? skin.accent : skin.muted}`}>{formatTool(u)}</span>
+                          <span className="truncate text-sm">
+                            {u.tool}
+                            {/* the accessible name keeps the visible text (tool name + usage stat) and adds
+                                the purpose (matches LogoSelectorApple / the round-45 label-content-name-mismatch
+                                fix pattern) — the previous `aria-label` fully replaced both visible spans with
+                                unrelated wording ("Liquid — Show details"), which axe's audit flags since
+                                neither visible span's text is a substring of it. */}
+                            <span className="sr-only"> {formatTool(u)}, {isOpen ? sk.orbit.collapseRow : sk.orbit.expandRow}</span>
+                          </span>
+                          <span aria-hidden="true" className={`shrink-0 text-xs tabular-nums ${isOpen ? skin.accent : skin.muted}`}>{formatTool(u)}</span>
                         </button>
                       </m.div>
                     )

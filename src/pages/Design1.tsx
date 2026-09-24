@@ -115,7 +115,12 @@ function Design1Content() {
   const bgCard = isDark ? 'bg-stone-900' : 'bg-stone-100'
   const textPrimary = isDark ? 'text-stone-100' : 'text-stone-900'
   const textSecondary = isDark ? 'text-stone-300' : 'text-stone-600'
-  const textMuted = isDark ? 'text-stone-500' : 'text-stone-500'
+  // Was `isDark ? 'text-stone-500' : 'text-stone-500'` (not actually mode-aware) — stone-500 measures
+  // 4.11:1 as text on this page's dark bg (stone-950, #0c0a09), just under the 4.5:1 small-text floor
+  // ("CTO & SHOPIFY TECH LEAD", "MEDELLÍN, COLOMBIA", "EST. 2022", the footer line — Lighthouse
+  // `color-contrast`, 2026-09-24). stone-400/stone-600 clear it with margin on both registers
+  // (7.83 dark, 6.99 light) — the same pair ExploreDesignsBrutalist.tsx's own `textMuted` now uses.
+  const textMuted = isDark ? 'text-stone-400' : 'text-stone-600'
   const borderColor = isDark ? 'border-stone-800' : 'border-stone-300'
   const borderStrong = isDark ? 'border-stone-700' : 'border-stone-900'
 
@@ -267,7 +272,12 @@ function Design1Content() {
               >
                 <div className="grid grid-cols-12 gap-6 md:gap-8">
                   <div className="col-span-12 md:col-span-8">
-                    <p className={`font-mono text-xs uppercase tracking-[0.3em] ${isDark ? 'text-red-400' : 'text-stone-500'} mb-4`}>
+                    {/* This box's own bg is ALWAYS dark (`bg-red-950`/`bg-stone-900` above, never a
+                        light one) regardless of the outer page's `isDark` — so both label colors here
+                        need to be dark-bg-safe, not just the `isDark` branch. `text-stone-500` on
+                        `bg-stone-900` measured 3.65:1 (Lighthouse `color-contrast`, 2026-09-24);
+                        `text-stone-400` clears 4.5+ there, matching this page's own `textMuted` fix. */}
+                    <p className={`font-mono text-xs uppercase tracking-[0.3em] ${isDark ? 'text-red-400' : 'text-stone-400'} mb-4`}>
                       {t('sections.magazineProfile')}
                     </p>
                     <p className="font-editorial text-xl md:text-2xl lg:text-3xl italic leading-relaxed">"{c.experience['digitdeck-cto'].summary}"</p>
@@ -278,13 +288,17 @@ function Design1Content() {
                   </div>
                   <div className="col-span-12 md:col-span-4 flex flex-col justify-between gap-6">
                     <div>
-                      <p className={`font-mono text-xs uppercase tracking-wider ${isDark ? 'text-red-400' : 'text-stone-500'} mb-2`}>{t('nav.contact')}</p>
+                      {/* Same always-dark-box reasoning as the label above. */}
+                      <p className={`font-mono text-xs uppercase tracking-wider ${isDark ? 'text-red-400' : 'text-stone-400'} mb-2`}>{t('nav.contact')}</p>
                       <p className="text-base md:text-lg">{registry.personal.email}</p>
                       <p className="text-base md:text-lg">{registry.personal.phone}</p>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-3">
                       <button onClick={() => setIsContactOpen(true)} className="flex-1 border-2 border-red-600 px-6 py-3 hover:bg-red-600 transition-colors group">
-                        <span className="font-mono text-xs uppercase tracking-wider text-red-500 group-hover:text-white">{c.hero.ctaContact}</span>
+                        {/* text-red-500 on this always-dark box's bg measured 4.28-4.29:1 (Lighthouse
+                            `color-contrast`, 2026-09-24, on the red-950 register) — red-400 clears 4.5+
+                            on both this box's registers (red-950 and stone-900). */}
+                        <span className="font-mono text-xs uppercase tracking-wider text-red-400 group-hover:text-white">{c.hero.ctaContact}</span>
                       </button>
                       <button
                         onClick={downloadCv}
@@ -580,7 +594,9 @@ function Design1Content() {
               © 2026 {registry.personal.name}. {c.footer.rights}
             </p>
             <p className={`font-mono text-xs ${textMuted}`}>
-              <span className="text-red-600">{t(self.nameKey)}</span> — {t(self.subtitleKey)}
+              {/* text-red-600 measured 4.09:1 on this footer's dark bg (Lighthouse `color-contrast`,
+                  2026-09-24) — the same mode-aware pair `skins.ts`'s brutalist `accent` now uses. */}
+              <span className={isDark ? 'text-red-400' : 'text-red-700'}>{t(self.nameKey)}</span> — {t(self.subtitleKey)}
             </p>
           </div>
         </footer>

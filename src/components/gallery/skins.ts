@@ -196,18 +196,29 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     // on the dark register's stone-950 (Lighthouse `color-contrast`, 2026-09-23 audit; SkillPanel's
     // own comment already flagged this exact gap). stone-400/stone-600 both clear AA with margin.
     muted: d ? 'text-stone-400' : 'text-stone-600',
-    accent: 'text-red-600',
+    // Wasn't mode-aware either — text-red-600 measures 3.62-4.09:1 as text on this theme's dark
+    // registers (stone-900/950 page and card backgrounds) and only 4.43:1 on stone-100, just under
+    // AA, on the light ones (Lighthouse `color-contrast`, 2026-09-24 audit — ShopifyWork's repeated
+    // "Case study ›"/"Visit store ›" row CTAs, the theme-switcher's current-design highlight, and
+    // this component's own headings all use it as text). red-700 clears 4.5+ on every light
+    // background used here (white/stone-100/stone-200); red-400 clears 4.5+ on every dark one
+    // (stone-900/950 and the red-tinted CTA background). `accentBg`/`chipOn`/`badgeLive` keep the
+    // brand red-600 unchanged — those put white text ON it, a different contrast pair that already
+    // passes, not this one.
+    accent: d ? 'text-red-400' : 'text-red-700',
     chip: `font-mono text-[10px] px-2 py-1 ${d ? 'bg-stone-800 text-stone-400' : 'bg-stone-200 text-stone-600'}`,
     chipOn: 'font-mono text-[10px] px-2 py-1 bg-red-600 text-white',
     badgeLive: 'bg-red-600 text-white font-mono uppercase',
-    badgeDev: 'border-2 border-red-600 text-red-600 font-mono uppercase',
+    badgeDev: `border-2 ${d ? 'border-red-400 text-red-400' : 'border-red-700 text-red-700'} font-mono uppercase`,
     rowHover: d ? 'hover:bg-stone-800/60' : 'hover:bg-stone-200/60',
     divider: d ? 'divide-stone-700 border-stone-700' : 'divide-stone-900 border-stone-900',
     line: d ? 'border-stone-700' : 'border-stone-900',
     accentBg: 'bg-red-600',
     headingFont: 'font-editorial italic',
     invertedBand: d ? 'bg-stone-100 text-stone-900' : 'bg-stone-900 text-stone-100',
-    invertedAccent: 'text-red-600',
+    // Inverted relative to `accent` above: `invertedBand` flips light<->dark, so when the page itself
+    // is dark (d) the band is LIGHT (needs red-700) and vice versa.
+    invertedAccent: d ? 'text-red-700' : 'text-red-400',
     logoChip: 'rounded-none border-2 border-stone-900',
     logoChipBg: 'bg-white',
   }),
@@ -225,7 +236,11 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     // chip content; the raised/inset .neo-chip stays reserved for the nav's language switch).
     chip: 'neo-tag',
     chipOn: 'neo-tag-on',
-    badgeLive: d ? 'bg-neo-darkAccent/20 text-neo-darkAccent' : 'bg-neo-accent/15 text-neo-accent',
+    // Text color: `--neo-accent-tint-text` (src/styles/neo.css), not `text-neo-accent`/`-darkAccent` —
+    // this label sits on the accent's own light self-tint (the background below), where the raw
+    // accent measures under AA (4.0-4.3:1, Lighthouse `color-contrast`, 2026-09-24; see the token's
+    // own comment). The CSS var already switches with `[data-theme='dark']`, one class either mode.
+    badgeLive: `${d ? 'bg-neo-darkAccent/20' : 'bg-neo-accent/15'} text-[color:var(--neo-accent-tint-text)]`,
     badgeDev: d ? 'text-neo-darkInkMuted bg-white/5' : 'text-neo-inkMuted bg-black/5',
     rowHover: d ? 'hover:bg-white/[0.03]' : 'hover:bg-black/[0.02]',
     divider: d ? 'divide-white/10 border-white/10' : 'divide-black/[0.06] border-black/[0.06]',

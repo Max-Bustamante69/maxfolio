@@ -15,7 +15,12 @@ export function ExploreDesignsBrutalist({ isDark }: ExploreDesignsBrutalistProps
 
   const textPrimary = isDark ? 'text-stone-100' : 'text-stone-900'
   const textSecondary = isDark ? 'text-stone-400' : 'text-stone-600'
-  const textMuted = isDark ? 'text-stone-500' : 'text-stone-500'
+  // Was `isDark ? 'text-stone-500' : 'text-stone-500'` (not actually mode-aware, unlike every other
+  // token here) — stone-500 measures 3.65:1 on this section's dark bg and 3.82:1 on its light bg
+  // (Lighthouse `color-contrast`, 2026-09-24), both under the 4.5:1 small-text floor every caption
+  // using it needs (eyebrow, row subtitles, footer). stone-400/600 — this file's own `textSecondary`
+  // pair — clears 4.5:1 on both (6.93 dark, 6.08 light).
+  const textMuted = isDark ? 'text-stone-400' : 'text-stone-600'
   const borderColor = isDark ? 'border-stone-700' : 'border-stone-300'
   const sectionBg = isDark ? 'bg-stone-900' : 'bg-stone-200'
 
@@ -81,8 +86,13 @@ export function ExploreDesignsBrutalist({ isDark }: ExploreDesignsBrutalistProps
               <div className="grid grid-cols-12 items-center">
                 {/* Number */}
                 <div className={`col-span-2 md:col-span-1 p-4 md:p-6 border-r-2 ${borderColor}`}>
+                  {/* stone-500 (not the previous 700/300): a large decorative index number is still
+                      real text content, needing WCAG's 3:1 large-text floor — 700-on-dark-900 measured
+                      1.70:1 and 300-on-light-200 measured 1.19:1 (Lighthouse `color-contrast`,
+                      2026-09-24), both far under it. stone-500 clears 3:1 on both registers (3.65 dark,
+                      3.82 light) and is already this component's own `textMuted` shade. */}
                   <span
-                    className={`font-editorial text-3xl md:text-5xl italic ${isDark ? 'text-stone-700' : 'text-stone-300'} transition-colors`}
+                    className="font-editorial text-3xl md:text-5xl italic text-stone-500 transition-colors"
                     style={{ color: hovered ? row.accentHex : undefined }}
                   >
                     {String(index + 1).padStart(2, '0')}
@@ -134,7 +144,10 @@ export function ExploreDesignsBrutalist({ isDark }: ExploreDesignsBrutalistProps
       <div className="py-6 px-4 md:px-6">
         <div className="max-w-[1800px] mx-auto flex items-center justify-between">
           <p className={`font-mono text-xs ${textMuted} uppercase tracking-wider`}>
-            {t('exploreBrutalist.viewing')} <span className="text-red-600">{t(designById('brutalist').nameKey)}</span>
+            {/* text-red-600 measured 3.62:1 on this footer's dark sectionBg (Lighthouse
+                `color-contrast`, 2026-09-24) — the same mode-aware pair `skins.ts`'s brutalist
+                `accent` now uses. */}
+            {t('exploreBrutalist.viewing')} <span className={isDark ? 'text-red-400' : 'text-red-700'}>{t(designById('brutalist').nameKey)}</span>
           </p>
           <p className={`font-mono text-xs ${textMuted}`}>
             {designs.length} styles

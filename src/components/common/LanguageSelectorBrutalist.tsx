@@ -26,7 +26,6 @@ export function LanguageSelectorBrutalist({ size = 'md' }: { size?: 'sm' | 'md' 
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={`relative ${buttonSize} flex items-center justify-center group`}
-        aria-label={t('language.selector.ariaLabel')}
         aria-expanded={open}
         aria-haspopup="menu"
         whileHover={{ rotate: -1, scale: 1.02 }}
@@ -36,6 +35,9 @@ export function LanguageSelectorBrutalist({ size = 'md' }: { size?: 'sm' | 'md' 
         <div className="absolute inset-0 border border-red-600/30" aria-hidden="true" />
         <span className={`relative z-10 font-mono uppercase font-bold ${letterSize} text-white tracking-wider`}>
           {localeLabel(locale)}
+          {/* the accessible name keeps the visible text and adds the purpose (matches LogoSelectorApple /
+              the round-45 label-content-name-mismatch fix pattern — this sibling component missed it). */}
+          <span className="sr-only">, {t('language.selector.ariaLabel')}</span>
         </span>
       </m.button>
 

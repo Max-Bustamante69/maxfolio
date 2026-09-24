@@ -66,7 +66,11 @@ export const experience: ExperienceEntry[] = [
     end: '2025-10',
     employment: 'full-time',
     website: 'https://abidata.co/en/',
-    logo: 'https://abidata.co/en/wp-content/uploads/2025/05/logo-abi.webp',
+    // Self-hosted (public/logos/abi-data.webp), not hotlinked: abidata.co sits behind Cloudflare Bot
+    // Management, which sets a `__cf_bm` third-party cookie on any cross-origin request for this
+    // image — Lighthouse's `third-party-cookies`/`inspector-issues` audits on /brutalist, 2026-09-24
+    // (this was the only one of this file's several external logo URLs whose origin does that).
+    logo: '/logos/abi-data.webp',
     technologies: ['Django', 'Next.js', 'React Email', 'PostgreSQL', 'REST'],
     metrics: [
       { id: 'contacts', value: '10,000+' },
