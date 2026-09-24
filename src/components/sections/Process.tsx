@@ -11,9 +11,13 @@ interface ProcessProps {
   /** Background class of the band the section sits on; the checkpoint rings punch it out of the line. */
   canvas?: string
   /** Pinned mobile progress rail under the fixed nav (round 44 prototype, `?proposal=process-a`;
-   *  round 46 lane "extras" made it the only implementation). Its `top-11` offset matches Apple's
-   *  h-11 mobile nav exactly — Neo/Persona/Terminal use a different nav height and shape, so this
-   *  defaults off and only Apple.tsx opts in. Desktop (lg:hidden) is untouched either way. */
+   *  round 46 lane "extras" made it the only implementation). Its offset clears Apple's h-11 (44px)
+   *  mobile nav PLUS `ScrollRail`'s own 2px site-wide scroll-progress bar, which is *also* fixed at
+   *  `top-11 z-40 lg:hidden` (src/components/common/ScrollRail.tsx) — stacking this rail at the same
+   *  44px would draw that bar directly across this rail's top edge (caught in round-46 "extras" QA:
+   *  a stray blue sliver over the dot row). Neo/Persona/Terminal use a different nav height and
+   *  shape, so this defaults off and only Apple.tsx opts in. Desktop (lg:hidden) is untouched either
+   *  way. */
   pinnedRail?: boolean
 }
 
@@ -78,14 +82,15 @@ export function Process({ skin, heading, canvas = '', pinnedRail = false }: Proc
     }
   }, [])
 
-  // Pinned mobile rail visibility: on while any part of the section is past the fixed mobile nav
-  // (44px) and hasn't yet scrolled 90% out the top — an IntersectionObserver, same house pattern
-  // Apple.tsx's own nav-active tracking uses, not scroll-position math.
+  // Pinned mobile rail visibility: on while any part of the section is past the fixed mobile nav +
+  // ScrollRail's progress bar (44px + 2px = 46px) and hasn't yet scrolled 90% out the top — an
+  // IntersectionObserver, same house pattern Apple.tsx's own nav-active tracking uses, not
+  // scroll-position math.
   useEffect(() => {
     if (!pinnedRail) return
     const el = sectionRef.current
     if (!el) return
-    const io = new IntersectionObserver(([entry]) => setRailVisible(entry.isIntersecting), { rootMargin: '-44px 0px -90% 0px', threshold: 0 })
+    const io = new IntersectionObserver(([entry]) => setRailVisible(entry.isIntersecting), { rootMargin: '-46px 0px -90% 0px', threshold: 0 })
     io.observe(el)
     return () => io.disconnect()
   }, [pinnedRail])
@@ -111,7 +116,7 @@ export function Process({ skin, heading, canvas = '', pinnedRail = false }: Proc
           tapping a dot reuses the same `go` handler as the stepper below. */}
       {pinnedRail && (
         <div
-          className={`fixed inset-x-0 top-11 z-30 border-b backdrop-blur-xl transition-opacity duration-300 lg:hidden ${skin.dark ? 'bg-black/80' : 'bg-white/80'} ${skin.line} ${railVisible ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+          className={`fixed inset-x-0 top-[46px] z-30 border-b backdrop-blur-xl transition-opacity duration-300 lg:hidden ${skin.dark ? 'bg-black/80' : 'bg-white/80'} ${skin.line} ${railVisible ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
           aria-hidden={!railVisible}
         >
           <div className="mx-auto flex max-w-5xl items-stretch">

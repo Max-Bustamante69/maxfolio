@@ -93,6 +93,22 @@ for (const vp of VIEWPORTS) {
       const dotCount = await rail.locator('button').count()
       if (dotCount !== 5) failures.push(`${vp.name}/${mode}: process rail expected 5 step dots, found ${dotCount}`)
 
+      // Regression guard: ScrollRail's own site-wide 2px scroll-progress bar is ALSO fixed at
+      // `top-11 z-40 lg:hidden` (src/components/common/ScrollRail.tsx) — it must not draw across
+      // this rail's top edge. Caught once in round-46 "extras" QA as a stray blue sliver over the
+      // dot row; the fix moved this rail to `top-[46px]`, clearing that bar entirely.
+      const overlap = await page.evaluate(() => {
+        const r = document.querySelector('#process > div.fixed')
+        const bar = document.querySelector('.fixed.left-0.top-11')
+        if (!r || !bar) return null
+        const rr = r.getBoundingClientRect()
+        const br = bar.getBoundingClientRect()
+        return { railTop: rr.top, barBottom: br.top + br.height }
+      })
+      if (overlap && overlap.railTop < overlap.barBottom) {
+        failures.push(`${vp.name}/${mode}: process pinned rail (top=${overlap.railTop}) overlaps ScrollRail's progress bar (bottom=${overlap.barBottom})`)
+      }
+
       // Tap the 3rd dot and confirm `active` moved (aria-current appears on that button).
       if (dotCount === 5) {
         await rail.locator('button').nth(2).click()
