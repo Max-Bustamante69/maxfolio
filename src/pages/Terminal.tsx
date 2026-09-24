@@ -489,17 +489,31 @@ function TerminalContent() {
                     {registry.personal.name} — {c.hero.eyebrow}
                   </h1>
                   {/* Always mounted (never conditionally unmounted) — this used to be `{!bootDone &&
-                      ...}`, so finishing the boot sequence removed its ~60px (button + `mb-4`) from
-                      above the boot lines and shifted them, and every section below, up by that same
-                      amount (measured: 0.0207 of /terminal's 0.0217 total CLS, PerformanceObserver
-                      `layout-shift` probe, 2026-09-23). Toggling opacity/pointer-events instead reserves
-                      the space, matching the sibling post-boot block's own opacity-toggle just below. */}
+                      ...}`, so finishing the boot sequence removed its box from above the boot lines
+                      and shifted them, and every section below, up by that amount (measured: 0.0207 of
+                      /terminal's 0.0217 total CLS, PerformanceObserver `layout-shift` probe,
+                      2026-09-23). Toggling opacity/pointer-events instead reserves the space, matching
+                      the sibling post-boot block's own opacity-toggle just below.
+                      `min-h-6 min-w-6` (24px) + `mb-1` (permanently, not just once hidden — this box
+                      never resizes, so it can never itself cause a shift): the base 44px touch-target
+                      floor (index.css) plus `mb-4` reserved ~60px forever, including after boot, on
+                      every visit — at 390x844 that pushed the ASCII logo block (and everything after
+                      it) 60px further down than production, past the initial viewport it used to sit
+                      inside the bottom edge of (scripts/.tmp-ascii-rect.mjs, 2026-09-24: production's
+                      `.term-ascii` top=826 of 844, candidate's was 866 — off by exactly the 40px this
+                      box was still over-reserving after the first pass at compact-touch/mb-2). 24px is
+                      WCAG 2.5.8's actual AA minimum (not the 44px this codebase's own floor chooses
+                      for most controls) and is close to this button's natural, undecorated content
+                      size — the same kind of bespoke override index.css's carousel dots already carry
+                      ("the house carousel controls own their geometry", `min-height:0`) for a
+                      comparably small, deliberate, secondary control. Reserved height is now 28px
+                      (24 + 4), down from 60. */}
                   <button
                     type="button"
                     onClick={skipBoot}
                     tabIndex={bootDone ? -1 : 0}
                     aria-hidden={bootDone || undefined}
-                    className={`mb-4 border border-[var(--term-line)] px-2 py-1 text-[11px] uppercase transition-opacity duration-300 ${muted} ${bootDone ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+                    className={`min-h-6 min-w-6 mb-1 border border-[var(--term-line)] px-2 py-1 text-[11px] uppercase transition-opacity duration-300 ${muted} ${bootDone ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
                   >
                     [skip]
                   </button>
