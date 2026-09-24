@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useContent } from '../../hooks'
 import { Ticker } from '../common'
 import type { SkillGroupId } from '../../data/registry'
-import { toolUsage, storesPerGroup, fleetLiquidLines, fleetIslandLines, fleetStoreCount, type ToolUsage } from '../../data/skillUsage'
+import { toolUsage, storesPerGroup, fleetLiquidLines, fleetIslandLines, type ToolUsage } from '../../data/skillUsage'
 import { CountUp } from '../gallery/charts'
 import type { Skin } from '../gallery'
 import type { SectionHeading } from './Gallery'
@@ -20,15 +20,18 @@ interface DepthStatProps {
   skin: Skin
   value: number
   text: string
+  /** Round 46: the storefront count uses this to render "20+" (the fixed public claim) instead of a
+   *  bare exact number — every other depth stat leaves it unset. */
+  suffix?: string
 }
 
 /** One typographic stat in the depth strip — a number and a caption, no card/box around it, per the
  *  brief's "compact strip... as small typographic stats, not boxes". Shared by every layout. */
-function DepthStat({ skin, value, text }: DepthStatProps) {
+function DepthStat({ skin, value, text, suffix = '' }: DepthStatProps) {
   return (
     <div>
       <p className={`text-xl font-semibold tabular-nums sm:text-2xl md:text-3xl ${skin.title}`}>
-        <CountUp value={value} />
+        <CountUp value={value} suffix={suffix} />
       </p>
       <p className={`mt-1 text-[10px] uppercase leading-tight tracking-wide sm:text-[11px] ${skin.muted}`}>{text}</p>
     </div>
@@ -93,7 +96,10 @@ export function Skills({ skin, heading, ownId = true }: SkillsProps) {
       <div className={`mt-8 grid grid-cols-3 gap-3 border-b pb-6 sm:flex sm:flex-wrap sm:items-baseline sm:gap-x-10 sm:gap-y-3 ${skin.line}`}>
         <DepthStat skin={skin} value={fleetLiquidLines} text={sk.depthLabel.liquid} />
         <DepthStat skin={skin} value={fleetIslandLines} text={sk.depthLabel.ts} />
-        <DepthStat skin={skin} value={fleetStoreCount} text={sk.depthLabel.stores} />
+        {/* Round 46: the public storefront count is the fixed "20+" everywhere, not the real, climbing
+            `fleetStoreCount` (registry.stores.length) — the other two stats here stay exact since only
+            the storefront figure is a public marketing claim, not an internal line-count metric. */}
+        <DepthStat skin={skin} value={registry.PUBLIC_STORE_COUNT} suffix="+" text={sk.depthLabel.stores} />
       </div>
 
       <div className="mt-7">

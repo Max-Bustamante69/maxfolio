@@ -28,7 +28,7 @@ import { createPortal } from 'react-dom'
 import { AnimatePresence, m, useDragControls, useReducedMotion } from 'framer-motion'
 import { useContent, useMediaQuery } from '../../../hooks'
 import type { RoleWorkId, SkillGroupId } from '../../../data/registry'
-import { fleetIslandLines, fleetLiquidLines, fleetProductCount, fleetStoreCount, type ToolUsage } from '../../../data/skillUsage'
+import { fleetIslandLines, fleetLiquidLines, fleetProductCount, type ToolUsage } from '../../../data/skillUsage'
 import { galleryCapture, toolRoleLines, toolThumbs, type ToolThumb } from '../../../lib/toolLinks'
 import { onCaseStudyVisibleChange, requestProduct, requestRole, requestStore, scrollToSection } from '../../../lib/sectionLinks'
 import { track } from '../../../lib/track'
@@ -217,14 +217,16 @@ function DrawerBody({ tool, skin, sk, bodyReady, reduced }: { tool: ToolUsage; s
         <p className={`text-[11px] font-semibold uppercase tracking-[0.14em] ${skin.muted}`}>{dr.fleetLabel}</p>
         <div className="mt-2.5 grid grid-cols-2 gap-x-3 gap-y-3 lg:grid-cols-4">
           {[
-            { value: fleetStoreCount, label: sk.depthLabel.stores },
-            { value: fleetProductCount, label: sk.layoutExtra.productsLabel },
-            { value: fleetLiquidLines, label: sk.depthLabel.liquid },
-            { value: fleetIslandLines, label: sk.depthLabel.ts },
+            // Round 46: the public storefront count is the fixed "20+" everywhere, not the real,
+            // climbing `fleetStoreCount` — the other three stats here stay exact internal metrics.
+            { value: registry.PUBLIC_STORE_COUNT, suffix: '+', label: sk.depthLabel.stores },
+            { value: fleetProductCount, suffix: '', label: sk.layoutExtra.productsLabel },
+            { value: fleetLiquidLines, suffix: '', label: sk.depthLabel.liquid },
+            { value: fleetIslandLines, suffix: '', label: sk.depthLabel.ts },
           ].map((stat) => (
             <div key={stat.label}>
               <p className={`text-base font-semibold tabular-nums ${skin.title}`}>
-                <CountUp value={stat.value} />
+                <CountUp value={stat.value} suffix={stat.suffix} />
               </p>
               <p className={`text-[10px] uppercase leading-tight tracking-wide ${skin.muted}`}>{stat.label}</p>
             </div>

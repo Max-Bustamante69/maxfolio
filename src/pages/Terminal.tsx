@@ -9,7 +9,7 @@ import { Experience } from '../components/sections/Experience'
 import { skins } from '../components/gallery/skins'
 import { useDynamicFavicon, useI18n, useContent } from '../hooks'
 import { designs, otherDesigns, MENU } from '../data/designs'
-import { fleetLiquidLines, fleetIslandLines, fleetStoreCount } from '../data/skillUsage'
+import { fleetLiquidLines, fleetIslandLines } from '../data/skillUsage'
 import changelogData from '../data/changelog.json'
 
 // Below the fold, each section arrives as its own chunk — same convention as every other theme.
@@ -629,7 +629,8 @@ function TerminalContent() {
                     </tr>
                     <tr className="border-t border-[var(--term-line)]">
                       <td className="pr-4 py-1">fleet</td>
-                      <td className={`pr-4 py-1 tabular-nums ${accentCls}`}>{fleetStoreCount}</td>
+                      {/* Round 46: the fixed public "20+" claim, not the real, climbing `fleetStoreCount`. */}
+                      <td className={`pr-4 py-1 tabular-nums ${accentCls}`}>{registry.PUBLIC_STORE_COUNT}+</td>
                       <td className="py-1">/stores</td>
                     </tr>
                   </tbody>
