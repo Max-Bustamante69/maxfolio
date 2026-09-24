@@ -42,7 +42,14 @@ export interface PortfolioContent {
   /** One honest provenance line per stat band figure, shown on hover/tap so nothing reads as a boast without a source. */
   statSources: Record<StatId, string>
   sections: {
-    experience: SectionHeading & { achievements: string; technologies: string; visit: string }
+    experience: SectionHeading & {
+      achievements: string
+      technologies: string
+      visit: string
+      /** The metric-card layout's "what shipped" expand toggle. '{n}' in showMore is replaced with the hidden-bullet count. */
+      showMore: string
+      showLess: string
+    }
     shopify: SectionHeading & { lead: string; tabStores: string; tabProducts: string; legacyLabel: string; visit: string; showAll: string; showLess: string; filterAll: string; filters: Record<string, string> }
     gallery: SectionHeading & {
       lead: string

@@ -38,7 +38,16 @@ export const en: PortfolioContent = {
 
   },
   sections: {
-    experience: { eyebrow: 'Every role, in order', title: 'Where the work', titleAccent: 'happened', achievements: 'What shipped', technologies: 'Stack', visit: 'Visit website' },
+    experience: {
+      eyebrow: 'Every role, in order',
+      title: 'Where the work',
+      titleAccent: 'happened',
+      achievements: 'What shipped',
+      technologies: 'Stack',
+      visit: 'Visit website',
+      showMore: '+{n} more',
+      showLess: 'Show less',
+    },
     shopify: {
       eyebrow: 'Real stores, real checkouts',
       title: 'Storefronts, apps,',

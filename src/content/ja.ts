@@ -38,7 +38,16 @@ export const ja: PortfolioContent = {
 
   },
   sections: {
-    experience: { eyebrow: 'すべての役割を、順番通りに', title: '仕事をしてきた', titleAccent: '場所', achievements: '成果', technologies: '技術スタック', visit: 'サイトを見る' },
+    experience: {
+      eyebrow: 'すべての役割を、順番通りに',
+      title: '仕事をしてきた',
+      titleAccent: '場所',
+      achievements: '成果',
+      technologies: '技術スタック',
+      visit: 'サイトを見る',
+      showMore: '他{n}件',
+      showLess: '閉じる',
+    },
     shopify: {
       eyebrow: '実在するストア、実際のチェックアウト',
       title: 'ストア、アプリ、',
