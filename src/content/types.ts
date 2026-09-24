@@ -218,6 +218,12 @@ export interface PortfolioContent {
           noCaptures: string // shown when a tool has no linkable store/product at all (rare)
         }
       }
+      /** `ConstellationMobile` (round 46) — the default sub-1024px view, a tap-to-zoom cluster map.
+       *  Shares `groupSelectorLabel` (the group chip strip's aria-label, above) and `orbit.clear`. */
+      mobile: {
+        openCluster: string // aria-label for a cluster card — 'Open {group}'
+        back: string // back button, from the zoomed cluster panel to the map
+      }
     }
     contact: SectionHeading & {
       lead: string
