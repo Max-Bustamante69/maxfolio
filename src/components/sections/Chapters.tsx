@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { animate, m, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform, type MotionValue } from 'framer-motion'
+import { animate, m, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useSpring, useTransform, useVelocity, type MotionValue } from 'framer-motion'
 import { useContent, useMediaQuery } from '../../hooks'
 import { RevealText } from '../common'
 import type { Skin } from '../gallery'
@@ -116,13 +116,22 @@ function YearOdometer({ yearFloat, className }: { yearFloat: MotionValue<number>
   const d2 = useTransform(yearFloat, (v) => digitAt(Math.round(v), 100))
   const d1 = useTransform(yearFloat, (v) => digitAt(Math.round(v), 10))
   const d0 = useTransform(yearFloat, (v) => digitAt(v, 1))
+  // The anti-bleed gutter between two stacked digits (see DIGIT_CELL_EM) has no ink in it by
+  // construction — no amount of easing removes that, only shortens how long a frame can land there.
+  // A fast-scrolling visitor can still catch one. A real spinning wheel photographed at that instant
+  // reads as motion blur, never as a crisp disconnected fragment — so blur here, scaled by how fast
+  // the numeral is actually moving (raw px/s off the year value, not a fixed decorative amount), and
+  // zero at rest: the ones digit is sharp whenever it's still enough to matter for reading it.
+  const velocity = useVelocity(yearFloat)
+  const blurPx = useTransform(velocity, (v) => Math.min(2.2, Math.abs(v) * 0.22))
+  const filter = useTransform(blurPx, (b) => (b > 0.05 ? `blur(${b.toFixed(2)}px)` : 'none'))
   return (
-    <span className={`inline-flex tabular-nums ${className}`} aria-hidden="true">
+    <m.span className={`inline-flex tabular-nums ${className}`} style={{ filter }} aria-hidden="true">
       <DigitRoller mv={d3} className="w-[0.62em]" />
       <DigitRoller mv={d2} className="w-[0.62em]" />
       <DigitRoller mv={d1} className="w-[0.62em]" />
       <DigitRoller mv={d0} className="w-[0.62em]" />
-    </span>
+    </m.span>
   )
 }
 
