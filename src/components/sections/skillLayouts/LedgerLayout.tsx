@@ -21,7 +21,7 @@ import type { SkillsLayoutProps } from './types'
  * too, independently of `OrbitLayout`'s own copy of the same wiring — the two never mount together.
  */
 export function LedgerLayout({ data }: SkillsLayoutProps) {
-  const { skin, sk, groups, groupLabel, groupNote, storesPerGroup, toolsByGroup, formatTool, formatGroup } = data
+  const { skin, sk, groups, groupLabel, groupNote, storesPerGroup, toolsByGroup, formatTool } = data
   const [openTool, setOpenTool] = useState<string | null>(null)
   const filter = useSkillsFilter(groups)
   const openToolUsage = openTool ? (toolUsageById.get(openTool) ?? null) : null
@@ -37,7 +37,7 @@ export function LedgerLayout({ data }: SkillsLayoutProps) {
 
   return (
     <div className="mt-2">
-      <SkillsFilterBar skin={skin} sk={sk} groups={groups} groupLabel={groupLabel} toolsByGroup={toolsByGroup} formatGroup={formatGroup} filter={filter} />
+      <SkillsFilterBar skin={skin} sk={sk} groups={groups} groupLabel={groupLabel} toolsByGroup={toolsByGroup} filter={filter} />
       <div className="mt-6 sm:columns-2 sm:gap-x-12">
         {groups.map((g) => {
           const visibleCount = toolsByGroup[g].filter(filter.matchesTool).length

@@ -26,7 +26,6 @@ interface SkillsFilterBarProps {
   groups: SkillGroupId[]
   groupLabel: Record<SkillGroupId, string>
   toolsByGroup: Record<SkillGroupId, ToolUsage[]>
-  formatGroup: (n: number) => string
   filter: SkillsFilter
   /** Orbit only: temporary (non-filtering) dim-preview when hovering/focusing a group chip. */
   onHoverGroup?: (g: SkillGroupId | null) => void
@@ -162,7 +161,7 @@ function Summary({ template, n, m, k, kSuffix = '' }: { template: string; n: num
   )
 }
 
-export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, formatGroup, filter, onHoverGroup }: SkillsFilterBarProps) {
+export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, filter, onHoverGroup }: SkillsFilterBarProps) {
   const ob = sk.orbit
   const onQueryChange = (e: ChangeEvent<HTMLInputElement>) => filter.setQuery(e.target.value)
 
@@ -203,7 +202,14 @@ export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, fo
             // LogoSelectorApple already uses) satisfies it structurally instead of by coincidence.
             // A group whose tools carry no real store usage (entirely in-house products / client-role
             // work) never announces "0 stores": the sentence names what it IS used in instead.
-            const storesPhrase = facet.stores > 0 ? formatGroup(facet.stores) : ob.chipAriaNoStores
+            // Round 46: same public "20+" floor as `matchingStoresDisplay` above — a group whose real
+            // usage already reaches every fleet store must not announce the raw, climbing count either.
+            const facetStoresText =
+              facet.stores >= PUBLIC_STORE_COUNT ? `${PUBLIC_STORE_COUNT}+` : String(facet.stores)
+            const storesPhrase =
+              facet.stores > 0
+                ? (facet.stores === 1 ? sk.usage.storesUnitOne : sk.usage.storesUnit).replace('{n}', facetStoresText)
+                : ob.chipAriaNoStores
             const chipAriaExtra = `, ${sk.layoutExtra.toolsSuffix}, ${storesPhrase}`
             return (
               <button

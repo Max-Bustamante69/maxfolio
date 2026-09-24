@@ -193,7 +193,7 @@ interface RingSpec {
 }
 
 export function OrbitLayout({ data }: SkillsLayoutProps) {
-  const { skin, sk, groups, groupLabel, toolsByGroup, formatTool, formatGroup } = data
+  const { skin, sk, groups, groupLabel, toolsByGroup, formatTool } = data
   const isDesktop = useMediaQuery('(min-width: 1024px)')
   const reduced = useReducedMotion()
   const [hoveredTool, setHoveredTool] = useState<string | null>(null)
@@ -300,7 +300,6 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
         groups={ringOrder}
         groupLabel={groupLabel}
         toolsByGroup={toolsByGroup}
-        formatGroup={formatGroup}
         filter={filter}
         onHoverGroup={setHoveredGroup}
       />

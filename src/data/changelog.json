@@ -1,5 +1,10 @@
 [
   {
+    "hash": "38f1106",
+    "date": "2026-09-23",
+    "subject": "chore(build): regenerate changelog after round 46 integration"
+  },
+  {
     "hash": "26dd1b7",
     "date": "2026-09-23",
     "subject": "chore(build): regenerate changelog after the brutalist a11y fix"
@@ -53,10 +58,5 @@
     "hash": "515a6b6",
     "date": "2026-09-23",
     "subject": "chore(build): regenerated changelog for round 46 experience lane"
-  },
-  {
-    "hash": "2ad6003",
-    "date": "2026-09-23",
-    "subject": "test(experience): Playwright probe for the Métricas vivas layout"
   }
 ]
