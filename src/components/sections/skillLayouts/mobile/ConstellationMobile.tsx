@@ -6,7 +6,7 @@
 // button OR Escape returns to the map. The dots themselves are decorative at this scale — only the
 // cluster (128px tall, well over the 44px minimum) and, once zoomed, each tool row (44px) and the back
 // button (44px) are real tap targets.
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { useSheetHistory } from '../../../../hooks'
 import type { SkillGroupId } from '../../../../data/registry'
@@ -50,16 +50,37 @@ export function ConstellationMobile({ data }: SkillsLayoutProps) {
     },
   })
 
+  // Focus follows the "magic move" the same way `ToolDrawer` follows its own open/close (review fix):
+  // without this, the grid button that had focus unmounts the instant `zoomed` is set (AnimatePresence
+  // removes the whole grid), and the browser silently drops focus to `<body>` — a keyboard user who
+  // just activated a cluster loses their place on the page entirely, on both directions of the trip.
+  const clusterRefs = useRef<Partial<Record<SkillGroupId, HTMLButtonElement | null>>>({})
+  const backButtonRef = useRef<HTMLButtonElement>(null)
+  const lastZoomedRef = useRef<SkillGroupId | null>(null)
+  const closeZoom = () => {
+    if (zoomed) lastZoomedRef.current = zoomed
+    setZoomed(null)
+  }
+  useEffect(() => {
+    if (zoomed) {
+      backButtonRef.current?.focus()
+    } else if (lastZoomedRef.current) {
+      clusterRefs.current[lastZoomedRef.current]?.focus()
+      lastZoomedRef.current = null
+    }
+  }, [zoomed])
+
   // Esc closes the zoomed cluster panel and returns to the map — the keyboard equivalent of the back
   // button, and independent of ToolDrawer's own Escape handling (a nested, later concern: with a tool
   // open, Escape closes the drawer first, matching the visual stacking order).
   useEffect(() => {
     if (!zoomed) return
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !openTool) setZoomed(null)
+      if (e.key === 'Escape' && !openTool) closeZoom()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zoomed, openTool])
 
   return (
@@ -100,13 +121,22 @@ export function ConstellationMobile({ data }: SkillsLayoutProps) {
               return (
                 <m.button
                   key={g}
+                  ref={(el) => {
+                    clusterRefs.current[g] = el
+                  }}
                   layoutId={`cluster-${g}`}
                   type="button"
                   aria-expanded={false}
                   aria-label={fill(sk.mobile.openCluster, { group: groupLabel[g] })}
+                  // A filter that leaves nothing in this cluster can't be tapped into an empty panel —
+                  // same "can't open" convention `OrbitLayout`'s own filtered-out dots follow (see this
+                  // file's header comment / that file's 2026-09-11 review fix), so it also leaves the
+                  // tab order like a filtered-out dot does.
+                  disabled={allFiltered}
+                  aria-disabled={allFiltered}
                   onClick={() => setZoomed(g)}
                   transition={ZOOM_TRANSITION}
-                  className={`relative h-32 overflow-hidden rounded-2xl border p-3 text-left ${skin.line} ${skin.dark ? 'bg-white/[0.03]' : 'bg-white'}`}
+                  className={`relative h-32 overflow-hidden rounded-2xl border p-3 text-left disabled:cursor-default ${skin.line} ${skin.dark ? 'bg-white/[0.03]' : 'bg-white'}`}
                 >
                   <svg viewBox="0 0 100 100" aria-hidden="true" className="absolute inset-0 h-full w-full">
                     <AnimatePresence initial={false}>
@@ -147,8 +177,9 @@ export function ConstellationMobile({ data }: SkillsLayoutProps) {
           >
             <div className="mb-4 flex items-center gap-3">
               <button
+                ref={backButtonRef}
                 type="button"
-                onClick={() => setZoomed(null)}
+                onClick={closeZoom}
                 aria-label={sk.mobile.back}
                 className={`press flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-3 text-xs font-medium ${skin.dark ? 'bg-white/10' : 'bg-black/5'} ${skin.body}`}
               >
