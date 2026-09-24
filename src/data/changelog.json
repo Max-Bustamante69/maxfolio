@@ -1,5 +1,15 @@
 [
   {
+    "hash": "80dfa98",
+    "date": "2026-09-23",
+    "subject": "fix(process): clear ScrollRail's progress bar with the mobile pinned rail"
+  },
+  {
+    "hash": "e931a4f",
+    "date": "2026-09-23",
+    "subject": "chore(build): regenerated changelog for round 46 extras lane (final)"
+  },
+  {
     "hash": "7d2b740",
     "date": "2026-09-23",
     "subject": "fix(content): drop the em dash from the free-review card, add the r46 extras probe"
@@ -48,15 +58,5 @@
     "hash": "d2ad40a",
     "date": "2026-09-23",
     "subject": "fix(terminal-nav): links centered vertically and 16 px clear of the language buttons"
-  },
-  {
-    "hash": "fe3f2d2",
-    "date": "2026-09-23",
-    "subject": "fix(sections): dedupe wrapper ids on luxury/brutalist/neo, fix hash landing"
-  },
-  {
-    "hash": "077c5e1",
-    "date": "2026-09-23",
-    "subject": "feat(mobile-menu): show each design's brand mark in the switcher list"
   }
 ]
