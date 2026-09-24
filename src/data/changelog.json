@@ -1,5 +1,55 @@
 [
   {
+    "hash": "b3bb3b4",
+    "date": "2026-09-23",
+    "subject": "fix(a11y): luxury-gold accent text fails AA on this theme's light surfaces (color-contrast)"
+  },
+  {
+    "hash": "6f76aed",
+    "date": "2026-09-23",
+    "subject": "fix(perf): give the display/body webfonts closer-shaped fallbacks (CLS)"
+  },
+  {
+    "hash": "2046ee3",
+    "date": "2026-09-23",
+    "subject": "fix(perf): reserve space for Terminal's boot-sequence skip control (CLS)"
+  },
+  {
+    "hash": "5347103",
+    "date": "2026-09-23",
+    "subject": "fix(a11y): keep visible text as the accessible name's own prefix (label-content-name-mismatch)"
+  },
+  {
+    "hash": "0ff060f",
+    "date": "2026-09-23",
+    "subject": "fix(a11y): delay the skills orbit's ambient rotation past the page's first 9s (target-size)"
+  },
+  {
+    "hash": "f48e325",
+    "date": "2026-09-23",
+    "subject": "fix(a11y): raise muted-text contrast to AA on Luxury/Brutalist/Menu and fix the theme-switcher preview's dimmed label"
+  },
+  {
+    "hash": "1a861f3",
+    "date": "2026-09-23",
+    "subject": "chore(build): regenerate changelog for the nav768 fix commits"
+  },
+  {
+    "hash": "1ee56fb",
+    "date": "2026-09-23",
+    "subject": "fix(neo): nav CTA was fully off-screen at 768-834px"
+  },
+  {
+    "hash": "f7e0870",
+    "date": "2026-09-23",
+    "subject": "fix(apple): nav no longer clips the CTA at 768px"
+  },
+  {
+    "hash": "3b1f2ee",
+    "date": "2026-09-23",
+    "subject": "chore(build): regenerated changelog for round 45 persona-motion lane"
+  },
+  {
     "hash": "4eb01c0",
     "date": "2026-09-23",
     "subject": "fix(charts): gate MiniRing's count-up on entering the viewport"
@@ -8,55 +58,5 @@
     "hash": "68de457",
     "date": "2026-09-23",
     "subject": "fix(rail): release the drag cursor on pointerup, not when the landing spring settles"
-  },
-  {
-    "hash": "fe95bd0",
-    "date": "2026-09-09",
-    "subject": "fix(arcade): stop the long hero chips clipping their own text"
-  },
-  {
-    "hash": "f98cc40",
-    "date": "2026-09-23",
-    "subject": "fix(persona): load Anton/Rajdhani in the SPA shell, fix a contact-modal contrast and clip-path bug"
-  },
-  {
-    "hash": "fd8f31d",
-    "date": "2026-09-23",
-    "subject": "chore(build): regenerated artifacts for round 44 ship lane"
-  },
-  {
-    "hash": "b226156",
-    "date": "2026-09-23",
-    "subject": "fix(arcade): the inverted band's label keeps the theme red in dark mode"
-  },
-  {
-    "hash": "91a35ae",
-    "date": "2026-09-23",
-    "subject": "fix(review): dedupe the Apple page's #faq id and cap /api/event body size"
-  },
-  {
-    "hash": "9010854",
-    "date": "2026-09-23",
-    "subject": "feat(analytics+quick-wins): first-party event ledger, /stats dashboard, and audit quick wins"
-  },
-  {
-    "hash": "e6d378d",
-    "date": "2026-09-23",
-    "subject": "chore(build): regenerated artifacts for round 44 fixes"
-  },
-  {
-    "hash": "aeba562",
-    "date": "2026-09-23",
-    "subject": "fix(orbit): curved group names are labels again; desktop dots use a 32 px target"
-  },
-  {
-    "hash": "d2ad40a",
-    "date": "2026-09-23",
-    "subject": "fix(terminal-nav): links centered vertically and 16 px clear of the language buttons"
-  },
-  {
-    "hash": "fe3f2d2",
-    "date": "2026-09-23",
-    "subject": "fix(sections): dedupe wrapper ids on luxury/brutalist/neo, fix hash landing"
   }
 ]
