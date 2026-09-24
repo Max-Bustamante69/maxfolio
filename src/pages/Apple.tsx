@@ -206,7 +206,7 @@ function AppleContent() {
   )
 
   const primaryBtn = 'press inline-flex items-center justify-center rounded-full bg-apple-blue px-6 py-3 text-sm font-medium text-white hover:bg-apple-blueHover'
-  // Tracks more bands than the nav shows links for (skills, review, faq) so "Projects" doesn't stay
+  // Tracks more bands than the nav shows links for (skills, proof, faq) so "Projects" doesn't stay
   // lit through them (the nav's `on` check only matches the 6 href ids below, so an id outside that
   // list simply shows nothing active — which is the fix: no longer the *wrong* thing staying active).
   const activeSection = useActiveSection([...nav.map(([href]) => href.slice(1)), 'skills', 'proof', 'faq'])

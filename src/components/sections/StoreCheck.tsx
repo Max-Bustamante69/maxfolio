@@ -185,7 +185,7 @@ export function StoreCheck({ skin, heading, onCta }: StoreCheckProps) {
     <section className="scroll-mt-20">
       {heading(s.eyebrow, s.title, s.titleAccent, s.lead)}
 
-      <div className={`rounded-[22px] border p-5 md:p-8 ${skin.line} ${skin.dark ? 'bg-white/[0.03]' : 'bg-white'}`}>
+      <div className={`rounded-[22px] border p-5 md:p-8 ${skin.line} ${skin.dark ? 'bg-white/[0.03]' : 'bg-white'}`} aria-live="polite">
         {phase !== 'running' && (
           <form
             onSubmit={(e) => {
