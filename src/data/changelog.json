@@ -1,5 +1,20 @@
 [
   {
+    "hash": "2ad6003",
+    "date": "2026-09-23",
+    "subject": "test(experience): Playwright probe for the Métricas vivas layout"
+  },
+  {
+    "hash": "80aadae",
+    "date": "2026-09-23",
+    "subject": "chore(build): regenerated artifacts for round 46 experience lane"
+  },
+  {
+    "hash": "268bf67",
+    "date": "2026-09-23",
+    "subject": "feat(experience): \"Métricas vivas\" replaces the plain dl as the only Experience layout"
+  },
+  {
     "hash": "fd8f31d",
     "date": "2026-09-23",
     "subject": "chore(build): regenerated artifacts for round 44 ship lane"
@@ -43,20 +58,5 @@
     "hash": "077c5e1",
     "date": "2026-09-23",
     "subject": "feat(mobile-menu): show each design's brand mark in the switcher list"
-  },
-  {
-    "hash": "ee9c5f3",
-    "date": "2026-09-23",
-    "subject": "fix(nav): replace absolute nav centering with a balanced CSS grid"
-  },
-  {
-    "hash": "9a73cc2",
-    "date": "2026-09-23",
-    "subject": "fix(neo-selector): give the style-selector trigger a real accessible name at mobile widths"
-  },
-  {
-    "hash": "2f70d58",
-    "date": "2026-09-23",
-    "subject": "fix(chapters): rail stops flush with the frame, not past it"
   }
 ]
