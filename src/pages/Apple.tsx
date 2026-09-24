@@ -25,6 +25,8 @@ const Manifesto = lazy(() => import('../components/sections/Manifesto').then((mo
 const Projects = lazy(() => import('../components/sections/Projects').then((mod) => ({ default: mod.Projects })))
 const Skills = lazy(() => import('../components/sections/Skills').then((mod) => ({ default: mod.Skills })))
 const ReviewChecklist = lazy(() => import('../components/sections/ReviewChecklist').then((mod) => ({ default: mod.ReviewChecklist })))
+// "How we could work together" — round 44 prototype (?proposal=models-a|b), round 46 lane "extras" made it the only implementation.
+const EngagementModels = lazy(() => import('../components/sections/EngagementModels').then((mod) => ({ default: mod.EngagementModels })))
 const Faq = lazy(() => import('../components/sections/Faq').then((mod) => ({ default: mod.Faq })))
 const Contact = lazy(() => import('../components/sections/Contact').then((mod) => ({ default: mod.Contact })))
 const CareerSubway = lazy(() => import('../components/sections/CareerSubway').then((mod) => ({ default: mod.CareerSubway })))
@@ -209,7 +211,7 @@ function AppleContent() {
   // Tracks more bands than the nav shows links for (skills, review, faq) so "Projects" doesn't stay
   // lit through them (the nav's `on` check only matches the 6 href ids below, so an id outside that
   // list simply shows nothing active — which is the fix: no longer the *wrong* thing staying active).
-  const activeSection = useActiveSection([...nav.map(([href]) => href.slice(1)), 'skills', 'review', 'faq'])
+  const activeSection = useActiveSection([...nav.map(([href]) => href.slice(1)), 'skills', 'review', 'engagement', 'faq'])
   const liveCount = registry.stores.filter((s) => s.status === 'live').length
   const devCount = registry.stores.filter((s) => s.status === 'dev').length
 
@@ -436,7 +438,7 @@ function AppleContent() {
           <section className={`px-4 py-14 md:py-20 ${surface}`}>
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
-                <Process skin={skin} heading={Heading} canvas={surface} />
+                <Process skin={skin} heading={Heading} canvas={surface} pinnedRail />
               </Suspense>
             </div>
           </section>
@@ -508,6 +510,15 @@ function AppleContent() {
             <div className="max-w-5xl mx-auto">
               <Suspense fallback={<Pending />}>
                 <ReviewChecklist skin={skin} heading={Heading} onCta={() => openContact()} />
+              </Suspense>
+            </div>
+          </section>
+
+          {/* Engagement models — "how we could work together". Owns its own id for the same reason. */}
+          <section id="engagement" data-track-section="engagement" className={`px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
+            <div className="max-w-5xl mx-auto">
+              <Suspense fallback={<Pending />}>
+                <EngagementModels ownId={false} skin={skin} heading={Heading} />
               </Suspense>
             </div>
           </section>

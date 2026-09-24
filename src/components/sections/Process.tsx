@@ -10,6 +10,15 @@ interface ProcessProps {
   heading: SectionHeading
   /** Background class of the band the section sits on; the checkpoint rings punch it out of the line. */
   canvas?: string
+  /** Pinned mobile progress rail under the fixed nav (round 44 prototype, `?proposal=process-a`;
+   *  round 46 lane "extras" made it the only implementation). Its offset clears Apple's h-11 (44px)
+   *  mobile nav PLUS `ScrollRail`'s own 2px site-wide scroll-progress bar, which is *also* fixed at
+   *  `top-11 z-40 lg:hidden` (src/components/common/ScrollRail.tsx) — stacking this rail at the same
+   *  44px would draw that bar directly across this rail's top edge (caught in round-46 "extras" QA:
+   *  a stray blue sliver over the dot row). Neo/Persona/Terminal use a different nav height and
+   *  shape, so this defaults off and only Apple.tsx opts in. Desktop (lg:hidden) is untouched either
+   *  way. */
+  pinnedRail?: boolean
 }
 
 const EASE = [0.23, 1, 0.32, 1] as const
@@ -21,7 +30,7 @@ const REF_LINE = 0.42
  * itself, the active step lit by the nearest-to-reference-line rule (not scroll-progress math), and
  * on wide screens a pinned numeral that crossfades as the steps pass. Each step says what you get.
  */
-export function Process({ skin, heading, canvas = '' }: ProcessProps) {
+export function Process({ skin, heading, canvas = '', pinnedRail = false }: ProcessProps) {
   const { strings } = useContent()
   // Luxury's `skin.accent` (#c9a962) is tuned for its own dark surfaces (7.3:1 there) — this
   // section sits on the page's light cream instead, where it measures 2.0:1 as text (Lighthouse
@@ -37,6 +46,8 @@ export function Process({ skin, heading, canvas = '' }: ProcessProps) {
   const listRef = useRef<HTMLOListElement>(null)
   const items = useRef<(HTMLLIElement | null)[]>([])
   const mode = useRef<'scroll' | 'click'>('scroll')
+  const sectionRef = useRef<HTMLElement>(null)
+  const [railVisible, setRailVisible] = useState(false)
 
   const { scrollYProgress } = useScroll({ target: listRef, offset: ['start 0.72', 'end 0.5'] })
   const drawn = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: 0.6 })
@@ -77,6 +88,19 @@ export function Process({ skin, heading, canvas = '' }: ProcessProps) {
     }
   }, [])
 
+  // Pinned mobile rail visibility: on while any part of the section is past the fixed mobile nav +
+  // ScrollRail's progress bar (44px + 2px = 46px) and hasn't yet scrolled 90% out the top — an
+  // IntersectionObserver, same house pattern Apple.tsx's own nav-active tracking uses, not
+  // scroll-position math.
+  useEffect(() => {
+    if (!pinnedRail) return
+    const el = sectionRef.current
+    if (!el) return
+    const io = new IntersectionObserver(([entry]) => setRailVisible(entry.isIntersecting), { rootMargin: '-46px 0px -90% 0px', threshold: 0 })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [pinnedRail])
+
   const go = (i: number) => {
     mode.current = 'click'
     setActive(i)
@@ -91,7 +115,44 @@ export function Process({ skin, heading, canvas = '' }: ProcessProps) {
   const track = skin.dark ? 'bg-white/15' : 'bg-black/10'
 
   return (
-    <section id="process" className="scroll-mt-20">
+    <section id="process" ref={sectionRef} className="scroll-mt-20">
+      {/* Pinned progress rail (mobile only, Apple opt-in) — the desktop numeral above has no phone
+          equivalent, so the step someone is reading is otherwise invisible below lg. Fixed under the
+          mobile nav (44px), same active-step rule as the desktop numeral (nearest to REF_LINE),
+          tapping a dot reuses the same `go` handler as the stepper below. */}
+      {pinnedRail && (
+        <div
+          className={`fixed inset-x-0 top-[46px] z-30 border-b backdrop-blur-xl transition-opacity duration-300 lg:hidden ${skin.dark ? 'bg-black/80' : 'bg-white/80'} ${skin.line} ${railVisible ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+          aria-hidden={!railVisible}
+        >
+          <div className="mx-auto flex max-w-5xl items-stretch">
+            {p.steps.map((step, i) => {
+              const on = active === i
+              return (
+                <button
+                  key={step.title}
+                  type="button"
+                  onClick={() => go(i)}
+                  tabIndex={railVisible ? 0 : -1}
+                  aria-current={on ? 'step' : undefined}
+                  aria-label={`${num(i)} · ${step.title}`}
+                  className="press flex min-w-0 flex-1 flex-col items-center justify-center gap-1 px-1 py-1.5"
+                >
+                  <span className={`block h-1.5 w-1.5 shrink-0 rounded-full transition-colors duration-300 ${on ? skin.accentBg : track}`} aria-hidden="true" />
+                  <span className={`w-full truncate text-center text-[9px] font-medium leading-tight transition-colors duration-300 ${on ? skin.title : skin.muted}`}>{step.title}</span>
+                </button>
+              )
+            })}
+          </div>
+          <div className={`h-[2px] w-full ${track}`} aria-hidden="true">
+            <m.div
+              className={`h-full origin-left ${skin.accentBg}`}
+              animate={{ scaleX: (active + 1) / total }}
+              transition={reduced ? { duration: 0 } : { duration: 0.35, ease: EASE }}
+            />
+          </div>
+        </div>
+      )}
       {heading(p.eyebrow, p.title, p.titleAccent)}
       {/* the narrative spine: the bottleneck, then the fix */}
       <div className="-mt-2 mb-12 grid max-w-4xl gap-5 md:-mt-4 md:mb-16 md:grid-cols-2 md:gap-10">

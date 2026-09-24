@@ -65,6 +65,13 @@ export interface PortfolioContent {
     careerSubway: SectionHeading & { lead: string; toggleShow: string; toggleHide: string; transferLabel: string; rowAria: string }
     process: SectionHeading & { problemLabel: string; problem: string; fixLabel: string; fix: string; stepOf: string; deliverableLabel: string; steps: { title: string; body: string; deliverable: string }[] }
     testimonials: SectionHeading
+    /** "How we could work together" — three one-line cards, one per engagement model (free review,
+     *  project build, ongoing collaboration), between Review and FAQ. Every `models[].body` restates
+     *  a fact already stated elsewhere on this page (round 44 prototype r44/p44/extras-models,
+     *  round 46 lane "extras" — the struck-through "a generic agency would..." contrast Max saw in
+     *  the prototype was cut for reading as fighting agencies while he runs one; only the one-line
+     *  card mechanic, positively worded, shipped). */
+    engagement: SectionHeading & { lead: string; models: { title: string; body: string }[] }
     faq: SectionHeading & { items: { q: string; a: string }[] }
     manifesto: { label: string; lines: string[] }
     years: SectionHeading & { lead: string; roles: string; shipped: string; work: string; products: string; side: string; more: string; count: string; perYear: string; eras: Record<string, string> }
