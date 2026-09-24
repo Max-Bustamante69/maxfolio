@@ -14,7 +14,7 @@
 //   405 for any method but GET
 export const config = { runtime: 'nodejs', maxDuration: 60 }
 import { ipAddress } from '@vercel/functions'
-import { kv, pipeline, json } from './_kv'
+import { kv, pipeline, json } from './_kv.js' // explicit .js: the Node runtime runs ESM output, where extensionless relative imports fail at load
 
 const MAX_URL_LENGTH = 2048
 // PSI itself commonly takes 10-40s; this is our own upstream fetch's ceiling so a hung request always
@@ -79,8 +79,8 @@ interface PsiResponse {
 
 const scorePct = (v: number | undefined) => Math.round((v ?? 0) * 100)
 
-export default async function handler(req: Request): Promise<Response> {
-  if (req.method !== 'GET') return new Response(null, { status: 405 })
+// Named GET export = Vercel Node runtime Web-handler signature (a default (req: Request) export is treated as the legacy (req, res) handler).
+export async function GET(req: Request): Promise<Response> {
 
   const reqUrl = new URL(req.url)
   const target = validateTargetUrl(reqUrl.searchParams.get('url') ?? '')
