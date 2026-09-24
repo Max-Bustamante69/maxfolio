@@ -166,6 +166,15 @@ const ORBIT_CSS = `
 @media (prefers-reduced-motion: reduce) {
   .mfOrbitRing, .mfOrbitDot, .mfCenterBreathe, .mfCenterRing { animation: none; }
 }
+/* The icon-less fallback's single-letter monogram (below) — a real DOM text node would still show
+   up in axe's "visible text" scan for label-content-name-mismatch even wrapped in aria-hidden,
+   since that scan reads rendered content, not the accessibility tree (aria-hidden only removes a
+   node from THAT, which is why the wrapping span alone didn't clear this audit — measured: 5/5
+   orbit dots without an icon failing with nodeLabel "letter, newline, tool name", 2026-09-24).
+   CSS-generated content is invisible to that same text scan (it is paint, not a text node), so the
+   letter moves here — identical pixels, nothing left for axe to read against the button's own
+   aria-label. */
+.mfOrbitMonogram::before { content: attr(data-mono); }
 `
 
 interface RingSpec {
@@ -416,7 +425,13 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
                               style={{ height: size, width: size }}
                               className={`flex items-center justify-center rounded-full border text-[10px] font-bold transition-colors ${skin.line} ${isEmphasized ? `${skin.accent} ${skin.dark ? 'bg-white/10' : 'bg-black/[0.04]'}` : `${skin.muted} ${skin.dark ? 'bg-black/20' : 'bg-white/70'}`}`}
                             >
-                              {toolIcon(u.tool) ? <ToolMark tool={u.tool} className="h-1/2 w-1/2" /> : monogram(u.tool).slice(0, 1)}
+                              {toolIcon(u.tool) ? (
+                                <ToolMark tool={u.tool} className="h-1/2 w-1/2" />
+                              ) : (
+                                // Letter painted via CSS `content`, not JSX text — see the
+                                // `.mfOrbitMonogram::before` rule in ORBIT_CSS above for why.
+                                <span aria-hidden="true" className="mfOrbitMonogram" data-mono={monogram(u.tool).slice(0, 1)} />
+                              )}
                             </span>
                           </span>
                           <span

@@ -112,13 +112,22 @@ export function ExploreDesignsBrutalist({ isDark }: ExploreDesignsBrutalistProps
                   </p>
                 </div>
 
-                {/* Preview - Hidden on mobile */}
+                {/* Preview - Hidden on mobile. Desktop-only (`hidden md:block`), which is exactly
+                    why the bug below never showed up on a mobile Lighthouse run. */}
                 <div className={`hidden md:block col-span-3 lg:col-span-2 border-l-2 ${borderColor} h-full`}>
-                  <m.div className="h-full" style={{ backgroundColor: row.previewBg }} animate={{ opacity: hovered ? 1 : 0.7 }}>
+                  {/* Was `animate={{ opacity: hovered ? 1 : 0.7 }}` — dimming the WHOLE tile at rest
+                      (not just a decorative layer) blends its own text colors toward this section's
+                      dark/light bg behind it, dropping two already-marginal AA passes (ApplePreview's
+                      "Learn more" #0066cc, LuxuryPreview's "Luxury" #7a5d14) to ~4.1:1 (Lighthouse
+                      `color-contrast`, desktop, 2026-09-24 — both measured against the 70%-opacity
+                      blended background, e.g. #b8b7b8, not either preview's own full-opacity bg).
+                      Full opacity always, same fix shape as ApplePreview's own idle-state fix: hover
+                      affordance lives in the row's border/text-color changes already, not here. */}
+                  <div className="h-full" style={{ backgroundColor: row.previewBg }}>
                     <div className="aspect-square">
                       <row.Preview />
                     </div>
-                  </m.div>
+                  </div>
                 </div>
 
                 {/* Arrow */}

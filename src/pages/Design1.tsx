@@ -194,7 +194,11 @@ function Design1Content() {
             <div className="flex items-center gap-3 justify-self-end">
               <button
                 onClick={() => setIsContactOpen(true)}
-                className="hidden sm:flex items-center h-10 font-mono text-xs uppercase tracking-[0.2em] leading-none text-red-600 hover:text-red-500 transition-colors gap-2"
+                // text-red-600 measured 4.09:1 on this nav's dark register (bg-stone-950/90 —
+                // Lighthouse `color-contrast`, desktop, 2026-09-24; only visible from `sm:` up, so
+                // a mobile-viewport audit never renders it). red-400 clears 4.5+ there, matching
+                // this page's own dark-register red everywhere else (footer credit, hero CTA).
+                className={`hidden sm:flex items-center h-10 font-mono text-xs uppercase tracking-[0.2em] leading-none ${isDark ? 'text-red-400' : 'text-red-600'} hover:text-red-500 transition-colors gap-2`}
               >
                 <span className="hidden sm:inline">{t('common.quickEmail')}</span>
                 <MailIcon />
