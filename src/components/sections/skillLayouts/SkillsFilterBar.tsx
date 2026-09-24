@@ -58,7 +58,17 @@ function onRadioGroupKeyDown(e: KeyboardEvent<HTMLDivElement>) {
   options[next].click()
 }
 
-const CHIP = 'compact-touch shrink-0 snap-start max-lg:inline-flex max-lg:min-h-11 max-lg:min-w-11 max-lg:items-center max-lg:justify-center rounded-full px-2.5 py-1 text-[11px] transition-colors'
+// `relative`: the chip's own accessible-name span (below) is an absolutely-positioned `sr-only` node
+// (round-45 label-content-name-mismatch fix). Without a positioned ancestor, an absolutely-positioned
+// element's containing block is the document root, not this button — so instead of sitting invisibly
+// inside the chip, that 1px node was measured at the chip's unscrolled flex position (this row scrolls
+// horizontally below `lg`), which for chips past the first few landed 300-700px past the viewport and
+// widened `document.documentElement.scrollWidth` by that much on every theme sharing this component
+// (measured regression: /, /luxury, /brutalist, /neo, /terminal all gained page-wide horizontal
+// overflow at every width below `lg` that production doesn't have; header-overflow-probe.mjs, 2026-09-24).
+// `relative` gives the sr-only span the correct containing block — its own chip — matching the pattern
+// LogoSelectorLuxury/LanguageSelectorLuxury/LanguageSelectorMenu already use for their own sr-only spans.
+const CHIP = 'relative compact-touch shrink-0 snap-start max-lg:inline-flex max-lg:min-h-11 max-lg:min-w-11 max-lg:items-center max-lg:justify-center rounded-full px-2.5 py-1 text-[11px] transition-colors'
 
 /** Real scroll position, not a guess: drives the rail's own one-sided `mask-image` (transparent only
  *  on the edge that still has content to reveal) so it never becomes the "fixed two-sided mask" the
