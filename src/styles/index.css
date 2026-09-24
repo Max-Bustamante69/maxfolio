@@ -56,6 +56,38 @@
     outline-color: #0071e3;
   }
   
+/* Page frame (Digitdeck layout convention, design-system/layout.md): one cap + one gutter for the
+   whole page, so the header, every section and the footer share the same left and right edges.
+   Border-box: the 50px desktop gutter lives inside the 1650px cap (content ≈ 1550px). */
+:root {
+  --frame-max: 1650px;
+  --gutter-x: 16px;
+}
+@media (min-width: 1024px) {
+  :root { --gutter-x: 50px; }
+}
+.frame {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--frame-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter-x);
+}
+/* Full-bleed chip rail below lg (full-bleed-carousel-recipe): the scrollport spans the viewport so chips
+   run off both edges while the first one rests on the frame's content edge. At lg+ these rails wrap
+   instead of scrolling, so the class switches itself off there. `--vw` is the viewport without the
+   scrollbar (main.tsx); plain 100vw includes the Windows scrollbar and shifts the first chip ~8px. */
+@media (max-width: 1023.98px) {
+  .bleed-rail {
+    --bleed-offset: max(var(--gutter-x), calc((var(--vw, 100vw) - var(--frame-max)) / 2 + var(--gutter-x)));
+    box-sizing: border-box;
+    width: var(--vw, 100vw);
+    margin-left: calc(50% - var(--vw, 100vw) / 2);
+    padding-inline: var(--bleed-offset);
+    scroll-padding-inline: var(--bleed-offset);
+  }
+}
+
   /* Gallery rail: breaks out of the 64rem column on wide screens (up to 1400px) so the device
    composites read at size; below 1024px it is exactly the column. */
 .rail-wide {

@@ -83,10 +83,17 @@ export function ConstellationMobile({ data }: SkillsLayoutProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [zoomed, openTool])
 
+  // Rail convention: this component only ever renders below `lg` (the OrbitLayout/reduced-motion
+  // switch above), so there's no desktop state to cancel — the offset just always equals the page's
+  // own content edge. Reads the real `--gutter-x` token (falling back to today's 16px) instead of a
+  // hardcoded `-mx-4/px-4` guess at it, so it stays correct if that token ever changes.
+  const edgeInset = { marginInline: 'calc(-1 * var(--gutter-x, 16px))' } as const
+  const edgePad = { paddingInline: 'var(--gutter-x, 16px)' } as const
+
   return (
     <div className="mt-2">
-      <div className={`sticky top-16 z-20 -mx-4 mb-4 px-4 pb-3 pt-1 backdrop-blur ${skin.dark ? 'bg-black/75' : 'bg-white/85'}`}>
-        <div role="group" aria-label={sk.groupSelectorLabel} className="-mx-4 flex items-center gap-1.5 overflow-x-auto px-4 no-scrollbar">
+      <div style={{ ...edgeInset, ...edgePad }} className={`sticky top-16 z-20 mb-4 pb-3 pt-1 backdrop-blur ${skin.dark ? 'bg-black/75' : 'bg-white/85'}`}>
+        <div style={{ ...edgeInset, ...edgePad }} role="group" aria-label={sk.groupSelectorLabel} className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
           {groups.map((g) => {
             const on = filter.groups.has(g)
             return (

@@ -69,6 +69,7 @@ function onRadioGroupKeyDown(e: KeyboardEvent<HTMLDivElement>) {
 // LogoSelectorLuxury/LanguageSelectorLuxury/LanguageSelectorMenu already use for their own sr-only spans.
 const CHIP = 'relative compact-touch shrink-0 snap-start max-lg:inline-flex max-lg:min-h-11 max-lg:min-w-11 max-lg:items-center max-lg:justify-center rounded-full px-2.5 py-1 text-[11px] transition-colors'
 
+// Rail convention: below `lg` this row is a full-bleed scroller (`.bleed-rail`, styles/index.css), off at `lg`+.
 /** Real scroll position, not a guess: drives the rail's own one-sided `mask-image` (transparent only
  *  on the edge that still has content to reveal) so it never becomes the "fixed two-sided mask" the
  *  house filter-motion contract rules out. Off entirely at `lg`+, where the rail stops scrolling. */
@@ -122,7 +123,7 @@ function Rail({ ariaLabel, children }: RailProps) {
       ref={ref}
       role="group"
       aria-label={ariaLabel}
-      className="-mx-4 flex items-center gap-1.5 overflow-x-auto px-4 py-0.5 no-scrollbar snap-x snap-proximity lg:mx-0 lg:flex-wrap lg:justify-center lg:overflow-visible lg:px-0"
+      className="bleed-rail flex items-center gap-1.5 overflow-x-auto py-0.5 no-scrollbar snap-x snap-proximity lg:flex-wrap lg:justify-center lg:overflow-visible"
       style={{ WebkitMaskImage: maskImage, maskImage }}
     >
       {children}
@@ -163,6 +164,7 @@ function Summary({ template, n, m, k, kSuffix = '' }: { template: string; n: num
 
 export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, filter, onHoverGroup }: SkillsFilterBarProps) {
   const ob = sk.orbit
+  const isApple = skin.frame === 'apple'
   const onQueryChange = (e: ChangeEvent<HTMLInputElement>) => filter.setQuery(e.target.value)
 
   // Facet counting (deliverable a): a group chip's own count ignores the group facet itself so it
@@ -189,7 +191,7 @@ export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, fi
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center lg:justify-between">
+      <div className={`flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center lg:justify-between ${isApple ? 'xl:gap-x-8' : ''}`}>
         <Rail ariaLabel={sk.groupSelectorLabel}>
           {groups.map((g) => {
             const on = filter.groups.has(g)

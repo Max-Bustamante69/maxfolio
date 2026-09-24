@@ -125,6 +125,36 @@ export const es: PortfolioContent = {
       ],
     },
     manifesto: { label: 'Lo que hago siempre', lines: ['Leo Lighthouse y las cifras de ventas primero.', 'Cada despliegue sale de un commit de git.', 'Más de 40 pruebas de Playwright antes de lanzar.', 'Te quedas con el editor, los docs y el repo.'] },
+    buildKit: {
+      eyebrow: 'Lo que de verdad recibes',
+      title: 'Cada build sale',
+      titleAccent: 'con esto',
+      lead: 'Cuatro promesas hechas concretas: lo que llega a tu repo, tu editor y tu panel, siempre.',
+      tiles: {
+        repo: {
+          title: 'Tu repo, tu historia',
+          body: 'Cada despliegue sale de un commit real de git: historia real de la flota, nunca una foto de un momento.',
+          unit: '{n} commits',
+        },
+        checks: {
+          title: 'Más de 40 pruebas antes de lanzar',
+          body: 'Un arnés de Playwright y un set de guardas revisan la tienda por comportamiento antes de publicar.',
+          items: ['Cada link interno abre', 'Cero desbordes, de móvil a escritorio', 'Scroll y snap del carrusel', 'Agregar al carrito, cajón, upsell', 'Errores de consola y de red', 'Seguridad del push del tema'],
+        },
+        editor: {
+          title: 'Secciones que editas sin un desarrollador',
+          body: 'Cada sección es un bloque real del tema: la reordenas, agregas o restilas desde el editor, sin desplegar.',
+          items: ['Hero', 'Galería', 'Reseñas', 'FAQ'],
+          blockLabel: 'Reseñas',
+          fieldLabel: 'Título',
+        },
+        tracking: {
+          title: 'Medido desde el día uno',
+          body: 'Cada tarjeta, riel y CTA queda instrumentado y reporta al panel Optimize desde el lanzamiento.',
+          caption: '{n} elementos medidos, en una tienda real.',
+        },
+      },
+    },
     testimonials: { eyebrow: 'En sus palabras', title: 'Lo que dicen', titleAccent: 'los clientes' },
     now: { label: 'Ahora', live: '{n} tiendas en vivo', dev: '{n} en construcción', band: 'Tiendas entregadas', local: 'Medellín · {time} hora local' },
     statBand: { label: 'El trabajo, en números', asOf: 'Septiembre de 2026', sourceLabel: 'Fuente', note: 'Rangos medidos en tiendas de clientes, de 2023 a 2026; las cifras exactas por tienda se mantienen confidenciales.' },

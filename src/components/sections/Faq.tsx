@@ -25,16 +25,19 @@ export function Faq({ skin, heading, ownId = true }: FaqProps) {
   const reduced = useReducedMotion()
   const f = strings.sections.faq
   const [open, setOpen] = useState(0)
+  // Already the right shape at wide widths (a capped, left-aligned measure rather than a stretched
+  // full-bleed accordion) — just gives it a little more room to breathe once the frame is 1550px wide.
+  const isApple = skin.frame === 'apple'
 
   return (
     <section id={ownId ? 'faq' : undefined} className="scroll-mt-20">
       {heading(f.eyebrow, f.title, f.titleAccent)}
-      <div className={`max-w-3xl border-t ${skin.line}`}>
+      <div className={`max-w-3xl border-t ${isApple ? 'lg:max-w-[52rem]' : ''} ${skin.line}`}>
         {f.items.map((item, i) => {
           const on = open === i
           return (
             <div key={item.q} className={`border-b ${skin.line}`}>
-              <button type="button" aria-expanded={on} aria-controls={`faq-${i}`} onClick={() => setOpen(on ? -1 : i)} className="flex w-full items-start justify-between gap-6 py-5 text-left md:py-6">
+              <button type="button" aria-expanded={on} aria-controls={`faq-${i}`} onClick={() => setOpen(on ? -1 : i)} className={`flex w-full items-start justify-between gap-6 py-5 text-left md:py-6 ${isApple ? 'lg:py-7' : ''}`}>
                 <span className={`${on ? skin.title : ''} text-lg leading-snug transition-colors md:text-xl`}>{item.q}</span>
                 <m.span
                   aria-hidden="true"

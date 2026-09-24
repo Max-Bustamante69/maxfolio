@@ -48,6 +48,7 @@ function DepthStat({ skin, value, text, suffix = '' }: DepthStatProps) {
 export function Skills({ skin, heading, ownId = true }: SkillsProps) {
   const { strings, registry } = useContent()
   const sk: SkillsStrings = strings.sections.skills
+  const isApple = skin.frame === 'apple'
   const groups = Object.keys(registry.skillGroups) as SkillGroupId[]
   const groupLabel = sk.groups as Record<SkillGroupId, string>
   const groupNote = sk.groupNote as Record<SkillGroupId, string>
@@ -93,7 +94,7 @@ export function Skills({ skin, heading, ownId = true }: SkillsProps) {
     <section id={ownId ? 'skills' : undefined} className="scroll-mt-20">
       {heading(sk.eyebrow, sk.title, sk.titleAccent)}
 
-      <div className={`mt-8 grid grid-cols-3 gap-3 border-b pb-6 sm:flex sm:flex-wrap sm:items-baseline sm:gap-x-10 sm:gap-y-3 ${skin.line}`}>
+      <div className={`mt-8 grid grid-cols-3 gap-3 border-b pb-6 sm:flex sm:flex-wrap sm:items-baseline sm:gap-x-10 sm:gap-y-3 ${isApple ? 'lg:gap-x-16 lg:pb-8' : ''} ${skin.line}`}>
         <DepthStat skin={skin} value={fleetLiquidLines} text={sk.depthLabel.liquid} />
         <DepthStat skin={skin} value={fleetIslandLines} text={sk.depthLabel.ts} />
         {/* Round 46: the public storefront count is the fixed "20+" everywhere, not the real, climbing

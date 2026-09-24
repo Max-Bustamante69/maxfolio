@@ -194,6 +194,12 @@ interface RingSpec {
 
 export function OrbitLayout({ data }: SkillsLayoutProps) {
   const { skin, sk, groups, groupLabel, toolsByGroup, formatTool } = data
+  // The 680px cap was tuned for the old ~1024px column; inside Apple's 1550px frame it now floats in a
+  // few hundred px of dead space on both sides at 1440/1920. Every dot's real tap target is a fixed
+  // 44px CSS floor (see ORBIT_CSS's comment above), never a percentage of the ring, so growing the ring
+  // itself only adds clearance between rings — safe for the WCAG-tuned rest positions above. Other
+  // skins keep the original 680px cap untouched.
+  const isApple = skin.frame === 'apple'
   const isDesktop = useMediaQuery('(min-width: 1024px)')
   const reduced = useReducedMotion()
   const [hoveredTool, setHoveredTool] = useState<string | null>(null)
@@ -304,7 +310,7 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
         onHoverGroup={setHoveredGroup}
       />
 
-      <div className="relative mx-auto mt-6 aspect-square w-full max-w-[680px] overflow-visible [perspective:1400px]">
+      <div className={`relative mx-auto mt-6 aspect-square w-full max-w-[680px] ${isApple ? 'lg:max-w-[760px] xl:max-w-[900px]' : ''} overflow-visible [perspective:1400px]`}>
         <div
           ref={tiltRef}
           className="absolute inset-0"

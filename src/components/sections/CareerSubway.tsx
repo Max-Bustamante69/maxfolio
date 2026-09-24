@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { m, useReducedMotion } from 'framer-motion'
 import { useContent, useMediaQuery } from '../../hooks'
-import type { Skin } from '../gallery'
+import { sheetTokens, type Skin } from '../gallery'
 import type { SectionHeading } from './Gallery'
 
 interface CareerSubwayProps {
@@ -76,6 +76,13 @@ export function CareerSubway({ skin, heading }: CareerSubwayProps) {
   const cw = strings.sections.careerSubway
   const { lines, transfers } = useLines()
   const ROWS = lines.length
+  // A real per-skin color, not a Tailwind class: `skin.accentBg` is a `bg-*` utility string, and the
+  // previous `skin.accentBg.replace('bg-', 'stroke-')`/`'fill-'` trick built classes like
+  // `stroke-[#0066cc]` only at runtime — Tailwind's JIT scans source text for literal class names, so
+  // a class assembled by `.replace()` never appears anywhere for it to find and never gets generated.
+  // The computed `stroke`/`fill` silently fell back to the SVG default (`none`/`black`), which is why
+  // every line in this map rendered invisible and every dot rendered black instead of the accent.
+  const accent = sheetTokens(skin).accent
 
   const padStart = wide ? 118 : 26
   const padEnd = wide ? 24 : 16
@@ -154,8 +161,7 @@ export function CareerSubway({ skin, heading }: CareerSubwayProps) {
                       y2={y2}
                       strokeWidth={trackWidth}
                       strokeLinecap="round"
-                      className={skin.accentBg.replace('bg-', 'stroke-')}
-                      style={{ opacity: seg.current ? 1 : 0.55 }}
+                      style={{ stroke: accent, opacity: seg.current ? 1 : 0.55 }}
                       initial={reduced ? false : { pathLength: 0 }}
                       whileInView={{ pathLength: 1 }}
                       viewport={{ once: true, margin: '-40px' }}
@@ -163,8 +169,8 @@ export function CareerSubway({ skin, heading }: CareerSubwayProps) {
                     >
                       <title>{cw.rowAria.replace('{company}', line.company).replace('{period}', `${seg.start}–${seg.current ? 'now' : seg.end}`)}</title>
                     </m.line>
-                    <circle cx={x1} cy={y1} r={4} className={skin.accentBg.replace('bg-', 'fill-')} />
-                    <circle cx={x2} cy={y2} r={4} className={seg.current ? `${skin.accentBg.replace('bg-', 'fill-')} animate-pulse` : skin.accentBg.replace('bg-', 'fill-')} style={{ opacity: seg.current ? 1 : 0.55 }} />
+                    <circle cx={x1} cy={y1} r={4} style={{ fill: accent }} />
+                    <circle cx={x2} cy={y2} r={4} className={seg.current ? 'animate-pulse' : undefined} style={{ fill: accent, opacity: seg.current ? 1 : 0.55 }} />
                   </g>
                 )
               })}

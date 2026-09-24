@@ -11,8 +11,8 @@ interface MeasuredBandProps {
 }
 
 /** A small right-pointing arrow between the two Lighthouse rings — decorative, the numerals carry the meaning. */
-const Arrow = ({ color }: { color: string }) => (
-  <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 shrink-0" fill="none" stroke={color} strokeWidth={1.8} aria-hidden="true">
+const Arrow = ({ color, large }: { color: string; large?: boolean }) => (
+  <svg viewBox="0 0 16 16" className={`shrink-0 ${large ? 'h-3.5 w-3.5 lg:h-4 lg:w-4' : 'h-3.5 w-3.5'}`} fill="none" stroke={color} strokeWidth={1.8} aria-hidden="true">
     <path d="M2 8h11m0 0-4-4m4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 )
@@ -20,11 +20,15 @@ const Arrow = ({ color }: { color: string }) => (
 const RING_R = 17
 const RING_C = 2 * Math.PI * RING_R
 
-/** One arc: `pct` of a 0-100 scale, drawn once when `show` flips true (or shown static under reduced motion). */
-function Ring({ pct, color, track, delay, show, reduced }: { pct: number; color: string; track: string; delay: number; show: boolean; reduced: boolean }) {
+/** One arc: `pct` of a 0-100 scale, drawn once when `show` flips true (or shown static under reduced motion).
+ *  `large` (Apple skin only, see `isApple` below) bumps the ring a notch at `lg` so the graphic still
+ *  reads as a deliberate mark rather than a stray dot once its grid cell is ~350px wide instead of
+ *  ~220px — a Tailwind `lg:` class alone would also fire for the narrower-column themes at the same
+ *  viewport width, so this only ever applies when the caller (`MeasuredBand`) has confirmed the frame skin. */
+function Ring({ pct, color, track, delay, show, reduced, large }: { pct: number; color: string; track: string; delay: number; show: boolean; reduced: boolean; large?: boolean }) {
   const offset = RING_C - (Math.max(0, Math.min(100, pct)) / 100) * RING_C
   return (
-    <svg viewBox="0 0 40 40" className="h-10 w-10 shrink-0" aria-hidden="true">
+    <svg viewBox="0 0 40 40" className={`shrink-0 ${large ? 'h-10 w-10 lg:h-12 lg:w-12' : 'h-10 w-10'}`} aria-hidden="true">
       <circle cx="20" cy="20" r={RING_R} fill="none" strokeWidth="3.5" stroke={track} />
       {reduced ? (
         <circle cx="20" cy="20" r={RING_R} fill="none" strokeWidth="3.5" strokeLinecap="round" stroke={color} strokeDasharray={RING_C} strokeDashoffset={offset} transform="rotate(-90 20 20)" />
@@ -49,15 +53,15 @@ function Ring({ pct, color, track, delay, show, reduced }: { pct: number; color:
 }
 
 /** Two small rings (before, muted → after, band-colored) with an arrow between: the Lighthouse range as a shape, not a sentence. */
-function LighthouseRings({ dark, show, reduced, delay = 0 }: { dark: boolean; show: boolean; reduced: boolean; delay?: number }) {
+function LighthouseRings({ dark, show, reduced, delay = 0, large }: { dark: boolean; show: boolean; reduced: boolean; delay?: number; large?: boolean }) {
   const track = dark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)'
   const before = dark ? 'rgba(255,255,255,0.32)' : 'rgba(0,0,0,0.28)'
   const after = scoreColor(95)
   return (
-    <div className="flex items-center gap-2" aria-hidden="true">
-      <Ring pct={70} color={before} track={track} delay={delay} show={show} reduced={reduced} />
-      <Arrow color={dark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.3)'} />
-      <Ring pct={95} color={after} track={track} delay={delay + 0.12} show={show} reduced={reduced} />
+    <div className={`flex items-center ${large ? 'gap-2 lg:gap-2.5' : 'gap-2'}`} aria-hidden="true">
+      <Ring pct={70} color={before} track={track} delay={delay} show={show} reduced={reduced} large={large} />
+      <Arrow color={dark ? 'rgba(255,255,255,0.35)' : 'rgba(0,0,0,0.3)'} large={large} />
+      <Ring pct={95} color={after} track={track} delay={delay + 0.12} show={show} reduced={reduced} large={large} />
     </div>
   )
 }
@@ -153,6 +157,11 @@ export function MeasuredBand({ skin }: MeasuredBandProps) {
   const dark = skin.dark
   const { accent } = sheetTokens(skin)
   const byId = Object.fromEntries(registry.stats.map((st) => [st.id, st.value])) as Record<string, string>
+  // Other themes still render this band in a 64rem column, where a Tailwind `lg:` class alone would
+  // ALSO fire (the viewport, not the column, is what `lg:` reads) — so the wider gap and larger
+  // graphics are gated on the skin, not the breakpoint alone, matching the frame-1650 convention's
+  // "gate to `skin.frame === 'apple'`" rule for any width-dependent change to a shared component.
+  const isApple = skin.frame === 'apple'
 
   return (
     <section aria-label={s.label} className="mb-10 md:mb-14">
@@ -160,9 +169,9 @@ export function MeasuredBand({ skin }: MeasuredBandProps) {
         <p className={`text-[11px] font-semibold uppercase tracking-[0.18em] ${skin.muted}`}>{s.label}</p>
         <p className={`text-[11px] ${skin.muted}`}>{s.asOf}</p>
       </div>
-      <div ref={ref} className={`mt-5 grid grid-cols-2 gap-x-4 gap-y-6 md:grid-cols-4 ${skin.body}`}>
+      <div ref={ref} className={`mt-5 grid grid-cols-2 gap-x-4 gap-y-6 md:grid-cols-4 ${isApple ? 'lg:gap-x-8' : ''} ${skin.body}`}>
         <Cell value={byId.lighthouse} label={stat.lighthouse}>
-          <LighthouseRings dark={dark} show={show} reduced={reduced} />
+          <LighthouseRings dark={dark} show={show} reduced={reduced} large={isApple} />
         </Cell>
         <Cell value={byId.loadTime} label={stat.loadTime}>
           <RangeBar afterFrom={60} afterTo={70} color={accent} dark={dark} show={show} reduced={reduced} delay={0.06} />

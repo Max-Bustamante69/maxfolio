@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
-import { m } from 'framer-motion'
+import { m, useReducedMotion } from 'framer-motion'
 import { ThemeProvider, useTheme } from '../context/ThemeContext'
 // Direct imports (not the component barrels) so the main chunk carries only what the first paint needs.
 import { SEOHead, MobileMenuApple, LanguageSelectorApple, LogoSelectorApple, Magnetic, TransitionLink, SmoothScroll, ScrollRail, Ticker, RevealText } from '../components/common'
@@ -21,7 +21,7 @@ const ShopifyWork = lazy(() => import('../components/sections/ShopifyWork').then
 const MeasuredBand = lazy(() => import('../components/sections/MeasuredBand').then((mod) => ({ default: mod.MeasuredBand })))
 const Gallery = lazy(() => import('../components/sections/Gallery').then((mod) => ({ default: mod.Gallery })))
 const FeaturedBuild = lazy(() => import('../components/sections/FeaturedBuild').then((mod) => ({ default: mod.FeaturedBuild })))
-const Manifesto = lazy(() => import('../components/sections/Manifesto').then((mod) => ({ default: mod.Manifesto })))
+const BuildKit = lazy(() => import('../components/sections/BuildKit').then((mod) => ({ default: mod.BuildKit })))
 const Projects = lazy(() => import('../components/sections/Projects').then((mod) => ({ default: mod.Projects })))
 const Skills = lazy(() => import('../components/sections/Skills').then((mod) => ({ default: mod.Skills })))
 // "How we could work together" — round 44 prototype (?proposal=models-a|b), round 46 lane "extras" made it the only implementation.
@@ -116,17 +116,21 @@ function useActiveSection(ids: string[]) {
 // Strong ease-out: instant response, soft landing.
 const EASE = [0.23, 1, 0.32, 1] as const
 
-const Reveal = ({ children, delay = 0, className = '' }: { children: ReactNode; delay?: number; className?: string }) => (
-  <m.div
-    initial={{ opacity: 0, y: 20, scale: 0.985 }}
-    whileInView={{ opacity: 1, y: 0, scale: 1 }}
-    viewport={{ once: true, amount: 0.1 }}
-    transition={{ duration: 0.6, delay, ease: EASE }}
-    className={className}
-  >
-    {children}
-  </m.div>
-)
+const Reveal = ({ children, delay = 0, className = '' }: { children: ReactNode; delay?: number; className?: string }) => {
+  // Reduced motion: fade only, no travel or scale.
+  const reduce = useReducedMotion()
+  return (
+    <m.div
+      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 20, scale: 0.985 }}
+      whileInView={reduce ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, amount: 0.1 }}
+      transition={{ duration: 0.6, delay, ease: EASE }}
+      className={className}
+    >
+      {children}
+    </m.div>
+  )
+}
 
 const Icon = {
   mail: (
@@ -246,7 +250,7 @@ function AppleContent() {
               container is too narrow for that (e.g. the right cluster's own content is wider than
               half the remaining space) the wider side freezes at its content width and the links
               shift instead of sliding underneath either cluster — never an overlap. */}
-          <div className="max-w-5xl mx-auto h-full px-4 lg:px-6 grid grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)] items-center gap-3">
+          <div className="frame h-full grid grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)] items-center gap-3">
             <div className="justify-self-start min-w-0">
               <LogoSelectorApple isDark={isDark} />
             </div>
@@ -306,102 +310,140 @@ function AppleContent() {
         </nav>
 
         <main id="main-content" className="pt-11 lg:pt-14">
-          {/* Hero — typographic */}
-          <section id="hero" data-track-section="hero" className="px-4 pt-16 md:pt-24 pb-14 md:pb-20 text-center scroll-mt-20 lg:scroll-mt-[92px]" aria-labelledby="hero-heading">
-            <p className={`text-sm font-semibold ${blue}`}>{c.hero.eyebrow}</p>
-            {/* The LCP element stays static: an entrance fade would delay the first meaningful paint. */}
-            <h1
-              id="hero-heading"
-              className="mx-auto mt-4 max-w-4xl text-5xl md:text-7xl lg:text-[84px] font-semibold tracking-[-0.03em] leading-[1.02]"
-            >
-              {registry.personal.name}
-            </h1>
-            <p className={`mx-auto mt-5 max-w-2xl text-xl md:text-2xl ${muted} leading-snug tracking-[-0.01em]`}>{c.hero.positioning}</p>
-            {/* Static (no entrance): index.html carries the same hero markup before React mounts. A `trigger="load"` RevealText
-                here was tried and reverted -- it starts every word at opacity:0, so the lead line (already painted, readable,
-                by the static shell) vanished for ~1-2s on every load before re-animating in word by word, a real flash/regression
-                against the exact static-shell duplication this comment is about. */}
-            <p className="mx-auto mt-6 max-w-2xl text-base md:text-lg leading-relaxed">{c.hero.lead}</p>
-            {/* Static (no entrance): index.html carries the same hero markup before React mounts, so an entrance fade would flash. */}
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
-              <Magnetic>
-                <button
-                  type="button"
-                  onClick={() => {
-                    track('cta_click', { cta: 'store-review', position: 'hero' })
-                    openContact()
-                  }}
-                  className={primaryBtn}
-                >
-                  {c.hero.ctaPrimary}
-                </button>
-              </Magnetic>
-              <a href="#shopify" className={`${blue} inline-flex items-center gap-1.5 text-sm font-medium`}>
-                {c.hero.ctaSecondary} {Icon.down}
-              </a>
-              <a
-                href={registry.personal.cv}
-                download
-                onClick={() => track('cv_download', { theme: 'apple' })}
-                className={`${muted} text-sm font-medium`}
-              >
-                {c.hero.ctaCv} ›
-              </a>
-            </div>
-            <p className={`${muted} mt-4 text-xs`}>{c.hero.ctaNote}</p>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-2 text-xs">
-              <span className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 font-medium ${tile}`}>
-                <span className="w-2 h-2 rounded-full bg-[#34c759]" aria-hidden="true" />
-                {c.hero.availability}
-              </span>
-              <span className={`inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 ${tile} ${muted}`}>
-                {Icon.globe}
-                {c.hero.location}
-              </span>
+          {/* Hero — editorial, left-aligned on the frame's 12-col grid (round 47: replaces the
+              centered stack Max called "desorganizada, cosas no alineadas"). `items-start` on the
+              grid is a deliberate alignment choice: the Now card's top sits flush with the eyebrow's
+              top — the column's first line either way, so the two columns read as one baseline. */}
+          <section id="hero" data-track-section="hero" className="pt-16 md:pt-24 pb-10 md:pb-12 scroll-mt-20 lg:scroll-mt-[92px]" aria-labelledby="hero-heading">
+            <div className="frame">
+              {/* Two rows on the frame's 12-col grid: the name runs across the whole frame, then the
+                  message (7 cols) sits beside the Now card (4 cols, right edge). Both start on the same
+                  line, so the two columns end near each other instead of leaving a hole under the card.
+                  The card stays top-aligned: React appends rows to it on hydration, and a bottom- or
+                  center-aligned card would move what the static shell already painted. */}
+              <div className="grid gap-y-8 gap-x-10 lg:grid-cols-12 lg:items-start lg:gap-x-12 lg:gap-y-10">
+                <div className="lg:col-span-12">
+                  <p className={`text-sm font-semibold ${blue}`}>{c.hero.eyebrow}</p>
+                  {/* The LCP element stays static: an entrance fade would delay the first meaningful
+                      paint. Two lines below lg, one line from lg up, where the frame is wide enough;
+                      sizes stay under the frame's content width at each breakpoint (≈9.3em for the name). */}
+                  <h1
+                    id="hero-heading"
+                    className="mt-4 font-semibold tracking-[-0.03em] leading-[0.95] text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[7rem] 2xl:text-[8rem]"
+                  >
+                    <span className="block lg:inline">{registry.personal.firstName}</span>{' '}
+                    <span className="block lg:inline">{registry.personal.lastName}</span>
+                  </h1>
+                </div>
+                <div className="lg:col-span-7">
+                  <p className="max-w-xl text-xl md:text-2xl font-medium leading-snug tracking-[-0.01em]">{c.hero.positioning}</p>
+                  {/* Static (no entrance): index.html carries the same hero markup before React mounts. A `trigger="load"` RevealText
+                      here was tried and reverted -- it starts every word at opacity:0, so the lead line (already painted, readable,
+                      by the static shell) vanished for ~1-2s on every load before re-animating in word by word, a real flash/regression
+                      against the exact static-shell duplication this comment is about. Capped at ~60ch (design-system measure), not
+                      the column's own width — at xl the left column runs well past a readable line length. */}
+                  <p className={`mt-5 max-w-[60ch] text-base md:text-lg leading-relaxed ${muted}`}>{c.hero.lead}</p>
+                  {/* Static (no entrance): index.html carries the same hero markup before React mounts, so an entrance fade would
+                      flash. All three items share an explicit h-11 (the 44px touch floor) and items-center, so the filled pill and
+                      the two plain-text links sit on one visual baseline instead of three different box heights. */}
+                  <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2">
+                    <Magnetic>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          track('cta_click', { cta: 'store-review', position: 'hero' })
+                          openContact()
+                        }}
+                        className={`${primaryBtn} h-11`}
+                      >
+                        {c.hero.ctaPrimary}
+                      </button>
+                    </Magnetic>
+                    <a href="#shopify" className={`h-11 inline-flex items-center gap-1.5 text-sm font-medium ${blue}`}>
+                      {c.hero.ctaSecondary} {Icon.down}
+                    </a>
+                    <a
+                      href={registry.personal.cv}
+                      download
+                      onClick={() => track('cv_download', { theme: 'apple' })}
+                      className={`h-11 inline-flex items-center text-sm font-medium ${muted}`}
+                    >
+                      {c.hero.ctaCv} ›
+                    </a>
+                  </div>
+                  <p className={`${muted} mt-4 text-xs`}>{c.hero.ctaNote}</p>
+                </div>
+
+                {/* Now — one Apple tile that absorbs the old availability/location pills and the
+                    separate "Now" pill that used to float under the ticker below. Availability and
+                    location come first (deliberately, not the brief's own listed order): they're the
+                    only rows the static shell in index.html can pre-render (fixed copy, no runtime
+                    value), so putting them first means React only ever APPENDS the live/dev/local-time
+                    rows below on hydration — it never inserts above already-painted text, so the swap
+                    can't shift it. */}
+                {/* The availability line is the card's title, flush left; every other row keeps a 14px leading slot (dot, globe or blank) so their text lines up. */}
+                <div className="lg:col-span-4 lg:col-start-9">
+                  <div className={`${skin.card} p-6 md:p-7`}>
+                    <div className={`flex items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.12em] ${muted}`}>
+                      <span className="relative flex h-3.5 w-3.5 items-center justify-center" aria-hidden="true">
+                        <span className="absolute inline-flex h-2 w-2 animate-ping rounded-full bg-[#34c759] opacity-60 motion-reduce:animate-none" />
+                        <span className="relative inline-flex h-2 w-2 rounded-full bg-[#34c759]" />
+                      </span>
+                      {c.sections.now.label}
+                    </div>
+                    <p className="mt-3 text-base font-semibold leading-snug">{c.hero.availability}</p>
+                    <p className={`mt-2 flex items-center gap-2.5 text-sm ${muted}`}>
+                      {Icon.globe}
+                      {c.hero.location}
+                    </p>
+                    <div className={`mt-5 space-y-2 border-t pt-5 text-sm ${skin.line}`}>
+                      <p className="flex items-center gap-2.5">
+                        <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center" aria-hidden="true"><span className="h-1.5 w-1.5 rounded-full bg-[#34c759]" /></span>
+                        {c.sections.now.live.replace('{n}', String(liveCount))}
+                      </p>
+                      <p className="flex items-center gap-2.5">
+                        <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center" aria-hidden="true"><span className="h-1.5 w-1.5 rounded-full bg-[#ff9f0a]" /></span>
+                        {c.sections.now.dev.replace('{n}', String(devCount))}
+                      </p>
+                      <p className={`flex items-center gap-2.5 ${muted}`}>
+                        <span className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                        {c.sections.now.local.replace('{time}', localTime)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
 
-          {/* Now + the fleet ticker */}
-          <section className="px-4 pb-14 md:pb-20" aria-label={c.sections.now.label}>
-            <div className="max-w-5xl mx-auto">
-              <Reveal className={`inline-flex flex-wrap items-center gap-x-5 gap-y-2 rounded-full px-5 py-2.5 text-sm ${tile}`}>
-                <span className="inline-flex items-center gap-2 font-medium">
-                  <span className="relative flex h-2 w-2" aria-hidden="true">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34c759] opacity-60 motion-reduce:animate-none" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-[#34c759]" />
-                  </span>
-                  {c.sections.now.label}
-                </span>
-                <span className={muted}>{c.sections.now.live.replace('{n}', String(liveCount))}</span>
-                <span className={muted}>{c.sections.now.dev.replace('{n}', String(devCount))}</span>
-                <span className={muted}>{c.sections.now.local.replace('{time}', localTime)}</span>
-              </Reveal>
-            </div>
-            <div className="mt-10 rail-wide">
-              {/* Speed-hover (accelerates ×2.5 under the cursor) layered with a skew tied to page-scroll velocity — the two Now-band effects the ticker spec asked for on the same strip. */}
-              <Ticker
-                variant="speed-hover"
-                skew
-                duration={46}
-                label={c.sections.now.band}
-                items={registry.stores.filter((s) => !s.legacy)}
-                keyOf={(s) => s.slug}
-                itemClassName="flex shrink-0 items-center gap-2.5 whitespace-nowrap px-5 py-3"
-                renderItem={(s) => (
-                  <>
-                    <span className={`h-1.5 w-1.5 rounded-full ${s.status !== 'live' ? 'bg-[#ff9f0a]' : 'bg-[#34c759]'}`} aria-hidden="true" />
-                    <span className={`font-sf text-lg font-semibold tracking-[-0.02em] ${isDark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'}`}>{s.name}</span>
-                    {c.stores[s.slug]?.industry && <span className={`text-sm ${muted}`}>{c.stores[s.slug].industry}</span>}
-                  </>
-                )}
-              />
-            </div>
+          {/* Fleet ticker — full width, edge to edge of the viewport; the Now pill that used to sit
+              above it now lives in the hero's status card. `.ticker-mask` (index.css) already fades
+              both edges to transparent and the strip carries no width constraint of its own, so it
+              never hard-cuts a name mid-word the way the old 1400px `rail-wide` rail could. */}
+          <section className="pt-6 md:pt-8 pb-12 md:pb-16">
+            {/* Speed-hover (accelerates ×2.5 under the cursor) layered with a skew tied to page-scroll velocity — the two Now-band effects the ticker spec asked for on the same strip. */}
+            <Ticker
+              variant="speed-hover"
+              skew
+              duration={46}
+              label={c.sections.now.band}
+              items={registry.stores.filter((s) => !s.legacy)}
+              keyOf={(s) => s.slug}
+              itemClassName="flex shrink-0 items-center gap-2.5 whitespace-nowrap px-5 py-3"
+              renderItem={(s) => (
+                <>
+                  <span className={`h-1.5 w-1.5 rounded-full ${s.status !== 'live' ? 'bg-[#ff9f0a]' : 'bg-[#34c759]'}`} aria-hidden="true" />
+                  <span className={`font-sf text-lg font-semibold tracking-[-0.02em] ${isDark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'}`}>{s.name}</span>
+                  {c.stores[s.slug]?.industry && <span className={`text-sm ${muted}`}>{c.stores[s.slug].industry}</span>}
+                </>
+              )}
+            />
           </section>
 
           {/* Experience — split 50/50, with an optional subway-map view of the same roles */}
           {/* This non-lazy wrapper owns id="experience" (so a hash link lands before the chunk mounts) and the Apple-only lg offset; the inner section renders no id here. */}
-          <section id="experience" data-track-section="experience" className={`px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
-            <div className="max-w-5xl mx-auto">
+          <section id="experience" data-track-section="experience" className={`py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
+            <div className="frame">
               <Experience ownId={false} skin={skin} heading={Heading} />
               <div className="mt-10 md:mt-14">
                 <button
@@ -427,8 +469,8 @@ function AppleContent() {
           {/* Chapters — a horizontal scroll-snap rail of five year cards, not the shared Years.tsx
               editorial list or the old Gantt ribbon. content-visibility:auto was tried and reverted
               here — see docs/seo.md "content-visibility" for the measured instability. */}
-          <section className="px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
-            <div className="max-w-5xl mx-auto">
+          <section className="py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
+            <div className="frame">
               <Suspense fallback={<Pending />}>
                 <Chapters skin={skin} heading={Heading} />
               </Suspense>
@@ -436,8 +478,8 @@ function AppleContent() {
           </section>
 
           {/* Process — pinned stepper */}
-          <section className={`px-4 py-14 md:py-20 ${surface}`}>
-            <div className="max-w-5xl mx-auto">
+          <section className={`py-14 md:py-20 ${surface}`}>
+            <div className="frame">
               <Suspense fallback={<Pending />}>
                 <Process skin={skin} heading={Heading} canvas={surface} pinnedRail />
               </Suspense>
@@ -445,8 +487,8 @@ function AppleContent() {
           </section>
 
           {/* Shopify work — the index */}
-          <section id="shopify" data-track-section="shopify" className="px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
-            <div className="max-w-5xl mx-auto">
+          <section id="shopify" data-track-section="shopify" className="py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
+            <div className="frame">
               {/* Measured ranges — the hero's old stat band, moved here and re-drawn as small graphics:
                   where "See the storefronts" actually lands, not stacked on top of the hero's own claim. */}
               <Suspense fallback={<Pending h="min-h-[24vh]" />}>
@@ -459,8 +501,8 @@ function AppleContent() {
           </section>
 
           {/* Gallery — media carousel. content-visibility:auto tried and reverted — docs/seo.md. */}
-          <section id="gallery" data-track-section="gallery" className={`px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
-            <div className="max-w-5xl mx-auto">
+          <section id="gallery" data-track-section="gallery" className={`py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
+            <div className="frame">
               <Suspense fallback={<Pending />}>
                 <Gallery ownId={false} skin={skin} heading={Heading} />
               </Suspense>
@@ -470,25 +512,25 @@ function AppleContent() {
           {/* Featured build — The Gummy Box, told through one of four selectable design variants
               (?featured=a|b|c|d). Tighter rhythm than its neighbors on purpose — the brief asked for
               denser spacing than the site's usual py-14/py-20 band. */}
-          <section className="px-4 py-12 md:py-16 scroll-mt-20 lg:scroll-mt-[92px]">
-            <div className="max-w-5xl mx-auto">
+          <section className="py-12 md:py-16 scroll-mt-20 lg:scroll-mt-[92px]">
+            <div className="frame">
               <Suspense fallback={<Pending />}>
                 <FeaturedBuild skin={skin} heading={Heading} />
               </Suspense>
             </div>
           </section>
 
-          {/* Manifesto — an inverted typographic band between two media-heavy sections, grounded on a very quiet frosted-glass gradient */}
+          {/* Every build ships with — four concrete deliverables (repo, checks, editable sections, tracking); replaced the Manifesto band in round 47 */}
           <Suspense fallback={<Pending h="min-h-[40vh]" />}>
-            <Manifesto skin={skin} backdropSrc="/art/apple/frosted-glass.webp" />
+            <BuildKit skin={skin} />
           </Suspense>
 
           {/* Testimonials (absent until a real quote exists) */}
           <Testimonials skin={skin} heading={Heading} />
 
           {/* Projects — index list. content-visibility:auto tried and reverted — docs/seo.md. */}
-          <section id="projects" data-track-section="projects" className="px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
-            <div className="max-w-5xl mx-auto">
+          <section id="projects" data-track-section="projects" className="py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
+            <div className="frame">
               <Suspense fallback={<Pending />}>
                 <Projects ownId={false} skin={skin} heading={Heading} />
               </Suspense>
@@ -497,8 +539,8 @@ function AppleContent() {
 
           {/* Skills — narrative with inline chips. content-visibility:auto tried and reverted — docs/seo.md. */}
           {/* This non-lazy wrapper owns id="skills" (so a hash link lands before the chunk mounts) and the Apple-only lg offset; the inner section renders no id here. */}
-          <section id="skills" data-track-section="skills" className={`px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
-            <div className="max-w-5xl mx-auto">
+          <section id="skills" data-track-section="skills" className={`py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
+            <div className="frame">
               <Suspense fallback={<Pending />}>
                 <Skills ownId={false} skin={skin} heading={Heading} />
               </Suspense>
@@ -508,8 +550,8 @@ function AppleContent() {
           {/* Store check — a real URL field that measures the visitor's own store live via the
               server-side PSI proxy. Owns its own id so useActiveSection can track it separately from
               Projects above it (round 46, replaces the old review-checklist replay). */}
-          <section id="proof" data-track-section="proof" className="px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
-            <div className="max-w-5xl mx-auto">
+          <section id="proof" data-track-section="proof" className="py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
+            <div className="frame">
               <Suspense fallback={<Pending />}>
                 <StoreCheck skin={skin} heading={Heading} onCta={(prefill) => openContact(prefill)} />
               </Suspense>
@@ -517,8 +559,8 @@ function AppleContent() {
           </section>
 
           {/* Engagement models — "how we could work together". Owns its own id for the same reason. */}
-          <section id="engagement" data-track-section="engagement" className={`px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
-            <div className="max-w-5xl mx-auto">
+          <section id="engagement" data-track-section="engagement" className={`py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
+            <div className="frame">
               <Suspense fallback={<Pending />}>
                 <EngagementModels ownId={false} skin={skin} heading={Heading} />
               </Suspense>
@@ -526,8 +568,8 @@ function AppleContent() {
           </section>
 
           {/* FAQ — the objections, answered before the ask. Owns its own id for the same reason. */}
-          <section id="faq" data-track-section="faq" className="px-4 py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
-            <div className="max-w-5xl mx-auto">
+          <section id="faq" data-track-section="faq" className="py-14 md:py-20 scroll-mt-20 lg:scroll-mt-[92px]">
+            <div className="frame">
               <Suspense fallback={<Pending h="min-h-[40vh]" />}>
                 <Faq ownId={false} skin={skin} heading={Heading} />
               </Suspense>
@@ -535,7 +577,7 @@ function AppleContent() {
           </section>
 
           {/* Contact — typographic close, a mesh gradient at 30% opacity so the last section isn't flat */}
-          <section id="contact" data-track-section="contact" className={`relative overflow-hidden px-4 py-24 md:py-32 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
+          <section id="contact" data-track-section="contact" className={`relative overflow-hidden py-24 md:py-32 scroll-mt-20 lg:scroll-mt-[92px] ${surface}`}>
             <img
               src="/art/apple/mesh.webp"
               alt=""
@@ -546,7 +588,7 @@ function AppleContent() {
               decoding="async"
               className={`pointer-events-none absolute inset-0 h-full w-full object-cover opacity-30 ${isDark ? "mix-blend-screen" : ""}`}
             />
-            <div className="relative max-w-5xl mx-auto">
+            <div className="relative frame">
               <Suspense fallback={<Pending />}>
                 <Contact
                   ownId={false}
@@ -560,8 +602,8 @@ function AppleContent() {
           </section>
 
           {/* Explore */}
-          <section id="explore" data-track-section="explore" className="px-4 py-20 scroll-mt-20 lg:scroll-mt-[92px]">
-            <div className="max-w-5xl mx-auto">
+          <section id="explore" data-track-section="explore" className="py-20 scroll-mt-20 lg:scroll-mt-[92px]">
+            <div className="frame">
               {Heading(c.sections.explore.eyebrow, c.sections.explore.title, '', c.sections.explore.lead)}
               <div className="grid sm:grid-cols-3 gap-3">
                 {otherDesigns('apple').map((d) => (
@@ -606,8 +648,8 @@ function AppleContent() {
         </main>
 
         {/* Footer — a deliberate close: rights, an honest build stamp, back to top */}
-        <footer className={`px-4 pb-10 pt-4 text-xs ${muted}`} role="contentinfo" aria-label="Site footer">
-          <div className={`max-w-5xl mx-auto flex flex-col gap-3 border-t pt-8 md:flex-row md:items-baseline md:justify-between ${skin.line}`}>
+        <footer className={`pb-10 pt-4 text-xs ${muted}`} role="contentinfo" aria-label="Site footer">
+          <div className={`frame flex flex-col gap-3 border-t pt-8 md:flex-row md:items-baseline md:justify-between ${skin.line}`}>
             <p>
               © 2026 {registry.personal.name}. {c.footer.rights}
             </p>

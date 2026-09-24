@@ -57,10 +57,21 @@ export function MetricsAlive({ skin }: MetricsAliveProps) {
   const extra = bullets.slice(SHOWN_BULLETS)
   const hiddenCount = extra.length
 
+  // Wide frame (round 47): the grid's default `align-items: stretch` was pulling this short rail's
+  // own box down to match the taller panel's height, which just left the extra space below the last
+  // role blank — no different at 1024px, but a much bigger, more obviously "empty" gap now that the
+  // Apple skin's frame runs to 1550px and the panel (metrics + shipped + chips) is that much taller.
+  // `self-start` lets the rail size to its own content instead of stretching, and a sticky top on top
+  // of that keeps the role list in view (same `top-28` offset Process/Chapters already pin to) while
+  // the panel is read — an index staying put beside its detail pane, not a column trailing off into
+  // void. Apple-only: the shared grid ratio and stretch behavior stay exactly as before on every
+  // other skin's narrower column, where the two sides are closer in height to begin with.
+  const railSticky = skin.frame === 'apple' ? 'lg:sticky lg:top-28 lg:self-start' : ''
+
   return (
     <div className="grid gap-8 lg:grid-cols-12 lg:gap-12">
       {/* rail */}
-      <div className="relative min-w-0 -mx-4 lg:mx-0 lg:col-span-4">
+      <div className={`relative min-w-0 -mx-4 lg:mx-0 lg:col-span-4 ${railSticky}`}>
         <div
           ref={railRef}
           className="snap-x snap-mandatory overflow-x-auto px-4 no-scrollbar max-lg:[mask-image:linear-gradient(to_right,black,black_calc(100%-28px),transparent)] max-lg:[-webkit-mask-image:linear-gradient(to_right,black,black_calc(100%-28px),transparent)] lg:overflow-visible lg:px-0"

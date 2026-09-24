@@ -100,7 +100,7 @@ export function ScrollRail({ sections, dark, accent = '#0071e3' }: ScrollRailPro
 
       {/* the rail: pointer devices, ≥ lg */}
       <div
-        className="scroll-rail fixed right-3 top-1/2 z-40 hidden h-[62vh] w-8 -translate-y-1/2 [@media(hover:hover)_and_(min-width:1024px)]:block"
+        className="group/rail scroll-rail fixed right-3 top-1/2 z-40 hidden h-[62vh] w-8 -translate-y-1/2 [@media(hover:hover)_and_(min-width:1024px)]:block"
         role="presentation"
       >
         <div
@@ -132,15 +132,20 @@ export function ScrollRail({ sections, dark, accent = '#0071e3' }: ScrollRailPro
           style={{ top: thumbTop }}
         >
           <div className={`h-9 w-[14px] rounded-full ${glass}`} />
-          <m.span
-            key={label}
-            initial={reduced ? false : { opacity: 0, x: 6 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
-            className={`absolute right-full mr-3 whitespace-nowrap rounded-full px-3 py-1 text-[11px] font-medium ${glass} ${ink}`}
-          >
-            {label}
-          </m.span>
+          {/* The label sits over the page's right gutter. A 1650px frame leaves that gutter under ~140px
+              below a 1840px viewport, so there it would cover content: it shows only while the rail is
+              hovered or focused. */}
+          <span className="absolute right-full mr-3 opacity-0 transition-opacity duration-200 group-hover/rail:opacity-100 group-focus-within/rail:opacity-100 min-[1840px]:opacity-100">
+            <m.span
+              key={label}
+              initial={reduced ? false : { opacity: 0, x: 6 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
+              className={`block whitespace-nowrap rounded-full px-3 py-1 text-[11px] font-medium ${glass} ${ink}`}
+            >
+              {label}
+            </m.span>
+          </span>
         </m.div>
       </div>
     </>

@@ -263,10 +263,16 @@ export function Gallery({ skin, heading, ownId = true }: GalleryProps) {
       </div>
 
       {view === 'carousel' && (
-        <div className="rail-wide" style={carouselTokens(skin.frame, skin.dark)} data-lenis-prevent-wheel>
+        // Apple: no `.rail-wide` breakout — the section already sits inside the 1550px-wide `.frame`
+        // (frame-1650 convention), and the shared Carousel's own `edgeBleed` measures ITS wrap div's
+        // live position to bleed slides to the true viewport edge while resting the first card on
+        // whatever edge that wrap sits on — here, the frame's own content edge. Stacking `.rail-wide`'s
+        // separate 1400px/100vw-clamp geometry on top of that would just re-center a narrower box
+        // inside the frame instead of letting the carousel bleed off it. Other themes keep `.rail-wide`
+        // unchanged: their own column is still 64rem, and the rail is what widens the carousel past it.
+        <div className={skin.frame === 'apple' ? '' : 'rail-wide'} style={carouselTokens(skin.frame, skin.dark)} data-lenis-prevent-wheel>
           {/* House carousel: edge bleed to the viewport, centered snap on mobile, left rest on desktop,
-              weighted mouse drag, step-by-one arrows + the five-dot window in glass. The rail breaks
-              out of the text column on wide screens so the composites read at size. */}
+              weighted mouse drag, step-by-one arrows + the five-dot window in glass. */}
           <Carousel
             key={filter}
             slidesPerView={{ base: 1, md: 2, lg: 2, xl: 3 }}
@@ -287,7 +293,9 @@ export function Gallery({ skin, heading, ownId = true }: GalleryProps) {
       )}
 
       {view === 'grid' && (
-        <m.div className="rail-wide grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+        // Apple: the frame already gives this its width; other themes still need `.rail-wide` to break
+        // out of their 64rem column.
+        <m.div className={`${skin.frame === 'apple' ? '' : 'rail-wide'} grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3`}>
           {items.map((s, idx) => (
             <m.figure
               key={s.slug}
@@ -305,7 +313,7 @@ export function Gallery({ skin, heading, ownId = true }: GalleryProps) {
       )}
 
       {view === 'phones' && (
-        <m.div className="rail-wide grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
+        <m.div className={`${skin.frame === 'apple' ? '' : 'rail-wide'} grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-5 ${skin.frame === 'apple' ? 'xl:grid-cols-6' : ''}`}>
           {items.map((s, idx) => (
             <m.figure
               key={s.slug}

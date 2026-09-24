@@ -22,6 +22,7 @@ import type { SkillsLayoutProps } from './types'
  */
 export function LedgerLayout({ data }: SkillsLayoutProps) {
   const { skin, sk, groups, groupLabel, groupNote, storesPerGroup, toolsByGroup, formatTool } = data
+  const isApple = skin.frame === 'apple'
   const [openTool, setOpenTool] = useState<string | null>(null)
   const filter = useSkillsFilter(groups)
   const openToolUsage = openTool ? (toolUsageById.get(openTool) ?? null) : null
@@ -38,7 +39,10 @@ export function LedgerLayout({ data }: SkillsLayoutProps) {
   return (
     <div className="mt-2">
       <SkillsFilterBar skin={skin} sk={sk} groups={groups} groupLabel={groupLabel} toolsByGroup={toolsByGroup} filter={filter} />
-      <div className="mt-6 sm:columns-2 sm:gap-x-12">
+      {/* Six groups: a third column only earns its keep once the frame is wide enough that two columns
+          would otherwise leave real space unused (the 1550px Apple frame at xl+) — other skins keep the
+          two-column register exactly as before. */}
+      <div className={`mt-6 sm:columns-2 sm:gap-x-12 ${isApple ? 'xl:columns-3' : ''}`}>
         {groups.map((g) => {
           const visibleCount = toolsByGroup[g].filter(filter.matchesTool).length
           // 2026-09-11: a group with nothing left showing no longer dims as a whole block — it

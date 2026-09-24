@@ -81,6 +81,20 @@ export interface PortfolioContent {
     engagement: SectionHeading & { lead: string; models: { title: string; body: string }[] }
     faq: SectionHeading & { items: { q: string; a: string }[] }
     manifesto: { label: string; lines: string[] }
+    /** Apple's "Every build ships with" band (BuildKit.tsx, round 47) — replaces `manifesto`'s four
+     *  abstract lines on this theme only (every other theme still renders `manifesto` above). Four
+     *  concrete, checkable deliverables, each drawing its own small honest artifact; the two tiles with
+     *  real numbers (`repo`, `tracking`) read them from the registry/facts at render time, never from
+     *  copy here — `unit`/`caption` are templates with a `{n}` the component fills in. */
+    buildKit: SectionHeading & {
+      lead: string
+      tiles: {
+        repo: { title: string; body: string; unit: string } // unit: '{n} commits', filled per store
+        checks: { title: string; body: string; items: string[] } // a handful of real QA-harness check names
+        editor: { title: string; body: string; items: string[]; blockLabel: string; fieldLabel: string } // section list + one expanded block
+        tracking: { title: string; body: string; caption: string } // caption: '{n} tracked elements…', filled from a real store fact
+      }
+    }
     years: SectionHeading & { lead: string; roles: string; shipped: string; work: string; products: string; side: string; more: string; count: string; perYear: string; eras: Record<string, string> }
     /** Apple's Years replacement: a horizontal scroll-snap rail of year cards (Chapters.tsx). */
     chapters: SectionHeading & {

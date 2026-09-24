@@ -33,6 +33,10 @@ export function Projects({ skin, heading, ownId = true }: ProjectsProps) {
   const reduced = useReducedMotion()
   const pr = strings.sections.projects
   const items = [...registry.personalProjects].sort((a, b) => b.year - a.year)
+  // Only the Apple skin runs the 1550px frame; every other theme still sits in its own narrower
+  // (64rem-ish) column, where this row already reads fine at its current scale — gating the wide-only
+  // bumps here keeps their rendering byte-for-byte the same.
+  const isApple = skin.frame === 'apple'
 
   return (
     <section id={ownId ? 'projects' : undefined} className="scroll-mt-20">
@@ -53,22 +57,24 @@ export function Projects({ skin, heading, ownId = true }: ProjectsProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`${pr.view}: ${p.name}`}
-                className={`group grid grid-cols-[2.25rem_1fr_auto] items-baseline gap-3 border-b py-6 md:grid-cols-[3rem_1fr_auto] md:gap-6 md:py-7 ${skin.line} ${skin.rowHover} transition-colors`}
+                className={`group grid grid-cols-[2.25rem_1fr_auto] items-baseline gap-3 border-b py-6 md:grid-cols-[3rem_1fr_auto] md:gap-6 md:py-7 ${isApple ? 'lg:grid-cols-[3.5rem_1fr_auto] lg:gap-8 lg:py-8' : ''} ${skin.line} ${skin.rowHover} transition-colors`}
               >
-                <span className={`${skin.muted} text-sm tabular-nums`}>{String(i + 1).padStart(2, '0')}</span>
+                <span className={`${skin.muted} text-sm tabular-nums ${isApple ? 'lg:text-base' : ''}`}>{String(i + 1).padStart(2, '0')}</span>
                 <div className="min-w-0">
-                  <h3 className={`${skin.title} text-xl leading-tight transition-transform duration-200 ease-out-strong group-hover:translate-x-1 md:text-2xl`}>
+                  <h3 className={`${skin.title} text-xl leading-tight transition-transform duration-200 ease-out-strong group-hover:translate-x-1 md:text-2xl ${isApple ? 'lg:text-[1.75rem]' : ''}`}>
                     {p.name}
                     {c?.tagline && <span className={`${skin.accent} ml-2 text-base font-medium`}>{c.tagline}</span>}
                   </h3>
-                  {c?.description && <p className={`${skin.muted} mt-1.5 text-sm leading-relaxed md:text-base`}>{c.description}</p>}
-                  <p className={`${skin.muted} mt-1.5 text-xs`}>{p.stack.join(' · ')}</p>
+                  {/* Capped to a readable measure at the 1550px Apple frame — full width here would run
+                      the description past 100ch, well beyond the ~65ch the design bar asks for. */}
+                  {c?.description && <p className={`${skin.muted} mt-1.5 text-sm leading-relaxed md:text-base ${isApple ? 'max-w-[60ch] lg:mt-2 lg:text-lg' : ''}`}>{c.description}</p>}
+                  <p className={`${skin.muted} mt-1.5 text-xs ${isApple ? 'lg:text-sm' : ''}`}>{p.stack.join(' · ')}</p>
                 </div>
-                <span className={`${skin.muted} flex items-center gap-4 text-sm tabular-nums`}>
+                <span className={`${skin.muted} flex items-center gap-4 text-sm tabular-nums ${isApple ? 'lg:gap-6' : ''}`}>
                   {/* Clip-path reveal on hover: an accent monogram (typographic, not a fabricated screenshot — these projects have no real capture) circles open from its center. */}
                   <span
                     aria-hidden="true"
-                    className={`hidden h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-sm font-bold text-white transition-[clip-path] duration-500 ease-out-strong [clip-path:circle(0%_at_50%_50%)] md:flex [@media(hover:hover)]:group-hover:[clip-path:circle(75%_at_50%_50%)] ${skin.accentBg}`}
+                    className={`hidden h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-sm font-bold text-white transition-[clip-path] duration-500 ease-out-strong [clip-path:circle(0%_at_50%_50%)] md:flex [@media(hover:hover)]:group-hover:[clip-path:circle(75%_at_50%_50%)] ${isApple ? 'lg:h-12 lg:w-12 lg:text-base' : ''} ${skin.accentBg}`}
                   >
                     {initials(p.name)}
                   </span>

@@ -30,22 +30,23 @@ export function EngagementModels({ skin, heading, ownId = true }: EngagementMode
   const { strings } = useContent()
   const reduced = !!useReducedMotion()
   const e = strings.sections.engagement
+  const isApple = skin.frame === 'apple'
 
   return (
     <section id={ownId ? 'engagement' : undefined} className="scroll-mt-20">
       {heading(e.eyebrow, e.title, e.titleAccent, e.lead)}
-      <ul className="grid gap-4 md:grid-cols-3">
+      <ul className={`grid gap-4 md:grid-cols-3 ${isApple ? 'lg:gap-6' : ''}`}>
         {e.models.map((model, i) => (
           <m.li
             key={model.title}
-            className={`${skin.card} p-6`}
+            className={`${skin.card} p-6 ${isApple ? 'lg:p-8' : ''}`}
             initial={reduced ? false : { opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.3 }}
             transition={{ duration: 0.5, delay: i * 0.1, ease: EASE }}
           >
-            <h3 className={`text-lg font-semibold tracking-tight ${skin.title}`}>{model.title}</h3>
-            <p className={`mt-2 text-sm leading-relaxed md:text-base ${skin.muted}`}>{model.body}</p>
+            <h3 className={`text-lg font-semibold tracking-tight ${isApple ? 'lg:text-xl' : ''} ${skin.title}`}>{model.title}</h3>
+            <p className={`mt-2 text-sm leading-relaxed md:text-base ${isApple ? 'lg:mt-3' : ''} ${skin.muted}`}>{model.body}</p>
           </m.li>
         ))}
       </ul>

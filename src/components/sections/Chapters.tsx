@@ -316,9 +316,15 @@ export function Chapters({ skin, heading }: ChaptersProps) {
       {heading(c.eyebrow, c.title, c.titleAccent, c.lead)}
       <div ref={wrapRef} style={{ height: `${PIN_VH}vh` }} className="relative">
         <div className="sticky top-24 flex min-h-[70vh] items-center lg:top-28">
-          <div className="grid w-full gap-10 md:grid-cols-[1fr_auto] md:items-center">
-            <div className="min-w-0">
-              <div className={`${skin.headingFont} text-[20vw] font-semibold leading-none tracking-[-0.05em] md:text-[9rem]`}>
+          {/* Round 47 (1550px frame): the old `[1fr_auto]` split gave the numeral column nearly the
+              whole row and let the year rail sit as a tiny content-hugging sliver right after it —
+              at the old ~1024px column the leftover was easy to miss, at 1550px it read as a few
+              hundred px of dead air between two small things. A proportional 12-col split bounds the
+              numeral column to a sane width and hands the rail column real, guaranteed space, which
+              is what lets it grow from five bare dots into an actual year index below. */}
+          <div className="grid w-full items-center gap-10 md:grid-cols-12 md:gap-12 lg:gap-16">
+            <div className="min-w-0 md:col-span-7">
+              <div className={`${skin.headingFont} text-[20vw] font-semibold leading-none tracking-[-0.05em] md:text-[9rem] xl:text-[10rem] 2xl:text-[11rem]`}>
                 <YearOdometer yearFloat={yearFloat} className="text-inherit" />
               </div>
               <p className="sr-only" aria-live="polite">
@@ -369,24 +375,42 @@ export function Chapters({ skin, heading }: ChaptersProps) {
               </div>
             </div>
 
-            <div className="hidden shrink-0 items-center gap-3 md:flex" role="group" aria-label={c.eyebrow}>
-              <div className={`relative h-48 w-0.5 overflow-hidden rounded-full ${skin.dark ? 'bg-white/15' : 'bg-black/10'}`}>
+            {/* Year index — was five bare 32px dots (content-hugging, `auto` column width); now a
+                real row per year (year + its era name, same data StackedYears/the mobile fallback
+                already show) filling the column the 12-col split above guarantees it. The connecting
+                rail no longer hardcodes a height to match the old fixed dot spacing — `self-stretch`
+                inside this flex row tracks however tall five real rows turn out to be. */}
+            <div className="hidden md:col-span-5 md:flex md:items-stretch md:gap-5" role="group" aria-label={c.eyebrow}>
+              <div className={`relative w-0.5 shrink-0 self-stretch overflow-hidden rounded-full ${skin.dark ? 'bg-white/15' : 'bg-black/10'}`}>
                 <m.div className={`absolute inset-x-0 top-0 rounded-full ${skin.accentBg}`} style={{ height: `${((active + 1) / total) * 100}%` }} transition={{ ease: EASE }} />
               </div>
-              <ol className="flex flex-col gap-3">
-                {years.map((e, i) => (
-                  <li key={e.year}>
-                    <button
-                      type="button"
-                      onClick={() => goTo(i)}
-                      aria-current={i === active}
-                      aria-label={e.year.toString()}
-                      className={`press flex h-8 w-8 items-center justify-center rounded-full text-[11px] font-semibold tabular-nums transition-colors duration-150 ${i === active ? `${skin.accentBg} text-white` : `${yearPillMuted(skin)} ${skin.dark ? 'bg-white/5' : 'bg-black/5'}`}`}
-                    >
-                      {String(e.year).slice(2)}
-                    </button>
-                  </li>
-                ))}
+              {/* `min-w-0`: this `ol` is itself a flex item of the row above (progress rail + list),
+                  so it needs the same shrink override as the era span below it — otherwise ITS
+                  default `min-width: auto` is what actually stops the era text from truncating,
+                  regardless of the span's own `min-w-0`. */}
+              <ol className="flex min-w-0 flex-1 flex-col gap-1.5">
+                {years.map((e, i) => {
+                  const on = i === active
+                  const era = y.eras[String(e.year)]
+                  return (
+                    <li key={e.year}>
+                      <button
+                        type="button"
+                        onClick={() => goTo(i)}
+                        aria-current={i === active}
+                        aria-label={e.year.toString()}
+                        className={`press flex w-full items-baseline gap-3 rounded-xl px-3.5 py-3 text-left transition-colors duration-200 ${on ? (skin.dark ? 'bg-white/[0.06]' : 'bg-black/[0.04]') : ''}`}
+                      >
+                        <span className={`shrink-0 text-xl font-semibold tabular-nums ${on ? skin.title : yearPillMuted(skin)}`}>{e.year}</span>
+                        {/* `min-w-0`: a flex item's default `min-width: auto` refuses to shrink below its
+                            text's intrinsic width, which silently defeats `truncate`'s ellipsis — without
+                            it this era label just ran past the column at narrower (md/lg) widths instead
+                            of clipping. */}
+                        {era && <span className={`min-w-0 truncate text-sm ${on ? skin.accent : skin.muted}`}>{era}</span>}
+                      </button>
+                    </li>
+                  )
+                })}
               </ol>
             </div>
           </div>

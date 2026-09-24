@@ -125,6 +125,36 @@ export const en: PortfolioContent = {
       ],
     },
     manifesto: { label: 'What every build does', lines: ['I read Lighthouse and the sales numbers first.', 'Every deploy comes from a git commit.', '40+ Playwright checks run before every launch.', 'You keep the editor, the docs and the repo.'] },
+    buildKit: {
+      eyebrow: 'What you actually get',
+      title: 'Every build ships',
+      titleAccent: 'with this',
+      lead: 'Four promises, made concrete — what lands in your repo, your editor and your dashboard, every time.',
+      tiles: {
+        repo: {
+          title: 'Your repo, your history',
+          body: 'Every deploy comes from a real git commit — real history across the fleet, never a snapshot.',
+          unit: '{n} commits',
+        },
+        checks: {
+          title: '40+ Shopify checks before launch',
+          body: 'A Playwright harness and a set of guards run the store behaviorally before anything ships.',
+          items: ['Every internal link opens', 'Zero overflow, mobile to desktop', 'Carousel scroll & snap', 'Add to cart, drawer, upsell', 'Console & network errors', 'Theme-push safety'],
+        },
+        editor: {
+          title: 'Sections you edit without a developer',
+          body: 'Every section is a real theme block — reorder, add or restyle it from the editor, no deploy needed.',
+          items: ['Hero', 'Gallery', 'Reviews', 'FAQ'],
+          blockLabel: 'Reviews',
+          fieldLabel: 'Heading',
+        },
+        tracking: {
+          title: 'Measured from day one',
+          body: 'Every card, rail and CTA is instrumented and reports to the Optimize dashboard from launch.',
+          caption: '{n} tracked elements, one real store.',
+        },
+      },
+    },
     testimonials: { eyebrow: 'In their words', title: 'What clients', titleAccent: 'say' },
     now: { label: 'Now', live: '{n} storefronts live', dev: '{n} in development', band: 'Storefronts shipped', local: 'Medellín · {time} local' },
     statBand: { label: 'The work, in numbers', asOf: 'September 2026', sourceLabel: 'Source', note: 'Measured ranges across client storefronts, 2023 to 2026; exact per-store figures stay confidential.' },

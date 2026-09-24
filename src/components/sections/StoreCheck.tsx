@@ -99,6 +99,11 @@ async function runPsi(url: string, signal: AbortSignal): Promise<MeasureResult> 
 export function StoreCheck({ skin, heading, onCta }: StoreCheckProps) {
   const { strings } = useContent()
   const s = strings.sections.storeCheck
+  // At the 1550px Apple frame a single URL field stretched edge to edge read as an accidental
+  // full-bleed input, not a designed one — capped to a card width proportioned like the rest of the
+  // page's utility surfaces (the FAQ's own max-w-3xl measure), still resting on the content edge, never
+  // centered. Other skins keep the full-width card they already had.
+  const isApple = skin.frame === 'apple'
   const reduced = !!useReducedMotion()
   const [input, setInput] = useState('')
   const [phase, setPhase] = useState<Phase>('idle')
@@ -185,7 +190,7 @@ export function StoreCheck({ skin, heading, onCta }: StoreCheckProps) {
     <section className="scroll-mt-20">
       {heading(s.eyebrow, s.title, s.titleAccent, s.lead)}
 
-      <div className={`rounded-[22px] border p-5 md:p-8 ${skin.line} ${skin.dark ? 'bg-white/[0.03]' : 'bg-white'}`} aria-live="polite">
+      <div className={`rounded-[22px] border p-5 md:p-8 ${isApple ? 'lg:max-w-2xl lg:p-9' : ''} ${skin.line} ${skin.dark ? 'bg-white/[0.03]' : 'bg-white'}`} aria-live="polite">
         {phase !== 'running' && (
           <form
             onSubmit={(e) => {
