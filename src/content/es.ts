@@ -255,6 +255,10 @@ export const es: PortfolioContent = {
           noCaptures: 'Sin capturas públicas todavía.',
         },
       },
+      mobile: {
+        openCluster: 'Abrir {group}',
+        back: 'Volver',
+      },
     },
     contact: {
       eyebrow: 'Diagnóstico primero, gratis, 20 minutos',

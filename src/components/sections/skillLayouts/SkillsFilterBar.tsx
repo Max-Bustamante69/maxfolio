@@ -12,7 +12,7 @@
 // line and a Clear link.
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type KeyboardEvent, type ReactNode } from 'react'
 import { useMediaQuery } from '../../../hooks'
-import type { SkillGroupId } from '../../../data/registry'
+import { PUBLIC_STORE_COUNT, type SkillGroupId } from '../../../data/registry'
 import { track } from '../../../lib/track'
 import type { ToolUsage } from '../../../data/skillUsage'
 import { CountUp } from '../../gallery/charts'
@@ -132,27 +132,32 @@ function Rail({ ariaLabel, children }: RailProps) {
 }
 
 const SUMMARY_TOKEN = /(\{n\}|\{m\}|\{k\})/
-const fillSummary = (template: string, n: number, m: number, k: number) =>
-  template.replace('{n}', String(n)).replace('{m}', String(m)).replace('{k}', String(k))
+const fillSummary = (template: string, n: number, m: number, kText: string) =>
+  template.replace('{n}', String(n)).replace('{m}', String(m)).replace('{k}', kText)
 
 /** The visible counters tween through several intermediate values on every filter change (measured:
  *  ~16 DOM mutations per toggle, e.g. 39 -> 28 -> 20 -> 15 -> 7 -> ... -> 3) — fine to watch, but
  *  inside a live region a screen reader queues and reads out each intermediate value in turn, which
  *  is real noise on every single interaction. `aria-hidden` on the animating span keeps it out of the
  *  accessibility tree (it still renders and animates visually) while a plain `sr-only` sibling carries
- *  the one, already-settled sentence a live region should actually announce. */
-function Summary({ template, n, m, k }: { template: string; n: number; m: number; k: number }) {
+ *  the one, already-settled sentence a live region should actually announce.
+ *
+ *  `kSuffix` (round 46): once the live store count reaches the public floor (unfiltered, it always
+ *  does — the real fleet only ever grows), this renders the capped, fixed "20+" instead of the real,
+ *  climbing count, so the line can never read a different total than the hero above it. A filter that
+ *  genuinely narrows below the floor still shows its own precise, smaller count. */
+function Summary({ template, n, m, k, kSuffix = '' }: { template: string; n: number; m: number; k: number; kSuffix?: string }) {
   return (
     <>
       <span aria-hidden="true">
         {template.split(SUMMARY_TOKEN).map((part, i) => {
           if (part === '{n}') return <CountUp key={`n-${i}`} value={n} duration={0.2} className="tabular-nums" />
           if (part === '{m}') return <span key={`m-${i}`} className="tabular-nums">{m}</span>
-          if (part === '{k}') return <CountUp key={`k-${i}`} value={k} duration={0.2} className="tabular-nums" />
+          if (part === '{k}') return <CountUp key={`k-${i}`} value={k} suffix={kSuffix} duration={0.2} className="tabular-nums" />
           return <span key={`t-${i}`}>{part}</span>
         })}
       </span>
-      <span className="sr-only">{fillSummary(template, n, m, k)}</span>
+      <span className="sr-only">{fillSummary(template, n, m, `${k}${kSuffix}`)}</span>
     </>
   )
 }
@@ -179,6 +184,9 @@ export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, fo
   const allTools = useMemo(() => groups.flatMap((g) => toolsByGroup[g]), [groups, toolsByGroup])
   const matchingTools = useMemo(() => allTools.filter(filter.matchesTool), [allTools, filter.matchesTool])
   const matchingStores = useMemo(() => new Set(matchingTools.flatMap((u) => u.storeNames)).size, [matchingTools])
+  // Round 46: cap the summary line's own display at the public "20+" floor — see `Summary`'s doc comment.
+  const matchingStoresDisplay = matchingStores >= PUBLIC_STORE_COUNT ? PUBLIC_STORE_COUNT : matchingStores
+  const matchingStoresSuffix = matchingStores >= PUBLIC_STORE_COUNT ? '+' : ''
 
   return (
     <div className="flex flex-col gap-3">
@@ -271,7 +279,7 @@ export function SkillsFilterBar({ skin, sk, groups, groupLabel, toolsByGroup, fo
 
       <div className="flex flex-col items-center gap-1">
         <p aria-live="polite" className={`text-center text-[11px] ${skin.muted}`}>
-          <Summary template={ob.summary} n={matchingTools.length} m={allTools.length} k={matchingStores} />
+          <Summary template={ob.summary} n={matchingTools.length} m={allTools.length} k={matchingStoresDisplay} kSuffix={matchingStoresSuffix} />
           {filter.isActive && matchingTools.length === 0 && (
             <>
               {' — '}

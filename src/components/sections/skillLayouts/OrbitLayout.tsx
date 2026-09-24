@@ -24,18 +24,22 @@
 // alike); `CenterMark` fills the vacated center instead. `?tool=<slug>` deep-links the drawer open,
 // history-aware exactly like `ShopifyWork`'s `?store=` (see `useSheetHistory`).
 //
-// Below 1024px it falls back to layout 1 (ledger) — fully legible and keyboard/touch operable on its
-// own, carrying the same filter bar and opening the very same `ToolDrawer` (as a bottom sheet) — and so
-// does reduced motion (an orbit is inherently a motion-heavy metaphor even though most of its geometry
-// is static). A compact mobile orbit (three rings, tap to select) was measured and cut: Shopify alone
-// is 13 tools, and even the best pairing puts 20+ tools on a half-ring inside a ~340px container — ~25px
-// of arc per dot, well under a 44px tap target, so nothing short of hiding most of the labels/dots stays
-// legible there. The brief's own escape hatch for this ("if it stays legible — else ledger only") is
-// why ledger covers all of <1024px.
+// Below 1024px it falls back to `ConstellationMobile` (round 46 — the owner's pick, candidate "d" of
+// four contact-sheet options, from `?skillsMobile=` round-44 prototyping) — a static clustered map,
+// fully legible and touch-operable on its own, carrying the same filter chips and opening the very
+// same `ToolDrawer` (as a bottom sheet) the orbit does. A compact mobile ORBIT (three rings, tap to
+// select) was measured and cut back in round 44: Shopify alone is 13 tools, and even the best pairing
+// puts 20+ tools on a half-ring inside a ~340px container — ~25px of arc per dot, well under a 44px tap
+// target, so nothing short of hiding most of the labels/dots stays legible there.
+//
+// Reduced motion falls back further, to layout 1 (ledger) — a plain typographic register, since even
+// the constellation's shared-element "zoom into cluster" move is itself a motion metaphor. Ledger is
+// now ONLY the reduced-motion fallback (desktop or mobile); it no longer covers <1024px at rest.
 //
 // 2026-09-11 — owner feedback: filtering dimmed instead of removing (fixed below — a filtered-out dot
 // unmounts through `AnimatePresence` instead of fading, so it also leaves the tab order and can't open
-// the drawer). The sub-1024px/reduced-motion gate renders `LedgerLayout` directly.
+// the drawer). Reduced motion renders `LedgerLayout` directly, before either the desktop orbit or the
+// mobile constellation gets a chance to mount.
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from 'react'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { useMediaQuery, useSheetHistory } from '../../../hooks'
@@ -44,6 +48,7 @@ import { toolUsageById, type ToolUsage } from '../../../data/skillUsage'
 import { toolIcon, monogram, ToolMark } from '../skillIcons'
 import { CenterMark } from './CenterMark'
 import { LedgerLayout } from './LedgerLayout'
+import { ConstellationMobile } from './mobile/ConstellationMobile'
 import { SkillsFilterBar } from './SkillsFilterBar'
 import { ToolDrawer, DRAWER_ID } from './ToolDrawer'
 import { useSkillsFilter } from './useSkillsFilter'
@@ -236,8 +241,12 @@ export function OrbitLayout({ data }: SkillsLayoutProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter.isActive, filter.matchesTool, hoveredTool])
 
-  if (!isDesktop || reduced) {
+  if (reduced) {
     return <LedgerLayout data={data} />
+  }
+
+  if (!isDesktop) {
+    return <ConstellationMobile data={data} />
   }
 
   const ringSpecs: RingSpec[] = ringOrder.map((g, ri) => {

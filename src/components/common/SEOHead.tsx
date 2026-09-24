@@ -10,7 +10,11 @@ interface SEOHeadProps {
 
 export function SEOHead({
   title = 'Maximiliano Bustamante | CTO & Shopify Tech Lead',
-  description = 'CTO & Shopify Tech Lead at Digitdeck. 18+ Shopify storefronts, a production app suite, and the delivery system behind them.',
+  // Round 46: the public storefront-count claim is the fixed "20+" (`registry.PUBLIC_STORE_COUNT`)
+  // everywhere else on the site. /stats (Stats.tsx) calls <SEOHead title="Stats" noindex /> with no
+  // `description`, so this default DOES render there (og:description/meta description) even though
+  // the page itself is noindex — keep it in sync with the public figure rather than a stale "18+".
+  description = 'CTO & Shopify Tech Lead at Digitdeck. 20+ Shopify storefronts, a production app suite, and the delivery system behind them.',
   canonical = 'https://www.maxfolio.dev',
   ogImage = 'https://www.maxfolio.dev/og-image.png',
   noindex = false,

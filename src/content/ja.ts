@@ -255,6 +255,10 @@ export const ja: PortfolioContent = {
           noCaptures: '公開キャプチャはまだありません。',
         },
       },
+      mobile: {
+        openCluster: '{group}を開く',
+        back: '戻る',
+      },
     },
     contact: {
       eyebrow: 'まず診断。無料、20分。',

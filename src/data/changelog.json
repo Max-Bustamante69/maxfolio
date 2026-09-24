@@ -1,62 +1,62 @@
 [
   {
-    "hash": "da7b64a",
+    "hash": "8c6d0ca",
     "date": "2026-09-23",
-    "subject": "fix(a11y): clear /brutalist's real 97-100 gap -- a 4th, unmeasured color-contrast node"
+    "subject": "fix(skills): keyboard focus follows the constellation zoom, filtered clusters can't dead-end"
   },
   {
-    "hash": "99a3d86",
+    "hash": "997edc5",
     "date": "2026-09-23",
-    "subject": "chore(build): regenerate changelog after the fonts/a11y fixes"
+    "subject": "chore(build): regenerated artifacts for round 46 skills-claims lane"
   },
   {
-    "hash": "cae8362",
+    "hash": "fb1795d",
     "date": "2026-09-23",
-    "subject": "fix(a11y): clear /brutalist's desktop-only Lighthouse failures (97 - 100)"
+    "subject": "fix(content): close the remaining public storefront-count leaks"
   },
   {
-    "hash": "d1fac65",
+    "hash": "fa0b4b1",
     "date": "2026-09-23",
-    "subject": "perf(fonts): stop loading Arcade's Anton/Rajdhani on every route"
+    "subject": "feat(skills): mobile constellation is the default under 1024px"
   },
   {
-    "hash": "cf2a066",
+    "hash": "7428715",
     "date": "2026-09-23",
-    "subject": "fix(a11y): bring /neo and /brutalist Lighthouse accessibility + brutalist best-practices to 100"
+    "subject": "fix(content): pin the public storefront count to one constant, 20+"
   },
   {
-    "hash": "f1f8d00",
+    "hash": "fd8f31d",
     "date": "2026-09-23",
-    "subject": "fix(terminal): shrink the boot-skip control's permanent CLS-reservation box"
+    "subject": "chore(build): regenerated artifacts for round 44 ship lane"
   },
   {
-    "hash": "d93a142",
+    "hash": "b226156",
     "date": "2026-09-23",
-    "subject": "fix(a11y): contain the skills-chip accessible-name span (390px header-region overflow regression)"
+    "subject": "fix(arcade): the inverted band's label keeps the theme red in dark mode"
   },
   {
-    "hash": "63db8ab",
+    "hash": "91a35ae",
     "date": "2026-09-23",
-    "subject": "chore(build): regenerate changelog after round 45 integration"
+    "subject": "fix(review): dedupe the Apple page's #faq id and cap /api/event body size"
   },
   {
-    "hash": "b3bb3b4",
+    "hash": "9010854",
     "date": "2026-09-23",
-    "subject": "fix(a11y): luxury-gold accent text fails AA on this theme's light surfaces (color-contrast)"
+    "subject": "feat(analytics+quick-wins): first-party event ledger, /stats dashboard, and audit quick wins"
   },
   {
-    "hash": "6f76aed",
+    "hash": "e6d378d",
     "date": "2026-09-23",
-    "subject": "fix(perf): give the display/body webfonts closer-shaped fallbacks (CLS)"
+    "subject": "chore(build): regenerated artifacts for round 44 fixes"
   },
   {
-    "hash": "2046ee3",
+    "hash": "aeba562",
     "date": "2026-09-23",
-    "subject": "fix(perf): reserve space for Terminal's boot-sequence skip control (CLS)"
+    "subject": "fix(orbit): curved group names are labels again; desktop dots use a 32 px target"
   },
   {
-    "hash": "5347103",
+    "hash": "d2ad40a",
     "date": "2026-09-23",
-    "subject": "fix(a11y): keep visible text as the accessible name's own prefix (label-content-name-mismatch)"
+    "subject": "fix(terminal-nav): links centered vertically and 16 px clear of the language buttons"
   }
 ]

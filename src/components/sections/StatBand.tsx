@@ -4,7 +4,7 @@ import { useContent } from '../../hooks'
 import { CountUp } from '../gallery/charts'
 import type { Skin } from '../gallery'
 
-/** "18+" → { value: 18, suffix: "+" }; anything that is not a number stays static. */
+/** "20+" → { value: 20, suffix: "+" }; anything that is not a number stays static. */
 const parse = (v: string) => {
   const mt = v.match(/^([^\d]*)(\d[\d,.]*)(.*)$/)
   return mt ? { prefix: mt[1], value: Number(mt[2].replace(/,/g, '')), suffix: mt[3] } : null
