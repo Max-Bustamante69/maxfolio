@@ -296,6 +296,9 @@ export const personal = {
   email: 'maxbustamanteg@gmail.com',
   phone: '+57 319 594 0522',
   phoneHref: 'tel:+573195940522',
+  // Calls go to the 319 line; WhatsApp is the 305 line (Max, 2026-09-24).
+  whatsapp: '+57 305 473 8740',
+  whatsappHref: 'https://wa.me/573054738740',
   linkedin: 'https://www.linkedin.com/in/maximiliano-bustamante-998b77173/',
   github: 'https://github.com/Max-Bustamante69',
   site: 'https://www.maxfolio.dev/',

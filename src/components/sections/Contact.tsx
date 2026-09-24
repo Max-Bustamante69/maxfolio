@@ -125,6 +125,11 @@ export function Contact({ skin, ctaClass, onContact, fieldClassName, ownId = tru
               {registry.personal.phone}
             </a>
           </dd>
+          <dd className="mt-1 text-sm">
+            <a href={registry.personal.whatsappHref} target="_blank" rel="noopener noreferrer" className={skin.accent}>
+              WhatsApp · {registry.personal.whatsapp}
+            </a>
+          </dd>
         </div>
         <div>
           <dt className={label}>{c.location}</dt>
