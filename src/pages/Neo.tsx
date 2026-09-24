@@ -221,8 +221,12 @@ function NeoContent() {
                 columns means each grows to share the leftover space equally once there's room for
                 both, which lands the links group exactly on the container's midpoint; when the
                 container is too narrow for that the wider side freezes at its content width and the
-                links shift instead of sliding underneath either cluster — never an overlap. */}
-            <div className="hidden md:flex items-center gap-0.5 text-xs font-semibold">
+                links shift instead of sliding underneath either cluster — never an overlap.
+                Links show from lg, not md: at 768px the links + language chips + theme toggle +
+                CTA together measured 865px wide (97px past the viewport, the nav fully off-screen
+                on the right) — below lg the mobile sheet (hamburger below) carries the links
+                instead, same split Apple/Brutalist/Luxury use (round-45 nav768 fix). */}
+            <div className="hidden lg:flex items-center gap-0.5 text-xs font-semibold">
               {nav.map(([href, label]) => (
                 <a key={href} href={href} className={`inline-flex items-center h-8 px-3 rounded-full ${muted} hover:${accent} transition-colors duration-150`}>
                   {label}
@@ -251,7 +255,7 @@ function NeoContent() {
               <button
                 type="button"
                 onClick={() => setMobileOpen(true)}
-                className={`border !rounded-full md:hidden flex h-9 w-9 items-center justify-center transition-colors ${isDark ? 'border-white/10 hover:bg-white/5' : 'border-black/[0.08] hover:bg-black/[0.03]'}`}
+                className={`border !rounded-full lg:hidden flex h-9 w-9 items-center justify-center transition-colors ${isDark ? 'border-white/10 hover:bg-white/5' : 'border-black/[0.08] hover:bg-black/[0.03]'}`}
                 aria-label="Open menu"
                 aria-expanded={mobileOpen}
               >

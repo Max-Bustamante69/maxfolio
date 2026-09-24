@@ -226,11 +226,13 @@ function AppleContent() {
       <div className={`theme-apple min-h-screen font-sf ${bg} transition-colors duration-300 [overflow-x:clip]`} role="document">
         <ScrollRail sections={nav.map(([href, label]) => ({ id: href.slice(1), label }))} dark={isDark} accent={isDark ? '#2997ff' : '#0071e3'} />
         {/* Nav — 44px through tablet widths, 56px from lg (1024px, the same desktop cutoff the
-            drawer/sheet split already uses) up for more breathing room, frosted. The extra padding/
-            gaps/text-size only kick in at lg: at md (768-1023px, e.g. iPad portrait/landscape) the
-            full nav — logo, 6 links, language selector, theme toggle, CTA — needs more horizontal
-            room than those viewports have; gating the wider values behind lg keeps the compact 44px
-            metrics (which do fit that range) all the way to desktop, where there's room to spare. */}
+            drawer/sheet split already uses) up for more breathing room, frosted. The 6-link row
+            plus language selector, theme toggle and CTA together are wider than any md
+            (768-1023px, e.g. iPad portrait/landscape) viewport has room for — measured: at
+            exactly 768px the CTA's right edge sat 4-7px past the viewport edge, clipped (round-45
+            nav768 fix). Below lg the links row gives way to the same MobileMenuApple sheet phones
+            use, matching how Brutalist/Luxury already split; logo + language + theme toggle + CTA
+            + hamburger fit that range with room to spare once the links aren't also competing. */}
         <nav
           className={`fixed top-0 inset-x-0 z-40 h-11 lg:h-14 ${isDark ? 'bg-black/70' : 'bg-white/70'} backdrop-blur-xl border-b ${isDark ? 'border-white/10' : 'border-black/5'}`}
           aria-label="Main navigation"
@@ -245,7 +247,7 @@ function AppleContent() {
             <div className="justify-self-start min-w-0">
               <LogoSelectorApple isDark={isDark} />
             </div>
-            <div className="hidden md:flex items-center gap-4 lg:gap-6 text-xs lg:text-[13px]">
+            <div className="hidden lg:flex items-center gap-4 lg:gap-6 text-xs lg:text-[13px]">
               {nav.map(([href, label]) => {
                 const on = activeSection === href.slice(1)
                 return (
