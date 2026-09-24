@@ -105,8 +105,11 @@ export function ContactFormModal({
       : 'bg-white border-luxury-black/20 text-luxury-black placeholder:text-luxury-black/40 focus:border-luxury-gold',
     textPrimary: isDark ? 'text-deco-cream' : 'text-luxury-black',
     textSecondary: isDark ? 'text-deco-cream/60' : 'text-luxury-black/60',
-    textMuted: isDark ? 'text-deco-cream/40' : 'text-luxury-black/40',
-    accent: isDark ? 'text-deco-gold' : 'text-luxury-gold',
+    // Same tokens Design4.tsx/skins.ts carry for the same reason: light-mode /40 muted and raw
+    // 'text-luxury-gold' both measured well under AA's 4.5:1 as text elsewhere on this theme
+    // (Lighthouse `color-contrast`, 2026-09-23) — /65 and the darker "text-safe" #6b5730 clear it.
+    textMuted: isDark ? 'text-deco-cream/40' : 'text-luxury-black/65',
+    accent: isDark ? 'text-deco-gold' : 'text-[#6b5730]',
     btnPrimary: isDark 
       ? 'bg-deco-gold text-deco-navy hover:bg-deco-cream' 
       : 'bg-luxury-black text-luxury-cream hover:bg-luxury-gold hover:text-luxury-black',

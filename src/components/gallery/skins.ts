@@ -162,8 +162,17 @@ export const skins: Record<FrameStyle, (isDark: boolean) => Skin> = {
     // 2026-09-23 accessibility audit) — short of AA's 4.5:1. /65 measures 5.2:1 (see
     // SkillPanel.tsx's own local override of this same token, same reasoning).
     muted: d ? 'text-deco-cream/50' : 'text-luxury-black/65',
+    // #c9a962 clears AA easily as text on this skin's own DARK surfaces (7.3:1 on luxury-black) but
+    // fails on its light ones (2.0-2.1:1, Lighthouse `color-contrast`, 2026-09-23) — and this shared
+    // token legitimately renders on both (e.g. Ticker/`CareerSubway` rows inside Design4's dark
+    // "inverted" band vs. everything else on the page's cream). Left as-is here since a single flat
+    // swap breaks one context to fix the other; SkillPanel.tsx already takes the same approach this
+    // fix follows elsewhere — a local, context-aware override (`text-[#6b5730]`, 4.6:1) only where the
+    // surface is confirmed light, not a change to this shared value.
     accent: d ? 'text-deco-gold' : 'text-luxury-gold',
-    chip: `border px-2 py-0.5 text-[10px] tracking-[0.15em] uppercase ${d ? 'border-deco-gold/20 text-deco-cream/60' : 'border-luxury-black/10 text-luxury-black/60'}`,
+    // Light-mode /60 measured 4.46:1 as text (Lighthouse `color-contrast`, 2026-09-23) — just short
+    // of AA's 4.5:1. /65 (already used for this skin's `muted`, measures 5.2:1 there) clears it.
+    chip: `border px-2 py-0.5 text-[10px] tracking-[0.15em] uppercase ${d ? 'border-deco-gold/20 text-deco-cream/60' : 'border-luxury-black/10 text-luxury-black/65'}`,
     chipOn: `border px-2 py-0.5 text-[10px] tracking-[0.15em] uppercase ${d ? 'bg-deco-gold text-deco-navy border-deco-gold' : 'bg-luxury-black text-luxury-cream border-luxury-black'}`,
     badgeLive: d ? 'bg-deco-gold text-deco-navy' : 'bg-luxury-black text-luxury-cream',
     badgeDev: `border ${d ? 'border-deco-gold text-deco-gold' : 'border-luxury-gold text-luxury-gold'}`,

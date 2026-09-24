@@ -35,8 +35,11 @@ export function MobileMenuLuxury({ navItems, isDark, onContactClick }: MobileMen
 
   const menuBg = isDark ? 'bg-deco-navy' : 'bg-luxury-cream'
   const textPrimary = isDark ? 'text-deco-cream' : 'text-luxury-black'
-  const textMuted = isDark ? 'text-deco-cream/40' : 'text-luxury-black/40'
-  const accent = isDark ? 'text-deco-gold' : 'text-luxury-gold'
+  // Same tokens Design4.tsx/skins.ts carry for the same reason: light-mode /40 muted and raw
+  // 'text-luxury-gold' both measured well under AA's 4.5:1 as text elsewhere on this theme
+  // (Lighthouse `color-contrast`, 2026-09-23) — /65 and the darker "text-safe" #6b5730 clear it.
+  const textMuted = isDark ? 'text-deco-cream/40' : 'text-luxury-black/65'
+  const accent = isDark ? 'text-deco-gold' : 'text-[#6b5730]'
   const accentBg = isDark ? 'bg-deco-gold' : 'bg-luxury-gold'
 
   const menuContent = (

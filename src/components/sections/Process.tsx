@@ -23,6 +23,12 @@ const REF_LINE = 0.42
  */
 export function Process({ skin, heading, canvas = '' }: ProcessProps) {
   const { strings } = useContent()
+  // Luxury's `skin.accent` (#c9a962) is tuned for its own dark surfaces (7.3:1 there) — this
+  // section sits on the page's light cream instead, where it measures 2.0:1 as text (Lighthouse
+  // `color-contrast`, 2026-09-23). #6b5730 is a darker "text-safe" gold (6.1:1 on this section's
+  // own background); scoped to this component's own accent text, not the shared token, since other
+  // Luxury surfaces (Design4's dark "inverted" band) still need the brighter original.
+  const accentSafe = skin.frame === 'luxury' && !skin.dark ? 'text-[#6b5730]' : skin.accent
   const lenis = useLenis()
   const reduced = useReducedMotion()
   const p = strings.sections.process
@@ -90,7 +96,7 @@ export function Process({ skin, heading, canvas = '' }: ProcessProps) {
       {/* the narrative spine: the bottleneck, then the fix */}
       <div className="-mt-2 mb-12 grid max-w-4xl gap-5 md:-mt-4 md:mb-16 md:grid-cols-2 md:gap-10">
         <p className="text-lg leading-relaxed md:text-xl">
-          <span className={`font-semibold ${skin.accent}`}>{p.problemLabel}</span> <span className={skin.muted}>{p.problem}</span>
+          <span className={`font-semibold ${accentSafe}`}>{p.problemLabel}</span> <span className={skin.muted}>{p.problem}</span>
         </p>
         <p className="text-lg leading-relaxed md:text-xl">
           <span className={`font-semibold ${skin.title}`}>{p.fixLabel}</span> <span className={skin.muted}>{p.fix}</span>
@@ -190,11 +196,11 @@ export function Process({ skin, heading, canvas = '' }: ProcessProps) {
                 </button>
                 {/* Inactive steps recede by color, not opacity, so every state keeps AA contrast. */}
                 <div className="transition-colors duration-300">
-                  <p className={`text-[11px] font-semibold uppercase tracking-[0.18em] tabular-nums ${on ? skin.accent : skin.muted}`}>{num(i)}</p>
+                  <p className={`text-[11px] font-semibold uppercase tracking-[0.18em] tabular-nums ${on ? accentSafe : skin.muted}`}>{num(i)}</p>
                   <h3 className={`mt-1 text-2xl font-semibold tracking-tight transition-colors duration-300 md:text-3xl ${on ? skin.title : skin.muted}`}>{step.title}</h3>
                   <p className={`mt-2 max-w-xl text-base leading-relaxed transition-colors duration-300 md:text-lg ${on ? '' : skin.muted}`}>{step.body}</p>
                   <p className="mt-3 max-w-xl text-sm leading-relaxed">
-                    <span className={`font-semibold ${on ? skin.accent : skin.muted}`}>{p.deliverableLabel}</span> <span className={skin.muted}>{step.deliverable}</span>
+                    <span className={`font-semibold ${on ? accentSafe : skin.muted}`}>{p.deliverableLabel}</span> <span className={skin.muted}>{step.deliverable}</span>
                   </p>
                 </div>
               </li>

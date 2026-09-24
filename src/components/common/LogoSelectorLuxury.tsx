@@ -53,7 +53,9 @@ export function LogoSelectorLuxury({ isDark }: LogoSelectorLuxuryProps) {
   const textPrimary = isDark ? "text-deco-cream" : "text-luxury-black";
   // Light-mode /50 measured 3.3:1 (Lighthouse `color-contrast`, 2026-09-23) — /65 clears AA at 5.2:1.
   const textMuted = isDark ? "text-deco-cream/50" : "text-luxury-black/65";
-  const accent = isDark ? "text-deco-gold" : "text-luxury-gold";
+  // Light-mode 'text-luxury-gold' measured 2.0-2.1:1 as text elsewhere on this page (Lighthouse
+  // `color-contrast`, 2026-09-23) — #6b5730 is the darker "text-safe" gold already used for this.
+  const accent = isDark ? "text-deco-gold" : "text-[#6b5730]";
   const accentHex = isDark ? "#d4af37" : "#C9A962";
   const borderColor = isDark ? "border-deco-gold/20" : "border-luxury-black/10";
   const glowColor = isDark ? "rgba(212, 175, 55, 0.3)" : "rgba(201, 169, 98, 0.3)";

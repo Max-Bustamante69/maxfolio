@@ -41,6 +41,12 @@ export function Years({ skin, heading, variant = 'rows', depth = false }: YearsP
   const [picked, setPicked] = useState(years[0].year)
   const dot = (s: YearEntry['stores'][number]) => (s.status === 'live' ? 'bg-[#34c759]' : 'bg-[#ff9f0a]')
   const label = `text-[11px] font-semibold uppercase tracking-[0.18em] ${skin.muted}`
+  // Luxury's `skin.accent` (#c9a962) is tuned for its own dark surfaces (7.3:1 there) — this
+  // section's five-line sentence sits on the page's light cream instead, where it measures 2.1:1 as
+  // text (Lighthouse `color-contrast`, 2026-09-23, mobile — the desktop layout truncates the same
+  // text out of view, so only the mobile audit caught it). #6b5730 is the darker "text-safe" gold
+  // used elsewhere in this fix for the same reason.
+  const accentSafe = skin.frame === 'luxury' && !skin.dark ? 'text-[#6b5730]' : skin.accent
   const maxTotal = Math.max(1, ...timeline.map(workTotal))
   // One accent, four strengths (opacity classes): the stack reads as one bar whose parts are the kinds of work.
   // Blocks animate scaleX, never opacity, or the inline opacity would erase the strength.
@@ -355,9 +361,9 @@ export function Years({ skin, heading, variant = 'rows', depth = false }: YearsP
                   <RevealText text={String(entry.year)} />
                 </p>
                 {variant === 'lines' ? (
-                  <p className={`${skin.accent} font-display mt-3 text-base italic leading-snug md:text-lg`}>{fiveLineSentence(entry)}.</p>
+                  <p className={`${accentSafe} font-display mt-3 text-base italic leading-snug md:text-lg`}>{fiveLineSentence(entry)}.</p>
                 ) : (
-                  y.eras[String(entry.year)] && <p className={`${skin.accent} mt-3 text-sm font-medium`}>{y.eras[String(entry.year)]}</p>
+                  y.eras[String(entry.year)] && <p className={`${accentSafe} mt-3 text-sm font-medium`}>{y.eras[String(entry.year)]}</p>
                 )}
               </div>
               <div className="md:col-span-9">
@@ -393,9 +399,9 @@ export function Years({ skin, heading, variant = 'rows', depth = false }: YearsP
           <AnimatePresence mode="wait" initial={false}>
             <m.div key={picked} role="tabpanel" className="pt-6" initial={reduced ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, transition: { duration: 0.1 } }} transition={{ duration: 0.28, ease: EASE }}>
               {variant === 'lines' ? (
-                <p className={`${skin.accent} font-display mb-5 text-base italic leading-snug`}>{fiveLineSentence(years.find((e) => e.year === picked) ?? years[0])}.</p>
+                <p className={`${accentSafe} font-display mb-5 text-base italic leading-snug`}>{fiveLineSentence(years.find((e) => e.year === picked) ?? years[0])}.</p>
               ) : (
-                y.eras[String(picked)] && <p className={`${skin.accent} mb-5 text-sm font-medium`}>{y.eras[String(picked)]}</p>
+                y.eras[String(picked)] && <p className={`${accentSafe} mb-5 text-sm font-medium`}>{y.eras[String(picked)]}</p>
               )}
               <Body entry={years.find((e) => e.year === picked) ?? years[0]} />
             </m.div>
