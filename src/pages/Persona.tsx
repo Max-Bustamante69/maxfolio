@@ -7,7 +7,7 @@ import { MenuPreview } from '../components/previews'
 import { StatBand } from '../components/sections/StatBand'
 import { Experience } from '../components/sections/Experience'
 import { skins } from '../components/gallery/skins'
-import { useDynamicFavicon, useI18n, useContent } from '../hooks'
+import { useDynamicFavicon, useI18n, useContent, useArcadeFonts } from '../hooks'
 import { designs, designById, otherDesigns, MENU } from '../data/designs'
 import { personaArt } from '../data/personaArt'
 import '../styles/persona.css'
@@ -908,6 +908,9 @@ function PersonaContent() {
   const [contactPrefill, setContactPrefill] = useState('')
   const rootRef = useRef<HTMLDivElement>(null)
   useDynamicFavicon('persona')
+  // Anton/Rajdhani (this theme's real type) load on demand from here — see useArcadeFonts.ts —
+  // instead of riding index.html's shared stylesheet on every route.
+  useArcadeFonts()
   useScrollVar(rootRef)
   const sfx = useSfx()
   const reduced = useReducedMotion()

@@ -2,7 +2,7 @@ import { m, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { ThemeProvider, useTheme } from '../context/ThemeContext'
 import { LanguageSelectorMenu, ThemeToggle, TransitionLink, SEOHead } from '../components'
-import { useDynamicFavicon, useI18n } from '../hooks'
+import { useDynamicFavicon, useI18n, useArcadeFonts } from '../hooks'
 import { personal } from '../data/registry'
 import { designs, defaultDesign, type DesignId } from '../data/designs'
 
@@ -21,6 +21,9 @@ function HomeContent() {
 
   // Dynamic favicon
   useDynamicFavicon('menu')
+  // This screen's grid shows every design's real preview tile, including Persona's — load its
+  // Anton/Rajdhani on demand here too (see useArcadeFonts.ts) instead of the old shared shell link.
+  useArcadeFonts()
 
   useEffect(() => {
     if (hoveredDesign !== null) return

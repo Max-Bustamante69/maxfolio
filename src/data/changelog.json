@@ -1,5 +1,25 @@
 [
   {
+    "hash": "cf2a066",
+    "date": "2026-09-23",
+    "subject": "fix(a11y): bring /neo and /brutalist Lighthouse accessibility + brutalist best-practices to 100"
+  },
+  {
+    "hash": "f1f8d00",
+    "date": "2026-09-23",
+    "subject": "fix(terminal): shrink the boot-skip control's permanent CLS-reservation box"
+  },
+  {
+    "hash": "d93a142",
+    "date": "2026-09-23",
+    "subject": "fix(a11y): contain the skills-chip accessible-name span (390px header-region overflow regression)"
+  },
+  {
+    "hash": "63db8ab",
+    "date": "2026-09-23",
+    "subject": "chore(build): regenerate changelog after round 45 integration"
+  },
+  {
     "hash": "b3bb3b4",
     "date": "2026-09-23",
     "subject": "fix(a11y): luxury-gold accent text fails AA on this theme's light surfaces (color-contrast)"
@@ -38,25 +58,5 @@
     "hash": "1ee56fb",
     "date": "2026-09-23",
     "subject": "fix(neo): nav CTA was fully off-screen at 768-834px"
-  },
-  {
-    "hash": "f7e0870",
-    "date": "2026-09-23",
-    "subject": "fix(apple): nav no longer clips the CTA at 768px"
-  },
-  {
-    "hash": "3b1f2ee",
-    "date": "2026-09-23",
-    "subject": "chore(build): regenerated changelog for round 45 persona-motion lane"
-  },
-  {
-    "hash": "4eb01c0",
-    "date": "2026-09-23",
-    "subject": "fix(charts): gate MiniRing's count-up on entering the viewport"
-  },
-  {
-    "hash": "68de457",
-    "date": "2026-09-23",
-    "subject": "fix(rail): release the drag cursor on pointerup, not when the landing spring settles"
   }
 ]

@@ -321,13 +321,18 @@
     <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
     <link rel="dns-prefetch" href="https://api.fontshare.com" />
 
-    <!-- Google Fonts (Luxury, Brutalist and Persona/Arcade experiences). Loaded without blocking first
-         paint: the default experience uses the system font stack, so these only matter after a switch.
-         Anton + Rajdhani are the Persona (Arcade) theme's type — persona.html (its standalone A/B shell)
-         loads them separately, but a visit through the SPA router (/arcade, the theme menu's preview
-         cards) only ever gets fonts from this shared entry, so they have to be combined in here too. -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Instrument+Serif:ital@0;1&family=Anton&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Instrument+Serif:ital@0;1&family=Anton&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" /></noscript>
+    <!-- Google Fonts (Luxury and Brutalist experiences). Loaded without blocking first paint: the
+         default experience uses the system font stack, so these only matter after a switch.
+         Anton + Rajdhani (Persona/Arcade's type) used to be combined into this SAME request —
+         round 45 (2026-09-24) — which put their CSS on every route's shell, including `/` and
+         `/luxury`, neither of which ever renders a single Arcade glyph. Measured mobile Lighthouse
+         A/B (production vs local, both simulated-throttled, same session): pulling them back out
+         closed the LCP gap on both routes. Persona.tsx and Home.tsx (`/arcade`, `/menu` — the only
+         two screens that render real Arcade type) now load that pair on demand instead, via
+         `useArcadeFonts()`; persona.html (the standalone A/B shell, currently unused — see
+         ab.config.ts) keeps loading them separately, on its own, like it always did. -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" /></noscript>
 
     <!-- Clash Display from CDN, same non-blocking pattern -->
     <link href="https://api.fontshare.com/v2/css?f[]=clash-display@200,300,400,500,600,700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
