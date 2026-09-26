@@ -1,5 +1,25 @@
 [
   {
+    "hash": "b53dd8e",
+    "date": "2026-09-24",
+    "subject": "feat(contact): WhatsApp line (305) under the phone (319 stays for calls)"
+  },
+  {
+    "hash": "7636a45",
+    "date": "2026-09-24",
+    "subject": "feat(apple): 1650px frame, editorial hero and Every build ships with"
+  },
+  {
+    "hash": "f77f7e9",
+    "date": "2026-09-24",
+    "subject": "fix(api): psi runs on Vercel's Node runtime (named GET export, explicit .js import)"
+  },
+  {
+    "hash": "cee3670",
+    "date": "2026-09-24",
+    "subject": "chore(build): regenerate changelog after the a11y/WebGL fix"
+  },
+  {
     "hash": "914e209",
     "date": "2026-09-24",
     "subject": "fix(a11y): clear the two round-46 gate failures + a WebGL crash the sweep surfaced"
@@ -38,25 +58,5 @@
     "hash": "cae8362",
     "date": "2026-09-23",
     "subject": "fix(a11y): clear /brutalist's desktop-only Lighthouse failures (97 - 100)"
-  },
-  {
-    "hash": "d1fac65",
-    "date": "2026-09-23",
-    "subject": "perf(fonts): stop loading Arcade's Anton/Rajdhani on every route"
-  },
-  {
-    "hash": "cf2a066",
-    "date": "2026-09-23",
-    "subject": "fix(a11y): bring /neo and /brutalist Lighthouse accessibility + brutalist best-practices to 100"
-  },
-  {
-    "hash": "f1f8d00",
-    "date": "2026-09-23",
-    "subject": "fix(terminal): shrink the boot-skip control's permanent CLS-reservation box"
-  },
-  {
-    "hash": "d93a142",
-    "date": "2026-09-23",
-    "subject": "fix(a11y): contain the skills-chip accessible-name span (390px header-region overflow regression)"
   }
 ]
