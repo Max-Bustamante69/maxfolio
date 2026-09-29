@@ -54,6 +54,13 @@ experience passes a `skin` (`src/components/gallery/skins.ts`).
 React 19 · Vite 6 · TypeScript · Tailwind CSS 3 · framer-motion · react-router 7 · Playwright +
 sharp (captures) · Bun · Vercel (with `vercel.json` SPA rewrite).
 
+## 3D pieces (opt-in, `?3d=1`)
+
+Obsidian-studio 3D pieces (Blender/Cycles poster + GLB + measured R3F twin) live in `src/three` behind `?3d=1`:
+one persistent Canvas (drei `View`), poster first, lazy three, poster-only on reduced-motion / low-end devices.
+Without the flag the site is unchanged. See `src/three/LEEME.md` (usage, architecture, pending work) and
+`public/3d/README.md` (asset provenance and weights). Lab: `/?3d=1&lab`. QA: `node scripts/qa-3d.mjs` after `bun run build`.
+
 ## Development
 
 ```bash

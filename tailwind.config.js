@@ -3,6 +3,8 @@ export default {
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
+    // src/three solo usa estilos en línea: sus strings ('fixed', 'grid'...) no deben generar utilidades en el CSS del sitio.
+    "!./src/three/**",
   ],
   theme: {
     extend: {

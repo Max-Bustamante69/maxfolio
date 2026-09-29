@@ -1,0 +1,28 @@
+{
+  "_fuente": "max-folio-skills/src/data/registry.ts L190-212 (export const stores), leído 2026-09-29. Snapshot congelado para este asset: si el registro cambia, este archivo queda desactualizado y hay que regenerarlo a mano (no hay pipeline automático; ver FICHA.md).",
+  "stores": [
+    { "slug": "the-gummy-box", "name": "The Gummy Box", "year": 2026, "status": "live" },
+    { "slug": "nos-cafe", "name": "NOS Café", "year": 2026, "status": "live" },
+    { "slug": "millennio", "name": "Perfumería Millennio", "year": 2026, "status": "live" },
+    { "slug": "mindfuel", "name": "Mindfuel", "year": 2026, "status": "live" },
+    { "slug": "nalua", "name": "Nalua Skincare", "year": 2026, "status": "live" },
+    { "slug": "sebum", "name": "Sebum", "year": 2026, "status": "live" },
+    { "slug": "valdo-cafe", "name": "Valdo Café", "year": 2026, "status": "live" },
+    { "slug": "factores-2x2", "name": "Factores 2x2", "year": 2026, "status": "live" },
+    { "slug": "pixxiesx", "name": "Pixxiesx", "year": 2026, "status": "live" },
+    { "slug": "luxe-shine", "name": "Luxe Shine", "year": 2026, "status": "live" },
+    { "slug": "atmosfera", "name": "Atmósfera Tecnológica", "year": 2026, "status": "live" },
+    { "slug": "saint-theory", "name": "Saint Theory", "year": 2023, "status": "live" },
+    { "slug": "peluna", "name": "Peluna Pets", "year": 2026, "status": "dev" },
+    { "slug": "en-amor-a-dos", "name": "En Amor a Dos", "year": 2026, "status": "dev" },
+    { "slug": "unik", "name": "Unik Jeans", "year": 2026, "status": "dev" },
+    { "slug": "origen-vital", "name": "Origen Vital", "year": 2026, "status": "dev" },
+    { "slug": "para-machos", "name": "Para Machos", "year": 2026, "status": "dev" },
+    { "slug": "tierramont", "name": "TierraMont", "year": 2026, "status": "dev" },
+    { "slug": "alma-de-aviador", "name": "Alma de Aviador", "year": 2026, "status": "dev" },
+    { "slug": "joystaz", "name": "Joystaz Jeans", "year": 2025, "status": "live" },
+    { "slug": "new-urban", "name": "New Urban", "year": 2023, "status": "live" },
+    { "slug": "gummind", "name": "Gummind", "year": 2025, "status": "live" },
+    { "slug": "rimo", "name": "Rimo", "year": 2023, "status": "live" }
+  ]
+}
