@@ -42,6 +42,7 @@ import { Pieza3D } from '../three/Pieza3D'
 | `captura` | Dispositivos: otra captura con el aspecto EXACTO de la pantalla (390:844 / 1440:900). |
 | `prioridad` | Póster con `fetchpriority=high` y sin lazy (pieza de la primera pantalla). |
 | `soloPoster` | No monta el 3D aunque pueda. |
+| `realce` | Solo `monograma-mb` con `acento="apple"` sobre negro. Más luz de estudio (1 = el estudio tal cual): multiplica espejo, contornos y tira superior de la gemela y deja el pie del espejo donde estaba, así la cara sigue muriendo en negro y solo sube su parte alta y los filos. El póster pasa a `apple-oscuro` (captura de la gemela con ese realce, `scripts/poster-realce.mjs`) para que el relevo póster → 3D no salte. |
 | `className` `style` `alt` `sizes` | La caja tiene `aspect-ratio` fijo (el del póster): dale ancho y ya está. `alt` por defecto es una descripción en inglés. |
 
 `Pieza3D` con el 3D apagado devuelve `null`: quien la integre en una página no cambia esa página sin el flag.
@@ -109,6 +110,17 @@ renderer hace inestable el PMREM de three.
 - El Canvas está por encima del contenido (z-30) y por debajo del nav (z-40): si una skin tiene elementos con z-index entre 30 y 40 que deban tapar una pieza, ajustar `--escena3d-z`.
 - Fidelidad póster/3D que sigue abierta (el estudio no retoca luces por pieza): la cara superior del monograma pierde su degradado
   gris (Luxury ~21 % más oscuro en contexto) y los objetos de fila pierden la sombra de contacto del póster (fundido de 140 ms).
+- Firma del hero de Apple (`FirmaHero`, `firma-hero.css`): desde 1024 px el trazo mide 240x120 y cuelga de la banda entre el nav y
+  la «t» de «Bustamante» (borde superior a 76 px, 20 px bajo el nav; borde derecho 16 px dentro del marco para dejar aire al cursor
+  del riel). Es lo mayor que cabe sin tocar el flujo del hero (el cascarón estático de `index.html` no lleva hueco para ella), y la
+  caja del póster sigue por debajo del área de texto del titular: LCP y CLS medidos iguales con y sin la firma. En tema oscuro
+  lleva `realce` 3 y un pozo de la superficie de las tarjetas (`#1c1c1e`, radial, transparente en el borde) en vez del halo claro,
+  que tenía la luminancia de la propia cara y la borraba. Contraste de silueta a 1440 (anillo de 2 px a cada lado del borde, sobre
+  el alfa del póster): media de luminancia relativa borde/fondo 0.056/0.050 → 0.117/0.009; razón WCAG mediana por píxel de borde
+  1.54 → 2.24; bordes con razón >= 2: 21 % → 58 %, >= 3: 5 % → 36 %. La flotación cabecea el reflejo y la luminancia media de la zona oscila
+  entre ~35 y ~94 cada 4 s durante los ~8 s tras cargar o mover el puntero (en claro también: 26-82 sobre los píxeles oscuros) y se
+  asienta en ~65 en reposo = el póster. Con 1024-1031 px y 1280-1285 px (hasta 15 px más con barra de desplazamiento clásica) el
+  titular parte en dos líneas y queda un hueco a su derecha que la firma no usa.
 - Cobertura: firma MB solo en Apple, Luxury y Brutalist. Neo pierde su objeto ambiental con el flag y no gana firma (su panel no
   tiene hueco libre); Terminal conserva su MB en píxeles; Persona (`/arcade`) no tiene ninguna pieza. La órbita no está en Apple
   (Apple no monta `Years`).

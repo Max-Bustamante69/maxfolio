@@ -9,7 +9,7 @@ se vuelve a copiar (y a regenerar `scripts/poster-acento.mjs` si cambia el póst
 | Carpeta | Contenido | Peso (transferido) |
 |---|---|---|
 | `hdri/studio_small_09_512.hdr` | Entorno del estudio a 0.35 (Poly Haven, **CC0**, https://polyhaven.com/a/studio_small_09). El estudio usa la 2k (6.3 MB) y derivó una 1k; aquí va la 512×256 (`scripts/hdri-reducir.mjs`, filtro de caja en luz lineal). Medido con `scripts/qa-3d.mjs`: 2k, 1k y 512 dan la misma paridad con el póster (±0.02 en todas las métricas). | 512 KB |
-| `monograma-mb/` | `monograma-mb.opt.glb` (Draco, `--join false --no-simplify`) + pósters AVIF/WebP con alfa: `apple`, `luxury` (Cycles, 1200/2400) y `apple-<skin>` (1200, derivados) | GLB 68 KB · póster 1200: 16 KB avif / 30 KB webp |
+| `monograma-mb/` | `monograma-mb.opt.glb` (Draco, `--join false --no-simplify`) + pósters AVIF/WebP con alfa: `apple`, `luxury` (Cycles, 1200/2400), `apple-<skin>` y `apple-oscuro` (1200, derivados) | GLB 68 KB · póster 1200: 16 KB avif / 30 KB webp (`apple-oscuro`: 14 / 14 KB) |
 | `orbita-tiendas/` | `orbita-tiendas.opt.glb` + póster `reposo` (1200/2400) | GLB 91 KB · póster 30 / 47 KB |
 | `objetos-feature/` | `objetos-feature.opt.glb` (8 sub-grupos, un solo GLB) + 8 pósters a 1200 (tarjetas pequeñas) | GLB 160 KB · póster 6-10 / 20-34 KB |
 | `relieve-medellin/` | `relieve-medellin.opt.glb` + `relieve-medellin-normal.webp` (curvas de nivel y río) + pósters `recorte` (1200/2400) y `pequena` (600/1200, solo póster) | GLB 342 KB + normal 217 KB · póster 50 / 66 KB |
@@ -25,6 +25,11 @@ se vuelve a copiar (y a regenerar `scripts/poster-acento.mjs` si cambia el póst
 - **Pósters `apple-<skin>-1200`** (brutalist, neo, persona, terminal): esas skins solo tienen gemela en tiempo real en el
   estudio (sin render de Cycles). Se derivan del póster de `apple` recoloreando solo el punto (`scripts/poster-acento.mjs`).
   Son una derivación declarada, no un render; el póster exacto queda pendiente en el estudio.
+- **Póster `apple-oscuro-1200`**: el monograma de Apple sobre negro lleva `realce` (más luz de estudio arriba y en los filos,
+  ver `src/three/LEEME.md`), así que el póster de Cycles ya no coincide con la gemela. Este es una captura de la propia
+  gemela en su pose de reposo, con alfa (`scripts/poster-realce.mjs`: la vista se captura sobre negro y sobre blanco sin
+  redibujar y se despeja el alfa). Diferencia media de luminancia con la gemela en reposo, sobre la silueta: 1.4 de 255 (el póster
+  de Cycles frente a la gemela sin realce: 6.2). Derivación declarada, no un render; se regenera si cambia el realce, la luz o el GLB.
 - **Capturas de pantalla** de los dispositivos: los PNG de `logo3d/realtime/public/casos/` pasados a WebP q90 (mismo tamaño en px).
 - Los `camara.json` de cada pieza NO están aquí: se importan como módulo desde `src/three/piezas/camaras/` (van dentro del
   chunk de la pieza, sin petición extra).

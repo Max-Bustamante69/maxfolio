@@ -69,4 +69,10 @@ export interface Pieza3DProps {
   prioridad?: boolean
   /** No monta el 3D aunque pueda (comparativas, pruebas): solo póster. */
   soloPoster?: boolean
+  /**
+   * Más luz de estudio para fondos oscuros (1 = el estudio tal cual): sube la parte alta de la cara y los filos de la gemela
+   * sin subir su pie negro. Solo el monograma de `apple` sobre negro; su póster pasa a ser `apple-oscuro` (captura de la
+   * propia gemela en reposo), así el relevo póster → 3D no salta.
+   */
+  realce?: number
 }

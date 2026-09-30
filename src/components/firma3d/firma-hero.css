@@ -52,6 +52,17 @@
   --halo: 212 175 55;
   --halo-a: 0.22;
 }
+/* Apple, oscuro: el halo claro de arriba tenía la misma luminancia que la cara de la obsidiana (medido: borde 69 frente a
+ * fondo 65 sobre 255) y la disolvía. Aquí no hay halo sino una pizca de la superficie de las tarjetas (#1c1c1e, la de
+ * «Ahora») alrededor del trazo, que solo define el pie negro de las letras; la legibilidad la pone la gemela con `realce`
+ * (más luz arriba y en los filos) y su póster `apple-oscuro` (captura de esa misma gemela). El elipse se centra en el trazo
+ * (47 %, 51 % de la caja) y muere en transparente antes de tocar el borde, así no hay canto de caja. */
+.firma-hero[data-firma='apple'][data-tema='oscuro'] .firma-hero__caja::before {
+  inset: -8% -28% -10.4% -34%;
+  border-radius: 0;
+  filter: none;
+  background: radial-gradient(closest-side, rgb(36 36 39 / 0.95) 0%, rgb(28 28 31 / 0.7) 45%, rgb(20 20 22 / 0.28) 75%, rgb(20 20 22 / 0) 100%);
+}
 
 @media (max-width: 639.98px) {
   .firma-hero__caja {
@@ -87,6 +98,20 @@
   [data-firma='apple'] .firma-hero__caja {
     --g: 192px;
     --t: -78px;
+  }
+}
+/* Desde lg el nombre pasa a una línea (88 px, luego 112 y 128) y el aire sobre él es la banda entre el nav (56 px) y la
+ * tinta más alta del titular bajo el trazo (203-222 px según ancho, medida con capturas: la «t» de «Bustamante»).
+ * Trazo de 240x120 con su borde superior a 76 px (20 px de aire bajo el nav: la flotación asoma ~8 px) y el inferior a
+ * 196 (>= 15 px sobre la «t»). Es el mayor trazo que cabe sin tocar el flujo; la caja del póster (314x236 = 74 mil píxeles)
+ * sigue por debajo del área de texto del titular en todo el rango (95 mil o más), y el LCP medido se queda en el nombre.
+ * `--r: 16px`: el cursor del riel de scroll (fijo, z-40, desde y = 171 px) está de 15 a 29 px fuera del marco y arranca arriba,
+ * a la altura del punto de acento; con el trazo pegado al borde del marco quedaban a 13 px y se leían como un solo grupo. */
+@media (min-width: 1024px) {
+  [data-firma='apple'] .firma-hero__caja {
+    --g: 240px;
+    --t: -76px;
+    --r: 16px;
   }
 }
 

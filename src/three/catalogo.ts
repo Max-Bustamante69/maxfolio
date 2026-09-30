@@ -41,17 +41,27 @@ const ALT_FEATURE: Record<string, string> = {
  */
 const POSTER_DERIVADO: SkinId[] = ['brutalist', 'neo', 'persona', 'terminal']
 
+/**
+ * Con `realce` (más luz de estudio sobre negro) el póster de Cycles ya no coincide con la gemela: el de `apple` se sustituye por
+ * `apple-oscuro`, una captura de la propia gemela en su pose de reposo (`scripts/poster-realce.mjs`), así el relevo póster → 3D
+ * (y el póster que ven los móviles y el scroll rápido) es el mismo dibujo. Derivación declarada, no un render de Cycles. Solo 1200 px.
+ */
+const POSTER_REALCE: SkinId[] = ['apple']
+
 const P43 = { w: 1200, h: 900 }
 
-export function resolver(slug: SlugPieza, estado?: string, acento?: SkinId): Definicion {
+export function resolver(slug: SlugPieza, estado?: string, acento?: SkinId, realce = 1): Definicion {
   switch (slug) {
     case 'monograma-mb': {
       const derivado = acento !== undefined && POSTER_DERIVADO.includes(acento)
+      const oscuro = realce > 1 && acento !== undefined && POSTER_REALCE.includes(acento)
       return {
         carpeta: 'monograma-mb',
         poster: derivado
           ? { base: `apple-${acento}`, anchos: [1200], ...P43 }
-          : { base: acento === 'luxury' ? 'luxury' : 'apple', anchos: [1200, 2400], ...P43 },
+          : oscuro
+            ? { base: 'apple-oscuro', anchos: [1200], ...P43 }
+            : { base: acento === 'luxury' ? 'luxury' : 'apple', anchos: [1200, 2400], ...P43 },
         tiene3d: true,
         alt: 'MB monogram in polished obsidian with an accent dot',
       }

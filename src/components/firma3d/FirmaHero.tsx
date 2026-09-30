@@ -3,6 +3,12 @@ import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { Pieza3D } from '../../three/Pieza3D'
 import type { SkinId } from '../../three/tipos'
 
+/** Luz extra de estudio de la obsidiana de Apple sobre negro (fondo #000): con 1 sus caras (grises 0-75 sobre 255) no se separan del fondo. */
+const REALCE_OSCURO = 3
+
+/** Ancho mínimo de pantalla (px) por skin: por debajo no hay hueco libre en su hero y la firma no se pinta (ni se pide su póster). */
+const ANCHO_MINIMO: Partial<Record<SkinId, number>> = { luxury: 380, brutalist: 380 }
+
 /**
  * Firma de la primera pantalla: el monograma MB de obsidiana (estudio, p1) con el punto del color de la skin.
  * Solo existe con `?3d=1`: las páginas lo importan con `lazy()` y lo montan tras `modo3dActivo()`, así que sin el flag
@@ -15,12 +21,11 @@ import type { SkinId } from '../../three/tipos'
  *    Save-Data se quedan en el póster por las compuertas de `src/three`;
  *  - teléfono (< 640 px): póster de Cycles sin más, ni three ni bucle de dibujo por una firma decorativa.
  * Decorativa (`alt=""`, `aria-hidden`): el nombre ya está en el titular a su lado.
- * `oscuro`: la obsidiana sobre un fondo casi negro solo se lee por sus cantos; un halo de contraluz (CSS, detrás de la
- * pieza) le da el fondo contra el que se recorta. No toca la pieza ni sus pósters.
+ * `oscuro`: la obsidiana sobre un fondo casi negro solo se lee por sus cantos. Luxury y Brutalist llevan un halo de
+ * contraluz (CSS, detrás de la pieza) que le da el fondo contra el que se recorta; en Apple ese halo tenía la luminancia de
+ * la propia cara y la borraba, así que allí la pieza lleva `realce` (más luz arriba y en los filos, sin subir el negro del
+ * pie) sobre un fondo casi negro. Sin ninguno de los dos en tema claro.
  */
-/** Ancho mínimo de pantalla (px) por skin: por debajo no hay hueco libre en su hero y la firma no se pinta (ni se pide su póster). */
-const ANCHO_MINIMO: Partial<Record<SkinId, number>> = { luxury: 380, brutalist: 380 }
-
 export default function FirmaHero({ skin, oscuro = false }: { skin: SkinId; oscuro?: boolean }) {
   const telefono = useMediaQuery('(max-width: 639px)')
   const cabe = useMediaQuery(`(min-width: ${ANCHO_MINIMO[skin] ?? 0}px)`, true)
@@ -36,6 +41,7 @@ export default function FirmaHero({ skin, oscuro = false }: { skin: SkinId; oscu
           animar={!telefono}
           soloPoster={telefono}
           prioridad
+          realce={skin === 'apple' && oscuro ? REALCE_OSCURO : 1}
           alt=""
           sizes="(min-width: 640px) 320px, 140px"
           className="firma-hero__pieza"

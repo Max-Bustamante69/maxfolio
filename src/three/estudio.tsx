@@ -4,7 +4,8 @@ import * as THREE from 'three'
 
 /**
  * PORTADA TAL CUAL del estudio obsidiana de Digitdeck (`3d/estudio/estudio.tsx`); único cambio: el HDRI 512×256
- * (CC0, Poly Haven) se sirve local desde `/3d/hdri/`. No se retocan luces ni materiales por pieza.
+ * (CC0, Poly Haven) se sirve local desde `/3d/hdri/`. No se retocan luces ni materiales por pieza. (Salvedad: `realce`,
+ * un multiplicador opcional de las cajas de luz para fondos oscuros; con 1, el valor por defecto, es el estudio de siempre.)
  *
  * Gemela en tiempo real de estudio.py (Blender/Cycles): mismos materiales y mismas cajas de luz, para que
  * cada asset se vea en el navegador igual que su póster de Cycles. Calibrada contra el logo obsidiana
@@ -41,14 +42,16 @@ export function useMateriales() {
   return useMemo(crearMateriales, [])
 }
 
-function texturaDegradado() {
+/** `realce` > 1 sube el extremo alto y deja el bajo donde estaba: la caja se multiplica por `realce`, así que el pie 0.08 sigue en 0.08. */
+function texturaDegradado(realce = 1) {
   const c = document.createElement('canvas')
   c.width = 4
   c.height = 256
   const ctx = c.getContext('2d')!
   const g = ctx.createLinearGradient(0, 0, 0, 256)
+  const abajo = 20 / realce
   g.addColorStop(0, 'rgb(255,255,255)') // 1 arriba
-  g.addColorStop(1, 'rgb(20,20,20)') //   0.08 abajo
+  g.addColorStop(1, `rgb(${abajo},${abajo},${abajo})`) //   0.08 abajo (÷ realce)
   ctx.fillStyle = g
   ctx.fillRect(0, 0, 4, 256)
   const t = new THREE.CanvasTexture(c)
@@ -99,6 +102,12 @@ interface EntornoProps {
   resolucion?: number
   /** Ruta del HDRI de estudio servido por el sitio. */
   hdri?: string
+  /**
+   * Más luz para fondos oscuros (1 = el estudio tal cual, el del póster de Cycles). Multiplica las cuatro cajas de luz
+   * (espejo, contornos y tira superior) dejando el pie del espejo donde estaba: la cara sigue muriendo en negro y solo sube
+   * su parte alta y los filos.
+   */
+  realce?: number
 }
 
 /**
@@ -107,9 +116,9 @@ interface EntornoProps {
  */
 export function EntornoEstudio({
   yaw = 22, tilt = 6, camara = new THREE.Vector3(0, 0.55, 12.5), escala = 1, resolucion = 256,
-  hdri = '/3d/hdri/studio_small_09_512.hdr', centro = new THREE.Vector3(),
+  hdri = '/3d/hdri/studio_small_09_512.hdr', centro = new THREE.Vector3(), realce = 1,
 }: EntornoProps) {
-  const mapa = useMemo(texturaDegradado, [])
+  const mapa = useMemo(() => texturaDegradado(realce), [realce])
   const s = escala
   const c = centro
   const espejo = useMemo(
@@ -120,10 +129,10 @@ export function EntornoEstudio({
   const t = c.toArray() as [number, number, number]
   return (
     <Environment resolution={resolucion} frames={1}>
-      <Lightformer form="rect" map={mapa} intensity={3.2} position={espejo} scale={[7 * s, 1.8 * s, 1]} target={t} />
-      <Lightformer form="rect" intensity={26} color={lin(0.93, 0.95, 1)} position={en(-4.6, 0.8, -2.2)} scale={[0.3 * s, 7 * s, 1]} target={t} />
-      <Lightformer form="rect" intensity={20} color={lin(0.8, 0.72, 1)} position={en(4.6, 1.0, -2.4)} scale={[0.3 * s, 7 * s, 1]} target={t} />
-      <Lightformer form="rect" intensity={10} position={en(0, 5, -1)} scale={[6 * s, 0.5 * s, 1]} target={t} />
+      <Lightformer form="rect" map={mapa} intensity={3.2 * realce} position={espejo} scale={[7 * s, 1.8 * s, 1]} target={t} />
+      <Lightformer form="rect" intensity={26 * realce} color={lin(0.93, 0.95, 1)} position={en(-4.6, 0.8, -2.2)} scale={[0.3 * s, 7 * s, 1]} target={t} />
+      <Lightformer form="rect" intensity={20 * realce} color={lin(0.8, 0.72, 1)} position={en(4.6, 1.0, -2.4)} scale={[0.3 * s, 7 * s, 1]} target={t} />
+      <Lightformer form="rect" intensity={10 * realce} position={en(0, 5, -1)} scale={[6 * s, 0.5 * s, 1]} target={t} />
       {/* HDRI a 0.35 como fondo del entorno virtual = el mundo de Cycles */}
       <Environment files={hdri} background backgroundIntensity={0.35} />
     </Environment>

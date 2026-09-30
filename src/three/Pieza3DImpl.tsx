@@ -19,9 +19,9 @@ const srcSet = (carpeta: string, base: string, anchos: number[], ext: 'avif' | '
 export default function Pieza3DImpl(props: Pieza3DProps) {
   const {
     slug, estado, acento, interactiva = false, animar = interactiva, progreso, seleccionado, periodoPulsoMs, captura,
-    className, style, alt, sizes = '600px', prioridad = false, soloPoster = false,
+    className, style, alt, sizes = '600px', prioridad = false, soloPoster = false, realce = 1,
   } = props
-  const def = useMemo(() => resolver(slug, estado, acento), [slug, estado, acento])
+  const def = useMemo(() => resolver(slug, estado, acento, realce), [slug, estado, acento, realce])
   const { fase, rapido } = useEscena3d()
   const caja = useRef<HTMLDivElement>(null)
   const puntero = useRef<Puntero>({ x: 0, y: 0 })
@@ -118,7 +118,7 @@ export default function Pieza3DImpl(props: Pieza3DProps) {
           <Vista
             slug={slug} estado={estado} interactiva={interactiva} animar={animar} progreso={leerProgreso}
             puntero={puntero} acento={acento} seleccionado={seleccionado} periodoPulsoMs={periodoPulsoMs}
-            captura={captura} visible={!rapido} onDibujada={() => setDibujada(true)}
+            captura={captura} realce={realce} visible={!rapido} onDibujada={() => setDibujada(true)}
           />
         </Suspense>
       )}

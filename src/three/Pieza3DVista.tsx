@@ -73,6 +73,8 @@ interface PropsVista {
   seleccionado?: string
   periodoPulsoMs?: number
   captura?: string
+  /** Más luz de estudio (ver `Pieza3DProps.realce`). */
+  realce?: number
   /** Falso = la vista no se dibuja (scroll rápido: se ve el póster del DOM). */
   visible: boolean
   onDibujada: () => void
@@ -80,17 +82,21 @@ interface PropsVista {
 
 type PropsContenido = Omit<PropsVista, 'visible'>
 
-function Montaje({ mod, onDibujada, ...p }: PropsContenido & { mod: ModuloPieza }) {
+function Montaje({ mod, onDibujada, realce = 1, ...p }: PropsContenido & { mod: ModuloPieza }) {
   const cam = mod.camaraDe(p.estado)
   const { posicion, centro } = useMemo(() => camaraDesdeJson(cam), [cam])
   const Pieza = mod.default
-  
+  const invalidate = useThree((s) => s.invalidate)
+  // El entorno se hornea una vez (frames=1): un realce nuevo (cambio de tema) lo remonta con `key` y pide cuadros para hornearlo.
+  useLayoutEffect(() => {
+    invalidate(3)
+  }, [invalidate, realce])
   return (
     <>
       <CamaraPieza c={cam} recorte={mod.recorte} />
       <Pieza {...p} />
-      <EntornoEstudio yaw={cam.yaw} tilt={cam.tilt} escala={cam.escala} camara={posicion} centro={centro}
-        hdri="/3d/hdri/studio_small_09_512.hdr" resolucion={RESOLUCION_ENTORNO} />
+      <EntornoEstudio key={realce} yaw={cam.yaw} tilt={cam.tilt} escala={cam.escala} camara={posicion} centro={centro}
+        hdri="/3d/hdri/studio_small_09_512.hdr" resolucion={RESOLUCION_ENTORNO} realce={realce} />
       <AvisoCuadro onDibujada={onDibujada} />
     </>
   )
