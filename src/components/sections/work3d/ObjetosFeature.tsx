@@ -2,9 +2,14 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { Pieza3D } from '../../../three/Pieza3D'
 
 /**
- * Objetos-hecho de una tienda (p3 del estudio obsidiana): 1-2 piezas por fila, elegidas por la MISMA taxonomía
- * `FEATURES` que ya filtra la lista (bundles, quiz, subscriptions, reviews, migration, islands, tracking, i18n).
- * Este módulo solo se descarga con `?3d=1` (ShopifyWork lo importa en diferido), así que sin el flag la fila es la de siempre.
+ * Objeto-hecho de una tienda (p3 del estudio obsidiana): UNO por fila, el de la primera característica que coincide con
+ * la MISMA taxonomía `FEATURES` que ya filtra la lista (bundles, quiz, subscriptions, reviews, migration, islands,
+ * tracking, i18n); con un filtro activo, el de ese filtro. Este módulo solo se descarga con `?3d=1` (ShopifyWork lo
+ * importa en diferido), así que sin el flag la fila es la de siempre.
+ *
+ * Solo desde 1280 px: el objeto es una losa de ~66 px que dice «hay una característica», y el nombre y la cifra tienen
+ * que seguir empezando en el margen. Por debajo (móvil, tableta, Terminal a 320-360 px) la fila no cambia ni se pide su
+ * póster.
  *
  * Reglas de coste (TECNICA-3D-WEB.md): por defecto cada objeto es su póster estático; el 3D solo se monta en la fila sobre
  * la que se pasa el puntero (o se enfoca con teclado, o la que abre la órbita de habilidades), y se conservan a lo sumo
@@ -47,9 +52,13 @@ function useMedia(consulta: string) {
  */
 const OBJ_X0 = 0.2
 const OBJ_ANCHO = 0.59
+const CAJA = 108 // ancho de la caja del póster → el objeto mide ~64 px
+const ALTO = 72 // alto que reserva en la fila (el objeto ocupa el 81 % del alto de su caja)
+/** El hueco mide lo mismo en TODAS las filas (con o sin objeto) para que los nombres queden alineados (el aire lo pone el `gap` de la fila). */
+const HUECO = Math.round(CAJA * OBJ_ANCHO)
 
-// Ajustes de la caja del póster; el margen transparente se solapa con el hueco de al lado.
-const css = `.w3d-obj picture img{transition-duration:140ms!important}`
+// El póster se desvanece bajo el 3D en 140 ms (los objetos son pequeños: 450 ms se notaría como un parpadeo).
+const css = `.w3d-obj{--fundido-3d:140ms}`
 
 export interface ObjetosFeatureProps {
   /** Slug de la tienda (identifica la fila en la lista de filas vivas). */
@@ -63,16 +72,15 @@ export interface ObjetosFeatureProps {
   alAbrir: () => void
 }
 
-export default function ObjetosFeature({ id, features, etiquetas, resaltada, alAbrir }: ObjetosFeatureProps) {
+function Objeto({ id, features, etiquetas, resaltada, alAbrir }: ObjetosFeatureProps) {
   const raiz = useRef<HTMLDivElement>(null)
-  const grande = useMedia('(min-width: 768px)')
-  const doble = useMedia('(min-width: 1280px)')
   const vivo = useSyncExternalStore(suscribir, leer, leer).includes(id)
+  const f = features[0]
 
   // Hover con puntero fino / foco de teclado sobre TODA la fila (el <li> más cercano), sin tocar el JSX de ShopifyWork.
   useEffect(() => {
     const fila = raiz.current?.closest('li')
-    if (!fila || features.length === 0) return
+    if (!fila || !f) return
     let t = 0
     const entra = (e: PointerEvent) => {
       if (e.pointerType !== 'mouse') return
@@ -92,39 +100,31 @@ export default function ObjetosFeature({ id, features, etiquetas, resaltada, alA
       fila.removeEventListener('pointerleave', sale)
       fila.removeEventListener('focusin', foco)
     }
-  }, [id, features.length])
+  }, [id, f])
   useEffect(() => {
-    if (resaltada && features.length > 0) activar(id)
-  }, [resaltada, id, features.length])
-
-  const caja = grande ? 152 : 128 // ancho de la caja del póster; el objeto mide ~59 % → 90 px / 76 px
-  const alto = grande ? 96 : 80 // alto que reserva en la fila (el objeto ocupa el 81 % del alto de su caja)
-  const objAncho = caja * OBJ_ANCHO
-  const paso = objAncho + 8
-  const n = Math.min(features.length, doble ? 2 : 1)
-  // El hueco mide lo mismo en TODAS las filas (con o sin objetos) para que los nombres queden alineados.
-  const hueco = (doble ? paso : 0) + objAncho + 16
+    if (resaltada && f) activar(id)
+  }, [resaltada, id, f])
 
   return (
     <div
       ref={raiz}
       aria-hidden="true"
       className="w3d-obj shrink-0"
-      onClick={features.length > 0 ? alAbrir : undefined}
-      style={{ position: 'relative', width: hueco, height: alto, marginTop: grande ? 0 : 6, cursor: features.length > 0 ? 'pointer' : undefined }}
+      onClick={f ? alAbrir : undefined}
+      style={{ position: 'relative', width: HUECO, height: ALTO, cursor: f ? 'pointer' : undefined }}
     >
       <style href="w3d-obj" precedence="default">
         {css}
       </style>
-      {features.slice(0, n).map((f, i) => (
-        <div
-          key={f}
-          title={etiquetas[f]}
-          style={{ position: 'absolute', left: i * paso - caja * OBJ_X0, top: -((caja * 0.75 - alto) / 2), width: caja }}
-        >
-          <Pieza3D slug="objetos-feature" estado={f} soloPoster={!vivo} interactiva={vivo} alt="" sizes={`${caja}px`} style={{ width: '100%' }} />
+      {f && (
+        <div title={etiquetas[f]} style={{ position: 'absolute', left: -CAJA * OBJ_X0, top: -((CAJA * 0.75 - ALTO) / 2), width: CAJA }}>
+          <Pieza3D slug="objetos-feature" estado={f} soloPoster={!vivo} interactiva={vivo} alt="" sizes={`${CAJA}px`} style={{ width: '100%' }} />
         </div>
-      ))}
+      )}
     </div>
   )
+}
+
+export default function ObjetosFeature(props: ObjetosFeatureProps) {
+  return useMedia('(min-width: 1280px)') ? <Objeto {...props} /> : null
 }
