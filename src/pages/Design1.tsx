@@ -363,7 +363,8 @@ function Design1Content() {
 
           {/* Diagonal strip — the low-poly dodecahedron object, wireframe-edged, cutting between the ticker and the index. Desktop+motion-ok+in-view only; the strip is otherwise just flat ground. */}
           <div data-scroll-object-track className={`relative h-28 md:h-40 overflow-hidden border-y-4 ${borderStrong} ${bgSecondary}`} aria-hidden="true">
-            <ScrollObject variant="brutalist" className="[clip-path:polygon(0_100%,100%_0,100%_100%)]" />
+            {/* `?3d=1`: the MB monogram in the masthead replaces this ambient object (two WebGL contexts and two copies of three otherwise). */}
+            {!firma && <ScrollObject variant="brutalist" className="[clip-path:polygon(0_100%,100%_0,100%_100%)]" />}
           </div>
 
           {/* Stat band — the work, in numerals, on a hairline grid */}

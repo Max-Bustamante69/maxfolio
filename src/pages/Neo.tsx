@@ -11,6 +11,7 @@ import { Experience } from '../components/sections/Experience'
 import { skins } from '../components/gallery/skins'
 import { useDynamicFavicon, useI18n, useContent } from '../hooks'
 import { otherDesigns, MENU } from '../data/designs'
+import { modo3dActivo } from '../three/modo3d'
 
 // Below the fold, each section arrives as its own chunk.
 const Years = lazy(() => import('../components/sections/Years').then((mod) => ({ default: mod.Years })))
@@ -377,7 +378,8 @@ function NeoContent() {
                     className={`pointer-events-none absolute inset-0 h-full w-full object-cover ${isDark ? "opacity-[0.07]" : "opacity-[0.14]"}`}
                   />
                   {/* Matte pale blob, desktop+motion-ok+in-view only — idles and drifts with scroll behind the readout tiles. */}
-                  <ScrollObject variant="softui" className="opacity-70" />
+                  {/* `?3d=1`: the obsidian pieces replace this ambient object (two WebGL contexts and two copies of three otherwise). */}
+                  {!modo3dActivo() && <ScrollObject variant="softui" className="opacity-70" />}
                   <div className="relative">
                     <p className={`text-[11px] font-bold uppercase tracking-[0.2em] ${muted}`}>{c.sections.now.label}</p>
                     <div className="mt-3 flex items-center gap-2">
