@@ -4,7 +4,7 @@ import { useGLTF, useTexture } from '@react-three/drei'
 import * as THREE from 'three'
 import { DEG, useMateriales, type CamaraAsset } from '../estudio'
 import type { PropsPieza, Puntero } from '../tipos'
-import { sinAsentar } from './util'
+import { acotarDt, sinAsentar } from './util'
 import laptopCamara from './camaras/dispositivos-laptop.camara.json'
 import telefonoCamara from './camaras/dispositivos-telefono.camara.json'
 
@@ -40,9 +40,10 @@ function usePantalla(url: string) {
 
 function useInclinacion(interactiva: boolean, puntero: { current: Puntero }, base: [number, number], k: [number, number], damp: number) {
   const g = useRef<THREE.Group>(null)
-  useFrame((state, dt) => {
+  useFrame((state, dtCrudo) => {
     const grupo = g.current
     if (!grupo || !interactiva) return
+    const dt = acotarDt(dtCrudo)
     const objY = base[0] + puntero.current.x * k[0]
     const objX = base[1] - puntero.current.y * k[1]
     grupo.rotation.y = THREE.MathUtils.damp(grupo.rotation.y, objY, damp, dt)

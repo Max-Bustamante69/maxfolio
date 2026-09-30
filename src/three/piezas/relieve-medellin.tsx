@@ -4,7 +4,7 @@ import { useGLTF, useTexture } from '@react-three/drei'
 import * as THREE from 'three'
 import { DEG, lin, useMateriales, type CamaraAsset } from '../estudio'
 import type { PropsPieza } from '../tipos'
-import { pedirCuadro, sinAsentar } from './util'
+import { acotarDt, pedirCuadro, sinAsentar } from './util'
 import camaraJson from './camaras/relieve-medellin.camara.json'
 import recorteJson from './camaras/relieve-medellin.recorte.json'
 
@@ -78,7 +78,8 @@ export default function Pieza({ animar, interactiva, puntero, periodoPulsoMs = 3
   const yaw = cam.yaw * DEG
   const tilt = cam.tilt * DEG
 
-  useFrame((state, dt) => {
+  useFrame((state, dtCrudo) => {
+    const dt = acotarDt(dtCrudo)
     const grupo = g.current
     if (grupo && interactiva) {
       const objY = yaw + puntero.current.x * 0.1
@@ -93,7 +94,8 @@ export default function Pieza({ animar, interactiva, puntero, periodoPulsoMs = 3
         const t = (Date.now() % periodoPulsoMs) / periodoPulsoMs
         const onda = 0.5 - 0.5 * Math.cos(2 * Math.PI * t)
         perla.current.emissiveIntensity = EMISION_PERLA * (0.45 + 0.55 * Math.pow(onda, 1.6))
-        pedirCuadro(state, 20)
+        // Un pulso de 30 s (Apple) cambia menos de un 2 % de emisión por paso a 5 cuadros por segundo; uno de 1 s (Terminal) pide 15.
+        pedirCuadro(state, periodoPulsoMs >= 10000 ? 5 : 15)
       }
     }
   })

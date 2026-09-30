@@ -4,7 +4,7 @@ import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 import { DEG, useMateriales, type CamaraAsset, type MaterialesEstudio } from '../estudio'
 import type { PropsPieza } from '../tipos'
-import { sinAsentar } from './util'
+import { acotarDt, sinAsentar } from './util'
 import bundles from './camaras/objetos-feature-bundles.camara.json'
 import quiz from './camaras/objetos-feature-quiz.camara.json'
 import subscriptions from './camaras/objetos-feature-subscriptions.camara.json'
@@ -45,9 +45,10 @@ export default function Pieza({ interactiva, puntero, estado = 'bundles' }: Prop
   const yaw = cam.yaw * DEG
   const tilt = cam.tilt * DEG
   const g = useRef<THREE.Group>(null)
-  useFrame((state, dt) => {
+  useFrame((state, dtCrudo) => {
     const grupo = g.current
     if (!grupo || !interactiva) return
+    const dt = acotarDt(dtCrudo)
     const objY = yaw + puntero.current.x * 0.22
     const objX = tilt - puntero.current.y * 0.1
     grupo.rotation.y = THREE.MathUtils.damp(grupo.rotation.y, objY, 6, dt)

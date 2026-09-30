@@ -5,7 +5,7 @@ import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 import { DEG, useMateriales, type CamaraAsset, type MaterialesEstudio } from '../estudio'
 import type { PropsPieza } from '../tipos'
-import { pedirCuadro, sinAsentar } from './util'
+import { acotarDt, pedirCuadro, sinAsentar } from './util'
 import camaraJson from './camaras/orbita-tiendas.camara.json'
 import datosJson from './camaras/orbita-tiendas.datos.json'
 
@@ -62,7 +62,7 @@ function Cuenta({ nodo, resaltada, material, suave, onOver }: CuentaProps) {
     const malla = ref.current
     if (!malla) return
     const objetivo = resaltada ? ESCALA_RESALTE : 1
-    const actual = suave ? THREE.MathUtils.damp(malla.scale.x, objetivo, AMORTIGUACION, dt) : objetivo
+    const actual = suave ? THREE.MathUtils.damp(malla.scale.x, objetivo, AMORTIGUACION, acotarDt(dt)) : objetivo
     malla.scale.setScalar(actual)
     if (suave && sinAsentar(actual, objetivo, 1e-3)) state.invalidate()
   })
@@ -87,7 +87,7 @@ function Anillo({ anio, nodos, resaltado, animar, suave, onOver, m }: AnilloProp
   const i = ANIOS.indexOf(anio)
   useFrame((state, dt) => {
     if (!ref.current || !animar) return
-    ref.current.rotation.z += 2 * Math.PI * VUELTAS_POR_SEG(i) * dt
+    ref.current.rotation.z += 2 * Math.PI * VUELTAS_POR_SEG(i) * acotarDt(dt)
     pedirCuadro(state, 30)
   })
   return (

@@ -4,7 +4,7 @@ import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 import { DEG, lin, useMateriales, type CamaraAsset } from '../estudio'
 import type { PropsPieza, SkinId } from '../tipos'
-import { pedirCuadro, sinAsentar } from './util'
+import { acotarDt, pedirCuadro, sinAsentar } from './util'
 import camaraJson from './camaras/monograma-mb.camara.json'
 
 /**
@@ -19,6 +19,10 @@ import camaraJson from './camaras/monograma-mb.camara.json'
 export const camaraDe = (): CamaraAsset => camaraJson as unknown as CamaraAsset
 
 const AMPLITUD_YAW = 9 // grados, bucle estándar del estudio
+/** Sin mover el puntero durante tanto tiempo (s) la flotación se asienta en la pose del póster y deja de pedir cuadros. */
+const REPOSO_S = 8
+/** La firma flota a 30 cuadros por segundo: es un movimiento de 9° cada 4 s, no hace falta más. */
+const FPS = 30
 
 /** Mismos hex que `src/data/designs.ts` (accent por skin), en lineal. */
 export const ACENTOS_SKIN: Record<SkinId, THREE.Color> = {
@@ -45,18 +49,33 @@ export default function Pieza({ animar, interactiva, puntero, acento = 'apple' }
   const cam = camaraDe()
   const yaw = cam.yaw * DEG
   const tilt = cam.tilt * DEG
-  useFrame((state, dt) => {
+  // Reloj de LA PIEZA, no del Canvas (que lleva vivo desde la primera pieza de la página): la flotación arranca en el
+  // seno 0 = la pose del póster, y el primer cuadro 3D coincide con él.
+  const t0 = useRef<number | undefined>(undefined)
+  const despierto = useRef(0) // último movimiento del puntero (s de la pieza)
+  const amplitud = useRef(1) // 1 = flotando, 0 = asentada en la pose del póster
+  const ultimo = useRef({ x: 0, y: 0 })
+  useFrame((state, dtCrudo) => {
     const grupo = g.current
     if (!grupo || (!animar && !interactiva)) return
-    const w = animar ? (2 * Math.PI * state.clock.elapsedTime) / 4 : 0
+    const dt = acotarDt(dtCrudo)
+    const t = state.clock.elapsedTime - (t0.current ??= state.clock.elapsedTime)
     const px = interactiva ? puntero.current.x : 0
     const py = interactiva ? puntero.current.y : 0
-    const objY = yaw + (animar ? AMPLITUD_YAW * DEG * Math.sin(w) : 0) + px * 0.25
-    const objX = tilt + (animar ? 2 * DEG * Math.cos(w) : 0) - py * 0.12
+    if (px !== ultimo.current.x || py !== ultimo.current.y) {
+      ultimo.current = { x: px, y: py }
+      despierto.current = t
+    }
+    const activa = t - despierto.current < REPOSO_S
+    amplitud.current = THREE.MathUtils.damp(amplitud.current, activa ? 1 : 0, 2, dt)
+    const a = animar ? amplitud.current : 0
+    const w = (2 * Math.PI * t) / 4
+    const objY = yaw + a * AMPLITUD_YAW * DEG * Math.sin(w) + px * 0.25
+    const objX = tilt + a * 2 * DEG * Math.cos(w) - py * 0.12
     grupo.rotation.y = THREE.MathUtils.damp(grupo.rotation.y, objY, 5, dt)
     grupo.rotation.x = THREE.MathUtils.damp(grupo.rotation.x, objX, 5, dt)
-    grupo.position.y = animar ? 0.07 * Math.sin(w) : 0
-    if (animar) pedirCuadro(state, 60)
+    grupo.position.y = a * 0.07 * Math.sin(w)
+    if (animar && (activa || a > 1e-3)) pedirCuadro(state, FPS)
     else if (sinAsentar(grupo.rotation.y, objY) || sinAsentar(grupo.rotation.x, objX)) state.invalidate()
   })
   return (
