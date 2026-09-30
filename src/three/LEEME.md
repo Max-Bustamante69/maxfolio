@@ -2,11 +2,17 @@
 
 Infraestructura para llevar al portafolio las piezas 3D aprobadas (Blender/Cycles → póster + GLB + gemela R3F medida).
 **Todo va detrás de `?3d=1`.** Sin ese parámetro (ni el interruptor persistente que activa) el sitio es el de siempre:
-mismo DOM, mismo CSS, mismos chunks; solo una comprobación de ~200 bytes en `main.tsx`.
+mismo DOM (salvo ruido de animación), CSS idéntico byte a byte (mismo hash que `main`), cero peticiones nuevas. Lo único que
+viaja en el JS inicial es el interruptor (`flag3d.ts`) y los `if` de las páginas: medido contra `origin/main`, `main.js`
+crece **+0,8 kB gzip (+0,5 %)** y cada ruta carga entre +1,0 y +2,0 kB gzip de JS de sitio en total.
 
 ## Interruptor
 
 - `?3d=1` activa y guarda `maxfolio:3d=1` en localStorage (sigue activo en todas las rutas y visitas). `?3d=0` lo apaga y lo borra.
+  Vive en `flag3d.ts` (`modo3dActivo()` + `lazySiFlag()`, ~0,3 kB): es lo único de `src/three` que toca el chunk inicial. `modo3d.ts`
+  (laboratorio y `forzar`) solo lo importa `arrancar`. Las secciones cargan sus vistas 3D con `lazySiFlag` (`null` sin el flag, decidido
+  al primer uso y con la anotación PURE): un `flag ? lazy(...) : null` a nivel de módulo es un efecto secundario y arrastraba
+  `ShopifyWork.js` a `/menu`.
 - `?3d=1&lab` abre el **laboratorio** (`Laboratorio3D.tsx`): las 5 piezas y todas sus variantes, póster de Cycles a la
   izquierda y gemela en tiempo real a la derecha, con los interruptores `interactiva`, `animar`, `progreso` y `seleccionado`.
   `&forzar` se salta las heurísticas de gama baja (no las de accesibilidad ni WebGL2).
@@ -36,7 +42,6 @@ import { Pieza3D } from '../three/Pieza3D'
 | `captura` | Dispositivos: otra captura con el aspecto EXACTO de la pantalla (390:844 / 1440:900). |
 | `prioridad` | Póster con `fetchpriority=high` y sin lazy (pieza de la primera pantalla). |
 | `soloPoster` | No monta el 3D aunque pueda. |
-| `sinFlag` | `'nada'` (defecto: sin `?3d=1` devuelve `null`) o `'poster'` (pinta el póster también sin el flag). |
 | `className` `style` `alt` `sizes` | La caja tiene `aspect-ratio` fijo (el del póster): dale ancho y ya está. `alt` por defecto es una descripción en inglés. |
 
 `Pieza3D` con el 3D apagado devuelve `null`: quien la integre en una página no cambia esa página sin el flag.
@@ -58,9 +63,22 @@ Pieza3DVista.tsx  cámara del asset + gemela (piezas/*.tsx) + EntornoEstudio + a
   libera a > 2.5 pantallas. Al dibujar el primer cuadro, el póster se desvanece bajo el 3D (una vista es un recorte del
   Canvas compartido y no admite opacidad propia sin recompilar shaders, por eso se desvanece el póster).
 - **`frameloop="demand"`**: no se dibuja nada hasta que algo lo pide (scroll/resize, puntero, `progreso`, animaciones activas).
-  Medido: 0 llamadas de dibujo en 2 s con el laboratorio quieto. Los bucles lentos piden cuadros temporizados (anillos 30 fps, pulso 20 fps).
+  Los bucles lentos piden cuadros temporizados (monograma y anillos 30 fps, pulso del relieve 5 fps a 30 s y 15 fps a 1 s).
+  `pedirCuadro` deja UN temporizador pendiente por cadencia: el `useFrame` de todas las piezas corre en cada cuadro y antes cada
+  cuadro sembraba un temporizador nuevo que sembraba otro, así que los bucles se multiplicaban y no se apagaban.
+  Medido en la cabecera quieta (dibujos por segundo, GPU real): Luxury y Brutalist **20 → 0** a los ~12 s (el monograma flota 8 s
+  sin puntero, se asienta en la pose del póster y deja de pedir cuadros; el puntero lo despierta); Apple 20 → 5 (solo el pulso del
+  relieve); Terminal 13 (pulso de 1 s). Antes: 60 por segundo sin fin.
+- **Scroll rápido = póster**: el Canvas fijo va ~20 ms (1,2 cuadros) por detrás del DOM (medido: 34 px a 1750 px/s). `Escena3D`
+  mide la velocidad del scroll de la página; por encima de 700 px/s las piezas enseñan su póster (que es DOM y va pegado a su
+  texto) y ocultan la vista (`<View visible={false}>`), y 150 ms después de parar vuelve el 3D. La pose del póster y la del 3D
+  coinciden, así que no hay salto. El marco CSS de Productos hace lo mismo con `data-estado3d`.
+- **Primer cuadro = póster**: `dt` acotado a 1/30 s en todas las gemelas (con `demand` el primer cuadro traía todo el tiempo ocioso
+  y la órbita saltaba hasta 18° por segundo de inactividad) y el monograma cuenta su fase desde que se monta, no desde que se creó
+  el Canvas. Diferencia con el póster en el primer cuadro dibujado (0-255): órbita 32,6 → 3,1; monograma 9,9 → 3,4.
 - **three solo si hace falta**: sin `?3d=1` no se pide nada; con él y sin ninguna `<Pieza3D>` en la página solo baja `arrancar`
-  (~1.5 kB gzip); three/R3F/drei entran cuando hay una pieza cerca del viewport y el navegador está idle.
+  (~1.5 kB gzip); three/R3F/drei entran cuando hay una pieza cerca del viewport y el navegador está idle. La sonda WebGL (un
+  contexto desechable) espera a esa primera pieza: `/menu` y `/arcade` con el flag no crean ningún contexto.
 - **Póster (sin three) para**: `prefers-reduced-motion` (ni con `&forzar`), sin WebGL2, Save-Data, red 2G/3G, < 4 GB de RAM,
   < 4 núcleos, renderizado por software (SwiftShader/llvmpipe) y contexto WebGL perdido.
 - **Draco local**: GLB con Draco, decodificador servido desde `/draco/` (nada de CDN de gstatic).
@@ -85,8 +103,18 @@ renderer hace inestable el PMREM de three.
 ## Pendientes / decisiones abiertas
 
 - Póster exacto de Cycles para brutalist/neo/persona/terminal (hoy derivados del de apple) y de los estados `_p0/_p50` de la órbita.
-- `dispositivos · pareja` (laptop + teléfono juntos) no tiene GLB conjunto: solo póster. `relieve-medellin · pequena`: solo póster (otra geometría de curvas).
+- `dispositivos · pareja` (laptop + teléfono juntos) no tiene GLB conjunto: solo póster (y lleva desenfoque de profundidad en las
+  pantallas que la gemela dibuja nítidas). `relieve-medellin · pequena`: solo póster (otra geometría de curvas).
 - Cabeceras de caché largas para `/3d/*` y `/draco/*` (`vercel.json`, sin tocar aquí): los nombres no llevan hash.
 - El Canvas está por encima del contenido (z-30) y por debajo del nav (z-40): si una skin tiene elementos con z-index entre 30 y 40 que deban tapar una pieza, ajustar `--escena3d-z`.
-- Desfase de un cuadro entre el scroll del DOM y el Canvas fijo (limitación del patrón `View`); medir con scroll rápido en móvil real.
-- Decidir si el 3D pasa a ser el predeterminado y qué hace con `ScrollObject` (el estudio propone que el monograma lo sustituya).
+- Fidelidad póster/3D que sigue abierta (el estudio no retoca luces por pieza): la cara superior del monograma pierde su degradado
+  gris (Luxury ~21 % más oscuro en contexto) y los objetos de fila pierden la sombra de contacto del póster (fundido de 140 ms).
+- Cobertura: firma MB solo en Apple, Luxury y Brutalist. Neo pierde su objeto ambiental con el flag y no gana firma (su panel no
+  tiene hueco libre); Terminal conserva su MB en píxeles; Persona (`/arcade`) no tiene ninguna pieza. La órbita no está en Apple
+  (Apple no monta `Years`).
+- Táctil: el 3D no se descarga hasta que el usuario abre la Órbita o la pestaña Apps y plataforma (~285 kB gzip de JS + ~0,7 MB de
+  GLB/HDRI/Draco); decidir si en `(pointer: coarse)` esas dos vistas se quedan en póster.
+- Tarjeta «Ahora» de Apple: con el relieve crece 25 px respecto al cascarón estático (CLS 0,006 con el flag); limitar el relieve al
+  alto de las 3 filas lo dejaría en 0 a costa de dejarlo en póster.
+- Un enlace compartido con `?3d=1` activa el 3D para siempre en ese navegador y solo `?3d=0` lo apaga: no hay control visible.
+- Decidir si el 3D pasa a ser el predeterminado (y, entonces, retirar `ScrollObject`, que con el flag ya no se monta en Luxury, Brutalist y Neo).

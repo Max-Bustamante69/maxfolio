@@ -58,8 +58,12 @@ sharp (captures) · Bun · Vercel (with `vercel.json` SPA rewrite).
 
 Obsidian-studio 3D pieces (Blender/Cycles poster + GLB + measured R3F twin) live in `src/three` behind `?3d=1`:
 one persistent Canvas (drei `View`), poster first, lazy three, poster-only on reduced-motion / low-end devices.
-Without the flag the site is unchanged. See `src/three/LEEME.md` (usage, architecture, pending work) and
-`public/3d/README.md` (asset provenance and weights). Lab: `/?3d=1&lab`. QA: `node scripts/qa-3d.mjs` after `bun run build`.
+Without the flag the site is unchanged (same DOM, byte-identical CSS, no new requests; `main.js` +0.8 kB gzip). With it:
+the MB monogram in the hero of Apple, Luxury and Brutalist; the Aburrá relief beside the live clock (Apple, Terminal); a
+«Chart / Orbit» switch in the Years section; one feature object per store row (from 1280 px) and laptop + phone with the real
+capture in the Apps tab. `?3d=0` switches it off again (the flag persists in `localStorage`). See `src/three/LEEME.md` (usage,
+architecture, measurements, pending work), `src/components/sections/work3d/LEEME.md` and `public/3d/README.md` (asset provenance
+and weights). Lab: `/?3d=1&lab`. QA: `node scripts/qa-3d.mjs` after `bun run build`.
 
 ## Development
 
