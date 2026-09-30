@@ -25,19 +25,28 @@ function sondaWebgl(): { webgl2: boolean; software: boolean } {
 
 /**
  * ¿Merece la pena descargar three? No para: prefers-reduced-motion (accesibilidad, ni siquiera con `forzar`),
- * sin WebGL2, Save-Data, red 2G/3G, < 4 GB de RAM, < 4 núcleos o renderizado por software. Todo eso = póster.
- * `forzar` (solo laboratorio) se salta las heurísticas de equipo, no las de accesibilidad ni la de WebGL2.
+ * Save-Data, red 2G/3G, < 4 GB de RAM o < 4 núcleos. Todo eso = póster. Son comprobaciones baratas: no crean ningún
+ * contexto WebGL, así que se hacen antes de saber si la página tiene alguna pieza.
+ * `forzar` (solo laboratorio) se salta las heurísticas de equipo, no la de accesibilidad.
  */
-export function evaluarCapacidad(forzar = false): Veredicto {
+export function evaluarEquipo(forzar = false): Veredicto {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return { ok: false, motivo: 'prefers-reduced-motion' }
-  const sonda = sondaWebgl()
-  if (!sonda.webgl2) return { ok: false, motivo: 'sin-webgl2' }
   if (forzar) return { ok: true }
   const nav = navigator as NavegadorExtra
   if (nav.connection?.saveData) return { ok: false, motivo: 'save-data' }
   if (/^(slow-2g|2g|3g)$/.test(nav.connection?.effectiveType ?? '')) return { ok: false, motivo: 'red-lenta' }
   if ((nav.deviceMemory ?? 8) < 4) return { ok: false, motivo: 'memoria-baja' }
   if ((nav.hardwareConcurrency ?? 8) < 4) return { ok: false, motivo: 'cpu-baja' }
-  if (sonda.software) return { ok: false, motivo: 'render-por-software' }
+  return { ok: true }
+}
+
+/**
+ * Sin WebGL2 o con renderizado por software = póster. Crea un contexto desechable, así que solo se llama cuando ya hay
+ * una pieza cerca del viewport: una página con el flag y sin piezas (`/menu`, `/arcade`) no crea ninguno.
+ */
+export function evaluarWebgl(forzar = false): Veredicto {
+  const sonda = sondaWebgl()
+  if (!sonda.webgl2) return { ok: false, motivo: 'sin-webgl2' }
+  if (!forzar && sonda.software) return { ok: false, motivo: 'render-por-software' }
   return { ok: true }
 }

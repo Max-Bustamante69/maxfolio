@@ -73,10 +73,14 @@ interface PropsVista {
   seleccionado?: string
   periodoPulsoMs?: number
   captura?: string
+  /** Falso = la vista no se dibuja (scroll rápido: se ve el póster del DOM). */
+  visible: boolean
   onDibujada: () => void
 }
 
-function Montaje({ mod, onDibujada, ...p }: PropsVista & { mod: ModuloPieza }) {
+type PropsContenido = Omit<PropsVista, 'visible'>
+
+function Montaje({ mod, onDibujada, ...p }: PropsContenido & { mod: ModuloPieza }) {
   const cam = mod.camaraDe(p.estado)
   const { posicion, centro } = useMemo(() => camaraDesdeJson(cam), [cam])
   const Pieza = mod.default
@@ -93,13 +97,13 @@ function Montaje({ mod, onDibujada, ...p }: PropsVista & { mod: ModuloPieza }) {
 }
 
 /** Un chunk por gemela (three, GLB y normal maps solo se piden si la página monta esa pieza). */
-const cache = new Map<SlugPieza, ComponentType<PropsVista>>()
+const cache = new Map<SlugPieza, ComponentType<PropsContenido>>()
 function contenidoDe(slug: SlugPieza) {
   let c = cache.get(slug)
   if (!c) {
     c = lazy(async () => {
       const mod = await CARGADORES[slug]()
-      return { default: (p: PropsVista) => <Montaje mod={mod} {...p} /> }
+      return { default: (p: PropsContenido) => <Montaje mod={mod} {...p} /> }
     })
     cache.set(slug, c)
   }
@@ -111,10 +115,10 @@ function contenidoDe(slug: SlugPieza) {
  * DOM y túnel-a su contenido al `View.Port` de Escena3D. Lo que suspende (GLB, HDRI, normal map) queda dentro
  * de este Suspense, así la pieza aparece de golpe y nunca deja bloqueado el resto del Canvas.
  */
-export default function Vista(props: PropsVista) {
+export default function Vista({ visible, ...props }: PropsVista) {
   const Contenido = contenidoDe(props.slug)
   return (
-    <View style={{ position: 'absolute', inset: 0, pointerEvents: props.interactiva ? 'auto' : 'none' }}>
+    <View visible={visible} style={{ position: 'absolute', inset: 0, pointerEvents: props.interactiva ? 'auto' : 'none' }}>
       <Suspense fallback={null}>
         <Contenido {...props} />
       </Suspense>

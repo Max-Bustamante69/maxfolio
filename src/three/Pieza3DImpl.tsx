@@ -22,7 +22,7 @@ export default function Pieza3DImpl(props: Pieza3DProps) {
     className, style, alt, sizes = '600px', prioridad = false, soloPoster = false,
   } = props
   const def = useMemo(() => resolver(slug, estado, acento), [slug, estado, acento])
-  const { fase } = useEscena3d()
+  const { fase, rapido } = useEscena3d()
   const caja = useRef<HTMLDivElement>(null)
   const puntero = useRef<Puntero>({ x: 0, y: 0 })
   const [montada, setMontada] = useState(false)
@@ -77,15 +77,21 @@ export default function Pieza3DImpl(props: Pieza3DProps) {
     invalidar3d()
   }
 
+  // Scroll rápido: el Canvas va ~1 cuadro por detrás del DOM, así que se enseña el póster (DOM, pegado a su texto) y
+  // se oculta la vista; al parar vuelve el 3D. La pose del póster y la de la gemela coinciden, así que no hay salto.
+  useEffect(() => {
+    invalidar3d()
+  }, [rapido])
+
   const { poster } = def
-  const en3d = montada && dibujada && fase === 'lista'
+  const en3d = montada && dibujada && fase === 'lista' && !rapido
   return (
     <div
       ref={caja}
       className={className}
       style={{ position: 'relative', aspectRatio: `${poster.w} / ${poster.h}`, ...style }}
       data-pieza3d={slug}
-      data-estado3d={en3d ? '3d' : montada && fase === 'lista' ? 'cargando' : 'poster'}
+      data-estado3d={en3d ? '3d' : montada && fase === 'lista' && !dibujada ? 'cargando' : 'poster'}
       onPointerMove={interactiva && en3d ? mover : undefined}
       onPointerLeave={interactiva && en3d ? soltar : undefined}
     >
@@ -103,7 +109,7 @@ export default function Pieza3DImpl(props: Pieza3DProps) {
           draggable={false}
           style={{
             position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', pointerEvents: 'none',
-            opacity: en3d ? 0 : 1, transition: 'opacity 450ms ease-out',
+            opacity: en3d ? 0 : 1, transition: rapido ? 'none' : 'opacity var(--fundido-3d, 450ms) ease-out',
           }}
         />
       </picture>
@@ -112,7 +118,7 @@ export default function Pieza3DImpl(props: Pieza3DProps) {
           <Vista
             slug={slug} estado={estado} interactiva={interactiva} animar={animar} progreso={leerProgreso}
             puntero={puntero} acento={acento} seleccionado={seleccionado} periodoPulsoMs={periodoPulsoMs}
-            captura={captura} onDibujada={() => setDibujada(true)}
+            captura={captura} visible={!rapido} onDibujada={() => setDibujada(true)}
           />
         </Suspense>
       )}

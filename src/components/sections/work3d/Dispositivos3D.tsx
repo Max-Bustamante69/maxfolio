@@ -65,7 +65,8 @@ export default function Dispositivos3D({ capturaLaptop, capturaTelefono, precarg
 
   const clavePrecarga = precarga.join('|')
   useEffect(() => {
-    if (degradada || !clavePrecarga) return
+    // En táctil no se precargan (datos móviles): el cambio de producto espera a su captura, como el marco CSS de siempre.
+    if (degradada || !clavePrecarga || matchMedia('(pointer: coarse)').matches) return
     const pedir = () => clavePrecarga.split('|').forEach((src) => {
       const img = new Image()
       img.src = src

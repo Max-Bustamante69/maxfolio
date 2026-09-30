@@ -93,7 +93,7 @@ export function Products({ skin, onOpen, select }: ProductsProps) {
           <div className="relative mb-8 w-full" style={{ maxWidth: 600, aspectRatio: '1.25 / 1' }}>
             <div
               inert={estado3d === '3d'}
-              style={{ position: 'absolute', left: '10.9%', top: '50%', width: '78.2%', transform: 'translateY(-50%)', opacity: estado3d === '3d' ? 0 : 1, transition: 'opacity 220ms ease-out' }}
+              style={{ position: 'absolute', left: '10.9%', top: '50%', width: '78.2%', transform: 'translateY(-50%)', opacity: estado3d === '3d' ? 0 : 1, transition: estado3d === '3d' ? 'opacity 220ms ease-out' : 'none' }}
             >
               {marco}
             </div>

@@ -1,4 +1,4 @@
-import { evaluarCapacidad } from './capacidad'
+import { evaluarEquipo, evaluarWebgl } from './capacidad'
 import { fijarFase, leerEstado, suscribir } from './estado3d'
 import { modo3d } from './modo3d'
 
@@ -30,13 +30,19 @@ export default async function arrancar() {
   // El laboratorio se monta siempre (con el equipo degradado enseña los pósters); las piezas reales, solo si el equipo lo merece.
   let eventSource: HTMLElement | null = document.getElementById('root')
   if (modo.lab) eventSource = (await import('./Laboratorio3D')).montarLab()
-  const veredicto = evaluarCapacidad(modo.forzar)
-  if (!veredicto.ok) {
-    fijarFase('degradada', veredicto.motivo)
+  const equipo = evaluarEquipo(modo.forzar)
+  if (!equipo.ok) {
+    fijarFase('degradada', equipo.motivo)
     return
   }
   fijarFase('cargando')
   await primeraPieza()
+  // Recién ahora, con una pieza a la vista, se prueba WebGL (un contexto desechable): sin piezas nunca se crea.
+  const webgl = evaluarWebgl(modo.forzar)
+  if (!webgl.ok) {
+    fijarFase('degradada', webgl.motivo)
+    return
+  }
   await idle()
   const { montarEscena } = await import('./Escena3D')
   montarEscena({ eventSource, z: modo.lab ? 50 : undefined })

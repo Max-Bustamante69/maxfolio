@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { Canvas, useThree } from '@react-three/fiber'
 import { View } from '@react-three/drei'
 import * as THREE from 'three'
-import { enlazarInvalidador, fijarFase } from './estado3d'
+import { enlazarInvalidador, fijarFase, fijarRapido } from './estado3d'
 
 /**
  * UN Canvas persistente para todas las piezas 3D del sitio (patrón drei `View`/`View.Port`): `position: fixed`,
@@ -13,6 +13,11 @@ import { enlazarInvalidador, fijarFase } from './estado3d'
  * Se monta en un root de React aparte (fuera de `#root`), así el sitio y su DOM no cambian sin `?3d=1`.
  */
 
+/** Scroll de página más rápido que esto (px/s) = «rápido»: medido, el Canvas va ~20 ms (1,2 cuadros) por detrás del DOM, ~34 px a 1750 px/s. */
+const VELOCIDAD_RAPIDA = 700
+/** Sin eventos de scroll durante tanto tiempo, el scroll rápido terminó y vuelve el 3D. */
+const REPOSO_SCROLL_MS = 150
+
 /** Mantiene despierto el frameloop "demand" con lo que mueve las cajas (scroll y resize) y vigila el contexto. */
 function Motor() {
   const invalidate = useThree((s) => s.invalidate)
@@ -20,8 +25,28 @@ function Motor() {
   useEffect(() => {
     const pedir = () => invalidate()
     enlazarInvalidador(pedir)
+    // Velocidad del scroll de la PÁGINA (el DOM se desplaza en el compositor y el Canvas en el hilo principal: con scroll
+    // rápido las piezas «nadan» respecto a su texto). Mientras dura, las piezas enseñan su póster, que es DOM y va pegado.
+    let y0 = scrollY
+    let t0 = performance.now()
+    let parar = 0
+    const alScroll = () => {
+      invalidate()
+      const t = performance.now()
+      if (t - t0 >= 40) {
+        if ((Math.abs(scrollY - y0) / (t - t0)) * 1000 > VELOCIDAD_RAPIDA) fijarRapido(true)
+        y0 = scrollY
+        t0 = t
+      }
+      clearTimeout(parar)
+      parar = window.setTimeout(() => {
+        fijarRapido(false)
+        y0 = scrollY
+        t0 = performance.now()
+      }, REPOSO_SCROLL_MS)
+    }
     // capture: también los scrolls de contenedores internos (el laboratorio, modales con overflow).
-    addEventListener('scroll', pedir, { passive: true, capture: true })
+    addEventListener('scroll', alScroll, { passive: true, capture: true })
     addEventListener('resize', pedir, { passive: true })
     visualViewport?.addEventListener('resize', pedir)
     const perdido = (e: Event) => {
@@ -32,8 +57,10 @@ function Motor() {
     const info = gl.getContext().getExtension('WEBGL_debug_renderer_info')
     if (info) document.documentElement.dataset.gl3d = String(gl.getContext().getParameter(info.UNMASKED_RENDERER_WEBGL))
     return () => {
+      clearTimeout(parar)
+      fijarRapido(false)
       enlazarInvalidador(undefined)
-      removeEventListener('scroll', pedir, { capture: true })
+      removeEventListener('scroll', alScroll, { capture: true })
       removeEventListener('resize', pedir)
       visualViewport?.removeEventListener('resize', pedir)
       gl.domElement.removeEventListener('webglcontextlost', perdido)
