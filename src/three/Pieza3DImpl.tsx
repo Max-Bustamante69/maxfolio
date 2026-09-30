@@ -1,7 +1,7 @@
 import { Suspense, lazy, useEffect, useMemo, useRef, useState, type PointerEvent } from 'react'
 import { resolver, urlPoster } from './catalogo'
 import { invalidar3d, registrarCerca, useEscena3d } from './estado3d'
-import { modo3dActivo } from './modo3d'
+import { modo3dActivo } from './flag3d'
 import type { Pieza3DProps, Puntero } from './tipos'
 
 // three, R3F, drei y las gemelas viven en este chunk: solo se piden cuando la escena ya está lista y la caja está cerca.

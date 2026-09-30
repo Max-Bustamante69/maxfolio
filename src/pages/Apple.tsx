@@ -11,7 +11,7 @@ import { skins } from '../components/gallery/skins'
 import { useDynamicFavicon, useI18n, useContent } from '../hooks'
 import { defaultDesign, otherDesigns, MENU } from '../data/designs'
 import { track, useSectionViewTracking } from '../lib/track'
-import { modo3dActivo } from '../three/modo3d'
+import { modo3dActivo } from '../three/flag3d'
 
 // Below the fold, each section arrives as its own chunk so the hero paints off a smaller bundle.
 const Chapters = lazy(() => import('../components/sections/Chapters').then((mod) => ({ default: mod.Chapters })))
@@ -188,7 +188,7 @@ function AppleContent() {
     setContactOpen(true)
   }
   useDynamicFavicon('apple')
-  const firma = modo3dActivo()
+  const con3d = modo3dActivo()
   // `contact_open` itself fires from inside `ContactFormModal` (one shared component, every theme) —
   // this page only needs `section_view` wired at the page level, and `data-track-section` on each
   // section id below is what feeds it.
@@ -228,7 +228,6 @@ function AppleContent() {
   const activeSection = useActiveSection([...nav.map(([href]) => href.slice(1)), 'skills', 'proof', 'engagement', 'faq'])
   const liveCount = registry.stores.filter((s) => s.status === 'live').length
   const devCount = registry.stores.filter((s) => s.status === 'dev').length
-  const relieve = modo3dActivo()
   // The Now card's three status rows (live / in development / Medellín clock); the same nodes with or without the 3D relief beside them.
   const filasAhora = (
     <>
@@ -349,7 +348,7 @@ function AppleContent() {
                   The card stays top-aligned: React appends rows to it on hydration, and a bottom- or
                   center-aligned card would move what the static shell already painted. */}
               {/* `?3d=1`: the grid becomes the containing block of the MB signature (absolute, out of flow: nothing moves). */}
-              <div className="grid gap-y-8 gap-x-10 lg:grid-cols-12 lg:items-start lg:gap-x-12 lg:gap-y-10" style={firma ? { position: 'relative' } : undefined}>
+              <div className="grid gap-y-8 gap-x-10 lg:grid-cols-12 lg:items-start lg:gap-x-12 lg:gap-y-10" style={con3d ? { position: 'relative' } : undefined}>
                 <div className="lg:col-span-12">
                   <p className={`text-sm font-semibold ${blue}`}>{c.hero.eyebrow}</p>
                   {/* The LCP element stays static: an entrance fade would delay the first meaningful
@@ -411,8 +410,15 @@ function AppleContent() {
                     can't shift it. */}
                 {/* The availability line is the card's title, flush left; every other row keeps a 14px leading slot (dot, globe or blank) so their text lines up. */}
                 {/* With `?3d=1` the card takes one more column (5, not 4) from xl up, where the Aburrá relief fits beside the status rows;
-                    at lg (1024-1279) there is no room for it, so the card stays as it is today and the relief is hidden. */}
-                <div className={relieve ? 'lg:col-span-4 lg:col-start-9 xl:col-span-5 xl:col-start-8' : 'lg:col-span-4 lg:col-start-9'}>
+                    at lg (1024-1279) there is no room for it, so the card stays as it is today and the relief is hidden. The rules live in
+                    a <style> that only exists with the flag (hoisted to <head> while rendering, so nothing moves), not in Tailwind utilities:
+                    that keeps the site's global CSS byte for byte the same without the flag. */}
+                {con3d && (
+                  <style href="ahora-3d" precedence="default">
+                    {'@media (min-width:1280px){.ahora-3d.ahora-3d{grid-column:8 / span 5}}@media (min-width:1024px) and (max-width:1279.98px){.ahora-relieve{display:none}}'}
+                  </style>
+                )}
+                <div className={con3d ? 'lg:col-span-4 lg:col-start-9 ahora-3d' : 'lg:col-span-4 lg:col-start-9'}>
                   <div className={`${skin.card} p-6 md:p-7`}>
                     <div className={`flex items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.12em] ${muted}`}>
                       <span className="relative flex h-3.5 w-3.5 items-center justify-center" aria-hidden="true">
@@ -428,11 +434,11 @@ function AppleContent() {
                     </p>
                     {/* With `?3d=1`: the three status rows on the left, the Aburrá relief on the right (its pearl beats at the clock's
                         refresh cadence). The box reserves its size up front (flex basis + aspect-ratio) so its chunk never moves anything. */}
-                    <div className={`mt-5 ${relieve ? 'flex items-center justify-between gap-2 sm:gap-4' : 'space-y-2'} border-t pt-5 text-sm ${skin.line}`}>
-                      {relieve ? (
+                    <div className={`mt-5 ${con3d ? 'flex items-center justify-between gap-2 sm:gap-4' : 'space-y-2'} border-t pt-5 text-sm ${skin.line}`}>
+                      {con3d ? (
                         <>
                           <div className="min-w-0 space-y-2" style={{ textWrap: 'pretty' }}>{filasAhora}</div>
-                          <div className="lg:hidden xl:block" style={{ flex: '1 1 80px', minWidth: 80, maxWidth: 200 }}>
+                          <div className="ahora-relieve" style={{ flex: '1 1 80px', minWidth: 80, maxWidth: 200 }}>
                             <Suspense fallback={<div style={{ aspectRatio: '1200 / 858' }} />}>
                               <AhoraRelieve periodoMs={LOCAL_TIME_MS} />
                             </Suspense>
@@ -445,7 +451,7 @@ function AppleContent() {
                   </div>
                 </div>
                 {/* `?3d=1` only: the MB monogram, absolute above the name (see components/firma3d/firma-hero.css). Last child = reading order and tab order untouched. */}
-                {firma && (
+                {con3d && (
                   <Suspense fallback={null}>
                     <FirmaHero skin="apple" oscuro={isDark} />
                   </Suspense>

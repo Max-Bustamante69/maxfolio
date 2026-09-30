@@ -1,5 +1,5 @@
 import { Suspense, lazy } from 'react'
-import { modo3dActivo } from './modo3d'
+import { modo3dActivo } from './flag3d'
 import type { Pieza3DProps } from './tipos'
 
 // Puerta ligera: sin `?3d=1` devuelve null (el DOM del sitio no cambia) y NO descarga nada. Con el 3D activo
@@ -21,7 +21,7 @@ const aspecto = (slug: string, estado?: string) =>
  * ```
  */
 export function Pieza3D(props: Pieza3DProps) {
-  if (!modo3dActivo() && props.sinFlag !== 'poster') return null
+  if (!modo3dActivo()) return null
   return (
     <Suspense fallback={<div className={props.className} style={{ aspectRatio: aspecto(props.slug, props.estado), ...props.style }} />}>
       <Impl {...props} />

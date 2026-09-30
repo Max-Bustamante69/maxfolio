@@ -51,7 +51,7 @@ const OBJ_ANCHO = 0.59
 // Ajustes de la caja del póster; el margen transparente se solapa con el hueco de al lado.
 const css = `.w3d-obj picture img{transition-duration:140ms!important}`
 
-interface Props {
+export interface ObjetosFeatureProps {
   /** Slug de la tienda (identifica la fila en la lista de filas vivas). */
   id: string
   /** Características de la tienda, por prioridad (la del filtro activo va primero). Vacío = solo el hueco. */
@@ -63,7 +63,7 @@ interface Props {
   alAbrir: () => void
 }
 
-export default function ObjetosFeature({ id, features, etiquetas, resaltada, alAbrir }: Props) {
+export default function ObjetosFeature({ id, features, etiquetas, resaltada, alAbrir }: ObjetosFeatureProps) {
   const raiz = useRef<HTMLDivElement>(null)
   const grande = useMedia('(min-width: 768px)')
   const doble = useMedia('(min-width: 1280px)')

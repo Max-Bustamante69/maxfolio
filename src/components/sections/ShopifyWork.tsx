@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useState, type MouseEvent, type ReactNode } from 'react'
+import { Suspense, useEffect, useState, type MouseEvent, type ReactNode } from 'react'
 import { AnimatePresence, m } from 'framer-motion'
 import { useContent, useSheetHistory } from '../../hooks'
 import { GalleryLightbox, type Skin } from '../gallery'
@@ -9,10 +9,11 @@ import type { StoreEntry, ProductEntry } from '../../data/registry'
 import { conversionSeries } from '../../data/illustrative'
 import { onRequestProduct, onRequestStore, scrollToSection, setCaseStudyVisible } from '../../lib/sectionLinks'
 import { track } from '../../lib/track'
-import { modo3dActivo } from '../../three/modo3d'
+import { lazySiFlag } from '../../three/flag3d'
+import type { ObjetosFeatureProps } from './work3d/ObjetosFeature'
 
 // 3D opt-in (?3d=1): objetos-hecho por característica en cada fila. Sin el flag este módulo nunca se pide y la fila es la de siempre.
-const ObjetosFeature = modo3dActivo() ? lazy(() => import('./work3d/ObjetosFeature')) : null
+const objetosSiHay = /* @__PURE__ */ lazySiFlag<ObjetosFeatureProps>(() => import('./work3d/ObjetosFeature'))
 
 /** How long a row's accent flash stays visible after the orbit links here — long enough to read as
  *  "this is the one that just opened", short enough to not linger once the shopper has moved on. */
@@ -48,6 +49,7 @@ const featuresDe = (st: StoreEntry, primero?: string) => {
 
 /** With `?3d=1`: the store's feature objects to the left of the row; without it, the row exactly as before. */
 function ConObjetos({ st, primero, etiquetas, resaltada, alAbrir, children }: { st: StoreEntry; primero?: string; etiquetas: Record<string, string>; resaltada: boolean; alAbrir: () => void; children: ReactNode }) {
+  const ObjetosFeature = objetosSiHay()
   if (!ObjetosFeature) return <>{children}</>
   return (
     <div className="relative flex items-start gap-x-4 md:items-center">

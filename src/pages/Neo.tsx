@@ -11,7 +11,7 @@ import { Experience } from '../components/sections/Experience'
 import { skins } from '../components/gallery/skins'
 import { useDynamicFavicon, useI18n, useContent } from '../hooks'
 import { otherDesigns, MENU } from '../data/designs'
-import { modo3dActivo } from '../three/modo3d'
+import { modo3dActivo } from '../three/flag3d'
 
 // Below the fold, each section arrives as its own chunk.
 const Years = lazy(() => import('../components/sections/Years').then((mod) => ({ default: mod.Years })))

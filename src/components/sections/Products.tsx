@@ -1,14 +1,14 @@
-import { Suspense, lazy, useEffect, useState, type CSSProperties } from 'react'
+import { Suspense, useEffect, useState, type CSSProperties } from 'react'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { useContent } from '../../hooks'
 import { ProjectFrame, type Skin } from '../gallery'
 import { shotsFor } from './Gallery'
 import type { ProductEntry } from '../../data/registry'
-import { modo3dActivo } from '../../three/modo3d'
-import type { EstadoDispositivos } from './work3d/Dispositivos3D'
+import { lazySiFlag } from '../../three/flag3d'
+import type { Dispositivos3DProps, EstadoDispositivos } from './work3d/Dispositivos3D'
 
 // 3D opt-in (?3d=1): laptop + teléfono del estudio con la captura real del producto. Sin el flag este módulo nunca se pide.
-const Dispositivos3D = modo3dActivo() ? lazy(() => import('./work3d/Dispositivos3D')) : null
+const dispositivosSiHay = /* @__PURE__ */ lazySiFlag<Dispositivos3DProps>(() => import('./work3d/Dispositivos3D'))
 /** Oculto a la vista pero enfocable: el marco CSS queda `inert` mientras el 3D lo tapa, y el teclado necesita su propio botón. */
 const SOLO_LECTOR: CSSProperties = { position: 'absolute', width: 1, height: 1, margin: -1, overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap' }
 
@@ -41,6 +41,7 @@ export function Products({ skin, onOpen, select }: ProductsProps) {
   const [current, setCurrent] = useState(registry.products[0])
   const c = strings.products[current.id]
   // Solo con ?3d=1: espera (marco CSS visible) -> 3d (el 3D ya dibuja, el marco se retira) | degradada (gama baja, reduced-motion, sin WebGL2: layout de siempre).
+  const Dispositivos3D = dispositivosSiHay()
   const [estado3d, setEstado3d] = useState<EstadoDispositivos>('espera')
   const [foco3d, setFoco3d] = useState(false)
   const en3d = Dispositivos3D !== null && estado3d !== 'degradada'

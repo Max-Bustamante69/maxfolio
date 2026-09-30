@@ -1,7 +1,8 @@
-import { Suspense, lazy, useState, type CSSProperties, type ComponentType, type ReactNode } from 'react'
+import { Suspense, useState, type CSSProperties, type ReactNode } from 'react'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { useContent, useMediaQuery } from '../../hooks'
 import { RevealText } from '../common'
+import { lazySiFlag } from '../../three/flag3d'
 import type { Skin } from '../gallery'
 import { WORK_KINDS, timeline, workCount, workTotal, type WorkKind, type YearEntry } from '../../data/timeline'
 import type { SectionHeading } from './Gallery'
@@ -19,19 +20,8 @@ interface YearsProps {
 }
 
 // 3D opt-in (`?3d=1`): vista alternativa «órbita de tiendas» junto al gráfico. Sin el flag esto es `null`: no se
-// descarga nada y la sección queda exactamente como siempre. Se decide al renderizar (no al evaluar el módulo) para
-// que este archivo siga sin efectos secundarios. El criterio es el de `modo3dActivo()` (src/three/modo3d.ts) escrito en
-// línea, igual que hace main.tsx: importar ese módulo añadiría una petición a las páginas que no usan el 3D.
-const flag3d = () => {
-  try {
-    const p = new URLSearchParams(location.search).get('3d')
-    return p === '1' || (p !== '0' && localStorage.getItem('maxfolio:3d') === '1')
-  } catch {
-    return false
-  }
-}
-let vistaOrbita: ComponentType<{ skin: Skin; grafico: ReactNode }> | null | undefined
-const orbitaSiHay = () => (vistaOrbita === undefined ? (vistaOrbita = flag3d() ? lazy(() => import('./YearsOrbita')) : null) : vistaOrbita)
+// descarga nada y la sección queda exactamente como siempre.
+const orbitaSiHay = /* @__PURE__ */ lazySiFlag<{ skin: Skin; grafico: ReactNode }>(() => import('./YearsOrbita'))
 
 const EASE = [0.23, 1, 0.32, 1] as const
 const NOW_YM = '2026-09'

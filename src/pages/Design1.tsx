@@ -25,7 +25,7 @@ import { skins } from '../components/gallery'
 import { Years } from '../components/sections/Years'
 import { useDynamicFavicon, useI18n, useContent } from '../hooks'
 import { designById } from '../data/designs'
-import { modo3dActivo } from '../three/modo3d'
+import { modo3dActivo } from '../three/flag3d'
 
 // MB monogram signature in the masthead, above the dateline: only with `?3d=1` (its own chunk + CSS; without the flag it is never requested nor rendered).
 const FirmaHero = lazy(() => import('../components/firma3d/FirmaHero'))

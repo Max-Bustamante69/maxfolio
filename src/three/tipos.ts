@@ -69,6 +69,4 @@ export interface Pieza3DProps {
   prioridad?: boolean
   /** No monta el 3D aunque pueda (comparativas, pruebas): solo póster. */
   soloPoster?: boolean
-  /** Con el 3D apagado (sin `?3d=1`): `'nada'` (por defecto, el sitio queda EXACTAMENTE como hoy) o `'poster'`. */
-  sinFlag?: 'nada' | 'poster'
 }

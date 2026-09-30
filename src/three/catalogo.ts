@@ -20,8 +20,6 @@ export interface Definicion {
   alt: string
 }
 
-export const SLUGS: readonly SlugPieza[] = ['monograma-mb', 'orbita-tiendas', 'objetos-feature', 'relieve-medellin', 'dispositivos']
-
 export const FEATURES = ['bundles', 'quiz', 'subscriptions', 'reviews', 'migration', 'islands', 'tracking', 'i18n'] as const
 export const DISPOSITIVOS = ['laptop', 'telefono', 'pareja'] as const
 

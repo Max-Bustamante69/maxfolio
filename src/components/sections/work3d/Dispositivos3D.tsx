@@ -26,7 +26,7 @@ const CSS = `
 
 export type EstadoDispositivos = 'espera' | '3d' | 'degradada'
 
-interface Props {
+export interface Dispositivos3DProps {
   /** `home-desktop.webp` del producto (1440:900). */
   capturaLaptop: string
   /** `home-mobile.webp` del producto (390:844). */
@@ -42,7 +42,7 @@ interface Props {
 // Referencias vivas: una imagen sin referencia puede recogerse antes de que el navegador la guarde en caché.
 const precargadas = new Set<HTMLImageElement>()
 
-export default function Dispositivos3D({ capturaLaptop, capturaTelefono, precarga = [], alAbrir, alEstado }: Props) {
+export default function Dispositivos3D({ capturaLaptop, capturaTelefono, precarga = [], alAbrir, alEstado }: Dispositivos3DProps) {
   const raiz = useRef<HTMLDivElement>(null)
   const { fase } = useEscena3d()
   const degradada = fase === 'degradada'

@@ -11,7 +11,7 @@ import { useDynamicFavicon, useI18n, useContent } from '../hooks'
 import { designs, otherDesigns, MENU } from '../data/designs'
 import { fleetLiquidLines, fleetIslandLines } from '../data/skillUsage'
 import changelogData from '../data/changelog.json'
-import { modo3dActivo } from '../three/modo3d'
+import { modo3dActivo } from '../three/flag3d'
 
 // Aburrá Valley relief beside the SYS.LOCATION clock: only with `?3d=1` (its own chunk; without the flag it is never requested nor rendered).
 const AhoraRelieve = lazy(() => import('../components/common/AhoraRelieve'))
