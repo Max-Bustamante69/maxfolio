@@ -1,5 +1,5 @@
 import { m, AnimatePresence } from 'framer-motion'
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { ThemeProvider, useTheme } from '../context/ThemeContext'
 import {
   ContactFormModal,
@@ -25,6 +25,10 @@ import { skins } from '../components/gallery'
 import { Years } from '../components/sections/Years'
 import { useDynamicFavicon, useI18n, useContent } from '../hooks'
 import { designById } from '../data/designs'
+import { modo3dActivo } from '../three/modo3d'
+
+// MB monogram signature in the masthead, above the dateline: only with `?3d=1` (its own chunk + CSS; without the flag it is never requested nor rendered).
+const FirmaHero = lazy(() => import('../components/firma3d/FirmaHero'))
 
 // Theme Toggle - Brutalist Design
 const ThemeToggle = ({ size = 'md' }: { size?: 'sm' | 'md' }) => {
@@ -105,6 +109,7 @@ function Design1Content() {
 
   // Dynamic favicon
   useDynamicFavicon('brutalist')
+  const firma = modo3dActivo()
 
   const skin = skins.brutalist(isDark)
   const self = designById('brutalist')
@@ -316,6 +321,12 @@ function Design1Content() {
                 </div>
               </m.div>
             </div>
+            {/* `?3d=1` only: the MB monogram, absolute over the section (see components/firma3d/firma-hero.css); out of flow, so nothing moves. */}
+            {firma && (
+              <Suspense fallback={null}>
+                <FirmaHero skin="brutalist" oscuro={isDark} />
+              </Suspense>
+            )}
           </section>
 
           {/* Torn-collage diagonal strip — a raw editorial cut between the hero and the ticker */}

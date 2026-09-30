@@ -1,5 +1,5 @@
 import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { useState, ReactNode } from "react";
+import { lazy, Suspense, useState, ReactNode } from "react";
 import { ThemeProvider, useTheme } from "../context/ThemeContext";
 import {
   ContactFormModal,
@@ -27,6 +27,10 @@ import { skins } from "../components/gallery";
 import { Years } from "../components/sections/Years";
 import { useDynamicFavicon, useI18n, useContent } from "../hooks";
 import { designById, otherDesigns, MENU } from "../data/designs";
+import { modo3dActivo } from "../three/modo3d";
+
+// MB monogram signature at the top right of the hero: only with `?3d=1` (its own chunk + CSS; without the flag it is never requested nor rendered).
+const FirmaHero = lazy(() => import("../components/firma3d/FirmaHero"));
 
 // Theme Toggle Button - Luxury Minimal Design
 const ThemeToggle = ({ size = "md" }: { size?: "sm" | "md" }) => {
@@ -127,6 +131,7 @@ function Design4Content() {
 
   // Dynamic favicon
   useDynamicFavicon("luxury");
+  const firma = modo3dActivo();
 
   const skin = skins.luxury(isDark);
   const self = designById("luxury");
@@ -361,7 +366,8 @@ function Design4Content() {
                 {/* Side Stats */}
                 <div className="lg:col-span-4 relative isolate">
                   {/* Procedural gold torus knot, desktop+motion-ok+in-view only — drifts with scroll, tilts ±6° toward the pointer. `isolate` above gives this column its own stacking context so z-0 here stays contained instead of escaping to some unrelated ancestor. Sits behind the stats, never intercepts clicks. */}
-                  <ScrollObject variant="luxury" className="-inset-x-6 -top-20 bottom-1/2 hidden lg:block z-0" />
+                  {/* `?3d=1`: the MB monogram (top right of the hero, above this column) replaces this ambient object. */}
+                  {!firma && <ScrollObject variant="luxury" className="-inset-x-6 -top-20 bottom-1/2 hidden lg:block z-0" />}
                   <m.div
                     initial={{ opacity: 0, x: 30 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -377,6 +383,12 @@ function Design4Content() {
                   </m.div>
                 </div>
               </div>
+              {/* `?3d=1` only: the MB monogram, absolute over this box (see components/firma3d/firma-hero.css); out of flow, so nothing moves. */}
+              {firma && (
+                <Suspense fallback={null}>
+                  <FirmaHero skin="luxury" oscuro={isDark} />
+                </Suspense>
+              )}
             </div>
           </section>
 

@@ -11,6 +11,7 @@ import { skins } from '../components/gallery/skins'
 import { useDynamicFavicon, useI18n, useContent } from '../hooks'
 import { defaultDesign, otherDesigns, MENU } from '../data/designs'
 import { track, useSectionViewTracking } from '../lib/track'
+import { modo3dActivo } from '../three/modo3d'
 
 // Below the fold, each section arrives as its own chunk so the hero paints off a smaller bundle.
 const Chapters = lazy(() => import('../components/sections/Chapters').then((mod) => ({ default: mod.Chapters })))
@@ -30,6 +31,10 @@ const StoreCheck = lazy(() => import('../components/sections/StoreCheck').then((
 const Faq = lazy(() => import('../components/sections/Faq').then((mod) => ({ default: mod.Faq })))
 const Contact = lazy(() => import('../components/sections/Contact').then((mod) => ({ default: mod.Contact })))
 const CareerSubway = lazy(() => import('../components/sections/CareerSubway').then((mod) => ({ default: mod.CareerSubway })))
+// MB monogram signature above the name: only with `?3d=1` (its own chunk + CSS; without the flag it is never requested nor rendered).
+const FirmaHero = lazy(() => import('../components/firma3d/FirmaHero'))
+// Aburrá Valley relief beside the clock in the Now card: only with `?3d=1` (its own chunk; without the flag it is never requested nor rendered).
+const AhoraRelieve = lazy(() => import('../components/common/AhoraRelieve'))
 
 /** Keeps the page height stable while a section's chunk loads. Capped at 40vh: on a slow connection
  * every one of these chunks starts downloading at mount (they aren't gated behind an
@@ -38,13 +43,16 @@ const CareerSubway = lazy(() => import('../components/sections/CareerSubway').th
  * manufacturing that much blank space for the short ones. */
 const Pending = ({ h = 'min-h-[40vh]' }: { h?: string }) => <div className={h} aria-hidden="true" />
 
+/** How often the Now card's clock refreshes; with `?3d=1` the relief's pearl beats at this same cadence. */
+const LOCAL_TIME_MS = 30_000
+
 /** Wall-clock time in Medellín, refreshed every 30 s — a real vital, not decoration. */
 function useLocalTime(locale: string) {
   const fmt = () => new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit', timeZone: 'America/Bogota' }).format(new Date())
   const [time, setTime] = useState(fmt)
   useEffect(() => {
     setTime(fmt())
-    const id = window.setInterval(() => setTime(fmt()), 30_000)
+    const id = window.setInterval(() => setTime(fmt()), LOCAL_TIME_MS)
     return () => window.clearInterval(id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locale])
@@ -180,6 +188,7 @@ function AppleContent() {
     setContactOpen(true)
   }
   useDynamicFavicon('apple')
+  const firma = modo3dActivo()
   // `contact_open` itself fires from inside `ContactFormModal` (one shared component, every theme) —
   // this page only needs `section_view` wired at the page level, and `data-track-section` on each
   // section id below is what feeds it.
@@ -219,6 +228,24 @@ function AppleContent() {
   const activeSection = useActiveSection([...nav.map(([href]) => href.slice(1)), 'skills', 'proof', 'engagement', 'faq'])
   const liveCount = registry.stores.filter((s) => s.status === 'live').length
   const devCount = registry.stores.filter((s) => s.status === 'dev').length
+  const relieve = modo3dActivo()
+  // The Now card's three status rows (live / in development / Medellín clock); the same nodes with or without the 3D relief beside them.
+  const filasAhora = (
+    <>
+      <p className="flex items-center gap-2.5">
+        <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center" aria-hidden="true"><span className="h-1.5 w-1.5 rounded-full bg-[#34c759]" /></span>
+        {c.sections.now.live.replace('{n}', String(liveCount))}
+      </p>
+      <p className="flex items-center gap-2.5">
+        <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center" aria-hidden="true"><span className="h-1.5 w-1.5 rounded-full bg-[#ff9f0a]" /></span>
+        {c.sections.now.dev.replace('{n}', String(devCount))}
+      </p>
+      <p className={`flex items-center gap-2.5 ${muted}`}>
+        <span className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+        {c.sections.now.local.replace('{time}', localTime)}
+      </p>
+    </>
+  )
 
   return (
     <>
@@ -321,7 +348,8 @@ function AppleContent() {
                   line, so the two columns end near each other instead of leaving a hole under the card.
                   The card stays top-aligned: React appends rows to it on hydration, and a bottom- or
                   center-aligned card would move what the static shell already painted. */}
-              <div className="grid gap-y-8 gap-x-10 lg:grid-cols-12 lg:items-start lg:gap-x-12 lg:gap-y-10">
+              {/* `?3d=1`: the grid becomes the containing block of the MB signature (absolute, out of flow: nothing moves). */}
+              <div className="grid gap-y-8 gap-x-10 lg:grid-cols-12 lg:items-start lg:gap-x-12 lg:gap-y-10" style={firma ? { position: 'relative' } : undefined}>
                 <div className="lg:col-span-12">
                   <p className={`text-sm font-semibold ${blue}`}>{c.hero.eyebrow}</p>
                   {/* The LCP element stays static: an entrance fade would delay the first meaningful
@@ -382,7 +410,9 @@ function AppleContent() {
                     rows below on hydration — it never inserts above already-painted text, so the swap
                     can't shift it. */}
                 {/* The availability line is the card's title, flush left; every other row keeps a 14px leading slot (dot, globe or blank) so their text lines up. */}
-                <div className="lg:col-span-4 lg:col-start-9">
+                {/* With `?3d=1` the card takes one more column (5, not 4) from xl up, where the Aburrá relief fits beside the status rows;
+                    at lg (1024-1279) there is no room for it, so the card stays as it is today and the relief is hidden. */}
+                <div className={relieve ? 'lg:col-span-4 lg:col-start-9 xl:col-span-5 xl:col-start-8' : 'lg:col-span-4 lg:col-start-9'}>
                   <div className={`${skin.card} p-6 md:p-7`}>
                     <div className={`flex items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.12em] ${muted}`}>
                       <span className="relative flex h-3.5 w-3.5 items-center justify-center" aria-hidden="true">
@@ -396,22 +426,30 @@ function AppleContent() {
                       {Icon.globe}
                       {c.hero.location}
                     </p>
-                    <div className={`mt-5 space-y-2 border-t pt-5 text-sm ${skin.line}`}>
-                      <p className="flex items-center gap-2.5">
-                        <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center" aria-hidden="true"><span className="h-1.5 w-1.5 rounded-full bg-[#34c759]" /></span>
-                        {c.sections.now.live.replace('{n}', String(liveCount))}
-                      </p>
-                      <p className="flex items-center gap-2.5">
-                        <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center" aria-hidden="true"><span className="h-1.5 w-1.5 rounded-full bg-[#ff9f0a]" /></span>
-                        {c.sections.now.dev.replace('{n}', String(devCount))}
-                      </p>
-                      <p className={`flex items-center gap-2.5 ${muted}`}>
-                        <span className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                        {c.sections.now.local.replace('{time}', localTime)}
-                      </p>
+                    {/* With `?3d=1`: the three status rows on the left, the Aburrá relief on the right (its pearl beats at the clock's
+                        refresh cadence). The box reserves its size up front (flex basis + aspect-ratio) so its chunk never moves anything. */}
+                    <div className={`mt-5 ${relieve ? 'flex items-center justify-between gap-2 sm:gap-4' : 'space-y-2'} border-t pt-5 text-sm ${skin.line}`}>
+                      {relieve ? (
+                        <>
+                          <div className="min-w-0 space-y-2" style={{ textWrap: 'pretty' }}>{filasAhora}</div>
+                          <div className="lg:hidden xl:block" style={{ flex: '1 1 80px', minWidth: 80, maxWidth: 200 }}>
+                            <Suspense fallback={<div style={{ aspectRatio: '1200 / 858' }} />}>
+                              <AhoraRelieve periodoMs={LOCAL_TIME_MS} />
+                            </Suspense>
+                          </div>
+                        </>
+                      ) : (
+                        filasAhora
+                      )}
                     </div>
                   </div>
                 </div>
+                {/* `?3d=1` only: the MB monogram, absolute above the name (see components/firma3d/firma-hero.css). Last child = reading order and tab order untouched. */}
+                {firma && (
+                  <Suspense fallback={null}>
+                    <FirmaHero skin="apple" oscuro={isDark} />
+                  </Suspense>
+                )}
               </div>
             </div>
           </section>

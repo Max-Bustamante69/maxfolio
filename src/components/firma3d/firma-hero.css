@@ -1,0 +1,145 @@
+/* Firma MB del hero (solo con ?3d=1; este CSS viaja con el chunk de FirmaHero y no toca el CSS del sitio).
+ *
+ * El póster es 4:3; el trazo de «MB.» ocupa x 8.9-85.3 % e y 25.3-76.2 % de la caja (medido sobre el alfa de los
+ * pósters apple/luxury; la gemela 3D usa la misma cámara). De ahí las tres constantes de abajo: con `--g` (ancho del
+ * trazo) la caja mide g/0.764, el punto de acento queda a 0.147·w del borde derecho de la caja y el borde superior
+ * del trazo a 0.2484·g de su borde superior. Así cada skin coloca el TRAZO (lo que se ve), no la caja transparente.
+ *
+ * El contenedor es un hijo absoluto de la rejilla del hero (que la página pone en `position: relative` solo con el
+ * flag): con `grid-area` su bloque contenedor es esa celda, sin tocar la colocación de nadie. Fuera del flujo = cero
+ * CLS y el hero pinta igual que su cascarón estático de index.html.
+ */
+.firma-hero {
+  position: absolute;
+  inset: 0;
+  grid-column: 1 / -1;
+  grid-row: 1 / 2;
+  pointer-events: none;
+}
+
+.firma-hero__caja {
+  --g: 100px;
+  --t: -56px;
+  --r: 0px; /* distancia del borde derecho del contenedor al del marco */
+  --w: calc(var(--g) / 0.764);
+  position: absolute;
+  width: var(--w);
+  right: calc(var(--r, 0px) + var(--w) * -0.147);
+  top: calc(var(--t) - var(--g) * 0.2484);
+  pointer-events: auto;
+}
+.firma-hero__pieza {
+  width: 100%;
+}
+
+/* Modo oscuro: halo de contraluz detrás de la pieza (la obsidiana sobre casi negro solo se lee por sus cantos). */
+.firma-hero[data-tema='oscuro'] .firma-hero__caja::before {
+  content: '';
+  position: absolute;
+  inset: 12% -4% 14% -2%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--halo, rgb(255 255 255 / 0.14)), rgb(255 255 255 / 0));
+  filter: blur(10px);
+  pointer-events: none;
+}
+.firma-hero[data-firma='luxury'][data-tema='oscuro'] .firma-hero__caja {
+  --halo: rgb(212 175 55 / 0.16);
+}
+
+@media (max-width: 639.98px) {
+  .firma-hero__caja {
+    pointer-events: none;
+  }
+}
+
+/* Apple: el titular ocupa toda la fila y el hueco libre en cualquier ancho e idioma es el aire sobre él. El nav es fijo
+ * (44 px hasta tableta, 56 desde lg) y el hero arranca 64 px por debajo en móvil y 96 desde md, así que la rejilla queda
+ * a 64/96 px del nav. `--t` es el borde superior del TRAZO respecto del borde superior de la rejilla; el titular arranca
+ * en +36 px y la etiqueta ocupa la fila 0-20 px (su texto acaba en x = 230 px de la rejilla, en los tres idiomas).
+ *  - < 380 px: el trazo (100x50) va en el aire sobre la etiqueta, entre el nav y ella (banda 64 px);
+ *  - 380-639 px: alineado con la fila de la etiqueta, a su derecha (trazo 92x46: cabe entre su final y el borde);
+ *  - 640-767 px: en el aire sobre el titular (banda de 100 px), trazo 160x80;
+ *  - desde 768 px: igual, con la banda de 132 px (nav a 44/56 y padding de 96), trazo 192x96 con 18 px por lado. */
+[data-firma='apple'] .firma-hero__caja {
+  --g: 100px;
+  --t: -56px;
+}
+@media (min-width: 380px) {
+  [data-firma='apple'] .firma-hero__caja {
+    --g: 92px;
+    --t: -19px;
+  }
+}
+@media (min-width: 640px) {
+  [data-firma='apple'] .firma-hero__caja {
+    --g: 160px;
+    --t: -54px;
+  }
+}
+@media (min-width: 768px) {
+  [data-firma='apple'] .firma-hero__caja {
+    --g: 192px;
+    --t: -78px;
+  }
+}
+
+/* Luxury: el contenedor es la caja interior del hero (`max-w-7xl`), que empieza a 64 px de arriba en móvil y a 80 desde
+ * md; el nav (fijo, 76 px en móvil y 92 desde md) tapa hasta ahí y el aire que queda a la derecha del titular es toda la
+ * esquina superior, porque el titular es un bloque a la izquierda y las cifras van abajo (columna derecha, alineada al
+ * final de la fila). `--t` es el borde superior del trazo respecto de esa caja.
+ *  - < 380 px: nada (a 320-379 no queda hueco a la derecha de «Bustamante»);
+ *  - 380-479 px: trazo de 84x42 a la derecha de «Bustamante» (segunda línea del titular, 24 px de aire); la etiqueta
+ *    se parte en dos líneas y «Maximiliano» acaba en x = 279 px, así que solo esa línea queda libre;
+ *  - 480-767 px: la etiqueta ya cabe en una línea (acaba bajo los 340 px, a y = 121 px): el trazo va debajo de ella, a la
+ *    derecha del titular (que acaba en x = 279 px), de 140 / 190 px;
+ *  - md (768): titular a 72 px, acaba en x = 446 px: trazo de 200 px, 24 px bajo el nav (92 px);
+ *  - desde lg: la esquina superior derecha sobre las cifras (que arrancan a +299 px, y el trazo acaba a +206): trazo de
+ *    24 vw, entre 260 y 340 px, siempre a la derecha del titular (que acaba en x = 759 px a 1440). */
+[data-firma='luxury'] .firma-hero__caja {
+  --g: 84px;
+  --t: 141px;
+}
+@media (min-width: 480px) {
+  [data-firma='luxury'] .firma-hero__caja {
+    --g: 140px;
+    --t: 66px;
+  }
+}
+@media (min-width: 600px) {
+  [data-firma='luxury'] .firma-hero__caja {
+    --g: 190px;
+  }
+}
+@media (min-width: 768px) {
+  [data-firma='luxury'] .firma-hero__caja {
+    --g: 200px;
+    --t: 36px;
+  }
+}
+@media (min-width: 1024px) {
+  [data-firma='luxury'] .firma-hero__caja {
+    --g: clamp(260px, 24vw, 340px);
+  }
+}
+
+/* Brutalist: el contenedor es la sección (`relative`, arranca bajo el nav de 80 px) y el marco es `max-w-[1800px]` con
+ * 16 px de padding en móvil y 24 desde md. El titular es solo el nombre de pila (10 vw desde md, 15 vw antes) y la línea
+ * «Medellín, Colombia / Est. 2022» va a su derecha, alineada al fondo de la fila.
+ *  - desde md: emblema de cabecera, en la esquina superior derecha del marco y justo sobre esa línea. La línea empieza a
+ *    120 px + 8 vw del borde de la sección (medido a 768, 1024, 1440 y 1920), así que el trazo va de 108 px hasta ~11 px
+ *    por encima de ella: alto 8 px + 7.5 vw, ancho 16 px + 15 vw (tope 340). La gemela 3D asoma ~8 px por encima del
+ *    póster con la flotación y la perspectiva, de ahí los 108 px (el nav acaba en 80);
+ *  - < md: a la derecha del titular (que acaba a 16 px + 64.5 vw) y apoyado en su base: ancho 35 vw - 56 px;
+ *  - < 380 px: nada (no queda hueco a la derecha del nombre). */
+[data-firma='brutalist'] .firma-hero__caja {
+  --r: 16px;
+  --g: calc(35vw - 56px);
+  --t: calc(127px + 19.5vw - var(--g) / 2);
+}
+@media (min-width: 768px) {
+  [data-firma='brutalist'] .firma-hero__caja {
+    --r: calc(max(0px, (100% - 1800px) / 2) + 24px);
+    --g: min(340px, calc(16px + 15vw));
+    --t: 108px;
+  }
+}

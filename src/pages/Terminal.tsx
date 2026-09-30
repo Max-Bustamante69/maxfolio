@@ -11,6 +11,10 @@ import { useDynamicFavicon, useI18n, useContent } from '../hooks'
 import { designs, otherDesigns, MENU } from '../data/designs'
 import { fleetLiquidLines, fleetIslandLines } from '../data/skillUsage'
 import changelogData from '../data/changelog.json'
+import { modo3dActivo } from '../three/modo3d'
+
+// Aburrá Valley relief beside the SYS.LOCATION clock: only with `?3d=1` (its own chunk; without the flag it is never requested nor rendered).
+const AhoraRelieve = lazy(() => import('../components/common/AhoraRelieve'))
 
 // Below the fold, each section arrives as its own chunk — same convention as every other theme.
 const Years = lazy(() => import('../components/sections/Years').then((mod) => ({ default: mod.Years })))
@@ -87,13 +91,16 @@ function useAccent(): [Accent, (a: Accent) => void] {
   return [accent, set]
 }
 
+/** How often the SYS.LOCATION clock ticks; with `?3d=1` the relief's pearl beats at this same cadence. */
+const CLOCK_TICK_MS = 1000
+
 /** Real, live wall-clock in Medellín — the only "live" readout on this page, per the site-wide honesty
  *  rule (no invented counters). Ticks once a second; `aria-live="off"` so a screen reader is never
  *  interrupted every second by a clock nobody asked it to narrate. */
 function useBogotaClock() {
   const [now, setNow] = useState(() => new Date())
   useEffect(() => {
-    const id = window.setInterval(() => setNow(new Date()), 1000)
+    const id = window.setInterval(() => setNow(new Date()), CLOCK_TICK_MS)
     return () => window.clearInterval(id)
   }, [])
   return new Intl.DateTimeFormat('en-GB', { timeZone: 'America/Bogota', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(now)
@@ -301,6 +308,7 @@ function TerminalContent() {
   useTerminalFont()
   const reduced = useReducedMotion()
   const clock = useBogotaClock()
+  const relieve = modo3dActivo()
 
   const skin = skins.terminal(true)
   const muted = skin.muted
@@ -556,10 +564,23 @@ function TerminalContent() {
                   </div>
                 </div>
 
-                <div className={`lg:col-span-4 transition-opacity duration-700 delay-150 ${bootDone ? 'opacity-100' : 'opacity-0'}`}>
+                {/* `?3d=1`: the relief sits under the MB logotype (beside the boot lines from lg up, next to it below lg) and its
+                    pearl beats once a second, the cadence of the SYS.LOCATION clock above. Same fade-in as the logotype; the box
+                    reserves its 200px up front so the chunk never moves anything. */}
+                <div className={`lg:col-span-4 transition-opacity duration-700 delay-150${relieve ? ' flex items-end gap-6 lg:flex-col lg:items-start lg:gap-8' : ''} ${bootDone ? 'opacity-100' : 'opacity-0'}`}>
                   <pre className="term-ascii text-[9px] leading-tight sm:text-xs md:text-sm" aria-hidden="true">
                     {ASCII_MB}
                   </pre>
+                  {relieve && (
+                    <div className="shrink-0" style={{ width: 200 }}>
+                      <Suspense fallback={<div style={{ aspectRatio: '1200 / 858' }} />}>
+                        <AhoraRelieve periodoMs={CLOCK_TICK_MS} />
+                      </Suspense>
+                      <p className={`mt-2 text-xs tabular-nums ${muted}`} aria-hidden="true">
+                        6.244°N 75.581°W
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
