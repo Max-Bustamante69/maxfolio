@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState, type MouseEvent } from 'react'
+import { Suspense, lazy, useEffect, useState, type MouseEvent, type ReactNode } from 'react'
 import { AnimatePresence, m } from 'framer-motion'
 import { useContent, useSheetHistory } from '../../hooks'
 import { GalleryLightbox, type Skin } from '../gallery'
@@ -9,6 +9,10 @@ import type { StoreEntry, ProductEntry } from '../../data/registry'
 import { conversionSeries } from '../../data/illustrative'
 import { onRequestProduct, onRequestStore, scrollToSection, setCaseStudyVisible } from '../../lib/sectionLinks'
 import { track } from '../../lib/track'
+import { modo3dActivo } from '../../three/modo3d'
+
+// 3D opt-in (?3d=1): objetos-hecho por característica en cada fila. Sin el flag este módulo nunca se pide y la fila es la de siempre.
+const ObjetosFeature = modo3dActivo() ? lazy(() => import('./work3d/ObjetosFeature')) : null
 
 /** How long a row's accent flash stays visible after the orbit links here — long enough to read as
  *  "this is the one that just opened", short enough to not linger once the shopper has moved on. */
@@ -35,6 +39,25 @@ const FEATURES: { id: string; test: RegExp }[] = [
   { id: 'tracking', test: /track|pixel|analytics/i },
   { id: 'i18n', test: /bilingual|currency|dual/i },
 ]
+
+/** The FEATURES a store's stack matches, by priority (the active filter first); the 3D objects follow the same taxonomy. */
+const featuresDe = (st: StoreEntry, primero?: string) => {
+  const ids = FEATURES.filter((f) => st.stack.some((t) => f.test.test(t))).map((f) => f.id)
+  return primero && ids.includes(primero) ? [primero, ...ids.filter((id) => id !== primero)] : ids
+}
+
+/** With `?3d=1`: the store's feature objects to the left of the row; without it, the row exactly as before. */
+function ConObjetos({ st, primero, etiquetas, resaltada, alAbrir, children }: { st: StoreEntry; primero?: string; etiquetas: Record<string, string>; resaltada: boolean; alAbrir: () => void; children: ReactNode }) {
+  if (!ObjetosFeature) return <>{children}</>
+  return (
+    <div className="relative flex items-start gap-x-4 md:items-center">
+      <Suspense fallback={null}>
+        <ObjetosFeature id={st.slug} features={featuresDe(st, primero)} etiquetas={etiquetas} resaltada={resaltada} alAbrir={alAbrir} />
+      </Suspense>
+      <div className="min-w-0 flex-1">{children}</div>
+    </div>
+  )
+}
 
 /**
  * The index: one line per store — name, what it is, when, and the one-sentence tagline. Everything
@@ -147,11 +170,15 @@ export function ShopifyWork({ skin, heading, ownId = true }: ShopifyWorkProps) {
   // other Luxury surfaces (Design4's dark "inverted" band) still need the brighter original.
   const ctaAccent = skin.frame === 'luxury' && !skin.dark ? 'text-[#6b5730]' : skin.accent
 
-  const StoreRow = ({ st }: { st: StoreEntry }) => {
+  // Called as a function (not mounted as `<StoreRow />`): declared inside this render, a component would get a new identity on
+  // every render — and the hover preview above re-renders on each row enter/leave — so every row would be torn down and rebuilt.
+  // Stable `<li key>`s keep the rows (and the 3D objects that live in them) mounted.
+  const storeRow = (st: StoreEntry) => {
     const c = strings.stores[st.slug]
     const highlighted = highlightSlug === st.slug
     return (
       <li
+        key={st.slug}
         data-orbit-row={st.slug}
         className={`group relative overflow-hidden ${skin.rowHover} transition-colors`}
         onMouseMove={onRowMove}
@@ -165,6 +192,7 @@ export function ShopifyWork({ skin, heading, ownId = true }: ShopifyWorkProps) {
           className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 [@media(hover:hover)_and_(pointer:fine)]:group-hover:opacity-100"
           style={{ background: `radial-gradient(260px circle at var(--spot-x, 50%) var(--spot-y, 50%), ${spotColor}, transparent 70%)` }}
         />
+        <ConObjetos st={st} primero={feature ?? undefined} etiquetas={s.filters} resaltada={highlighted} alAbrir={() => setOpenStore(st)}>
         <div className="relative grid gap-x-6 gap-y-1.5 py-4 md:grid-cols-12 md:items-center">
           <div className="md:col-span-4">
             <div className="flex flex-wrap items-center gap-2">
@@ -198,6 +226,7 @@ export function ShopifyWork({ skin, heading, ownId = true }: ShopifyWorkProps) {
             )}
           </div>
         </div>
+        </ConObjetos>
       </li>
     )
   }
@@ -262,17 +291,13 @@ export function ShopifyWork({ skin, heading, ownId = true }: ShopifyWorkProps) {
         {tab === 'stores' ? (
           <m.div key="stores" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}>
             <ul className={`divide-y border-y ${skin.divider}`}>
-              {visibleFleet.map((st) => (
-                <StoreRow key={st.slug} st={st} />
-              ))}
+              {visibleFleet.map(storeRow)}
             </ul>
             {showAll && legacy.length > 0 && (
               <>
                 <p className={`${skin.muted} mb-2 mt-10 text-xs uppercase tracking-[0.2em]`}>{s.legacyLabel}</p>
                 <ul className={`divide-y border-y ${skin.divider}`}>
-                  {legacy.map((st) => (
-                    <StoreRow key={st.slug} st={st} />
-                  ))}
+                  {legacy.map(storeRow)}
                 </ul>
               </>
             )}

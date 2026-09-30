@@ -1,9 +1,16 @@
-import { useEffect, useState } from 'react'
+import { Suspense, lazy, useEffect, useState, type CSSProperties } from 'react'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { useContent } from '../../hooks'
 import { ProjectFrame, type Skin } from '../gallery'
 import { shotsFor } from './Gallery'
 import type { ProductEntry } from '../../data/registry'
+import { modo3dActivo } from '../../three/modo3d'
+import type { EstadoDispositivos } from './work3d/Dispositivos3D'
+
+// 3D opt-in (?3d=1): laptop + teléfono del estudio con la captura real del producto. Sin el flag este módulo nunca se pide.
+const Dispositivos3D = modo3dActivo() ? lazy(() => import('./work3d/Dispositivos3D')) : null
+/** Oculto a la vista pero enfocable: el marco CSS queda `inert` mientras el 3D lo tapa, y el teclado necesita su propio botón. */
+const SOLO_LECTOR: CSSProperties = { position: 'absolute', width: 1, height: 1, margin: -1, overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap' }
 
 /** A real link into this rail from elsewhere on the page (the orbit skill layout, see
  *  src/lib/sectionLinks.ts): which product to select. `nonce` changes on every request, including a
@@ -33,6 +40,13 @@ export function Products({ skin, onOpen, select }: ProductsProps) {
   const g = strings.sections.gallery
   const [current, setCurrent] = useState(registry.products[0])
   const c = strings.products[current.id]
+  // Solo con ?3d=1: espera (marco CSS visible) -> 3d (el 3D ya dibuja, el marco se retira) | degradada (gama baja, reduced-motion, sin WebGL2: layout de siempre).
+  const [estado3d, setEstado3d] = useState<EstadoDispositivos>('espera')
+  const [foco3d, setFoco3d] = useState(false)
+  const en3d = Dispositivos3D !== null && estado3d !== 'degradada'
+  const marco = current.gallery ? (
+    <ProjectFrame name={current.name} shots={shotsFor(current.id, false)} skin={skin} onOpen={() => onOpen(current)} alt={g.open} variant="laptop" />
+  ) : null
 
   useEffect(() => {
     if (!select) return
@@ -72,13 +86,42 @@ export function Products({ skin, onOpen, select }: ProductsProps) {
       </div>
 
       <div className="lg:col-span-8">
+        {/* ?3d=1: the devices live OUTSIDE the keyed panel, so switching product only swaps the screen texture (no remount).
+            The CSS laptop stays underneath as the poster: it shows this product's real capture until the 3D draws. */}
+        {en3d && current.gallery && Dispositivos3D && (
+          <div className="relative mb-8 w-full" style={{ maxWidth: 600, aspectRatio: '1.25 / 1' }}>
+            <div
+              inert={estado3d === '3d'}
+              style={{ position: 'absolute', left: '10.9%', top: '50%', width: '78.2%', transform: 'translateY(-50%)', opacity: estado3d === '3d' ? 0 : 1, transition: 'opacity 220ms ease-out' }}
+            >
+              {marco}
+            </div>
+            <Suspense fallback={null}>
+              <Dispositivos3D
+                capturaLaptop={`/gallery/${current.id}/home-desktop.webp`}
+                capturaTelefono={`/gallery/${current.id}/home-mobile.webp`}
+                precarga={registry.products.filter((x) => x.gallery && x.id !== current.id).flatMap((x) => [`/gallery/${x.id}/home-desktop.webp`, `/gallery/${x.id}/home-mobile.webp`])}
+                alAbrir={() => onOpen(current)}
+                alEstado={setEstado3d}
+              />
+            </Suspense>
+            {estado3d === '3d' && (
+              <button
+                type="button"
+                onClick={() => onOpen(current)}
+                onFocus={() => setFoco3d(true)}
+                onBlur={() => setFoco3d(false)}
+                className={`${skin.chipOn} compact-touch`}
+                style={foco3d ? { position: 'absolute', left: '50%', bottom: 0, transform: 'translateX(-50%)', zIndex: 35 } : SOLO_LECTOR}
+              >
+                {current.name}: {g.open}
+              </button>
+            )}
+          </div>
+        )}
         <AnimatePresence mode="wait" initial={false}>
           <m.div key={current.id} role="tabpanel" initial={reduced ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, transition: { duration: 0.12 } }} transition={{ duration: 0.28, ease: EASE }}>
-            {current.gallery && (
-              <div className="mb-8 max-w-xl">
-                <ProjectFrame name={current.name} shots={shotsFor(current.id, false)} skin={skin} onOpen={() => onOpen(current)} alt={g.open} variant="laptop" />
-              </div>
-            )}
+            {current.gallery && !en3d && <div className="mb-8 max-w-xl">{marco}</div>}
             <h3 className={`${skin.title} text-2xl leading-tight md:text-3xl`}>{current.name}</h3>
             <p className={`${skin.accent} mt-1 text-sm font-medium`}>{c?.tagline}</p>
             <p className="mt-4 max-w-2xl text-base leading-relaxed md:text-lg">{c?.description}</p>
