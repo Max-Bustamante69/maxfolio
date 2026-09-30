@@ -32,18 +32,25 @@
   width: 100%;
 }
 
-/* Modo oscuro: halo de contraluz detrás de la pieza (la obsidiana sobre casi negro solo se lee por sus cantos). */
+/* Modo oscuro: halo de contraluz detrás de la pieza. La obsidiana sobre casi negro (Apple #000) solo se lee por sus cantos y
+ * «MB.» quedaba como un fantasma gris; una meseta clara (no solo un resplandor) la recorta como silueta a contraluz.
+ * `--halo` (r g b) y `--halo-a` (alfa) por skin; Luxury lo tiñe de oro. */
+.firma-hero[data-tema='oscuro'] .firma-hero__caja {
+  --halo: 210 222 255;
+  --halo-a: 0.42;
+}
 .firma-hero[data-tema='oscuro'] .firma-hero__caja::before {
   content: '';
   position: absolute;
   inset: 12% -4% 14% -2%;
   border-radius: 50%;
-  background: radial-gradient(closest-side, var(--halo, rgb(255 255 255 / 0.14)), rgb(255 255 255 / 0));
+  background: radial-gradient(closest-side, rgb(var(--halo) / var(--halo-a)), rgb(var(--halo) / calc(var(--halo-a) * 0.72)) 62%, rgb(var(--halo) / 0));
   filter: blur(10px);
   pointer-events: none;
 }
 .firma-hero[data-firma='luxury'][data-tema='oscuro'] .firma-hero__caja {
-  --halo: rgb(212 175 55 / 0.16);
+  --halo: 212 175 55;
+  --halo-a: 0.22;
 }
 
 @media (max-width: 639.98px) {

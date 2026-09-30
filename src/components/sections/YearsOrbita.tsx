@@ -112,10 +112,12 @@ export default function YearsOrbita({ skin, grafico }: Props) {
   const [elegida, setElegida] = useState(() => (porSlug.has(INICIAL) ? INICIAL : (grupos[0]?.items[0]?.slug ?? INICIAL)))
   const tienda = porSlug.get(elegida)
 
-  // La obsidiana y el titanio se leen sobre claro: en superficies oscuras la pieza va sobre una placa de estudio
-  // (degradado neutro claro, sin color de tema para no competir con el acento) con el radio propio de la skin.
+  // La obsidiana y el titanio se leen sobre claro: en superficies oscuras la pieza va sobre una placa de estudio con el
+  // radio propio de la skin. Es un gris pizarra de tono medio (la obsidiana sigue recortándose y no deslumbra sobre el azul
+  // noche ni sobre el negro; una placa casi blanca era un rectángulo de 730 px a pleno resplandor), sin color de tema para
+  // no competir con el acento.
   const placa = skin.dark ? `border ${skin.line} ${skin.frame === 'apple' || skin.frame === 'neo' ? 'rounded-[18px]' : ''}` : ''
-  const placaEstilo = skin.dark ? { background: 'radial-gradient(120% 100% at 50% 38%, #f6f6f8 0%, #dcdce1 100%)' } : undefined
+  const placaEstilo = skin.dark ? { background: 'radial-gradient(120% 100% at 50% 38%, #b0b4c8 0%, #70748f 100%)' } : undefined
   const altoToque = ancho ? 36 : 44 // 44 px de objetivo táctil en móvil
   const label = `text-[11px] font-semibold uppercase tracking-[0.18em] ${skin.muted}`
   const dot = (s: { status: string }) => (s.status === 'live' ? 'bg-[#34c759]' : 'bg-[#ff9f0a]')
