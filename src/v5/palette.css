@@ -1,4 +1,5 @@
-/* Paleta de Max para la v5 (2026-10-02): plata, gris y blanco con un azul pizarra frío.
+/* Paleta plata de Max (2026-10-02): plata, gris y blanco con un azul pizarra frío. Es la paleta de UNA dirección
+   (Max: «solo quiero 1 con esa paleta»); las demás definen la suya en su carpeta. Aquí queda como valor por defecto del hub.
    Los cinco son claros (Material Grey 300/400/500 y Blue Grey 100): sirven de superficie, filete y relleno,
    NUNCA de texto. La tinta es la única que lleva texto, foco y bordes de control.
    Contraste de la tinta #263238 (Blue Grey 900): blanco 13.16 · #E0E0E0 9.97 · #CFD8DC 9.09 · #BDBDBD 7.00 · #9E9E9E 4.91 (todos AA). */

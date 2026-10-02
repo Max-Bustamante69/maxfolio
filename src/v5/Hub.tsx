@@ -19,7 +19,7 @@ export default function Hub() {
     <main className="v5-root min-h-screen px-4 py-16 md:px-12">
       <meta name="robots" content="noindex" />
       <h1 className="text-3xl font-semibold tracking-tight md:text-5xl">Portafolio v5 · direcciones</h1>
-      <p className="v5-quiet mt-3 max-w-xl">Prototipos para elegir. Misma paleta y mismo contenido real; cambia la mecánica.</p>
+      <p className="v5-quiet mt-3 max-w-xl">Prototipos para elegir. Mismo contenido real; cada una con su mecánica y su paleta.</p>
       <ol className="mt-12 divide-y divide-[var(--v5-line)] border-y border-[var(--v5-line)]">
         {metas.map((m) => (
           <li key={m.id} className="grid gap-3 py-6 md:grid-cols-[4rem_1fr_auto] md:items-baseline">
