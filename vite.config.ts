@@ -9,6 +9,9 @@ const entries = ['index.html', 'neo.html', 'persona.html'].filter((f) => existsS
 
 export default defineConfig({
   plugins: [react()],
+  // Varios servidores de desarrollo en paralelo sobre el mismo checkout (un puerto por dirección v5):
+  // cada uno con su caché de dependencias para que el optimizador de Vite no se pise.
+  cacheDir: process.env.VITE_CACHE_DIR || 'node_modules/.vite',
   build: {
     // Lighthouse (best practices) wants source maps for large first-party JS; they only load in devtools.
     sourcemap: true,

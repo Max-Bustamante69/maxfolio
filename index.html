@@ -390,6 +390,10 @@
       </div>
     </div>
     <script>
+      // Las direcciones v5 no son el Apple: sin su shell estático (si no, el hero de Apple destella antes del chunk).
+      if (location.pathname.indexOf('/v5') === 0) { var v5shell = document.querySelector('#root [data-shell]'); if (v5shell) v5shell.remove(); }
+    </script>
+    <script>
       (function () {
         try {
           var L = {
