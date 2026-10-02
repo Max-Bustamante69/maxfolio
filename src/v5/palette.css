@@ -1,0 +1,9 @@
+/* Paleta de Max para la v5 (2026-10-02): plata, gris y blanco con un azul pizarra frío.
+   Las tres direcciones la usan como superficies y acentos; la tinta del texto se deriva aparte para contraste AA. */
+:root {
+  --v5-mist: #E0E0E0;
+  --v5-silver: #BDBDBD;
+  --v5-steel: #9E9E9E;
+  --v5-white: #FFFFFF;
+  --v5-slate: #CFD8DC;
+}

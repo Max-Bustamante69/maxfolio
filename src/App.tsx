@@ -18,6 +18,10 @@ const Persona = lazy(() => import('./pages/Persona'))
 const Terminal = lazy(() => import('./pages/Terminal'))
 // Private, unlisted (no nav link, not in sitemap.xml, `noindex` via its own SEOHead) — see Stats.tsx.
 const Stats = lazy(() => import('./pages/Stats'))
+// v5 desde cero: tres direcciones para elegir (sin enlace en la navegación).
+const V5A = lazy(() => import('./v5/a/Page'))
+const V5B = lazy(() => import('./v5/b/Page'))
+const V5C = lazy(() => import('./v5/c/Page'))
 
 // A/B: the landing at `/` is the visitor's variant. Every theme that can be a variant is registered here;
 // ab.config.ts decides which ones actually take traffic (with only `apple` listed there is no split).
@@ -73,6 +77,9 @@ function App() {
             <Route path={designById('terminal').route} element={<Terminal />} />
             <Route path={MENU.route} element={<Home />} />
             <Route path="/stats" element={<Stats />} />
+            <Route path="/v5/a" element={<V5A />} />
+            <Route path="/v5/b" element={<V5B />} />
+            <Route path="/v5/c" element={<V5C />} />
             {/* Legacy routes */}
             <Route path="/1" element={<Design4 />} />
             <Route path="/2" element={<Design1 />} />
