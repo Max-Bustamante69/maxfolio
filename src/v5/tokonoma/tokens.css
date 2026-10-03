@@ -1,0 +1,36 @@
+/* Tokonoma · tokens (ficha de estilo: estilo/tokonoma/ESTILO.md §3.1). Blanco, tinta neutra, el papel del nicho y UN solo acento: el sello. */
+@font-face{font-family:"Inter Tight";src:url(/fonts/tokonoma/inter-tight-latin-300-500.woff2) format("woff2");font-weight:300 500;font-style:normal;font-display:swap}
+@font-face{font-family:"Jost";src:url(/fonts/tokonoma/jost-latin-400-500.woff2) format("woff2");font-weight:400 500;font-style:normal;font-display:swap}
+
+/* Respaldos con el ancho de la fuente real (medido contra Arial: Inter Tight 0,965–0,988; Jost 0,943–0,981): el cambio de fuente no mueve el texto. */
+@font-face{font-family:"Inter Tight Fb";src:local("Arial");size-adjust:97%}
+@font-face{font-family:"Jost Fb";src:local("Arial");size-adjust:96%}
+
+.v5-tokonoma{
+  /* superficies: la página es luz; el papel es la pared del nicho y de la montura */
+  --luz:#FFFFFF;
+  --papel:#F4F2ED;
+  --tarima:#E7E3DA;
+  /* tinta: cuatro niveles, todos pasan AA sobre luz y papel */
+  --tinta:#1A1A1A;
+  --tinta-2:#5E5E5E;
+  --tinta-3:#6B6B6B;
+  --filete:#E3E1DC;
+  /* el sello (hanko): el único acento. 6,2:1 con texto blanco; solo en el sello, el botón al apuntarlo y el punto de «ahora» */
+  --sello:#B5301F;
+  /* retícula y aire (los saltos medidos en el ancla) */
+  --margen:48px;
+  --canalon:24px;
+  --a1:40px; --a2:80px; --a3:120px; --a4:160px; --a5:200px; --a6:240px;
+  /* el recorte de la pieza: toda captura de escritorio cuelga en 2:1 desde su parte alta (saca de cuadro cintas, píldoras y widgets) */
+  --recorte:2/1;
+  /* movimiento */
+  --expo:cubic-bezier(.19,1,.22,1);
+  --asienta:cubic-bezier(.6,0,.2,1.05);
+  /* tipografía */
+  --f-lectura:"Inter Tight","Inter Tight Fb","Helvetica Neue",Arial,"Hiragino Sans","Yu Gothic","Meiryo",sans-serif;
+  --f-rotulo:"Jost","Jost Fb","Futura","Century Gothic","Hiragino Sans","Yu Gothic","Meiryo",sans-serif;
+}
+@media (max-width:767px){
+  .v5-tokonoma{ --margen:20px; --a1:28px; --a2:44px; --a3:60px; --a4:76px; --a5:88px; --a6:120px; --recorte:780/1480 }
+}
