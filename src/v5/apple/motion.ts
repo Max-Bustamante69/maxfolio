@@ -103,10 +103,16 @@ const atar: Record<string, Atar> = {
   linea(el) {
     let tw: gsap.core.Tween | undefined
     let entro = false
+    let jugado = false
     let espera = 0
     SplitText.create(el, {
       type: 'lines', mask: 'lines', linesClass: 'ap-ln', autoSplit: true,
-      onSplit: (s) => (tw = gsap.from(s.lines, { yPercent: 112, duration: 0.95, ease: 'apple', stagger: 0.08, delay: espera, paused: !entro })),
+      // Si el ancho cambia o llegan las fuentes, SplitText divide de nuevo: un titular que ya entró vuelve a su sitio, no repite la entrada.
+      onSplit: (s) => {
+        tw = gsap.from(s.lines, { yPercent: 112, duration: 0.95, ease: 'apple', stagger: 0.08, delay: espera, paused: !entro, onComplete: () => { jugado = true } })
+        if (jugado) tw.progress(1)
+        return tw
+      },
     })
     return (r) => { entro = true; espera = r; tw?.delay(r).play() }
   },
@@ -114,10 +120,15 @@ const atar: Record<string, Atar> = {
   nombre(el) {
     let tw: gsap.core.Tween | undefined
     let entro = false
+    let jugado = false
     let espera = 0
     SplitText.create(el, {
       type: 'words', mask: 'words', wordsClass: 'ap-pl', autoSplit: true,
-      onSplit: (s) => (tw = gsap.from(s.words, { yPercent: 118, duration: 1.0, ease: 'apple', stagger: 0.1, delay: espera, paused: !entro })),
+      onSplit: (s) => {
+        tw = gsap.from(s.words, { yPercent: 118, duration: 1.0, ease: 'apple', stagger: 0.1, delay: espera, paused: !entro, onComplete: () => { jugado = true } })
+        if (jugado) tw.progress(1)
+        return tw
+      },
     })
     return (r) => { entro = true; espera = r; tw?.delay(r).play() }
   },

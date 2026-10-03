@@ -1,32 +1,27 @@
-import { useLayoutEffect, useRef } from 'react'
+import { useLayoutEffect, useRef, type ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { v5path, useV5, type Obra } from '../data'
+import type { Obra } from '../data'
 import { useCopy } from './copy'
 import { aterrizar, gsap, remedirEscenas, useVista, vueloDe, zoomTarjetas } from './motion'
-import { Chevron, Enlace, Segmentado, Tile } from './piezas'
+import { Fila, Segmentado, Tile } from './piezas'
+import { usePublico } from './publico'
 
 type Tipo = 'todo' | 'store' | 'product' | 'mas'
 const TIPOS: Tipo[] = ['todo', 'store', 'product', 'mas']
-const grupoDe = (o: Obra): Tipo => (o.kind === 'store' ? 'store' : o.kind === 'product' ? 'product' : 'mas')
 
-/** Obra sin captura: una fila de texto. Nunca una imagen inventada. */
-function Fila({ o }: { o: Obra }) {
-  const c = useCopy()
+/** Un grupo de la lista (tiendas, productos, proyectos): su título y lo que lleva dentro. Oculto, sigue en el DOM. */
+function Grupo({ id, titulo, oculto, children }: { id: string; titulo: ReactNode; oculto: boolean; children: ReactNode }) {
   return (
-    <li>
-      <Enlace to={v5path('apple', 'obra', o.slug)} className="ap-fila">
-        <span className="ap-fila-n">{o.name}</span>
-        <span className="ap-fila-d">{o.kind === 'personal' ? c.kinds.personal : (o.industry ?? o.tagline)}</span>
-        <span className="ap-fila-a">{o.year}</span>
-        <Chevron />
-      </Enlace>
-    </li>
+    <section className="ap-grupo" aria-labelledby={id} hidden={oculto}>
+      <h2 id={id} className="ap-subtitulo" data-ap="linea">{titulo}</h2>
+      {children}
+    </section>
   )
 }
 
 export default function Indice() {
   const c = useCopy()
-  const { obras, personal, storeCount } = useV5()
+  const { obras, personal, storeCount, strings: s } = usePublico()
   const [params, setParams] = useSearchParams()
   const pedido = params.get('tipo') as Tipo | null
   const tipo: Tipo = pedido && TIPOS.includes(pedido) ? pedido : 'todo'
@@ -34,7 +29,7 @@ export default function Indice() {
   const ref = useVista<HTMLElement>([], (raiz, limpiar) => {
     zoomTarjetas(raiz, limpiar)
     const slug = vueloDe()
-    const marco = slug ? raiz.querySelector<HTMLElement>(`.ap-tile[data-slug="${slug}"]:not([hidden]) .ap-tile-marco`) : null
+    const marco = slug ? raiz.querySelector<HTMLElement>(`.ap-grupo:not([hidden]) .ap-tile[data-slug="${slug}"] .ap-tile-marco`) : null
     if (!slug || !marco) return
     const tarjeta = marco.parentElement!
     aterrizar(slug, marco, limpiar, {
@@ -49,21 +44,50 @@ export default function Indice() {
   const rejilla = useRef<HTMLDivElement>(null)
   const primera = useRef(true)
 
-  const entra = (o: Obra) => tipo === 'todo' || grupoDe(o) === tipo
-  const conCaptura = obras.filter((o) => o.views.length)
-  const sinCaptura = obras.filter((o) => !o.views.length)
-  // Ritmo asimétrico entre las tarjetas VISIBLES (nth-child no sirve: las filtradas siguen en el DOM, ocultas): 7·5 y 4·4·4 en ciclos de cinco, y de la 7.ª en adelante, compactas en móvil.
-  const lugar = new Map(conCaptura.filter(entra).map((o, i) => [o.slug, i]))
+  const ver = (g: Exclude<Tipo, 'todo'>) => tipo === 'todo' || tipo === g
+  const de = (kind: Obra['kind']) => obras.filter((o) => o.kind === kind)
+  const tiendas = de('store')
+  const productos = de('product')
+  const personales = de('personal')
+  const entregables = de('role')
 
-  // Al cambiar de filtro las obras que se quedan vuelven a entrar escalonadas (las que ya estaban a la vista no se esconden antes).
+  // Al cambiar de filtro lo que se queda vuelve a entrar escalonado.
   useLayoutEffect(() => {
     if (primera.current) { primera.current = false; return }
     remedirEscenas() // las tarjetas que vuelven a mostrarse estaban medidas a cero
-    const visibles = rejilla.current?.querySelectorAll<HTMLElement>('.ap-tile:not([hidden]), .ap-fila')
+    const visibles = rejilla.current?.querySelectorAll<HTMLElement>('.ap-grupo:not([hidden]) :is(.ap-tile, .ap-fila)')
     if (!visibles?.length) return
     gsap.killTweensOf(visibles)
     gsap.fromTo(visibles, { opacity: 0, y: 36, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: 'apple', stagger: 0.035, clearProps: 'transform,opacity' })
   }, [tipo])
+
+  // Ritmo asimétrico dentro de cada grupo: 7·5 y 4·4·4 en ciclos de cinco; de la 7.ª en adelante, compactas en móvil.
+  const tarjetas = (lista: Obra[], prioridad = 0) => (
+    <div className="ap-tiles ap-tiles-indice">
+      {lista.filter((o) => o.views.length).map((o, n) => (
+        <Tile
+          key={o.slug}
+          o={o}
+          className={`ap-tile-i${n % 5}${n >= 6 ? ' ap-tile-c' : ''}`}
+          etq={[o.industry, o.rolLabel].filter(Boolean).join(' · ')}
+          texto={o.tagline}
+          ficha={c.verFicha}
+          prioridad={n < prioridad}
+          nivel={3}
+        />
+      ))}
+    </div>
+  )
+  const filas = (lista: Obra[], titulo?: string) => {
+    const sin = lista.filter((o) => !o.views.length)
+    if (!sin.length) return null
+    return (
+      <>
+        {titulo && <p className="ap-grupo-sub">{titulo}</p>}
+        <ul className="ap-filas" data-ap="grupo">{sin.map((o) => <Fila key={o.slug} o={o} />)}</ul>
+      </>
+    )
+  }
 
   return (
     <main id="contenido" tabIndex={-1} ref={ref} className="ap-vista">
@@ -78,28 +102,26 @@ export default function Indice() {
           <Segmentado
             etiqueta={c.obra.filtrar}
             valor={tipo}
-            opciones={TIPOS.map((t) => [t, c.obra.tipos[t === 'mas' ? 'mas' : t]])}
+            opciones={TIPOS.map((t) => [t, c.obra.tipos[t]])}
             onCambio={(t) => setParams(t === 'todo' ? {} : { tipo: t }, { replace: true })}
           />
         </div>
       </section>
 
       <div className="ap-frame ap-indice" ref={rejilla}>
-        <div className="ap-tiles ap-tiles-indice">
-          {conCaptura.map((o, i) => {
-            const n = lugar.get(o.slug) ?? 0
-            return <Tile key={o.slug} o={o} className={`ap-tile-i${n % 5}${n >= 6 ? ' ap-tile-c' : ''}`} rubro={o.industry ?? o.tagline} ficha={c.verFicha} hidden={!entra(o)} prioridad={i < 6} nivel={2} />
-          })}
-        </div>
-        {sinCaptura.some(entra) && (
-          <>
-            <h2 className="ap-subtitulo" data-ap="linea">{c.obra.masTitulo}</h2>
-            <ul className="ap-filas" data-ap="grupo">
-              {sinCaptura.filter(entra).map((o) => <Fila key={o.slug} o={o} />)}
-            </ul>
-          </>
-        )}
-        {!conCaptura.some(entra) && !sinCaptura.some(entra) && <p className="ap-tenue">{c.obra.vacio}</p>}
+        <Grupo id="ap-g-tiendas" titulo={s.sections.shopify.tabStores} oculto={!ver('store')}>
+          {tarjetas(tiendas, 6)}
+          {filas(tiendas, s.sections.shopify.legacyLabel)}
+        </Grupo>
+        <Grupo id="ap-g-productos" titulo={s.sections.shopify.tabProducts} oculto={!ver('product')}>
+          {tarjetas(productos)}
+          {filas(productos)}
+        </Grupo>
+        <Grupo id="ap-g-mas" titulo={`${s.sections.projects.title} ${s.sections.projects.titleAccent}`} oculto={!ver('mas')}>
+          <ul className="ap-filas" data-ap="grupo">{personales.map((o) => <Fila key={o.slug} o={o} />)}</ul>
+          <p className="ap-grupo-sub">{c.obra.entregables}</p>
+          <ul className="ap-filas" data-ap="grupo">{entregables.map((o) => <Fila key={o.slug} o={o} />)}</ul>
+        </Grupo>
       </div>
     </main>
   )

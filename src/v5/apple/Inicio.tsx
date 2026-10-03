@@ -1,8 +1,9 @@
 import { v5path, sinPuntoFinal, SHOT_DATE, useV5 } from '../data'
+import { usePublico } from './publico'
 import { useMedellinTime } from '../shared/useMedellinTime'
 import { useCopy } from './copy'
 import { escena, gsap, SplitText, useVista, zoomTarjetas } from './motion'
-import { Chevron, Enlace, Mac, Telefono, Tile } from './piezas'
+import { Chevron, Enlace, Fila, Mac, Telefono, Tile } from './piezas'
 
 /** Tarjeta «Ahora»: disponibilidad, lugar, cifra pública de tiendas y la hora de Medellín. Sin conteos de «en vivo». */
 function Ahora() {
@@ -24,7 +25,8 @@ function Ahora() {
 
 export default function Inicio() {
   const c = useCopy()
-  const { strings: s, personal, obras, obra } = useV5()
+  const { strings: s, personal, obras, obra, cifras } = usePublico()
+  const productos = obras.filter((o) => o.kind === 'product')
   const destacada = obra('nos-cafe')
   const banda = obras.filter((o) => o.kind === 'store' && !o.legacy && o.views.length)
   const tiles = obras.filter((o) => o.kind === 'store' && o.tema === 'digitdeck' && !o.legacy && o.views.length && o.slug !== destacada?.slug).slice(0, 4)
@@ -74,6 +76,7 @@ export default function Inicio() {
               <Enlace className="ap-enlace" to={v5path('apple', 'obra')}>{c.verObra}<Chevron /></Enlace>
               <a className="ap-enlace ap-enlace-tenue" href={personal.cv} download>{s.hero.ctaCv}<Chevron /></a>
             </div>
+            <p className="ap-hero-nota" data-ap="subir" data-ap-retraso="0.4">{s.hero.ctaNote}</p>
           </div>
           <Ahora />
         </div>
@@ -116,14 +119,53 @@ export default function Inicio() {
         <p className="ap-declaracion-txt">{s.hero.lead}</p>
       </section>
 
+      <section className="ap-cifras ap-frame" aria-labelledby="ap-cif-t">
+        <div className="ap-cifras-cab">
+          <p className="ap-eyebrow" data-ap="subir">{s.sections.statBand.asOf}</p>
+          <h2 id="ap-cif-t" data-ap="linea">{s.sections.statBand.label}</h2>
+        </div>
+        <ul className="ap-cifras-lista" data-ap="grupo">
+          {cifras.map((f) => (
+            <li key={f.id} className="ap-cifra">
+              <p className="ap-cifra-v">{f.valor}</p>
+              <p className="ap-cifra-e">{f.etiqueta}</p>
+              <p className="ap-cifra-f"><span>{s.sections.statBand.sourceLabel}</span> {f.fuente}</p>
+            </li>
+          ))}
+        </ul>
+        <p className="ap-cifras-nota">{s.sections.statBand.note}</p>
+      </section>
+
       <section className="ap-obra-home ap-frame" aria-labelledby="ap-obra-t">
         <div className="ap-sec-cab">
           <h2 id="ap-obra-t" data-ap="linea">{c.obra.h1}</h2>
           <Enlace className="ap-enlace" to={v5path('apple', 'obra')}>{c.verTodaObra}<Chevron /></Enlace>
         </div>
         <div className="ap-tiles">
-          {tiles.map((o, i) => <Tile key={o.slug} o={o} className={`ap-tile-${i}`} rubro={o.industry ?? o.tagline} ficha={c.verFicha} />)}
+          {tiles.map((o, i) => <Tile key={o.slug} o={o} className={`ap-tile-${i}`} etq={[o.industry, o.rolLabel].filter(Boolean).join(' · ')} texto={o.tagline} ficha={c.verFicha} />)}
         </div>
+        <p className="ap-grupo-sub">{s.sections.shopify.tabProducts}</p>
+        <ul className="ap-filas" data-ap="grupo">{productos.map((o) => <Fila key={o.slug} o={o} />)}</ul>
+      </section>
+
+      <section className="ap-proceso ap-frame" aria-labelledby="ap-proc-t">
+        <div className="ap-proceso-cab">
+          <p className="ap-eyebrow" data-ap="subir">{s.sections.process.eyebrow}</p>
+          <h2 id="ap-proc-t" data-ap="linea">
+            <span className="ap-bloque">{s.sections.process.title.replace(/[,，]\s*$/, '')}</span>
+            <span className="ap-bloque ap-tenue">{s.sections.process.titleAccent}</span>
+          </h2>
+        </div>
+        <ol className="ap-pasos" data-ap="grupo">
+          {s.sections.process.steps.map((p, i) => (
+            <li key={p.title} className="ap-paso">
+              <span className="ap-paso-n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <h3>{p.title}</h3>
+              <p>{p.body}</p>
+              <p className="ap-paso-r"><span>{s.sections.process.deliverableLabel}</span> {p.deliverable}</p>
+            </li>
+          ))}
+        </ol>
       </section>
 
       <section className="ap-cierre" aria-labelledby="ap-cierre-t">

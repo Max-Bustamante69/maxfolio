@@ -67,8 +67,8 @@ export function Telefono({ slug, vistas, activa = vistas[0], alt, previa }: { sl
   )
 }
 
-/** Obra con captura: la imagen manda, el texto cuelga debajo. Al pulsarla, la captura cruza a la ficha. */
-export function Tile({ o, rubro, ficha, className = '', hidden, prioridad, nivel = 3 }: { o: Obra; rubro: string; ficha: string; className?: string; hidden?: boolean; prioridad?: boolean; nivel?: 2 | 3 }) {
+/** Obra con captura: la imagen manda, el texto cuelga debajo (rubro y rol, nombre, su historia en una línea). Al pulsarla, la captura cruza a la ficha. */
+export function Tile({ o, etq, texto, ficha, className = '', hidden, prioridad, nivel = 3 }: { o: Obra; etq?: string; texto?: string; ficha: string; className?: string; hidden?: boolean; prioridad?: boolean; nivel?: 2 | 3 }) {
   const Titulo = nivel === 2 ? 'h2' : 'h3'
   const marco = useRef<HTMLDivElement>(null)
   const alPulsar = (e: MouseEvent) => {
@@ -83,8 +83,9 @@ export function Tile({ o, rubro, ficha, className = '', hidden, prioridad, nivel
         <div className="ap-tile-zoom"><ShotImg slug={o.slug} vista={o.views[0]} vp="desktop" alt="" prioridad={prioridad} /></div>
       </div>
       <div className="ap-tile-pie">
+        {etq && <p className="ap-tile-etq">{etq}</p>}
         <Titulo>{o.name}</Titulo>
-        <p>{rubro}</p>
+        {texto && <p className="ap-tile-txt">{texto}</p>}
         <span className="ap-tile-ver">{ficha}<Chevron /></span>
       </div>
     </Enlace>
@@ -98,5 +99,19 @@ export function Segmentado<T extends string>({ valor, opciones, onCambio, etique
         <button key={v} type="button" aria-pressed={v === valor} className="ap-seg-op" onClick={() => onCambio(v)}>{texto}</button>
       ))}
     </div>
+  )
+}
+
+/** Una obra en una fila: nombre, su historia en una línea, año. Es la forma de lo que no tiene captura (nunca una imagen inventada). */
+export function Fila({ o }: { o: Obra }) {
+  return (
+    <li>
+      <Enlace to={v5path('apple', 'obra', o.slug)} className="ap-fila">
+        <span className="ap-fila-n">{o.name}</span>
+        <span className="ap-fila-d">{o.tagline || o.industry}</span>
+        <span className="ap-fila-a">{o.year}</span>
+        <Chevron />
+      </Enlace>
+    </li>
   )
 }
