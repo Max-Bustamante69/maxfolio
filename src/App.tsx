@@ -1,89 +1,56 @@
-import { Navigate, Routes, Route, useLocation } from 'react-router-dom'
-import { lazy, Suspense, useEffect, useRef, type ComponentType } from 'react'
+import { Navigate, Routes, Route, useLocation, useParams } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
 import { Analytics } from '@vercel/analytics/react'
-import { LazyMotion } from 'framer-motion'
-import { PageTransitionProvider, usePageTransition } from './components/transitions'
 import { LanguageProvider } from './context/LanguageContext'
-import { designById, MENU } from './data/designs'
-import Apple from './pages/Apple'
-import { attributeUrl, currentVariant, recordAb, splitActive } from './ab'
-import type { VariantId } from '../ab.config'
+import { AB, THEMES, asignar } from '../ab.config'
+import ThemeRoot from './themes/Router'
 
-// The default experience ships in the main bundle; the others load on demand.
-const Home = lazy(() => import('./pages/Home'))
-const Design1 = lazy(() => import('./pages/Design1'))
-const Design4 = lazy(() => import('./pages/Design4'))
-const Neo = lazy(() => import('./pages/Neo'))
-const Persona = lazy(() => import('./pages/Persona'))
-const Terminal = lazy(() => import('./pages/Terminal'))
-// Private, unlisted (no nav link, not in sitemap.xml, `noindex` via its own SEOHead) — see Stats.tsx.
+// Panel privado del reparto (sin enlace, noindex, fuera del sitemap) — ver Stats.tsx.
 const Stats = lazy(() => import('./pages/Stats'))
 
-// A/B: the landing at `/` is the visitor's variant. Every theme that can be a variant is registered here;
-// ab.config.ts decides which ones actually take traffic (with only `apple` listed there is no split).
-const VARIANT_PAGES: Partial<Record<VariantId, ComponentType>> = { apple: Apple, neo: Neo, persona: Persona }
+const leerCookie = () =>
+  document.cookie
+    .split(';')
+    .map((p) => p.trim())
+    .find((p) => p.startsWith(`${AB.cookie}=`))
+    ?.slice(AB.cookie.length + 1)
 
-/** The landing at `/`: the pinned variant, or the one forced by `?v=` (theme links), resolved on every navigation. */
-function Landing() {
+/** `/` en el cliente: el middleware de Vercel ya redirige en el servidor; esto cubre `vite dev`/`preview` y un fallo del edge con la misma regla. */
+function Raiz() {
   const { search } = useLocation()
-  const variant = currentVariant()
-  const Page = VARIANT_PAGES[variant] ?? Apple
-  return <Page key={`${variant}${search}`} />
+  const q = new URLSearchParams(search)
+  const { id, fijar } = asignar(navigator.userAgent, q.get('v'), leerCookie(), Math.random())
+  if (fijar) document.cookie = `${AB.cookie}=${id}; Path=/; Max-Age=${AB.maxAge}; SameSite=Lax${location.protocol === 'https:' ? '; Secure' : ''}`
+  q.delete('v')
+  const resto = q.toString()
+  return <Navigate to={`/${id}${resto ? `?${resto}` : ''}`} replace />
 }
 
-function ScrollToTop() {
-  const { pathname } = useLocation()
-  const { isTransitioning } = usePageTransition()
-  const prevPath = useRef(pathname)
-
-  useEffect(() => {
-    // Only scroll if path changed and NOT during a transition (transition handles its own scroll)
-    if (pathname !== prevPath.current && !isTransitioning) {
-      window.scrollTo({ top: 0, behavior: 'instant' })
-    }
-    prevPath.current = pathname
-  }, [pathname, isTransitioning])
-
-  return null
-}
-
-/** One exposure beacon per page load, only while a split is running. */
-function AbView() {
-  useEffect(() => {
-    if (splitActive() && window.location.pathname === '/') recordAb('view')
-  }, [])
-  return null
+/** Las rutas de las direcciones antes de la fusión (`/v5/<tema>/…`) siguen funcionando. */
+function V5Antigua() {
+  const { '*': resto = '' } = useParams()
+  const { search } = useLocation()
+  return <Navigate to={`/${resto}${search}`} replace />
 }
 
 function App() {
   return (
     <LanguageProvider>
-      {/* `m.*` components everywhere; the feature set arrives as an async chunk instead of the eager bundle. */}
-      <LazyMotion features={() => import('./motion-features').then((mod) => mod.default)}>
-      <PageTransitionProvider>
-        <ScrollToTop />
-        <AbView />
-        <Suspense fallback={null}>
-          <Routes>
-            <Route path={designById('apple').route} element={<Landing />} />
-            <Route path={designById('luxury').route} element={<Design4 />} />
-            <Route path={designById('brutalist').route} element={<Design1 />} />
-            <Route path={designById('neo').route} element={<Neo />} />
-            <Route path={designById('persona').route} element={<Persona />} />
-            <Route path={designById('terminal').route} element={<Terminal />} />
-            <Route path={MENU.route} element={<Home />} />
-            <Route path="/stats" element={<Stats />} />
-            {/* Legacy routes */}
-            <Route path="/1" element={<Design4 />} />
-            <Route path="/2" element={<Design1 />} />
-            {/* Unknown paths (e.g. the removed /skyline) land on the default experience instead of a blank shell. */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Suspense>
-        {/* The insights script only exists on Vercel; skipping it elsewhere keeps local audits free of a 404. */}
-        {typeof window !== 'undefined' && /(^|\.)maxfolio\.dev$|\.vercel\.app$/.test(window.location.hostname) && <Analytics beforeSend={(e) => ({ ...e, url: attributeUrl(e.url) })} />}
-      </PageTransitionProvider>
-      </LazyMotion>
+      <Suspense fallback={null}>
+        <Routes>
+          <Route path="/" element={<Raiz />} />
+          {THEMES.map((id) => (
+            <Route key={id} path={`/${id}/*`} element={<ThemeRoot id={id} />} />
+          ))}
+          <Route path="/v5/*" element={<V5Antigua />} />
+          {/* Temas retirados (2026-10-03, decisión de Max): el viejo Persona era /arcade; el resto vuelve al sorteo. */}
+          <Route path="/arcade" element={<Navigate to="/persona" replace />} />
+          <Route path="/stats" element={<Stats />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
+      {/* Vercel Web Analytics por ruta: cada tema vive bajo su prefijo, así que las visitas ya salen separadas por tema. */}
+      {typeof window !== 'undefined' && /(^|\.)maxfolio\.dev$|\.vercel\.app$/.test(window.location.hostname) && <Analytics />}
     </LanguageProvider>
   )
 }

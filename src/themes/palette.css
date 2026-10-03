@@ -1,0 +1,31 @@
+/* Paleta plata de Max (2026-10-02): plata, gris y blanco con un azul pizarra frío. Es la paleta de UNA dirección
+   (Max: «solo quiero 1 con esa paleta»); las demás definen la suya en su carpeta. Aquí queda como valor por defecto del hub.
+   Los cinco son claros (Material Grey 300/400/500 y Blue Grey 100): sirven de superficie, filete y relleno,
+   NUNCA de texto. La tinta es la única que lleva texto, foco y bordes de control.
+   Contraste de la tinta #263238 (Blue Grey 900): blanco 13.16 · #E0E0E0 9.97 · #CFD8DC 9.09 · #BDBDBD 7.00 · #9E9E9E 4.91 (todos AA). */
+:root {
+  --v5-white: #FFFFFF;
+  --v5-mist: #E0E0E0;
+  --v5-slate: #CFD8DC;
+  --v5-silver: #BDBDBD;
+  --v5-steel: #9E9E9E;
+  --v5-ink: #263238;
+  /* Roles: cada dirección decide cuál es su papel y cuál su superficie; estos son los valores por defecto. */
+  --v5-paper: var(--v5-white);
+  --v5-line: var(--v5-silver);
+  /* Texto secundario: la misma tinta con opacidad (≥ 4.5:1 sobre blanco y sobre #E0E0E0). */
+  --v5-ink-quiet: rgb(38 50 56 / 0.78);
+}
+
+.v5-root {
+  background: var(--v5-paper);
+  color: var(--v5-ink);
+  -webkit-font-smoothing: antialiased;
+}
+.v5-quiet {
+  color: var(--v5-ink-quiet);
+}
+.v5-root :focus-visible {
+  outline: 2px solid var(--v5-ink);
+  outline-offset: 3px;
+}

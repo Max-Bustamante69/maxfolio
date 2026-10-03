@@ -1,0 +1,53 @@
+/* El Reportaje · tokens. Único archivo con hexadecimales; el resto usa var(--*).
+   Paleta (ficha de estilo 5.1): papel cálido, tinta casi negra y UN dorado de foco. El relleno dorado (1,61:1 sobre papel)
+   nunca va solo: siempre con trazo --gold-deep (receta del NYT: relleno claro + trazo del mismo tono más oscuro).
+   Contrastes (WCAG 2.x): ink/paper 16,03 · ink-2/paper 8,41 · ink-3/paper 5,11 · ink-3/card 5,52 · gold-deep/paper 5,16 · gold-deep/card 5,58
+   night-ink/night 14,77 · gold-fill/night 9,96 · night-2/night 8,3 · error/card 7,2. */
+
+@font-face { font-family: 'Newsreader'; font-style: normal; font-weight: 200 800; font-display: block; src: url('/fonts/reportaje/newsreader-var-latin.woff2') format('woff2'); }
+@font-face { font-family: 'Newsreader'; font-style: italic; font-weight: 400; font-display: swap; src: url('/fonts/reportaje/newsreader-italic-400-latin.woff2') format('woff2'); }
+@font-face { font-family: 'DM Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url('/fonts/reportaje/dm-mono-400-latin.woff2') format('woff2'); }
+@font-face { font-family: 'DM Mono'; font-style: normal; font-weight: 500; font-display: swap; src: url('/fonts/reportaje/dm-mono-500-latin.woff2') format('woff2'); }
+@font-face { font-family: 'Source Sans 3'; font-style: normal; font-weight: 300 700; font-display: swap; src: url('/fonts/reportaje/source-sans-3-var-latin.woff2') format('woff2'); }
+/* Mientras llega la serif: Georgia más estrecha, para que el titular no salte al cambiar. */
+@font-face { font-family: 'Newsreader Fallback'; src: local('Georgia'); size-adjust: 94%; }
+
+.v5-reportaje {
+  --paper: #f4efe5;
+  --card: #fbf8f1;
+  --ink: #17140f;
+  --ink-2: #4a443a;
+  --ink-3: #6b6457;
+  --rule: #cfc5b0;
+  --context: #b9af9b;
+  --gold-fill: #ddbb6a;
+  --gold-deep: #7e5f25;
+  --night: #17140f;
+  --night-ink: #ede6d6;
+  --night-2: #b9b09c;
+  --night-rule: #4a443a;
+  --error: #9b2c1d;
+  --foco: #7e5f25;
+  /* Texto de foco y trazo de las marcas: sobre papel son el dorado hondo; en el capítulo de tinta se invierten. */
+  --foco-texto: #7e5f25;
+  --trazo: #7e5f25;
+
+  --serif: 'Newsreader', 'Newsreader Fallback', Georgia, 'Times New Roman', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+  --mono: 'DM Mono', ui-monospace, Menlo, Consolas, monospace;
+  --sans: 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --prose: 650px;
+  --medium: 900px;
+  --wide: 1200px;
+  --gutter: clamp(16px, 6.7vw, 96px);
+  --cap: clamp(56px, 8vw, 120px);
+  --nav: 52px;
+
+  /* Curvas y tiempos medidos en The Pudding (ficha 2.2). */
+  --ease-out: cubic-bezier(0.33, 1, 0.68, 1);
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-panel: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  color-scheme: light;
+}

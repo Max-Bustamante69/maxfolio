@@ -11,9 +11,9 @@
 export const config = { runtime: 'edge' }
 import { kv, pipeline, json, safeEqual } from './_kv'
 import { stores } from '../src/data/registry'
+import { THEMES } from '../ab.config'
 
 const STORE_SLUGS = new Set(stores.map((s) => s.slug))
-const THEMES = ['apple', 'luxury', 'brutalist', 'neo', 'persona', 'terminal'] as const
 const LOCALES = ['en', 'es', 'ja'] as const
 const CTA_POSITIONS = ['nav', 'hero', 'section', 'footer', 'fab', 'mobile', 'sheet'] as const
 const FILTER_KINDS = ['stores', 'skills', 'gallery'] as const
@@ -35,12 +35,28 @@ const EVENTS: Record<string, EventSpec> = {
   cta_click: {
     fields: (p) => (isSlug(p.cta) && isEnum(p.position, CTA_POSITIONS) ? [`cta_click:${p.position}:${p.cta}`] : false),
   },
-  // `theme` is optional on these three (some triggers fire before a theme is known) — always counts
-  // toward the bare event total, plus a per-theme breakdown field when a valid theme came along.
+  // Las métricas del reparto entre temas (ab.config.ts): cada evento suma al total y a su tema, así `/stats` puede
+  // comparar vistas → interacción → contacto por tema. `theme` es opcional (un disparo sin tema cuenta solo al total).
+  theme_view: { fields: (p) => (isEnum(p.theme, THEMES) ? ['theme_view', `theme_view:${p.theme}`] : false) },
+  // Interacción real: la mitad de la página recorrida o 30 s visibles con algún gesto, una vez por carga.
+  theme_engaged: { fields: (p) => (isEnum(p.theme, THEMES) ? ['theme_engaged', `theme_engaged:${p.theme}`] : false) },
+  obra_open: {
+    fields: (p) => {
+      if (!isEnum(p.theme, THEMES)) return ['obra_open']
+      const slug = p.slug ?? p.obra
+      return ['obra_open', `obra_open:${p.theme}`, ...(isSlug(slug) ? [`obra_open:slug:${slug}`] : [])]
+    },
+  },
   contact_open: { fields: (p) => (isEnum(p.theme, THEMES) ? ['contact_open', `contact_open:${p.theme}`] : ['contact_open']) },
+  contact_click: {
+    fields: (p) => (isEnum(p.theme, THEMES) ? ['contact_click', `contact_click:${p.theme}`, ...(isSlug(p.canal, 24) ? [`contact_click:canal:${p.canal}`] : [])] : ['contact_click']),
+  },
   contact_submit: { fields: (p) => (isEnum(p.theme, THEMES) ? ['contact_submit', `contact_submit:${p.theme}`] : ['contact_submit']) },
   cv_download: { fields: (p) => (isEnum(p.theme, THEMES) ? ['cv_download', `cv_download:${p.theme}`] : ['cv_download']) },
-  theme_switch: { fields: (p) => (isEnum(p.to, THEMES) ? [`theme_switch:${p.to}`] : false) },
+  // De qué tema a cuál se cambia: el destino suma como preferencia y el par dice qué tema se abandona.
+  theme_switch: {
+    fields: (p) => (isEnum(p.to, THEMES) ? ['theme_switch', `theme_switch:${p.to}`, ...(isEnum(p.from, THEMES) ? [`theme_switch:${p.from}>${p.to}`] : [])] : false),
+  },
   locale_switch: { fields: (p) => (isEnum(p.to, LOCALES) ? [`locale_switch:${p.to}`] : false) },
   store_sheet_open: { fields: (p) => (typeof p.store === 'string' && STORE_SLUGS.has(p.store) ? [`store_sheet_open:${p.store}`] : false) },
   outbound_store_click: { fields: (p) => (typeof p.store === 'string' && STORE_SLUGS.has(p.store) ? [`outbound_store_click:${p.store}`] : false) },

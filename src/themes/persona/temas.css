@@ -1,0 +1,94 @@
+/* Persona — el selector de temas («SELECT STAGE»). Se carga junto con Temas.tsx (lazy): nada de esto pesa antes de abrirlo.
+   Ningún hexadecimal aquí: los colores vienen de tokens.css (roles --v5-*). Solo se anima transform, opacity y clip-path.
+   Contraste medido sobre la tinta: hielo 17.2 · blanco 19.2 · acento 3.6 (solo formas y texto grande, nunca texto
+   pequeño); blanco sobre acento 5.3 · tinta sobre blanco 19.2 · tinta-2 sobre blanco 8.7 · acento-hondo sobre hielo 8.9. */
+
+.pt-panel { position: fixed; inset: 0; z-index: 500; overflow: hidden; color: var(--v5-bg); }
+
+/* Las dos hojas del barrido: el acento va por delante y la tinta detrás (se animan con clip-path). */
+.pt-hoja { position: absolute; inset: 0; pointer-events: none; }
+.pt-hoja--acento { background: var(--v5-accent); }
+.pt-hoja--tinta { background: var(--v5-ink); overflow: hidden; }
+.pt-corte { position: absolute; inset: 0; background: var(--v5-accent); opacity: 0.2; clip-path: polygon(60% 0, 100% 0, 100% 100%, 34% 100%); }
+.pt-trama { position: absolute; inset: 0; background-image: radial-gradient(var(--v5-accent) 1.2px, transparent 1.7px); background-size: 16px 16px; opacity: 0.5; -webkit-mask-image: linear-gradient(115deg, transparent 42%, black 88%); mask-image: linear-gradient(115deg, transparent 42%, black 88%); }
+
+/* Escena con scroll propio (en el teléfono las ocho cartas no caben: la lista se desplaza dentro del panel). */
+.pt-escena { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; padding: calc(env(safe-area-inset-top, 0px) + 18px) var(--pr-gutter) calc(env(safe-area-inset-bottom, 0px) + 28px); }
+/* margin: auto centra el conjunto cuando cabe y, si no cabe, deja que la escena se desplace desde arriba. */
+.pt-marco { width: 100%; max-width: 1240px; margin: auto; }
+
+/* Cerrar: pegado arriba a la derecha mientras se desplaza (una barra pegajosa de alto cero deja que el botón sobresalga). */
+.pt-barra { position: sticky; top: 0; z-index: 9; display: flex; justify-content: flex-end; height: 0; }
+.v5-root.v5-persona .pt-cerrar { display: inline-flex; align-items: center; gap: 9px; min-height: 44px; padding: 0 22px 0 26px; background: var(--v5-bg); color: var(--v5-ink); border: 0; font: 700 0.82rem/1 var(--pr-label); letter-spacing: 0.16em; text-transform: uppercase; clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%); transition: background-color var(--pr-dur-ui), color var(--pr-dur-ui), transform var(--pr-dur-press) var(--pr-ease-out); }
+.v5-root.v5-persona .pt-cerrar:hover { background: var(--v5-accent); color: var(--v5-on-accent); }
+.v5-root.v5-persona .pt-cerrar:active { transform: scale(1.08); }
+.v5-root.v5-persona .pt-cerrar:focus-visible { clip-path: none; outline: 3px solid var(--v5-bg); outline-offset: 3px; }
+
+/* Cabecera: eyebrow, título de nota de rescate sobre una losa de acento, y la pista de teclas. */
+.pt-cabecera { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 28px; padding-top: 46px; overflow-x: clip; }
+@media (min-width: 640px) { .pt-cabecera { padding-top: 6px; padding-right: 150px; } }
+.pt-cabeza { position: relative; min-width: 0; }
+.v5-root.v5-persona .pt-eyebrow { display: block; width: fit-content; margin-bottom: 18px; color: color-mix(in srgb, var(--v5-bg) 86%, var(--v5-ink)); }
+.v5-root.v5-persona .pt-h { display: inline-block; max-width: 100%; margin: 0; color: var(--v5-surface); }
+.pt-h .pr-losa { inset: -4px -16px -2px; opacity: 1; }
+.pt-hint { display: none; margin: 0 0 6px; padding: 7px 12px; background: var(--v5-bg); color: var(--v5-ink); font: 600 0.78rem/1.3 var(--pr-label); letter-spacing: 0.14em; text-transform: uppercase; clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%); }
+.pt-hint b { color: var(--v5-accent-deep); font-weight: 700; }
+@media (hover: hover) and (pointer: fine) { .pt-hint { display: block; } }
+
+/* Rejilla: una columna de filas en el teléfono, dos en tableta, cuatro en escritorio. Todas las celdas miden lo mismo
+   (así el selector solo se traslada: nunca cambia de tamaño al moverse). */
+.pt-rejilla { position: relative; margin-top: 18px; }
+.pt-lista { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr); grid-auto-rows: 1fr; gap: 16px; padding: 16px 12px 14px; }
+@media (min-width: 640px) { .pt-lista { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 22px; padding: 20px 14px 16px; } }
+@media (min-width: 1024px) { .pt-lista { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px 22px; } }
+
+/* El selector azul (el mismo gesto del menú del inicio) y su imagen residual. */
+.pt-cursor { position: absolute; left: 0; top: 0; z-index: 0; background: var(--v5-accent); clip-path: polygon(2% 0, 100% 5%, 98% 100%, 0 95%); transform-origin: 0 50%; pointer-events: none; }
+.v5-root.v5-persona .pr-esquirla { background: var(--v5-accent); }
+.v5-root.v5-persona .pr-esquirla:nth-child(even) { background: var(--v5-surface); }
+
+/* Cartas inclinadas: cada una con su giro; la marcada se endereza y crece (transición CSS en el compositor). */
+.pt-item { --k: 1; display: flex; }
+.pt-item:nth-child(8n + 1) { --g: -1.5; }
+.pt-item:nth-child(8n + 2) { --g: 1.2; }
+.pt-item:nth-child(8n + 3) { --g: -0.9; }
+.pt-item:nth-child(8n + 4) { --g: 1.6; }
+.pt-item:nth-child(8n + 5) { --g: 1; }
+.pt-item:nth-child(8n + 6) { --g: -1.3; }
+.pt-item:nth-child(8n + 7) { --g: 0.8; }
+.pt-item:nth-child(8n + 8) { --g: -1.1; }
+@media (max-width: 639px) { .pt-item { --k: 0.4; } }
+
+.v5-root.v5-persona .pt-carta { position: relative; z-index: 1; flex: 1; min-width: 0; display: grid; grid-template-columns: 112px minmax(0, 1fr); min-height: 120px; background: var(--v5-surface); color: var(--v5-ink); clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px)); transform: rotate(calc(var(--g, 0) * var(--k) * 1deg)); transition: transform 170ms var(--pr-ease-out); }
+.pt-item[data-sel] .pt-carta { z-index: 3; transform: rotate(0deg) scale(1.05); }
+.v5-root.v5-persona .pt-carta:focus-visible { clip-path: none; outline: 3px solid var(--v5-bg); outline-offset: 4px; }
+/* Tema actual: una barra de acento al pie y la etiqueta. */
+.pt-carta[aria-current='true']::after { content: ''; position: absolute; inset: auto 0 0 0; height: 6px; background: var(--v5-accent); }
+
+.pt-carta__img { position: relative; display: block; overflow: hidden; background: var(--v5-ink); clip-path: polygon(0 0, 100% 0, 88% 100%, 0 100%); }
+.pt-carta__img picture { position: absolute; inset: 0; display: block; }
+.pt-carta__img img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top center; filter: saturate(0.72) brightness(0.94); transition: filter 170ms var(--pr-ease-out); }
+.pt-item[data-sel] .pt-carta__img img, .pt-carta[aria-current='true'] .pt-carta__img img { filter: none; }
+.pt-carta__n { position: absolute; left: 0; top: 0; z-index: 2; padding: 6px 14px 6px 9px; background: var(--v5-ink); color: var(--v5-bg); font: 700 0.78rem/1 var(--pr-label); letter-spacing: 0.14em; clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%); }
+
+.pt-carta__texto { display: flex; flex-direction: column; justify-content: center; gap: 6px; min-width: 0; padding: 12px 14px 14px 8px; }
+.pt-carta__nombre { display: block; font: 400 clamp(1.7rem, 7.6vw, 2rem)/1 var(--pr-display); font-style: oblique 6deg; text-transform: uppercase; }
+/* Japonés: sin espacios, así que «エンジニアリング» rompería a media palabra; se achica para que quepa entero. */
+:lang(ja) .pt-carta__nombre { font-size: 1.5rem; }
+.pt-carta__lema { display: block; font-size: 0.875rem; line-height: 1.38; color: var(--v5-ink-2); }
+.pt-carta__ahora { align-self: flex-start; padding: 5px 12px 5px 8px; background: var(--v5-accent); color: var(--v5-on-accent); font: 700 0.72rem/1 var(--pr-label); letter-spacing: 0.18em; text-transform: uppercase; clip-path: polygon(0 0, 100% 0, calc(100% - 7px) 100%, 0 100%); }
+
+@media (min-width: 640px) {
+  .v5-root.v5-persona .pt-carta { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; min-height: 0; }
+  .pt-carta__img { aspect-ratio: 16 / 10; clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%); }
+  .pt-carta__texto { justify-content: flex-start; gap: 8px; padding: 6px 18px 22px; }
+  .pt-carta__nombre { font-size: clamp(1.8rem, 2.6vw, 2.2rem); }
+  :lang(ja) .pt-carta__nombre { font-size: clamp(1.45rem, 2vw, 1.75rem); }
+  .pt-carta__lema { font-size: 0.9rem; }
+  .pt-carta__ahora { position: absolute; top: 0; right: 18px; z-index: 3; align-self: auto; padding: 7px 14px 7px 10px; }
+}
+
+/* El segundo barrido (al confirmar): acento con el nombre del tema elegido; cubre toda la pantalla y entonces se cambia de tema. */
+.pt-cubre { position: absolute; inset: 0 -20% 0 0; z-index: 7; display: flex; flex-direction: column; justify-content: center; gap: 10px; padding-left: 7vw; background: var(--v5-accent); color: var(--v5-surface); clip-path: polygon(0 0, 100% 0, 84% 100%, 0 100%); pointer-events: none; }
+.pt-cubre__kicker { font: 700 clamp(0.85rem, 2.2vw, 1.1rem)/1 var(--pr-label); letter-spacing: 0.3em; text-transform: uppercase; }
+.pt-cubre__nombre { display: block; font: 400 clamp(3.4rem, 15vw, 10rem)/0.95 var(--pr-display); font-style: oblique 6deg; text-transform: uppercase; }

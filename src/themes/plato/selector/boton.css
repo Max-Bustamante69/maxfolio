@@ -1,0 +1,34 @@
+/* Plató · disparador del selector de temas (la claqueta de la cabecera). Entra en la hoja principal: es pequeño y está en todas las vistas.
+   El panel («Cambiar de set») vive aparte, en panel.css, y no se descarga hasta que se abre. */
+
+.pl-temas {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px; flex: none;
+  min-width: 44px; min-height: 44px; height: var(--pil-h); width: var(--pil-h); padding: 0; border-radius: 999px;
+  background: var(--pildora-2); color: var(--tinta);
+  font-size: 14px; font-weight: 500; letter-spacing: 0.02em; text-transform: uppercase; white-space: nowrap;
+  transition: background-color 0.4s ease, color 0.4s ease, transform 0.4s var(--e-lusion);
+}
+@media (hover: hover) { .pl-temas:hover { transform: scale(1.03); } }
+.pl-temas:active { transform: scale(0.97); }
+.pl-raiz[data-tono='oscuro'] .pl-temas, .pl-cab[data-abierto='true'] .pl-temas { background: var(--grafito); color: var(--sala); border: 1px solid var(--linea-osc); }
+.pl-temas[aria-expanded='true'] { background: var(--tungsteno); color: var(--tinta); border-color: transparent; }
+
+/* El nombre accesible siempre existe; a la vista solo cuando cabe en la cabecera. */
+.pl-temas-t { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (min-width: 1300px) {
+  .pl-temas { width: auto; padding: 0 20px 0 15px; }
+  .pl-temas-t { position: static; width: auto; height: auto; overflow: visible; clip-path: none; }
+}
+
+/* La claqueta: el brazo se alza al apuntar o enfocar (despacio) y cae de golpe al soltar. */
+.pl-clap { flex: none; overflow: visible; }
+.pl-clap-brazo { transform-origin: 3.4px 8px; transition: transform 0.14s cubic-bezier(0.6, 0, 1, 0.55); }
+.pl-temas:focus-visible .pl-clap-brazo, .pl-temas[aria-expanded='true'] .pl-clap-brazo { transform: rotate(-24deg); transition: transform 0.4s var(--e-rodillo); }
+@media (hover: hover) { .pl-temas:hover .pl-clap-brazo { transform: rotate(-24deg); transition: transform 0.4s var(--e-rodillo); } }
+
+/* Hueco para el disparador en la cabecera (la fila ya iba justa a 1100 px y a 360 px). */
+@media (min-width: 900px) and (max-width: 1199px) { .pl-cab .pl-logo-txt { display: none; } }
+@media (max-width: 389px) {
+  .pl-cab .pl-logo { gap: 8px; }
+  .pl-cab .pl-logo-txt { font-size: 12px; letter-spacing: 0.04em; }
+}

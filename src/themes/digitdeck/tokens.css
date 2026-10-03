@@ -1,0 +1,127 @@
+/* Dirección «A la manera de Digitdeck» (la dirección del sitio v4 de Digitdeck, con el contenido de Max).
+   Tinta casi negra, UN solo acento —un verde eléctrico— y una banda de papel invertida por página. El acento es el punto final del
+   titular, los botones, el foco, la perla del MB, el disco de la transición y los estados; nunca un fondo grande salvo el disco.
+   Este es el ÚNICO archivo de la dirección con valores de color en bruto: el resto lee estas variables.
+   Roles comunes a las direcciones: --v5-bg, --v5-ink, --v5-ink-2, --v5-line, --v5-focus, --v5-surface.
+
+   Por qué #00ff6a (Max, 2026-10-03: «un verde llamativo, más agresivo, en vez del morado»): es el verde de mayor croma que cabe
+   en sRGB sin virar a lima (tono ≈ 143°; el lima #b6ff1f se lee deportivo y el menta #2bff88 se lee suave), y sobre la tinta tiene
+   la luminosidad que el violeta no tenía, así que es el único color de la página que brilla. Se compararon cinco candidatos sobre
+   el mismo titular y botón (estilo/digitdeck/swatch.png).
+
+   Pares medidos (WCAG 2.x, shots9/digitdeck/contraste.mjs): 0 fallos.
+     tinta sobre bg 17,13 · tinta-2 sobre bg 9,31 y sobre surface 8,78 (texto ≥ 4,5)
+     verde como texto sobre bg 14,51 y sobre surface 13,68 · TINTA sobre relleno verde 14,51 (el texto sobre el verde va en tinta)
+     foco verde sobre bg 14,51 · borde de control sobre bg 3,83 y sobre surface 3,61 (controles y foco ≥ 3)
+     banda de papel: tinta 17,13 · tinta-2 6,65 · verde profundo como punto, texto y foco 5,42 · borde de control 3,10
+   Descartado, escrito para que nadie lo reintroduzca: texto claro sobre el verde 1,18 (no pasa), el verde eléctrico como punto o
+   texto sobre el papel 1,18 (por eso la banda de papel redefine el punto con el verde profundo), texto-3 #7d7a88 bajo 24 px sobre surface. */
+.v5-digitdeck,
+:root:has(.v5-digitdeck) {
+  color-scheme: dark;
+
+  /* ---- roles comunes ---- */
+  --v5-bg: #0b0b0f;
+  --v5-ink: #f2efea;
+  --v5-ink-2: #b4b1bc;
+  --v5-line: rgb(242 239 234 / 0.16);
+  --v5-line-strong: #6f6c78;
+  --v5-focus: #00ff6a;
+  --v5-surface: #131318;
+
+  /* ---- el acento: un verde eléctrico. --v5-punto es el punto final del titular, del riel y de la marca: sobre el papel pasa al verde profundo ---- */
+  --v5-acento: #00ff6a;
+  --v5-on-acento: #0b0b0f;
+  --v5-punto: var(--v5-acento);
+
+  /* ---- banda de papel (una por página) ---- */
+  --v5-paper: #f2efea;
+  --v5-paper-ink: #0b0b0f;
+  --v5-paper-ink-2: #55525e;
+  --v5-paper-line: rgb(11 11 15 / 0.16);
+  --v5-paper-line-strong: #8a8693;
+  --v5-paper-accent: #00703a;
+  --v5-paper-error: #c42b3f;
+  --v5-paper-ok: #00703a;
+
+  /* ---- estados y velos ---- */
+  --v5-error: #ff7a7a;
+  --v5-ok: #00ff6a;
+  --v5-scrim: rgb(11 11 15 / 0.72);
+  --v5-shadow-float: 0 40px 60px rgb(0 0 0 / 0.55);
+
+  /* ---- tipografía ---- */
+  --f-display: 'DD Bricolage', 'DD Bricolage Fallback', system-ui, sans-serif;
+  --f-text: 'DD Hanken', 'DD Hanken Fallback', system-ui, sans-serif;
+  --f-serif: 'DD Serif', Georgia, serif;
+  --t-mega: clamp(2.25rem, 0.9rem + 4.9vw, 5.75rem); /* 36 / 85 / 92 px (390 / 1440 / 1920): el H1 de Max es una frase más larga que el de la agencia */
+  --t-display: clamp(2rem, 0.6rem + 4vw, 5rem); /* 32 / 67 / 80 */
+  --t-figure: clamp(4rem, 1rem + 11vw, 11rem); /* 64 / 174 / 176 */
+  --t-h2: clamp(1.625rem, 1rem + 1.8vw, 2.75rem); /* 26 / 42 / 44 */
+  --t-row: clamp(1.5rem, 1rem + 1.7vw, 2.625rem); /* nombre de fila del índice: 24 / 42 */
+  --t-lede: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  --t-body: 1rem;
+  --t-small: 0.875rem;
+  --t-micro: 0.75rem;
+
+  /* ---- retícula y ritmo ---- */
+  --gutter: clamp(15px, 3.5vw, 50px);
+  --frame-max: 1650px;
+  --sp-section: 96px;
+  --sp-breath: 160px;
+  --header-h: 60px;
+  --inset: max(var(--gutter), calc((100vw - var(--frame-max)) / 2 + var(--gutter)));
+  --r-tile: 10px;
+  --r-sheet: 20px;
+  --r-pill: 999px;
+
+  /* ---- movimiento: «llegar y asentarse» ---- */
+  --d-react: 0.12s;
+  --d-fast: 0.18s;
+  --d-base: 0.28s;
+  --d-reveal: 0.64s;
+  --d-photo: 0.9s;
+  --d-bloom: 0.34s;
+  --d-contract: 0.38s;
+  --d-count: 1.2s;
+  --stagger: 0.09;
+  --e-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --e-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --e-inout: cubic-bezier(0.7, 0, 0.2, 1);
+  --e-lift: cubic-bezier(0.77, 0, 0.175, 1);
+
+  /* ---- capas ---- */
+  --z-page: 2;
+  --z-fab: 50;
+  --z-cover: 78;
+  --z-menu: 75;
+  --z-header: 80;
+  --z-paleta: 90; /* la paleta de temas: sobre la cabecera, bajo el cursor; el disco de la elección pasa por encima (z-paleta + 2) */
+  --z-cursor: 95;
+  --z-entry: 100;
+  --z-skip: 110;
+}
+
+/* Dentro de la banda de papel los roles se invierten: el resto de la hoja no sabe que cambió de fondo. */
+.v5-digitdeck [data-tono='papel'] {
+  --v5-bg: var(--v5-paper);
+  --v5-surface: var(--v5-paper);
+  --v5-ink: var(--v5-paper-ink);
+  --v5-ink-2: var(--v5-paper-ink-2);
+  --v5-line: var(--v5-paper-line);
+  --v5-line-strong: var(--v5-paper-line-strong);
+  --v5-focus: var(--v5-paper-accent);
+  --v5-punto: var(--v5-paper-accent);
+  --v5-error: var(--v5-paper-error);
+  --v5-ok: var(--v5-paper-ok);
+  color-scheme: light;
+}
+
+@media (min-width: 1024px) {
+  .v5-digitdeck,
+  :root:has(.v5-digitdeck) {
+    --sp-section: 128px;
+    --sp-breath: 200px;
+    --header-h: 72px;
+  }
+}

@@ -1,0 +1,92 @@
+/* Dirección Ingeniería · tokens. Es el ÚNICO archivo de la dirección con hexadecimales de interfaz (más los del degradado de
+   la cinta, que es ilustración); el resto usa var(--ing-*). Derivados de la medición de stripe.com y linear.app (2026-10-03).
+   Contrastes (WCAG, calculados): tinta/blanco 13,16 · tinta-2/blanco 7,24 · tinta-3/blanco 5,40, /papel-2 5,07 · acento/blanco 5,13
+   blanco/acento 5,13 · noche/texto 15,81, /texto-2 9,58, /texto-3 7,05 · noche/acento-claro 7,35 · noche/ok 14,66.
+   Los grises claros (slate, línea) son superficie y filete, NUNCA texto; el acero #78909C (3,35:1) sirve de borde de control. */
+@font-face { font-family: 'Inter Ing'; src: url('/fonts/ingenieria/inter-latin-var.woff2') format('woff2'); font-weight: 100 900; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Geist Mono Ing'; src: url('/fonts/ingenieria/geist-mono-latin-var.woff2') format('woff2'); font-weight: 100 900; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Newsreader Ing'; src: url('/fonts/ingenieria/newsreader-display-var.woff2') format('woff2'); font-weight: 300 400; font-style: normal; font-display: swap; }
+/* Mientras llega Newsreader, Georgia ajustada para que el nombre no salte. */
+@font-face { font-family: 'Newsreader Ing Fallback'; src: local('Georgia'); size-adjust: 94%; ascent-override: 96%; descent-override: 28%; line-gap-override: 0%; }
+/* Mientras llega Inter, Arial ajustada para que el titular no salte. */
+@font-face { font-family: 'Inter Ing Fallback'; src: local('Arial'); size-adjust: 107.4%; ascent-override: 90.2%; descent-override: 22.5%; line-gap-override: 0%; }
+
+.v5-ingenieria {
+  /* superficies y tintas (la plata de Max + una noche derivada de su tinta) */
+  --ing-paper: #ffffff;
+  --ing-paper-2: #f6f8f9;
+  --ing-slate: #cfd8dc;
+  --ing-slate-2: #eceff1;
+  --ing-line: #e3e9ec;
+  --ing-ink: #263238;
+  --ing-ink-2: #455a64;
+  --ing-ink-3: #546e7a;
+  --ing-ctl: #78909c;
+  --ing-night: #0f161a;
+  --ing-night-2: #162026;
+  --ing-night-line: rgb(255 255 255 / 0.09);
+  --ing-night-line-2: rgb(255 255 255 / 0.16);
+  --ing-night-ink: #eceff1;
+  --ing-night-ink-2: #b0bec5;
+  --ing-night-ink-3: #90a4ae;
+  /* acento único: acciones, foco, enlaces, nodo activo de un diagrama */
+  --ing-accent: #3d5afe;
+  --ing-accent-press: #2f48d6;
+  --ing-accent-hi: #8c9eff;
+  --ing-accent-wash: #eef0ff;
+  --ing-accent-line: #c5cdfd;
+  --ing-ok: #64ffda;
+  /* relleno de las cifras grandes sobre noche (la cinta, en una sola pasada) */
+  --ing-grad-cifra: linear-gradient(100deg, #eceff1 8%, #b7c1ff 42%, #8c9eff 70%, #64ffda 135%);
+  --ing-grad-linea: linear-gradient(90deg, #536dfe, #00b8d4 55%, #b39dda);
+  --ing-error: #b3261e;
+
+  /* tipografía */
+  --ing-sans: 'Inter Ing', 'Inter Ing Fallback', Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ing-mono: 'Geist Mono Ing', 'Geist Mono', ui-monospace, Consolas, monospace;
+  --ing-serif: 'Newsreader Ing', 'Newsreader Ing Fallback', Georgia, 'Times New Roman', serif;
+  --ing-t-display: clamp(2.125rem, 1.2rem + 2.9vw, 3.75rem);
+  --ing-t-h1: clamp(2.125rem, 1.3rem + 2.2vw, 3rem);
+  --ing-t-h2: clamp(1.5rem, 1.1rem + 1.1vw, 2rem);
+  --ing-t-h3: clamp(1.375rem, 1.15rem + 0.55vw, 1.625rem);
+  --ing-t-lead: clamp(1.125rem, 1.05rem + 0.3vw, 1.25rem);
+  --ing-t-metric: clamp(2.125rem, 1.6rem + 1.5vw, 3rem);
+  /* el nombre (serif de exhibición, el gesto de identidad), el titular-promesa y la cifra grande de la banda de noche */
+  --ing-t-nombre: clamp(3.5rem, 1.5rem + 5.2vw, 6.1rem);
+  --ing-t-nombre-cierre: clamp(3.5rem, 1.3rem + 8vw, 8.75rem);
+  --ing-t-claim: clamp(1.625rem, 1.3rem + 1vw, 2.125rem);
+  --ing-t-cifra: clamp(3rem, 2.2rem + 3.3vw, 4.5rem);
+  --ing-t-frase: clamp(1.5rem, 1.1rem + 1.1vw, 1.9375rem);
+
+  /* retícula */
+  --ing-frame: 1266px;
+  --ing-gutter: 20px;
+  --ing-nav: 64px;
+  --ing-sec-top: 52px;
+  --ing-sec-bot: 56px;
+  --ing-gap-head: 32px;
+
+  /* forma */
+  --ing-r-btn: 4px;
+  --ing-r-card: 6px;
+  --ing-r-frame: 12px;
+  --ing-shadow-card: 0 30px 45px -30px rgb(38 50 56 / 0.25), 0 18px 36px -18px rgb(0 0 0 / 0.1);
+  --ing-shadow-pop: 0 15px 35px 0 rgb(23 23 23 / 0.08), 0 3px 6px 0 rgb(23 23 23 / 0.06);
+
+  /* movimiento (solo transform, opacity y clip-path; quieto cuando no hay gesto) */
+  --ing-ease: cubic-bezier(0.25, 1, 0.5, 1);
+  --ing-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ing-ease-reveal: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ing-d: 300ms;
+
+  /* contrato común del repo */
+  --v5-bg: var(--ing-paper);
+  --v5-surface: var(--ing-paper-2);
+  --v5-ink: var(--ing-ink);
+  --v5-ink-2: var(--ing-ink-2);
+  --v5-line: var(--ing-line);
+  --v5-focus: var(--ing-accent);
+}
+@media (min-width: 760px) {
+  .v5-ingenieria { --ing-nav: 76px; --ing-gutter: 28px; --ing-sec-top: 84px; --ing-sec-bot: 92px; --ing-gap-head: 48px; }
+}

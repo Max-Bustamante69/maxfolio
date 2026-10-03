@@ -5,23 +5,22 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "node scripts/build-jsonld.mjs && node scripts/build-sitemap.mjs && node scripts/build-changelog.mjs",
+    "prebuild": "node scripts/build-jsonld.mjs && node scripts/build-sitemap.mjs",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "gallery:capture": "node scripts/capture-gallery.mjs",
-    "gallery:capture:one": "node scripts/capture-gallery.mjs --only",
-    "qa:pages": "node scripts/qa-pages.mjs"
+    "gallery:capture:one": "node scripts/capture-gallery.mjs --only"
   },
   "dependencies": {
+    "@react-three/drei": "^10",
+    "@react-three/fiber": "^9",
     "@vercel/analytics": "^2.0.1",
     "@vercel/functions": "^3.9.6",
-    "framer-motion": "^11.15.0",
-    "lenis": "^1.3.26",
+    "gsap": "^3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.0",
-    "simple-icons": "^16.30.0",
     "three": "0.170.0"
   },
   "devDependencies": {

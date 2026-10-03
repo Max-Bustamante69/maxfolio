@@ -1,12 +1,12 @@
-import { designs } from '../data/designs'
+import { THEMES } from '../../ab.config'
 
 const EN_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten']
 const ES_WORDS = ['cero', 'uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve', 'diez']
 
-/** How many switchable experiences `designs.ts` actually registers right now — the single number
+/** How many switchable experiences ab.config.ts registers right now — the single number
  *  every locale's "N designs" copy below reads instead of a typed-in digit, so removing/adding a
  *  theme never leaves a stale count in three languages. */
-export const designCount = designs.length
+export const designCount = THEMES.length
 
 /** English/Spanish spell small counts ("six designs", "seis diseños"); Japanese keeps the numeral
  *  with its native "つ" counter ("6つのデザイン"), which is the idiomatic form here. Falls back to

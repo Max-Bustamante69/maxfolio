@@ -1,0 +1,82 @@
+/* Persona (réplica del estilo «Arcade» del portafolio anterior) — tokens de la dirección.
+   Ley de dos colores clave del original: hielo (papel #eef3f7, tinta #0a0f1a, acento azul #1c6fb0). En la v5 cada
+   dirección es UN mundo de color: aquí solo el hielo. Los hexadecimales viven SOLO en este archivo.
+   Contraste medido (WCAG 2.x): tinta/papel 17.15 · tinta/blanco 19.16 · tinta-2/papel 7.80 · tinta-2/blanco 8.71 ·
+   acento/papel 4.76 · acento/blanco 5.32 · blanco/acento 5.32 · blanco/acento-hondo 8.86 · línea/papel 4.05 (control ≥ 3) ·
+   foco(acento)/papel 4.76 · error/blanco 6.54. */
+
+@font-face {
+  font-family: 'Anton';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/persona/anton-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Rajdhani';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/persona/rajdhani-500-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Rajdhani';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/persona/rajdhani-600-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Rajdhani';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/persona/rajdhani-700-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* Respaldos con métrica ajustada: el cambio de fuente no mueve el diseño (CLS 0). */
+@font-face {
+  font-family: 'Anton Fallback';
+  src: local('Arial Narrow'), local('Arial');
+  size-adjust: 88%;
+  ascent-override: 112%;
+  descent-override: 28%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Rajdhani Fallback';
+  src: local('Arial');
+  size-adjust: 92%;
+  ascent-override: 98%;
+  descent-override: 28%;
+  line-gap-override: 0%;
+}
+
+.v5-persona {
+  /* Roles comunes de la v5 */
+  --v5-bg: #eef3f7;
+  --v5-surface: #ffffff;
+  --v5-ink: #0a0f1a;
+  --v5-ink-2: #3f4c5f;
+  --v5-line: #66788d;
+  --v5-focus: #1c6fb0;
+  /* Acento y apoyos propios */
+  --v5-accent: #1c6fb0;
+  --v5-accent-deep: #0f4c81;
+  --v5-on-accent: #ffffff;
+  --v5-error: #b3261e;
+  --v5-ok: #1a6b3c;
+  --v5-vivo: #55d48e; /* «disponible» sobre tinta (cierre del inicio): 11.5:1 contra la tinta */
+
+  --pr-display: 'Anton', 'Anton Fallback', 'Archivo Black', Impact, sans-serif;
+  --pr-label: 'Rajdhani', 'Rajdhani Fallback', 'Arial Narrow', Arial, sans-serif;
+  --pr-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Inter, system-ui, sans-serif;
+
+  /* Movimiento: el golpe de la casa de Persona (ataque seco, un rebote corto) y la salida suave */
+  --pr-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --pr-dur-press: 120ms;
+  --pr-dur-ui: 180ms;
+}
