@@ -248,3 +248,54 @@ export function useCopy(): Copy {
   const { locale } = useLanguage()
   return locale === 'es' ? es : en
 }
+
+// Selector de temas (paleta ⌘K): las únicas etiquetas de la dirección que existen en los TRES idiomas, porque el selector se
+// ofrece en todos y el japonés del resto de la interfaz todavía cae a inglés. Los nombres y lemas de los temas no están aquí:
+// vienen ya traducidos de useCambioDeTema().
+const temasEs = {
+  temas: 'Temas',
+  dialogo: 'Cambiar de tema',
+  lista: 'Temas disponibles',
+  buscar: 'Buscar un tema',
+  actual: 'Actual',
+  vacio: 'Ningún tema coincide',
+  cerrar: 'Cerrar',
+  mover: 'mover',
+  elegir: 'elegir',
+  salir: 'cerrar',
+  cuenta: (n: number) => `${n} temas`,
+}
+export type CopyTemas = typeof temasEs
+
+const temasEn: CopyTemas = {
+  temas: 'Themes',
+  dialogo: 'Change theme',
+  lista: 'Available themes',
+  buscar: 'Search themes',
+  actual: 'Current',
+  vacio: 'No theme matches',
+  cerrar: 'Close',
+  mover: 'move',
+  elegir: 'choose',
+  salir: 'close',
+  cuenta: (n) => `${n} themes`,
+}
+
+const temasJa: CopyTemas = {
+  temas: 'テーマ',
+  dialogo: 'テーマを切り替える',
+  lista: 'テーマ一覧',
+  buscar: 'テーマを検索',
+  actual: '現在',
+  vacio: '一致するテーマはありません',
+  cerrar: '閉じる',
+  mover: '移動',
+  elegir: '決定',
+  salir: '閉じる',
+  cuenta: (n) => `${n}テーマ`,
+}
+
+export function useCopyTemas(): CopyTemas {
+  const { locale } = useLanguage()
+  return locale === 'es' ? temasEs : locale === 'ja' ? temasJa : temasEn
+}

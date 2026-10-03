@@ -1,0 +1,65 @@
+/* El Reportaje · «Otras ediciones»: el quiosco. Una hoja de papel a pantalla completa (la misma que cae entre vistas) con las portadas
+   de los temas como números de revista. Móvil primero: lo de abajo es 390 px, dos columnas; 768 cambia la imagen a la de escritorio y
+   900 pasa a cuatro columnas. Se carga con el panel, no con la página. Ningún hexadecimal: el color sale de tokens.css. */
+
+.rp-ed { position: fixed; inset: 0; z-index: 120; box-sizing: border-box; display: flex; flex-direction: column; overflow-y: auto; overscroll-behavior: contain; background: var(--paper); border-bottom: 1px solid var(--ink); scrollbar-width: thin; scrollbar-color: var(--context) transparent; }
+.v5-reportaje .rp-ed:focus { outline: none; }
+
+/* Franja superior: lo que fue la barra de capítulos, ahora con el kicker y el cierre. Se queda fija si la hoja se desplaza. */
+.rp-ed-top { position: sticky; top: 0; z-index: 2; flex: none; background: var(--paper); border-bottom: 1px solid var(--rule); }
+.rp-ed-barra { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: var(--nav); }
+.rp-ed-kicker { color: var(--ink-3); }
+.rp-ed-filete { position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: var(--ink); transform-origin: 0 50%; }
+.rp-ed-x { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; min-width: 44px; margin-right: -4px; padding-left: 4px; color: var(--ink); }
+.rp-ed-x .rp-mono { color: inherit; }
+.rp-ed-x-ic { position: relative; flex: none; width: 22px; height: 22px; transition: transform 0.4s var(--ease-expo); }
+.rp-ed-x-ic::before, .rp-ed-x-ic::after { content: ''; position: absolute; left: 2px; right: 2px; top: 10.5px; height: 1px; background: currentColor; transform: rotate(45deg); }
+.rp-ed-x-ic::after { transform: rotate(-45deg); }
+@media (hover: hover) { .rp-ed-x:hover .rp-ed-x-ic { transform: rotate(90deg); } }
+
+/* Cabecera del quiosco: el titular sube dentro de su máscara y se subraya con el marcador dorado de la casa. */
+.rp-ed-cab-t { display: grid; gap: 14px 48px; align-items: end; padding-top: clamp(22px, 3.4vw, 40px); }
+.rp-ed-titulo { font: 300 clamp(34px, 3.6vw, 52px)/1.06 var(--serif); letter-spacing: -0.025em; text-wrap: balance; }
+.rp-ed-titulo-mascara { display: block; overflow: hidden; padding-block: 0.14em; margin-block: -0.14em; }
+.rp-ed-titulo-in { display: inline-block; padding-inline: 0.04em; margin-inline: -0.04em; background: linear-gradient(transparent 64%, rgb(221 187 106 / 0.5) 64%) no-repeat 0 0 / 100% 100%; }
+.rp-ed-dek { font: 300 clamp(17px, 1.5vw, 21px)/1.4 var(--serif); letter-spacing: -0.01em; color: var(--ink-2); max-width: 40ch; text-wrap: pretty; }
+@media (min-width: 900px) { .rp-ed-cab-t { grid-template-columns: minmax(0, 1fr) minmax(0, 36ch); } }
+
+/* El estante. */
+.rp-ed-lista { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px 14px; padding-block: 24px 56px; }
+.rp-ed-li { min-width: 0; }
+.rp-ed-portada { display: flex; flex-direction: column; height: 100%; border-top: 1px solid var(--ink); transition: border-color 0.4s ease; }
+.v5-reportaje .rp-ed-portada:focus-visible { outline-offset: 6px; }
+/* La edición actual lleva el filete en dorado y doble, hacia arriba: así su alto es el mismo que el de las demás. */
+.rp-ed-portada[aria-current='true'] { border-top-color: var(--gold-deep); box-shadow: 0 -2px 0 var(--gold-deep); }
+
+/* Cabecera de la portada: el nombre de la edición en cursiva, como una cabecera de revista, y su número a la derecha. */
+.rp-ed-cab { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 10px; padding: 10px 0 12px; }
+.rp-ed-nombre { min-width: 0; font: italic 400 clamp(21px, 1.9vw, 28px)/1.05 var(--serif); letter-spacing: -0.025em; overflow-wrap: anywhere; }
+.rp-ed-nombre span { background: linear-gradient(transparent 62%, rgb(221 187 106 / 0.62) 62%) no-repeat 0 0 / 0% 100%; transition: background-size 0.5s var(--ease-expo); box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.rp-ed-num { color: var(--ink-3); white-space: nowrap; }
+.rp-ed-portada[aria-current='true'] .rp-ed-num { color: var(--gold-deep); }
+
+/* La portada: la vista previa del tema, con filete y un sello si es la edición en la que estás. */
+.rp-ed-foto { position: relative; display: block; overflow: hidden; aspect-ratio: 4 / 5; border: 1px solid var(--rule); background: var(--card); transition: border-color 0.4s ease; }
+.rp-ed-foto picture { display: block; width: 100%; height: 100%; }
+.rp-ed-foto img { width: 100%; height: 100%; object-fit: cover; object-position: top left; transition: transform 1.1s var(--ease-expo); }
+.rp-ed-portada[aria-current='true'] .rp-ed-foto { border-color: var(--gold-deep); }
+.rp-ed-sello { position: absolute; right: 10px; bottom: 10px; display: inline-block; max-width: calc(100% - 20px); box-sizing: border-box; padding: 6px 10px 5px; border: 1.5px solid var(--gold-deep); background: var(--card); color: var(--gold-deep); font-weight: 500; line-height: 1.2; text-align: center; transform: rotate(-4deg); transform-origin: 70% 60%; }
+.rp-ed-lema { margin-top: 12px; font: 400 15.5px/1.4 var(--serif); color: var(--ink-2); text-wrap: pretty; }
+
+@media (min-width: 768px) {
+  .rp-ed-foto { aspect-ratio: 16 / 10; }
+  .rp-ed-lema { font-size: 16.5px; }
+}
+@media (min-width: 900px) {
+  .rp-ed-lista { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px 24px; }
+}
+
+@media (hover: hover) {
+  .rp-ed-portada:hover { border-top-color: var(--gold-deep); }
+  .rp-ed-portada:hover .rp-ed-foto img { transform: scale(1.04); }
+  .rp-ed-portada:hover .rp-ed-nombre span { background-size: 100% 100%; }
+  .rp-ed-portada:hover .rp-ed-foto { border-color: var(--ink-3); }
+  .rp-ed-portada[aria-current='true']:hover .rp-ed-foto { border-color: var(--gold-deep); }
+}

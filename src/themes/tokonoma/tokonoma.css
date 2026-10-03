@@ -80,7 +80,16 @@
 .tk-cab[data-oculta="1"]{opacity:0;transform:translateY(-10px);pointer-events:none}
 .tk-cab-in{display:flex;align-items:center;justify-content:space-between;height:72px}
 .tk-marca{display:inline-flex;align-items:center;gap:14px;min-height:44px;font:500 13px/1 var(--f-rotulo);letter-spacing:.32em;text-transform:uppercase;color:var(--tinta)}
+.tk-cab-der{display:flex;align-items:center;gap:32px}
 .tk-nav{display:flex;align-items:center;gap:32px}
+/* el selector de temas: una palabra del tamaño de la navegación, con un trazo corto debajo que se completa al apuntarla o abrirla */
+.tk-temas-b{position:relative;display:inline-flex;align-items:center;min-width:44px;min-height:44px;font:400 13px/1 var(--f-rotulo);letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-2);transition:opacity 800ms var(--expo)}
+.tk-temas-b::after{content:"";position:absolute;left:0;right:.14em;bottom:11px;height:1px;background:currentColor;transform:scaleX(.3);transform-origin:0 50%;transition:transform 900ms var(--expo)}
+.tk-temas-b[aria-expanded="true"]::after,.tk-temas-b:focus-visible::after{transform:scaleX(1)}
+@media (hover:hover){
+  .tk-temas-b:hover{opacity:.5}
+  .tk-temas-b:hover::after{transform:scaleX(1)}
+}
 .tk-nav > a{display:inline-flex;align-items:center;min-height:44px;font:400 13px/1 var(--f-rotulo);letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-2);transition:opacity 800ms var(--expo)}
 .tk-nav > a[aria-current="page"]{font-weight:500;color:var(--tinta)}
 .tk-idioma{display:flex;align-items:center}
@@ -98,11 +107,19 @@
 .tk-hoja-nav a{display:flex;align-items:center;min-height:71px;font:400 26px/1 var(--f-rotulo);letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-2)}
 .tk-hoja-nav a[aria-current="page"]{color:var(--tinta);font-weight:500}
 .tk-hoja-pie{margin-top:40px}
-@media (max-width:767px){
+/* hasta 959 la navegación cabe en la hoja (con «Temas» a la vista junto al icono); desde 960 caben marca, tres enlaces, idioma y «Temas» */
+@media (max-width:959px){
   .tk-nav{display:none}
   .tk-menu{display:block}
-  .tk-marca{letter-spacing:.2em;font-size:12px;gap:12px}
+  .tk-cab-der{gap:4px}
+}
+@media (max-width:767px){
+  .tk-temas-b{font-size:11px}
+  .tk-marca{letter-spacing:.14em;font-size:12px;gap:12px}
   .tk-cab,.tk-cab-in{height:64px}
+}
+@media (max-width:400px){
+  .tk-marca{letter-spacing:.11em;gap:10px}
 }
 
 /* la cubierta del cambio de vista: el papel del nicho, bajo la cabecera, con el sello */

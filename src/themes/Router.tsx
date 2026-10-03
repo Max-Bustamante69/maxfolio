@@ -1,10 +1,22 @@
-import { lazy, Suspense, useEffect, useMemo, type ComponentType } from 'react'
+import { lazy, Suspense, useEffect, type ComponentType, type LazyExoticComponent } from 'react'
 import { track } from '../lib/track'
 import type { ThemeId } from './temas'
 import './palette.css'
 
 // Cada tema vive entero en src/themes/<id>/ con un App.tsx (sus vistas, con <Routes> relativas) y un meta.ts.
 const apps = import.meta.glob<{ default: ComponentType }>('./*/App.tsx')
+
+// Un lazy por tema, creado UNA vez fuera del render. Crearlo en el render (aunque sea con useMemo) rompe el cambio de tema:
+// React Router navega dentro de una transición, el render nuevo suspende, React descarta el memo y cada reintento crea
+// otro lazy que vuelve a suspender, así que la URL cambia y el tema viejo se queda en pantalla.
+const cache = new Map<ThemeId, LazyExoticComponent<ComponentType>>()
+const temaLazy = (id: ThemeId) => {
+  let App = cache.get(id)
+  if (!App) cache.set(id, (App = lazy(apps[`./${id}/App.tsx`])))
+  return App
+}
+/** Descarga el código de un tema antes de cambiar a él (los selectores lo llaman al apuntar o enfocar una opción). */
+export const precargarTema = (id: ThemeId) => void apps[`./${id}/App.tsx`]?.()
 
 /**
  * Las dos métricas del reparto que no dependen del tema: una vista por carga y, una sola vez, «interacción» cuando
@@ -55,7 +67,7 @@ function useMetricasDeTema(id: ThemeId) {
 
 /** Monta un tema bajo su prefijo (`/plato/*`) y mide su vista y su interacción. */
 export default function ThemeRoot({ id }: { id: ThemeId }) {
-  const App = useMemo(() => lazy(apps[`./${id}/App.tsx`]), [id])
+  const App = temaLazy(id)
   useMetricasDeTema(id)
   return (
     <Suspense fallback={<div className="v5-root min-h-screen" />}>

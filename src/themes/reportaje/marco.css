@@ -1,6 +1,6 @@
 /* El Reportaje · marco: base tipográfica, retícula, barra de capítulos, hoja de papel, riel de método, pie y piezas que se repiten
    (botones, enlaces, figuras, placas, tarjetas, filas, chips, acordeón). Ningún hexadecimal aquí: todo el color viene de tokens.css.
-   Móvil primero: lo de abajo es 390 px; los saltos a 640, 900, 1040 y 1100 px ensanchan. */
+   Móvil primero: lo de abajo es 390 px; los saltos a 640, 900, 1100 y 1120 px ensanchan. */
 
 .v5-reportaje {
   position: relative;
@@ -113,10 +113,15 @@
 .rp-menu-l::after { top: 8px; }
 .rp-menu-l-x::before { top: 4px; transform: rotate(45deg); }
 .rp-menu-l-x::after { top: 4px; transform: rotate(-45deg); }
-@media (min-width: 1040px) {
+/* El selector de ediciones suma un botón a la derecha: la barra completa (capítulos, idioma y revisión) entra desde 1120 px; por debajo queda el menú. */
+@media (min-width: 1120px) {
   .rp-nav-links { display: block; }
   .rp-idioma-nav, .rp-nav-cta { display: inline-flex; }
   .rp-menu-b { display: none; }
+}
+@media (min-width: 1120px) and (max-width: 1279px) {
+  .rp-nav-links { margin-left: 24px; }
+  .rp-nav-links ul { gap: 22px; }
 }
 
 .rp-hoja { position: fixed; z-index: 55; inset: var(--nav) 0 0 0; box-sizing: border-box; overflow-y: auto; display: flex; flex-direction: column; justify-content: space-between; gap: 32px; padding: 28px var(--gutter) 32px; background: var(--paper); }

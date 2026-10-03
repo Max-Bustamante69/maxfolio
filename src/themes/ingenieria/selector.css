@@ -1,0 +1,162 @@
+/* Selector de temas · Ingeniería (el configurador «Elige tu variante»). Este archivo viaja con el chunk del panel: no pesa en la carga.
+   Ningún hexadecimal: todo sale de tokens.css. Solo transform, opacity y clip-path se animan; las transiciones de borde y relleno
+   son de 300 ms con la curva de la casa y solo corren cuando alguien apunta o elige. */
+
+.ing-sel { position: fixed; inset: 0; z-index: 5; }
+.ing-sel-vel { position: absolute; inset: 0; background: color-mix(in srgb, var(--ing-night) 58%, transparent); cursor: pointer; }
+
+/* La hoja: en móvil sube desde abajo; en escritorio se despliega bajo la barra (ver el salto de 760). */
+.ing-sel-hoja {
+  position: absolute; inset: auto 0 0 0; z-index: 1; display: flex; flex-direction: column;
+  max-height: min(90dvh, calc(100dvh - var(--ing-nav)));
+  overflow: hidden; border-radius: var(--ing-r-frame) var(--ing-r-frame) 0 0;
+  background: var(--ing-paper); box-shadow: 0 -24px 60px -24px rgb(15 22 26 / 0.5);
+}
+/* El filete de medición: una línea de acento de 2 px que se traza de lado a lado al abrir. */
+.ing-sel-linea { position: absolute; z-index: 2; top: 0; left: 0; right: 0; height: 2px; background: var(--ing-accent); pointer-events: none; }
+.ing-sel-in { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; padding-top: 22px; padding-bottom: max(14px, env(safe-area-inset-bottom)); }
+.ing-sel-in::before { content: ''; position: absolute; top: 8px; left: 50%; width: 36px; height: 4px; margin-left: -18px; border-radius: 2px; background: var(--ing-slate); }
+
+/* Cabecera: etiqueta mono, titular de dos tonos y el cierre. */
+.ing-sel-cab { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex: none; padding-bottom: 14px; }
+.ing-sel-cab .ing-etq { margin-bottom: 8px; }
+.ing-sel-t { margin: 0; font-size: clamp(1.5rem, 1.1rem + 1.1vw, 2rem); font-weight: 300; line-height: 1.12; letter-spacing: -0.02em; text-wrap: balance; color: var(--ing-ink); }
+.ing-sel-t em { font-style: normal; color: var(--ing-ink-3); }
+.ing-sel-actual { margin-top: 8px; font-size: 0.875rem; line-height: 1.4; color: var(--ing-ink-2); }
+.ing-sel-actual span { margin-right: 6px; font: 500 0.75rem/1 var(--ing-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ing-ink-3); }
+.ing-sel-x {
+  display: inline-flex; flex: none; align-items: center; justify-content: center; gap: 10px; min-height: 44px; min-width: 44px; padding: 0 14px;
+  border: 1px solid var(--ing-slate); border-radius: var(--ing-r-btn); font-size: 0.875rem; color: var(--ing-ink);
+  transition: border-color var(--ing-d) var(--ing-ease), background-color var(--ing-d) var(--ing-ease);
+}
+.ing-sel-x-t { display: none; }
+.ing-sel-esc { display: none; padding: 4px 6px; border-radius: 3px; background: var(--ing-slate-2); font: 500 0.75rem/1 var(--ing-mono); letter-spacing: 0.04em; color: var(--ing-ink-2); }
+@media (hover: hover) and (pointer: fine) { .ing-sel-x:hover { border-color: var(--ing-ctl); background: var(--ing-paper-2); } }
+
+/* Lista: una columna de filas en móvil, rejilla de tarjetas en escritorio. El margen negativo deja sitio a las marcas de registro. */
+.ing-sel-lista {
+  position: relative; flex: 1 1 auto; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 10px;
+  min-height: 0; margin: -8px; padding: 8px; overflow-y: auto; overscroll-behavior: contain; scroll-padding-block: 12px;
+}
+.ing-sel-lista > li { min-width: 0; }
+
+/* La tarjeta tipo radio. */
+.ing-sel-op {
+  position: relative; display: grid; grid-template-columns: 104px minmax(0, 1fr); height: 100%; min-height: 116px;
+  border: 1px solid var(--ing-line); border-radius: var(--ing-r-card); background: var(--ing-paper); color: var(--ing-ink);
+  transition: border-color var(--ing-d) var(--ing-ease), box-shadow var(--ing-d) var(--ing-ease), background-color var(--ing-d) var(--ing-ease), opacity var(--ing-d) var(--ing-ease);
+}
+.ing-sel-img { position: relative; display: block; overflow: hidden; border-radius: 5px 0 0 5px; background: var(--ing-slate-2); }
+.ing-sel-img picture { display: block; width: 100%; height: 100%; }
+/* La imagen no manda en el alto de la tarjeta: se acomoda al cajetín (en móvil, el de la fila). */
+.ing-sel-img img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: top left; }
+.ing-sel-cuerpo { display: flex; flex-direction: column; justify-content: center; gap: 4px; min-width: 0; padding: 10px 14px 10px; }
+
+.ing-sel-id { display: flex; align-items: center; gap: 8px; white-space: nowrap; font: 500 0.75rem/1 var(--ing-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ing-ink-3); }
+.ing-sel-tag { padding: 4px 6px; border-radius: 3px; background: var(--ing-accent-wash); color: var(--ing-accent-press); }
+.ing-sel-radio {
+  position: relative; display: grid; flex: none; place-items: center; width: 22px; height: 22px; margin-left: auto;
+  border: 1.5px solid var(--ing-ctl); border-radius: 50%; background: var(--ing-paper); color: var(--ing-paper);
+  transition: background-color var(--ing-d) var(--ing-ease), border-color var(--ing-d) var(--ing-ease);
+}
+/* La marca se traza de izquierda a derecha con clip-path cuando la casilla se rellena. */
+.ing-sel-check { display: block; clip-path: inset(0 100% 0 0); transition: clip-path 260ms var(--ing-ease) 70ms; }
+
+/* Ficha técnica: nombre y lema como filas con filete. El filete se traza al abrir (var --f, de 0 a 1). */
+.ing-sel-spec { display: grid; }
+.ing-sel-fila { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; padding-block: 6px 4px; }
+.ing-sel-fila::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: var(--ing-line); transform-origin: 0 50%; transform: scaleX(var(--f, 1)); }
+.ing-sel-fila dt { display: none; margin: 0; font: 500 0.75rem/1.5 var(--ing-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ing-ink-3); }
+.ing-sel-fila dd { margin: 0; min-width: 0; font-size: 0.8125rem; line-height: 1.4; color: var(--ing-ink-2); }
+.ing-sel-nombre dd { font-size: 1.0625rem; font-weight: 400; line-height: 1.2; letter-spacing: -0.01em; color: var(--ing-ink); }
+
+/* Marcas de registro en las cuatro esquinas: aparecen al apuntar y se quedan en la variante marcada. */
+.ing-sel-op::after {
+  content: ''; position: absolute; inset: -5px; pointer-events: none; opacity: 0; transform: scale(0.985);
+  --m: var(--ing-ink-3);
+  background:
+    linear-gradient(var(--m), var(--m)) 0 0 / 10px 1.5px no-repeat, linear-gradient(var(--m), var(--m)) 0 0 / 1.5px 10px no-repeat,
+    linear-gradient(var(--m), var(--m)) 100% 0 / 10px 1.5px no-repeat, linear-gradient(var(--m), var(--m)) 100% 0 / 1.5px 10px no-repeat,
+    linear-gradient(var(--m), var(--m)) 0 100% / 10px 1.5px no-repeat, linear-gradient(var(--m), var(--m)) 0 100% / 1.5px 10px no-repeat,
+    linear-gradient(var(--m), var(--m)) 100% 100% / 10px 1.5px no-repeat, linear-gradient(var(--m), var(--m)) 100% 100% / 1.5px 10px no-repeat;
+  transition: opacity var(--ing-d) var(--ing-ease), transform var(--ing-d) var(--ing-ease);
+}
+@media (hover: hover) and (pointer: fine) {
+  .ing-sel-op:hover { border-color: var(--ing-ctl); }
+  .ing-sel-op:hover::after { opacity: 1; transform: none; }
+  .ing-sel-op:hover .ing-sel-radio { border-color: var(--ing-accent); }
+}
+.ing-sel-op:focus-visible { outline: 2px solid var(--ing-accent); outline-offset: 5px; border-radius: var(--ing-r-card); }
+
+/* La variante marcada (la actual, o la elegida mientras se arma el cambio): borde de 2 px, casilla rellena con su marca. */
+.ing-sel-op[data-marca] { border-color: var(--ing-accent); box-shadow: 0 0 0 1px var(--ing-accent); background: color-mix(in srgb, var(--ing-accent-wash) 55%, var(--ing-paper)); }
+.ing-sel-op[data-marca]::after { --m: var(--ing-accent); opacity: 1; transform: none; }
+.ing-sel-op[data-marca]:focus-visible::after { opacity: 0; }
+.ing-sel-op[data-marca] .ing-sel-radio { border-color: var(--ing-accent); background: var(--ing-accent); }
+.ing-sel-op[data-marca] .ing-sel-check { clip-path: inset(0 0 0 0); }
+/* Mientras se arma el cambio, las demás bajan de tono y la marca viaja de la actual a la elegida. */
+.ing-sel-lista[data-elige] .ing-sel-op:not([data-armado]) { opacity: 0.42; pointer-events: none; }
+
+/* Pie: el cajetín de un plano (solo escritorio). */
+.ing-sel-pie { display: none; }
+
+@media (min-width: 560px) {
+  .ing-sel-x-t { display: inline; }
+}
+
+@media (min-width: 760px) {
+  .ing-sel-hoja {
+    inset: var(--ing-nav) 0 auto 0; max-height: calc(100dvh - var(--ing-nav));
+    border-radius: 0; border-bottom: 1px solid var(--ing-line); box-shadow: 0 40px 80px -30px rgb(15 22 26 / 0.5);
+  }
+  .ing-sel-in { padding-top: 30px; padding-bottom: 0; }
+  .ing-sel-in::before { display: none; }
+  .ing-sel-cab { align-items: flex-end; padding-bottom: 22px; }
+  .ing-sel-actual { display: none; }
+  .ing-sel-lista { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .ing-sel-op { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; min-height: 0; }
+  .ing-sel-img { aspect-ratio: 16 / 8.4; border-radius: 5px 5px 0 0; }
+  .ing-sel-cuerpo { justify-content: flex-start; gap: 10px; padding: 12px 14px 12px; }
+  .ing-sel-fila { grid-template-columns: 52px minmax(0, 1fr); gap: 10px; padding-block: 8px 6px; }
+  .ing-sel-fila dt { display: block; padding-top: 1px; }
+  .ing-sel-nombre dd { font-size: 1.125rem; }
+  .ing-sel-fila dd { font-size: 0.8125rem; }
+  .ing-sel-esc { display: inline-block; }
+  @media (hover: none) { .ing-sel-esc { display: none; } }
+
+  .ing-sel-pie { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-top: 22px; border-top: 1px solid var(--ing-line); }
+  .ing-sel-pie-d { display: flex; }
+  .ing-sel-pie-d > div { display: flex; align-items: baseline; gap: 10px; padding: 14px 24px 15px 0; margin-right: 24px; border-right: 1px solid var(--ing-line); }
+  .ing-sel-pie-d dt { margin: 0; font: 500 0.75rem/1.4 var(--ing-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ing-ink-3); }
+  .ing-sel-pie-d dd { margin: 0; font-size: 0.875rem; color: var(--ing-ink); }
+  .ing-sel-mono { font-family: var(--ing-mono); font-size: 0.8125rem; }
+  .ing-sel-nota { text-align: right; font: 400 0.75rem/1.5 var(--ing-mono); color: var(--ing-ink-3); }
+}
+
+@media (min-width: 1024px) {
+  .ing-sel-lista { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+/* Ventana baja (portátil de 768 a 880 px de alto): las ocho caben sin desplazar. Dos columnas de filas, miniatura a la izquierda. */
+@media (min-width: 760px) and (max-height: 880px) {
+  .ing-sel-in { padding-top: 24px; }
+  .ing-sel-cab { padding-bottom: 16px; }
+  .ing-sel-lista { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .ing-sel-op { grid-template-columns: 188px minmax(0, 1fr); grid-template-rows: auto; min-height: 0; }
+  .ing-sel-img { aspect-ratio: auto; border-radius: 5px 0 0 5px; }
+  .ing-sel-cuerpo { justify-content: center; gap: 2px; padding: 8px 14px; }
+  .ing-sel-fila { grid-template-columns: minmax(0, 1fr); padding-block: 4px 2px; }
+  .ing-sel-fila dt { display: none; }
+  .ing-sel-nombre dd { font-size: 1.0625rem; }
+  .ing-sel-pie { margin-top: 14px; }
+  .ing-sel-pie-d > div { padding-block: 10px 11px; }
+}
+@media (max-width: 559px) {
+  .ing-sel-t em { display: none; }
+}
+/* En 320 px la etiqueta «Actual» de la tarjeta se queda sin sitio: sigue la marca de la casilla y la línea «Actual» de la cabecera. */
+@media (max-width: 359px) {
+  .ing-sel-tag { display: none; }
+}
+@media (max-width: 1099px) {
+  .ing-sel-nota { display: none; }
+}

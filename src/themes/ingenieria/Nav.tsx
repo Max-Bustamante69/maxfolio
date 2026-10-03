@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { supportedLocales, useLanguage, type Locale } from '../../context/LanguageContext'
 import { useV5, v5path } from '../data'
+import { BotonTemas, cargarPanel } from './BotonTemas'
 import { useCopy } from './copy'
 import { gsap } from './motion'
 import { capturasDeObra, Enlace, Flecha, precargar } from './piezas'
@@ -9,6 +10,8 @@ import { capturasDeObra, Enlace, Flecha, precargar } from './piezas'
 const BASE = v5path('ingenieria')
 const SECCIONES = ['', 'obra', 'trayectoria', 'contacto'] as const
 const LABEL: Record<Locale, string> = { en: 'EN', es: 'ES', ja: 'JA' }
+// El selector de temas es otro chunk: no se descarga ni monta una imagen hasta que alguien lo abre.
+const PanelTemas = lazy(cargarPanel)
 
 /** Selector ES/EN/JA: un solo toque, sin menú. */
 function Idioma({ clase = '' }: { clase?: string }) {
@@ -69,6 +72,9 @@ export function Nav({ cv }: { cv: string }) {
   const lista = useRef<HTMLUListElement>(null)
   const barra = useRef<HTMLSpanElement>(null)
   const boton = useRef<HTMLButtonElement>(null)
+  const [temas, setTemas] = useState(false)
+  const disparador = useRef<HTMLButtonElement>(null)
+  const abiertoAntes = useRef(false)
   const actual = pathname.slice(BASE.length + 1).split('/')[0] as (typeof SECCIONES)[number]
   const textos = [c.nav.inicio, c.nav.obra, c.nav.trayectoria, c.nav.contacto]
   const cerrar = useCallback(() => { setAbierto(false); boton.current?.focus({ preventScroll: true }) }, [])
@@ -91,7 +97,14 @@ export function Nav({ cv }: { cv: string }) {
     ro.observe(lista.current)
     return () => ro.disconnect()
   }, [ajustar])
-  useEffect(() => { setAbierto(false) }, [pathname])
+  useEffect(() => { setAbierto(false); setTemas(false) }, [pathname])
+  const abrirTemas = useCallback(() => { setAbierto(false); setTemas(true) }, [])
+  const cerrarTemas = useCallback(() => setTemas(false), [])
+  // Al cerrar el selector el foco vuelve al disparador (ya sin inert: el panel lo quita al desmontarse).
+  useEffect(() => {
+    if (abiertoAntes.current && !temas) disparador.current?.focus({ preventScroll: true })
+    abiertoAntes.current = temas
+  }, [temas])
   // La barra baja suave en la primera carga.
   useLayoutEffect(() => {
     const ctx = gsap.context(() => { gsap.from('.ing-nav-in', { opacity: 0, y: -10, duration: 0.7, ease: 'expo.out', clearProps: 'transform,opacity' }) })
@@ -119,6 +132,7 @@ export function Nav({ cv }: { cv: string }) {
         </nav>
 
         <div className="ing-nav-der">
+          <BotonTemas ref={disparador} abierto={temas} alPulsar={abrirTemas} />
           <Idioma clase="ing-seg-idioma" />
           <Enlace to={`${BASE}/contacto?motivo=revision`} className="ing-btn ing-btn-pri ing-btn-chico ing-nav-cta">{c.revision}<Flecha /></Enlace>
           <button ref={boton} type="button" className="ing-burger" aria-expanded={abierto} aria-label={abierto ? c.menu.cerrar : c.menu.abrir} onClick={() => (abierto ? cerrar() : setAbierto(true))}>
@@ -126,6 +140,7 @@ export function Nav({ cv }: { cv: string }) {
           </button>
         </div>
       </div>
+      {temas && <Suspense fallback={null}><PanelTemas cerrar={cerrarTemas} /></Suspense>}
       {abierto && (
         <Hoja cerrar={cerrar} cv={cv} enlaces={SECCIONES.map((r, i) => [r ? `${BASE}/${r}` : BASE, textos[i], actual === r] as [string, string, boolean])} />
       )}

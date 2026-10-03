@@ -6,6 +6,7 @@ import { useMedellinTime } from '../shared/useMedellinTime'
 import { useCopy } from './copy'
 import { gsap, registrarVelo } from './motion'
 import { Chevron, Enlace, precargar } from './piezas'
+import { Ediciones } from './selector'
 
 const BASE = v5path('reportaje')
 const SECCIONES = ['', 'obra', 'trayectoria', 'contacto'] as const
@@ -122,6 +123,7 @@ export function Nav() {
           <span className="rp-nav-barra" ref={barra} aria-hidden="true" />
         </nav>
         <div className="rp-nav-der">
+          <Ediciones antes={() => setAbierto(false)} />
           <Idioma clase="rp-idioma-nav" />
           <Enlace to={`${BASE}/contacto?motivo=revision`} num={c.capitulo.contacto} titulo={c.nav.contacto} className="rp-btn rp-btn-linea rp-btn-chico rp-nav-cta">{c.pedir}</Enlace>
           <button ref={boton} type="button" className="rp-menu-b" aria-expanded={abierto} aria-label={abierto ? c.menu.cerrar : c.menu.abrir} onClick={() => (abierto ? cerrar() : setAbierto(true))}>

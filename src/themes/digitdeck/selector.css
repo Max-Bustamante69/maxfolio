@@ -1,0 +1,433 @@
+/* Paleta de temas de la dirección Digitdeck (SelectorTemas.tsx). Se carga con su trozo de JS, la primera vez que se abre: nada de esto
+   pesa en la carga de la página. Sin un solo color en bruto (todo sale de tokens.css) y sin animaciones en reposo: lo único de CSS que
+   se mueve es el resaltado de una fila y la captura que la sigue, y solo mientras alguien mueve el puntero o las flechas.
+   Escritorio (≥ 768 px): panel centrado, filas a la izquierda, captura del tema resaltado a la derecha. Móvil: hoja inferior con la
+   captura en la propia fila. */
+
+.dd-pal {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-paleta);
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  justify-items: center;
+  align-items: start;
+  padding: clamp(56px, 11svh, 120px) var(--gutter) 24px;
+  color: var(--v5-ink);
+}
+.dd-pal[data-eligiendo] {
+  pointer-events: none;
+}
+.dd-pal__velo {
+  position: absolute;
+  inset: 0;
+  background: var(--v5-scrim);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.dd-pal__panel {
+  position: relative;
+  width: min(100%, 960px);
+  max-height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  background: var(--v5-surface);
+  border: 1px solid var(--v5-line);
+  border-radius: var(--r-sheet);
+  box-shadow: var(--v5-shadow-float);
+  overflow: hidden;
+}
+.v5-digitdeck .dd-pal__panel:focus-visible {
+  outline: none;
+}
+
+/* ---- Cabecera: el punto como indicador de línea de órdenes, el buscador y el cierre ---- */
+.dd-pal__asa {
+  display: none;
+}
+.dd-pal__cab {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  min-height: 68px;
+  padding: 0 12px 0 24px;
+  border-bottom: 1px solid var(--v5-line);
+  transition: border-color var(--d-fast) var(--e-out);
+}
+.dd-pal__cab:focus-within {
+  border-bottom-color: var(--v5-acento);
+}
+.dd-pal__titulo {
+  display: none;
+  margin: 0;
+}
+.dd-pal .dd-pal__prompt {
+  width: 10px;
+  height: 10px;
+  margin: 0;
+  transition: box-shadow var(--d-base) var(--e-out);
+}
+.dd-pal__cab:focus-within .dd-pal__prompt {
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--v5-acento) 26%, transparent);
+}
+.v5-digitdeck .dd-pal__buscar {
+  min-width: 0;
+  height: 68px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--v5-ink);
+  font: 500 1.125rem / 1 var(--f-text);
+  outline: none;
+  appearance: none;
+}
+.dd-pal__buscar::placeholder {
+  color: var(--v5-ink-2);
+  opacity: 1;
+}
+.dd-pal__cerrar {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--v5-line-strong);
+  border-radius: 50%;
+  background: none;
+  color: var(--v5-ink);
+  cursor: pointer;
+  transition: border-color var(--d-fast) var(--e-out), transform var(--d-react) var(--e-out);
+}
+.dd-pal__cerrar:active {
+  transform: scale(0.94);
+}
+@media (hover: hover) {
+  .dd-pal__cerrar:hover {
+    border-color: var(--v5-acento);
+  }
+}
+
+/* ---- Cuerpo: lista a la izquierda, captura a la derecha ---- */
+.dd-pal__cuerpo {
+  --col: 40%;
+  position: relative; /* contenedor de las capturas (están dentro de las filas, pero se colocan en SU columna) */
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, var(--col)) minmax(0, 1fr);
+}
+.dd-pal__lista {
+  grid-column: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 8px;
+  list-style: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--v5-line-strong) transparent;
+}
+/* El filete entre filas es un fondo que se dibuja de izquierda a derecha (--fil de 0 a 1 lo mueve GSAP al entrar; en reposo vale 1). */
+.dd-pal__item {
+  margin: 0;
+  background: linear-gradient(var(--v5-line), var(--v5-line)) 16px 100% / calc((100% - 32px) * var(--fil, 1)) 1px no-repeat;
+}
+.dd-pal__item:last-child {
+  background: none;
+}
+.dd-pal__fila {
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  min-height: 60px;
+  padding: 0 16px;
+  border-radius: 12px;
+  color: inherit;
+  text-decoration: none;
+  transition: background-color var(--d-fast) var(--e-out);
+}
+.v5-digitdeck .dd-pal__fila:focus-visible {
+  outline: 2px solid var(--v5-focus);
+  outline-offset: -2px;
+  border-radius: 12px;
+}
+.dd-pal__item[data-activo='true'] .dd-pal__fila {
+  background: color-mix(in srgb, var(--v5-ink) 8%, transparent);
+}
+
+/* El punto: anillo en reposo, verde cuando la fila está resaltada, lleno en el tema que está en uso. */
+.dd-pal__punto {
+  box-sizing: border-box;
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid var(--v5-line-strong);
+  border-radius: 50%;
+  transition: transform var(--d-base) var(--e-out), border-color var(--d-fast) var(--e-out), background-color var(--d-fast) var(--e-out), box-shadow var(--d-base) var(--e-out);
+}
+.dd-pal__item[data-activo='true'] .dd-pal__punto {
+  border-color: var(--v5-acento);
+  transform: scale(1.2);
+}
+.dd-pal__item[data-actual='true'] .dd-pal__punto {
+  border-color: var(--v5-acento);
+  background: var(--v5-acento);
+}
+.dd-pal__item[data-actual='true'][data-activo='true'] .dd-pal__punto {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--v5-acento) 28%, transparent);
+}
+.dd-pal__nombre {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+  font: 700 1.25rem / 1.1 var(--f-display);
+  font-stretch: 90%;
+  letter-spacing: -0.015em;
+}
+.dd-pal__tag {
+  flex: none;
+  padding: 5px 10px;
+  border: 1px solid var(--v5-acento);
+  border-radius: var(--r-pill);
+  color: var(--v5-acento);
+  font: 600 var(--t-micro) / 1 var(--f-text);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* La captura del tema resaltado: cada fila lleva la suya, todas apiladas en la columna derecha. La que se resalta se dibuja de
+   izquierda a derecha por encima; la anterior se queda debajo 0,42 s y recién entonces se retira, así que nunca hay un hueco. */
+.dd-pal__vista {
+  position: absolute;
+  z-index: 1;
+  top: 12px;
+  left: calc(var(--col) + 8px);
+  right: 20px;
+  display: block;
+  padding-bottom: 8px;
+  background: var(--v5-surface);
+  clip-path: inset(0 100% 0 0);
+  pointer-events: none;
+  transition: clip-path 0s linear 0.42s;
+}
+.dd-pal__item[data-activo='true'] .dd-pal__vista {
+  z-index: 2;
+  clip-path: inset(0);
+  transition: clip-path 0.46s var(--e-out);
+}
+.dd-pal__foto {
+  display: block;
+  aspect-ratio: 720 / 450;
+  overflow: hidden;
+  border: 1px solid var(--v5-line);
+  border-radius: var(--r-tile);
+  background: var(--v5-bg);
+}
+.dd-pal__foto img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+}
+/* La captura se asienta (1,05 → 1) mientras el telón la descubre; al retirarse vuelve a 1,05 sin que se vea (el telón la tapa). */
+@media (min-width: 768px) {
+  .dd-pal__foto img {
+    transform: scale(1.05);
+    transition: transform 0s linear 0.42s;
+  }
+  .dd-pal__item[data-activo='true'] .dd-pal__foto img {
+    transform: scale(1);
+    transition: transform 0.8s var(--e-out);
+  }
+}
+.dd-pal__lema {
+  display: block;
+  margin: 16px 4px 0;
+  font: italic 400 1.5rem / 1.2 var(--f-serif);
+  color: var(--v5-ink);
+  text-wrap: balance;
+}
+.dd-pal[lang='ja'] .dd-pal__lema {
+  font: 500 1.125rem / 1.5 var(--f-text);
+}
+/* A dónde lleva la fila resaltada: la misma vista en el otro tema (lo que dice su href), como el comando que una paleta ejecutaría. */
+.dd-pal__ruta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 18px 4px 0;
+  color: var(--v5-ink-2);
+  font: 500 var(--t-small) / 1 var(--f-text);
+  letter-spacing: 0.01em;
+}
+.dd-pal__ruta kbd {
+  min-width: 22px;
+  padding: 5px 6px;
+  border: 1px solid var(--v5-line-strong);
+  border-radius: 6px;
+  color: var(--v5-ink);
+  font: 500 var(--t-micro) / 1 var(--f-text);
+  text-align: center;
+}
+.dd-pal__vacio {
+  grid-column: 1 / -1;
+  justify-self: center;
+  margin: 0;
+  padding: 48px 0;
+  color: var(--v5-ink-2);
+}
+
+/* ---- Pie: las teclas ---- */
+.dd-pal__pie {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  min-height: 48px;
+  padding: 0 24px;
+  border-top: 1px solid var(--v5-line);
+  color: var(--v5-ink-2);
+  font: 500 var(--t-micro) / 1 var(--f-text);
+}
+.dd-pal__teclas {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.dd-pal__pie kbd {
+  min-width: 22px;
+  padding: 5px 6px;
+  border: 1px solid var(--v5-line-strong);
+  border-radius: 6px;
+  color: var(--v5-ink);
+  font: 500 var(--t-micro) / 1 var(--f-text);
+  text-align: center;
+}
+.dd-pal__cuenta {
+  margin-left: auto;
+}
+@media (hover: none), (pointer: coarse) {
+  .dd-pal__teclas {
+    display: none;
+  }
+}
+
+/* ---- Móvil: hoja inferior ---- */
+@media (max-width: 767px) {
+  .dd-pal {
+    align-items: end;
+    padding: 0;
+  }
+  .dd-pal__panel {
+    width: 100%;
+    max-height: min(100%, 88svh);
+    padding-bottom: env(safe-area-inset-bottom);
+    border-bottom: 0;
+    border-radius: var(--r-sheet) var(--r-sheet) 0 0;
+  }
+  .dd-pal__panel {
+    grid-template-rows: auto auto minmax(0, 1fr); /* asa, cabecera, cuerpo (el pie de teclas no existe en móvil) */
+  }
+  .dd-pal__asa {
+    display: grid;
+    place-items: center;
+    height: 28px;
+    touch-action: none;
+    cursor: grab;
+  }
+  .dd-pal__asa span {
+    width: 36px;
+    height: 4px;
+    border-radius: var(--r-pill);
+    background: var(--v5-line-strong);
+  }
+  .dd-pal__cab {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'titulo cerrar' 'buscar buscar';
+    gap: 4px 12px;
+    min-height: 0;
+    padding: 0 12px 14px 20px;
+    border-bottom: 0;
+  }
+  .dd-pal .dd-pal__prompt {
+    display: none;
+  }
+  .dd-pal__titulo {
+    display: block;
+    grid-area: titulo;
+    font: 760 1.75rem / 1 var(--f-display);
+    font-stretch: 90%;
+    letter-spacing: -0.02em;
+  }
+  .dd-pal__cerrar {
+    grid-area: cerrar;
+  }
+  .v5-digitdeck .dd-pal__buscar {
+    grid-area: buscar;
+    height: 48px;
+    padding: 0 18px;
+    border: 1px solid var(--v5-line-strong);
+    border-radius: var(--r-pill);
+    font-size: 1rem; /* 16 px: iOS no hace zoom al enfocar */
+  }
+  .dd-pal__cab:focus-within {
+    border-bottom-color: transparent;
+  }
+  .dd-pal__cab:focus-within .dd-pal__buscar {
+    border-color: var(--v5-acento);
+  }
+  .dd-pal__cuerpo {
+    grid-template-columns: minmax(0, 1fr);
+    border-top: 1px solid var(--v5-line);
+  }
+  .dd-pal__lista {
+    padding: 4px 8px 12px;
+  }
+  .dd-pal__fila {
+    grid-template-columns: 14px minmax(0, 1fr) auto;
+    grid-template-areas: 'punto nombre foto' 'punto lema foto';
+    gap: 4px 14px;
+    min-height: 76px;
+    padding: 10px 12px;
+  }
+  .dd-pal__punto {
+    grid-area: punto;
+    align-self: center;
+  }
+  .dd-pal__nombre {
+    grid-area: nombre;
+    align-self: end;
+  }
+  .dd-pal__vista {
+    display: contents; /* la captura y el lema pasan a ser celdas de la fila */
+  }
+  .dd-pal__foto {
+    grid-area: foto;
+    align-self: center;
+    width: 56px;
+    height: 56px;
+    aspect-ratio: auto;
+    border-radius: 10px;
+  }
+  .dd-pal__lema {
+    grid-area: lema;
+    align-self: start;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    margin: 0;
+    font: 400 var(--t-small) / 1.35 var(--f-text);
+    color: var(--v5-ink-2);
+  }
+  .dd-pal[lang='ja'] .dd-pal__lema {
+    font: 400 var(--t-small) / 1.45 var(--f-text);
+  }
+  .dd-pal__ruta,
+  .dd-pal__pie {
+    display: none;
+  }
+}

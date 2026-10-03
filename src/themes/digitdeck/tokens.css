@@ -96,6 +96,7 @@
   --z-cover: 78;
   --z-menu: 75;
   --z-header: 80;
+  --z-paleta: 90; /* la paleta de temas: sobre la cabecera, bajo el cursor; el disco de la elección pasa por encima (z-paleta + 2) */
   --z-cursor: 95;
   --z-entry: 100;
   --z-skip: 110;

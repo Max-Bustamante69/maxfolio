@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { Component, lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { THEMES } from '../../../ab.config'
 import { supportedLocales, useLanguage, type Locale } from '../../context/LanguageContext'
 import { en } from '../../content/en'
 import { getContent } from '../../content'
@@ -15,6 +16,19 @@ import { Enlace, ID } from './piezas'
 import Trayectoria from './Trayectoria'
 import './tokens.css'
 import './maison.css'
+
+// El selector de temas (un lookbook a pantalla completa) llega con su código, su CSS y sus imágenes SOLO al abrirlo; al acercar el
+// cursor o el foco al disparador se pide el trozo para que abra sin espera.
+const cargarTemas = () => import('./Temas')
+const Temas = lazy(cargarTemas)
+const TEMAS_ID = 'mz-temas'
+/** Si el trozo del selector no llega (sin red, o un despliegue nuevo que ya no tiene el archivo viejo), el selector no abre y el resto de la página sigue en pie. */
+class Resguardo extends Component<{ alFallar: () => void; children: ReactNode }, { fallo: boolean }> {
+  state = { fallo: false }
+  static getDerivedStateFromError() { return { fallo: true } }
+  componentDidCatch() { this.props.alFallar() }
+  render() { return this.state.fallo ? null : this.props.children }
+}
 
 const BASE = v5path(ID)
 const SECCIONES = ['', 'obra', 'trayectoria', 'contacto'] as const
@@ -75,11 +89,14 @@ function Cabecera({ cv }: { cv: string }) {
   const c = useCopy()
   const { pathname } = useLocation()
   const [abierto, setAbierto] = useState(false)
+  const [temas, setTemas] = useState(false)
   const boton = useRef<HTMLButtonElement>(null)
+  const botonTemas = useRef<HTMLButtonElement>(null)
   const actual = pathname.slice(BASE.length + 1).split('/')[0] as (typeof SECCIONES)[number]
   const textos = [c.nav.inicio, c.nav.obra, c.nav.trayectoria, c.nav.contacto]
   const cerrar = useCallback(() => { setAbierto(false); boton.current?.focus({ preventScroll: true }) }, [])
-  useEffect(() => { setAbierto(false) }, [pathname])
+  const cerrarTemas = useCallback(() => { setTemas(false); botonTemas.current?.focus({ preventScroll: true }) }, [])
+  useEffect(() => { setAbierto(false); setTemas(false) }, [pathname])
   const enlaces = SECCIONES.map((r, i) => [r ? `${BASE}/${r}` : BASE, textos[i], actual === r] as [string, string, boolean])
   return (
     <header className="mz-cab">
@@ -91,6 +108,11 @@ function Cabecera({ cv }: { cv: string }) {
           ))}
         </nav>
         <div className="mz-cab-der">
+          <button ref={botonTemas} type="button" className="mz-tem-b" aria-haspopup="dialog" aria-expanded={temas} aria-controls={TEMAS_ID}
+            onPointerEnter={cargarTemas} onFocus={cargarTemas} onClick={() => { setAbierto(false); setTemas((v) => !v) }}>
+            <span>{c.temas.abrir}</span>
+            <span className="mz-tem-b-n" aria-hidden="true">({THEMES.length})</span>
+          </button>
           <Idioma clase="mz-idioma-cab" />
           <Enlace to={`${BASE}/contacto?motivo=revision`} className="mz-btn mz-btn-chico mz-cab-cta">{c.escribeme}</Enlace>
           <button ref={boton} type="button" className="mz-menu-b" aria-expanded={abierto} onClick={() => (abierto ? cerrar() : setAbierto(true))}>{abierto ? c.menu.cerrar : c.menu.abrir}</button>
@@ -99,6 +121,7 @@ function Cabecera({ cv }: { cv: string }) {
       <i className="mz-progreso" aria-hidden="true" />
       <i className="mz-trazo-pag" aria-hidden="true" />
       {abierto && <Hoja cerrar={cerrar} enlaces={enlaces} cv={cv} />}
+      {temas && <Resguardo alFallar={() => setTemas(false)}><Suspense fallback={null}><Temas id={TEMAS_ID} cerrar={cerrarTemas} /></Suspense></Resguardo>}
     </header>
   )
 }

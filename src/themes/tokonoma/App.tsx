@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { preload } from 'react-dom'
 import { en } from '../../content/en'
@@ -20,6 +20,12 @@ import './tokonoma.css'
 
 const ETIQUETA: Record<Locale, string> = { es: 'ES', en: 'EN', ja: 'JA' }
 const SECCIONES = ['obra', 'trayectoria', 'contacto'] as const
+
+// El selector de temas vive en su propio chunk: ni su código, ni su CSS, ni las ocho capturas se piden hasta que se abre
+// (o hasta que se apunta al disparador, que solo adelanta el chunk de código, no las imágenes).
+const cargarTemas = () => import('./Temas')
+const Temas = lazy(cargarTemas)
+const ID_TEMAS = 'tk-temas'
 
 /** Selector ES · EN · JA: un solo toque, sin menú. */
 function Idioma({ clase = '' }: { clase?: string }) {
@@ -77,10 +83,14 @@ function Cabecera() {
   const { personal } = useV5()
   const { pathname } = useLocation()
   const [abierto, setAbierto] = useState(false)
+  const [temas, setTemas] = useState(false)
   const raiz = useRef<HTMLElement>(null)
   const boton = useRef<HTMLButtonElement>(null)
+  const disparador = useRef<HTMLButtonElement>(null)
   const actual = pathname.slice(ruta().length + 1).split('/')[0]
   const cerrar = useCallback(() => { setAbierto(false); boton.current?.focus({ preventScroll: true }) }, [])
+  // El panel de temas suelta su aislamiento antes de avisar; el foco vuelve al disparador, que ya no es inerte.
+  const cerrarTemas = useCallback(() => { setTemas(false); disparador.current?.focus({ preventScroll: true }) }, [])
 
   useEffect(() => {
     let ultimo = window.scrollY
@@ -97,26 +107,30 @@ function Cabecera() {
     window.addEventListener('scroll', alDesplazar, { passive: true })
     return () => window.removeEventListener('scroll', alDesplazar)
   }, [])
-  useEffect(() => { setAbierto(false) }, [pathname])
+  useEffect(() => { setAbierto(false); setTemas(false) }, [pathname])
 
   return (
     <>
     <header className="tk-cab" ref={raiz} data-fondo="0" onFocus={() => raiz.current && delete raiz.current.dataset.oculta}>
       <div className="tk-fr tk-cab-in">
         <Enlace to={ruta()} className="tk-marca" aria-label={`${personal.name} · ${c.nav.inicio}`}><Sello tam={26} />{personal.name}</Enlace>
-        <nav className="tk-nav" aria-label={c.principal}>
-          {SECCIONES.map((s) => (
-            <Enlace key={s} to={ruta(s)} aria-current={actual === s ? 'page' : undefined}>{c.nav[s]}</Enlace>
-          ))}
-          <Idioma clase="tk-idioma-cab" />
-        </nav>
-        <button ref={boton} type="button" className="tk-menu" aria-expanded={abierto} aria-label={abierto ? c.cerrarMenu : c.abrirMenu} onClick={() => (abierto ? cerrar() : setAbierto(true))}>
-          <span aria-hidden="true" />
-          <span aria-hidden="true" />
-        </button>
+        <div className="tk-cab-der">
+          <nav className="tk-nav" aria-label={c.principal}>
+            {SECCIONES.map((s) => (
+              <Enlace key={s} to={ruta(s)} aria-current={actual === s ? 'page' : undefined}>{c.nav[s]}</Enlace>
+            ))}
+            <Idioma clase="tk-idioma-cab" />
+          </nav>
+          <button ref={disparador} type="button" className="tk-temas-b" aria-haspopup="dialog" aria-expanded={temas} aria-controls={ID_TEMAS} onPointerEnter={cargarTemas} onFocus={cargarTemas} onClick={() => { setAbierto(false); setTemas(true) }}>{c.temas.boton}</button>
+          <button ref={boton} type="button" className="tk-menu" aria-expanded={abierto} aria-label={abierto ? c.cerrarMenu : c.abrirMenu} onClick={() => (abierto ? cerrar() : (setTemas(false), setAbierto(true)))}>
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+          </button>
+        </div>
       </div>
     </header>
     {abierto && <Hoja cerrar={cerrar} />}
+    {temas && <Suspense fallback={null}><Temas id={ID_TEMAS} cerrar={cerrarTemas} /></Suspense>}
     </>
   )
 }

@@ -103,6 +103,8 @@ const es = {
     error: 'No se pudo enviar desde aquí; se abrió tu aplicación de correo con el mensaje listo.',
   },
   pie: { medellin: 'Medellín', volver: 'Volver arriba', derechos: '© 2026' },
+  // El selector de temas: una palabra en la cabecera abre una fila de rollos, uno por tema, cada uno con su cartela.
+  temas: { boton: 'Temas', titulo: 'Temas', sub: 'La misma obra, otra manera de recorrerla', lista: 'Temas del sitio', cerrar: 'Cerrar', cerrarAria: 'Cerrar los temas', actual: 'Tema actual', elegir: 'Elegir' },
 }
 
 type Copy = typeof es
@@ -208,6 +210,7 @@ const en: Copy = {
     error: 'It could not be sent from here; your mail app opened with the message ready.',
   },
   pie: { medellin: 'Medellín', volver: 'Back to top', derechos: '© 2026' },
+  temas: { boton: 'Themes', titulo: 'Themes', sub: 'The same work, another way to walk through it', lista: 'Site themes', cerrar: 'Close', cerrarAria: 'Close themes', actual: 'Current theme', elegir: 'Choose' },
 }
 
 // Japonés: la interfaz completa; los textos del portafolio (posicionamiento, cifras, cargos, FAQ) llegan en japonés desde useV5().
@@ -312,6 +315,7 @@ const ja: Copy = {
     error: 'ここから送信できなかったため、メールアプリを開きました。',
   },
   pie: { medellin: 'メデジン', volver: '上へ戻る', derechos: '© 2026' },
+  temas: { boton: 'テーマ', titulo: 'テーマ', sub: '同じ仕事を、別の見かたで', lista: 'サイトのテーマ', cerrar: '閉じる', cerrarAria: 'テーマを閉じる', actual: '現在のテーマ', elegir: '選ぶ' },
 }
 
 const TEXTOS: Record<string, Copy> = { es, en, ja }

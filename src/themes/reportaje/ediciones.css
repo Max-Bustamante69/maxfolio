@@ -1,0 +1,19 @@
+/* El Reportaje · disparador de «Otras ediciones» en la barra de capítulos. Solo el botón (glifo + palabra): el quiosco y sus
+   imágenes viven en quiosco.css y llegan al abrirlo. Ningún hexadecimal: el color sale de tokens.css. */
+
+.rp-ed-b { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-width: 44px; min-height: 44px; color: var(--ink); }
+.rp-ed-b-txt { display: none; color: var(--ink-2); transition: color 0.3s ease; white-space: nowrap; }
+.rp-ed-pila { flex: none; overflow: visible; }
+.rp-ed-pila-atras { transition: transform 0.4s var(--ease-expo); }
+@media (hover: hover) {
+  .rp-ed-b:hover .rp-ed-b-txt { color: var(--ink); }
+  .rp-ed-b:hover .rp-ed-pila-atras { transform: translate(-2px, 2px); }
+}
+/* Tabletas: la barra solo trae el menú, hay sitio para la palabra. En escritorio entra cuando caben los cuatro capítulos, el idioma y el botón de revisión. */
+@media (min-width: 640px) and (max-width: 1119px) { .rp-ed-b-txt { display: inline; } }
+@media (min-width: 1360px) { .rp-ed-b-txt { display: inline; } }
+/* En la barra completa el botón queda separado del idioma por un filete, para que «Ediciones ES EN JA» no se lea como una sola frase. */
+@media (min-width: 1120px) {
+  .rp-ed-b { position: relative; margin-right: 8px; }
+  .rp-ed-b::after { content: ''; position: absolute; right: -7px; top: 12px; bottom: 12px; width: 1px; background: var(--rule); }
+}

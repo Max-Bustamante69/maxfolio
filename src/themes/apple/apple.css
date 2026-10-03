@@ -115,6 +115,12 @@
 .ap-icono { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; color: var(--v5-ink); transition: background-color 0.2s ease, transform 0.16s var(--ap-ease); }
 .ap-icono:active { transform: scale(0.94); }
 @media (hover: hover) and (pointer: fine) { .ap-icono:hover { background: color-mix(in srgb, var(--v5-ink) 8%, transparent); } }
+.ap-temas-btn[aria-expanded='true'] { background: color-mix(in srgb, var(--v5-ink) 8%, transparent); }
+.ap-temas-txt { display: none; }
+@media (min-width: 1180px) {
+  .ap-temas-btn { display: inline-flex; align-items: center; gap: 7px; width: auto; padding: 0 14px 0 12px; border-radius: 999px; font-size: 0.8125rem; font-weight: 500; letter-spacing: -0.01em; }
+  .ap-temas-txt { display: inline; }
+}
 .ap-burger-l, .ap-burger-l::before { display: block; width: 18px; height: 1.5px; border-radius: 1px; background: currentColor; transition: transform 0.35s var(--ap-ease); }
 .ap-burger-l { position: relative; transform: translateY(-3px); }
 .ap-burger-l::before { content: ''; position: absolute; top: 6px; left: 0; }

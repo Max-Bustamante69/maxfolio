@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, type ReactNode } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useLanguage, type Locale } from '../../context/LanguageContext'
 import { useCopiarCorreo } from '../shared/contacto'
@@ -8,9 +8,15 @@ import { ID, usePersona } from './contexto'
 import { gsap, ScrollTrigger } from './motion'
 import { Enlace } from './piezas'
 import { sfx, useSfx } from './sfx'
+import { textoTemas } from './temasTexto'
 
 const LOCALES: Locale[] = ['es', 'en', 'ja']
 const BASE = v5path(ID)
+
+// El selector de temas («SELECT STAGE») es un trozo aparte: ni su código, ni su CSS, ni las ocho vistas previas se piden
+// hasta que alguien lo abre (o se acerca al botón con el puntero o el teclado).
+const PanelTemas = lazy(() => import('./Temas'))
+const precargarTemas = () => void import('./Temas')
 
 /** Barrido diagonal: una hoja de acento con una cuchilla de tinta por delante. Cubre en ≤ 0,26 s, cambia de ruta en
  *  ese instante (sin esperas fijas: el cambio es un callback de la línea de tiempo) y descubre en 0,3 s.
@@ -53,6 +59,11 @@ const Mail = () => (
     <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
   </svg>
 )
+const Rombos = () => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true">
+    <path d="M3.5 0.5L6.5 3.5L3.5 6.5L0.5 3.5ZM10.5 0.5L13.5 3.5L10.5 6.5L7.5 3.5ZM3.5 7.5L6.5 10.5L3.5 13.5L0.5 10.5ZM10.5 7.5L13.5 10.5L10.5 13.5L7.5 10.5Z" />
+  </svg>
+)
 const Check = () => (
   <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24" aria-hidden="true">
     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -69,6 +80,10 @@ export function Cromo({ children, barrido }: { children: ReactNode; barrido: Rea
   const hora = useMedellinTime(v5.intlLocale)
   const sonido = useSfx()
   const { copiar, copiado } = useCopiarCorreo(ID)
+  const tt = textoTemas(v5.locale)
+  const [temasAbierto, setTemasAbierto] = useState(false)
+  const disparador = useRef<HTMLButtonElement>(null)
+  const estabaAbierto = useRef(false)
 
   const seccion = pathname.replace(BASE, '').split('/')[1] ?? ''
   const nav = [
@@ -100,6 +115,13 @@ export function Cromo({ children, barrido }: { children: ReactNode; barrido: Rea
     document.getElementById('contenido')?.focus({ preventScroll: true })
   }, [pathname])
 
+  // El selector se cierra si la ruta cambia con él abierto (Atrás), y al cerrarse el foco vuelve al botón que lo abrió.
+  useEffect(() => setTemasAbierto(false), [pathname])
+  useEffect(() => {
+    if (estabaAbierto.current && !temasAbierto) disparador.current?.focus()
+    estabaAbierto.current = temasAbierto
+  }, [temasAbierto])
+
   // ⎋ vuelve al inicio desde cualquier pantalla (nunca dentro de un campo).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -125,6 +147,25 @@ export function Cromo({ children, barrido }: { children: ReactNode; barrido: Rea
             <span className="pr-marca__nombre">{v5.personal.name}</span>
           </Enlace>
           <div className="pr-top__acciones">
+            <button
+              ref={disparador}
+              type="button"
+              className="pr-temas"
+              aria-haspopup="dialog"
+              aria-expanded={temasAbierto}
+              aria-controls="pr-temas-panel"
+              onPointerEnter={precargarTemas}
+              onFocus={precargarTemas}
+              onClick={() => {
+                sfx.tono(660, 0.07)
+                setTemasAbierto(true)
+              }}
+            >
+              <span className="pr-temas__chip">
+                <Rombos />
+                <span>{tt.boton}</span>
+              </span>
+            </button>
             <button type="button" className="pr-icono pr-sfx" aria-pressed={sonido} aria-label={c.sonido} title={sonido ? c.sonidoOn : c.sonidoOff} onClick={() => sfx.alternar()}>
               <span aria-hidden="true">SFX</span>
               <span className="pr-sfx__estado" aria-hidden="true">{sonido ? 'On' : 'Off'}</span>
@@ -179,6 +220,12 @@ export function Cromo({ children, barrido }: { children: ReactNode; barrido: Rea
         <span className="pr-barrido__tinta" />
         <span className="pr-barrido__acento" />
       </div>
+
+      {temasAbierto && (
+        <Suspense fallback={null}>
+          <PanelTemas onCerrar={() => setTemasAbierto(false)} />
+        </Suspense>
+      )}
     </div>
   )
 }

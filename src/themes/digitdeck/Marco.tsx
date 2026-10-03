@@ -1,14 +1,14 @@
 // El marco permanente de la dirección: cabecera (siempre visible), menú de pantalla completa (un disco de papel que crece
 // desde el botón), pie con el MB gigante cuyo punto vuelve arriba, WhatsApp flotante y el cursor-punto.
-import { useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState, type ComponentType, type RefObject } from 'react'
 import { useLocation } from 'react-router-dom'
 import { gsap } from 'gsap'
 import { useLanguage, type Locale } from '../../context/LanguageContext'
 import { v5path, useV5 } from '../data'
 import { evento, useCopiarCorreo } from '../shared/contacto'
 import { useMedellinTime } from '../shared/useMedellinTime'
-import { useCopy } from './copy'
-import { IconoWhatsApp } from './iconos'
+import { useCopy, useCopyTemas } from './copy'
+import { IconoTemas, IconoWhatsApp } from './iconos'
 import { EASE, distanciaALaBarra, instanteEn } from './movimiento'
 import { Enlace } from './transicion'
 
@@ -19,6 +19,18 @@ const RUTAS = [
   ['trayectoria', v5path('digitdeck', 'trayectoria')],
   ['contacto', v5path('digitdeck', 'contacto')],
 ] as const
+
+// La paleta de temas es un trozo aparte (JS, CSS y sus imágenes): no pesa nada hasta que alguien la abre o apunta al botón.
+const cargarSelector = () => import('./SelectorTemas')
+const SelectorTemas = lazy<ComponentType<{ disparador: RefObject<HTMLElement | null>; onCerrado: () => void }>>(() =>
+  cargarSelector().catch(() => ({
+    // Sin red a mitad de visita: la paleta se cierra sola en vez de dejar un botón «abierto» que no abre nada.
+    default: function SinSelector({ onCerrado }: { onCerrado: () => void }) {
+      useEffect(() => onCerrado(), [onCerrado])
+      return null
+    },
+  })),
+)
 
 function SelectorIdioma() {
   const c = useCopy()
@@ -88,6 +100,9 @@ function Menu({ abierto, boton }: { abierto: boolean; boton: React.RefObject<HTM
           {c.contacto.whatsapp}
         </a>
         <span className="dd-micro" role="status">{c.medellin(hora)}</span>
+        <div className="dd-menu__idioma">
+          <SelectorIdioma />
+        </div>
       </div>
     </div>
   )
@@ -95,12 +110,36 @@ function Menu({ abierto, boton }: { abierto: boolean; boton: React.RefObject<HTM
 
 export function Cabecera() {
   const c = useCopy()
+  const ct = useCopyTemas()
   const { pathname } = useLocation()
   const [menu, setMenu] = useState(false)
+  const [temas, setTemas] = useState(false)
   const cab = useRef<HTMLElement>(null)
   const boton = useRef<HTMLButtonElement>(null)
+  const disparador = useRef<HTMLButtonElement>(null)
+  const temasAbierto = useRef(false)
+  temasAbierto.current = temas
+  // La tecla del atajo se decide al montar (⌘ en Apple, Ctrl en el resto); es solo el rótulo, el atajo acepta las dos.
+  const tecla = useMemo(() => (/Mac|iPhone|iPad|iPod/.test(navigator.platform) ? '⌘K' : 'Ctrl K'), [])
 
-  useEffect(() => setMenu(false), [pathname])
+  useEffect(() => {
+    setMenu(false)
+    setTemas(false)
+  }, [pathname])
+
+  // ⌘K / Ctrl+K abre la paleta de temas desde cualquier vista; abierta, la cierra ella misma (SelectorTemas.tsx).
+  useEffect(() => {
+    const alAtajo = (e: KeyboardEvent) => {
+      if (!(e.metaKey || e.ctrlKey) || e.altKey || e.shiftKey || e.key.toLowerCase() !== 'k') return
+      e.preventDefault()
+      if (temasAbierto.current) return
+      void cargarSelector()
+      setMenu(false)
+      setTemas(true)
+    }
+    addEventListener('keydown', alAtajo)
+    return () => removeEventListener('keydown', alAtajo)
+  }, [])
 
   // El cromo cambia de color en el cuadro en que el disco del menú cubre (o deja de cubrir) la barra: se calcula con la curva del disco.
   const alternar = () => {
@@ -160,11 +199,32 @@ export function Cabecera() {
           </Enlace>
         </nav>
         <SelectorIdioma />
+        <button
+          ref={disparador}
+          type="button"
+          className="dd-temas-boton"
+          aria-haspopup="dialog"
+          aria-expanded={temas}
+          aria-controls="dd-paleta"
+          aria-label={ct.temas}
+          aria-keyshortcuts="Control+K Meta+K"
+          onPointerEnter={() => void cargarSelector()}
+          onFocus={() => void cargarSelector()}
+          onClick={() => {
+            setMenu(false)
+            setTemas(true)
+          }}
+        >
+          <IconoTemas />
+          <span className="dd-temas-boton__txt" aria-hidden="true">{ct.temas}</span>
+          <kbd aria-hidden="true">{tecla}</kbd>
+        </button>
         <button ref={boton} type="button" className="dd-menu-boton" aria-expanded={menu} aria-controls="dd-menu" aria-label={menu ? c.nav.cerrarMenu : undefined} onClick={alternar}>
           {menu ? c.nav.cerrar : c.nav.menu}
         </button>
       </header>
       <Menu abierto={menu} boton={boton} />
+      <Suspense fallback={null}>{temas && <SelectorTemas disparador={disparador} onCerrado={() => setTemas(false)} />}</Suspense>
     </>
   )
 }

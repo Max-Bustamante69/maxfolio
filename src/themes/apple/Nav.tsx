@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { supportedLocales, useLanguage, type Locale } from '../../context/LanguageContext'
 import { useV5, v5path } from '../data'
@@ -6,6 +6,9 @@ import { useCopy } from './copy'
 import { Flip, gsap } from './motion'
 import { capturasDeObra, Enlace, precargar } from './piezas'
 
+// El selector de temas (miniaturas, GSAP del panel y su CSS) llega solo al abrirlo; al pasar el puntero o enfocar el botón se calienta el chunk.
+const cargarSelector = () => import('./Selector')
+const Selector = lazy(cargarSelector)
 const BASE = v5path('apple')
 const SECCIONES = ['', 'obra', 'trayectoria', 'contacto'] as const
 const LABEL: Record<Locale, string> = { en: 'EN', es: 'ES', ja: 'JA' }
@@ -13,6 +16,12 @@ const LABEL: Record<Locale, string> = { en: 'EN', es: 'ES', ja: 'JA' }
 const Sol = () => (
   <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
     <circle cx="12" cy="12" r="4" /><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4m11.4-11.4 1.4-1.4" />
+  </svg>
+)
+const Temas = () => (
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <rect x="3.5" y="9" width="12.5" height="11.5" rx="3.2" />
+    <path d="M8 5.7V6a3.2 3.2 0 0 1 3.2-3.2h6.6A3.2 3.2 0 0 1 21 6v6.6a3.2 3.2 0 0 1-3.2 3.2H17.5" />
   </svg>
 )
 const Luna = () => (
@@ -77,9 +86,11 @@ export function Nav({ oscuro, alternar, cv }: { oscuro: boolean; alternar: () =>
   const { pathname } = useLocation()
   const { obras } = useV5()
   const [abierto, setAbierto] = useState(false)
+  const [temas, setTemas] = useState(false)
   const lista = useRef<HTMLUListElement>(null)
   const barra = useRef<HTMLSpanElement>(null)
   const boton = useRef<HTMLButtonElement>(null)
+  const botonTemas = useRef<HTMLButtonElement>(null)
   const actual = pathname.slice(BASE.length + 1).split('/')[0] as (typeof SECCIONES)[number]
   const textos = [c.nav.inicio, c.nav.obra, c.nav.trayectoria, c.nav.contacto]
   const cerrar = useCallback(() => { setAbierto(false); boton.current?.focus({ preventScroll: true }) }, [])
@@ -102,7 +113,8 @@ export function Nav({ oscuro, alternar, cv }: { oscuro: boolean; alternar: () =>
     return () => ro.disconnect()
   }, [ajustar])
 
-  useEffect(() => { setAbierto(false) }, [pathname])
+  useEffect(() => { setAbierto(false); setTemas(false) }, [pathname])
+  const cerrarTemas = useCallback(() => setTemas(false), [])
 
   return (
     <header className="ap-nav">
@@ -128,6 +140,10 @@ export function Nav({ oscuro, alternar, cv }: { oscuro: boolean; alternar: () =>
 
         <div className="ap-nav-der">
           <Idioma clase="ap-seg-idioma" />
+          <button ref={botonTemas} type="button" className="ap-icono ap-temas-btn" aria-label={c.temas.boton} aria-haspopup="dialog" aria-expanded={temas} aria-controls="ap-temas"
+            onPointerEnter={cargarSelector} onPointerDown={cargarSelector} onFocus={cargarSelector} onClick={() => { setAbierto(false); setTemas(!temas) }}>
+            <Temas /><span className="ap-temas-txt" aria-hidden="true">{c.temas.boton}</span>
+          </button>
           <button type="button" className="ap-icono" onClick={alternar} aria-label={oscuro ? c.tema.aClaro : c.tema.aOscuro}>{oscuro ? <Sol /> : <Luna />}</button>
           <Enlace to={`${BASE}/contacto`} className="ap-btn ap-btn-pri ap-btn-chico ap-nav-cta">{c.escribeme}</Enlace>
           <button ref={boton} type="button" className="ap-icono ap-burger" aria-expanded={abierto} aria-label={abierto ? c.menu.cerrar : c.menu.abrir} onClick={() => (abierto ? cerrar() : setAbierto(true))}>
@@ -135,6 +151,7 @@ export function Nav({ oscuro, alternar, cv }: { oscuro: boolean; alternar: () =>
           </button>
         </div>
       </div>
+      {temas && <Suspense fallback={null}><Selector anclaje={botonTemas} cerrar={cerrarTemas} /></Suspense>}
       {abierto && (
         <Hoja
           cerrar={cerrar}

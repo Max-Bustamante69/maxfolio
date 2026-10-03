@@ -412,6 +412,81 @@
 .dd-menu-boton:active {
   transform: scale(0.96);
 }
+/* Selector de temas: paleta ⌘K (SelectorTemas.tsx, que se carga al abrirla). Solo icono hasta 640 px; con el rótulo desde ahí, y la tecla
+   solo con puntero fino. El punto verde del icono es el acento del tema en uso (--v5-punto). */
+.dd-temas-boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 1px solid currentColor;
+  border-radius: var(--r-pill);
+  background: none;
+  color: inherit;
+  font: 600 0.875rem / 1 var(--f-text);
+  cursor: pointer;
+  transition: transform var(--d-react) var(--e-out), border-color var(--d-fast) var(--e-out);
+}
+.dd-temas-boton:active {
+  transform: scale(0.96);
+}
+.dd-temas-boton[aria-expanded='true'] {
+  border-color: var(--v5-acento);
+}
+.dd-temas-boton__acento {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform var(--d-base) var(--e-out);
+}
+.dd-temas-boton__txt,
+.dd-temas-boton kbd {
+  display: none;
+}
+.dd-temas-boton kbd {
+  padding: 3px 6px;
+  border: 1px solid var(--v5-line);
+  border-radius: 6px;
+  font: 500 var(--t-micro) / 1 var(--f-text);
+  letter-spacing: 0.02em;
+  opacity: 0.8;
+}
+@media (hover: hover) {
+  .dd-temas-boton:hover:not([aria-expanded='true']) {
+    border-color: var(--v5-acento);
+  }
+  .dd-temas-boton:hover .dd-temas-boton__acento {
+    transform: scale(1.4);
+  }
+}
+@media (min-width: 640px) {
+  .dd-temas-boton {
+    padding: 0 14px 0 12px;
+  }
+  .dd-temas-boton__txt {
+    display: inline;
+  }
+}
+@media (min-width: 640px) and (hover: hover) and (pointer: fine) {
+  .dd-temas-boton kbd {
+    display: inline-block;
+  }
+}
+/* Bajo 480 px la cabecera no admite el selector de idioma además del de temas y el menú: el idioma pasa al pie del menú. */
+.dd-menu__idioma {
+  display: none;
+  margin-left: -15px; /* los botones miden 44 px y su texto va centrado: así «ES» queda alineado con «Copiar correo» */
+}
+@media (max-width: 479px) {
+  .dd-cab > .dd-idioma {
+    display: none;
+  }
+  .dd-menu__idioma {
+    display: block;
+  }
+}
 @media (min-width: 900px) {
   .dd-nav {
     display: flex;
@@ -1447,6 +1522,9 @@
 }
 .dd-cubierta[data-activa='true'] {
   visibility: visible;
+}
+.dd-cubierta[data-alto='true'] {
+  z-index: calc(var(--z-paleta) + 2);
 }
 .dd-cubierta__disco {
   position: absolute;

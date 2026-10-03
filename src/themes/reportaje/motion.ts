@@ -198,11 +198,12 @@ let esperaVista = 0
 /** La hoja vive en App; aquí se registra para que cualquier enlace pueda hacerla caer. */
 export function registrarVelo(el: HTMLElement | null) {
   velo = el
-  if (el) gsap.set(el, { yPercent: -101 })
+  // Un velo nuevo nace descubierto: el estado de módulo de una visita anterior (se cambió de tema con la hoja caída) no debe levantarla.
+  if (el) { gsap.set(el, { yPercent: -101 }); cubierto = false; saliendo = false; esperaVista = 0 }
 }
 
 /** Cubre en ≤ 0,34 s con el número y el nombre del capítulo; `luego` navega cuando la hoja ya tapa la vista vieja. */
-function cubrir(num: string, titulo: string, luego: () => void) {
+export function cubrir(num: string, titulo: string, luego: () => void) {
   if (!velo) { luego(); return }
   const v = velo
   const n = v.querySelector<HTMLElement>('.rp-velo-num')
@@ -227,6 +228,9 @@ function levantar() {
     onComplete: () => { gsap.set(v, { yPercent: -101 }); v.style.pointerEvents = 'none'; esperaVista = 0 },
   })
 }
+
+/** Levanta la hoja si quedó caída (el selector de ediciones la baja y luego navega: si la navegación no desmonta nada, no puede quedar tapando la página). */
+export { levantar as soltarVelo }
 
 /** Posición de scroll por ruta, para que Atrás devuelva la lista donde estaba. */
 const posiciones = new Map<string, number>()

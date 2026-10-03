@@ -15,3 +15,23 @@ export function IconoPausa({ pausado }: { pausado: boolean }) {
     </svg>
   )
 }
+
+/** Cuatro puntos —los temas— y uno verde, el que está en uso: el acento lo pone `--v5-punto` (pasa a tinta sobre el disco y al verde profundo sobre el papel). */
+export function IconoTemas() {
+  return (
+    <svg className="dd-temas-boton__icono" width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
+      <circle cx="5" cy="5" r="2.6" fill="currentColor" />
+      <circle cx="13" cy="5" r="2.6" fill="currentColor" />
+      <circle cx="5" cy="13" r="2.6" fill="currentColor" />
+      <circle className="dd-temas-boton__acento" cx="13" cy="13" r="2.6" fill="var(--v5-punto)" />
+    </svg>
+  )
+}
+
+export function IconoCerrar() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+    </svg>
+  )
+}

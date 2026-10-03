@@ -22,6 +22,8 @@ export const soltarCompartido = () => void (compartido = null)
 
 interface Api {
   ir: (to: string, origen: { x: number; y: number }, etiqueta: string) => void
+  /** Solo la cubierta: el disco crece desde `origen` (por encima de la paleta de temas) y la promesa se cumple al taparlo todo. */
+  cubrir: (origen: { x: number; y: number }, etiqueta: string) => Promise<void>
   irFicha: (to: string, rect: DOMRect) => void
   paginaLista: (info: InfoPagina) => void
   bloquear: (p: Promise<unknown>) => void
@@ -135,6 +137,16 @@ export function TransicionProvider({ children }: { children: ReactNode }) {
     [crecer, encoger, navigate],
   )
 
+  const cubrir = useCallback(
+    async (origen: { x: number; y: number }, etiqueta: string) => {
+      compartido = null
+      secuencia.current++ // cualquier viaje en curso deja de avanzar: la ruta que sigue no es de esta dirección
+      raiz.current!.dataset.alto = 'true'
+      await crecer(origen, etiqueta)
+    },
+    [crecer],
+  )
+
   const irFicha = useCallback(
     async (to: string, rect: DOMRect) => {
       compartido = { rect, t: performance.now() }
@@ -149,7 +161,7 @@ export function TransicionProvider({ children }: { children: ReactNode }) {
     bloqueo.current = p
   }, [])
 
-  const api = useMemo<Api>(() => ({ ir, irFicha, paginaLista, bloquear }), [ir, irFicha, paginaLista, bloquear])
+  const api = useMemo<Api>(() => ({ ir, cubrir, irFicha, paginaLista, bloquear }), [ir, cubrir, irFicha, paginaLista, bloquear])
   return (
     <Contexto.Provider value={api}>
       {children}
