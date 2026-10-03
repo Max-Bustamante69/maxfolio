@@ -1,0 +1,118 @@
+/* Dirección «A la manera de Digitdeck» (la dirección del sitio v4, con el contenido de Max).
+   Tinta casi negra, UN solo acento violeta (el punto) y una banda de papel invertida por página.
+   Este es el ÚNICO archivo de la dirección con valores de color en bruto: el resto lee estas variables.
+   Roles comunes a las direcciones: --v5-bg, --v5-ink, --v5-ink-2, --v5-line, --v5-focus, --v5-surface.
+
+   Pares medidos (WCAG 2.x, shots8/digitdeck/contraste.mjs): 0 fallos.
+     tinta sobre bg 17,13 · tinta-2 sobre bg 9,31 y sobre surface 8,78 (texto ≥ 4,5)
+     violeta como texto sobre bg 4,80 y sobre surface 4,53 · tinta sobre relleno violeta 4,80
+     foco violeta sobre bg 4,80 · borde de control sobre bg 3,83 y sobre surface 3,61 (controles y foco ≥ 3)
+     banda de papel: tinta 17,13 · tinta-2 6,65 · violeta profundo como texto y foco 5,94 · borde de control 3,10
+   Descartado, escrito para que nadie lo reintroduzca: blanco sobre violeta 4,09 (no pasa), violeta de marca como
+   texto sobre papel 3,57 (no pasa), texto-3 #7d7a88 bajo 24 px sobre surface. */
+.v5-digitdeck,
+:root:has(.v5-digitdeck) {
+  color-scheme: dark;
+
+  /* ---- roles comunes ---- */
+  --v5-bg: #0b0b0f;
+  --v5-ink: #f2efea;
+  --v5-ink-2: #b4b1bc;
+  --v5-line: rgb(242 239 234 / 0.16);
+  --v5-line-strong: #6f6c78;
+  --v5-focus: #915ff3;
+  --v5-surface: #131318;
+
+  /* ---- el punto: el único acento ---- */
+  --v5-violet: #915ff3;
+  --v5-on-violet: #0b0b0f;
+
+  /* ---- banda de papel (una por página) ---- */
+  --v5-paper: #f2efea;
+  --v5-paper-ink: #0b0b0f;
+  --v5-paper-ink-2: #55525e;
+  --v5-paper-line: rgb(11 11 15 / 0.16);
+  --v5-paper-line-strong: #8a8693;
+  --v5-paper-accent: #6636d8;
+  --v5-paper-error: #c42b3f;
+  --v5-paper-ok: #0b7a4e;
+
+  /* ---- estados y velos ---- */
+  --v5-error: #ff7a7a;
+  --v5-ok: #4ade9a;
+  --v5-scrim: rgb(11 11 15 / 0.72);
+  --v5-shadow-float: 0 40px 60px rgb(0 0 0 / 0.55);
+
+  /* ---- tipografía ---- */
+  --f-display: 'DD Bricolage', 'DD Bricolage Fallback', system-ui, sans-serif;
+  --f-text: 'DD Hanken', 'DD Hanken Fallback', system-ui, sans-serif;
+  --f-serif: 'DD Serif', Georgia, serif;
+  --t-mega: clamp(2.25rem, 0.9rem + 4.9vw, 5.75rem); /* 36 / 85 / 92 px (390 / 1440 / 1920): el H1 de Max es una frase más larga que el de la agencia */
+  --t-display: clamp(2rem, 0.6rem + 4vw, 5rem); /* 32 / 67 / 80 */
+  --t-figure: clamp(4rem, 1rem + 11vw, 11rem); /* 64 / 174 / 176 */
+  --t-h2: clamp(1.625rem, 1rem + 1.8vw, 2.75rem); /* 26 / 42 / 44 */
+  --t-row: clamp(1.5rem, 1rem + 1.7vw, 2.625rem); /* nombre de fila del índice: 24 / 42 */
+  --t-lede: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  --t-body: 1rem;
+  --t-small: 0.875rem;
+  --t-micro: 0.75rem;
+
+  /* ---- retícula y ritmo ---- */
+  --gutter: clamp(15px, 3.5vw, 50px);
+  --frame-max: 1650px;
+  --sp-section: 96px;
+  --sp-breath: 160px;
+  --header-h: 60px;
+  --inset: max(var(--gutter), calc((100vw - var(--frame-max)) / 2 + var(--gutter)));
+  --r-tile: 10px;
+  --r-sheet: 20px;
+  --r-pill: 999px;
+
+  /* ---- movimiento: «llegar y asentarse» ---- */
+  --d-react: 0.12s;
+  --d-fast: 0.18s;
+  --d-base: 0.28s;
+  --d-reveal: 0.64s;
+  --d-photo: 0.9s;
+  --d-bloom: 0.34s;
+  --d-contract: 0.38s;
+  --d-count: 1.2s;
+  --stagger: 0.09;
+  --e-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --e-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --e-inout: cubic-bezier(0.7, 0, 0.2, 1);
+  --e-lift: cubic-bezier(0.77, 0, 0.175, 1);
+
+  /* ---- capas ---- */
+  --z-page: 2;
+  --z-fab: 50;
+  --z-cover: 78;
+  --z-menu: 75;
+  --z-header: 80;
+  --z-cursor: 95;
+  --z-entry: 100;
+  --z-skip: 110;
+}
+
+/* Dentro de la banda de papel los roles se invierten: el resto de la hoja no sabe que cambió de fondo. */
+.v5-digitdeck [data-tono='papel'] {
+  --v5-bg: var(--v5-paper);
+  --v5-surface: var(--v5-paper);
+  --v5-ink: var(--v5-paper-ink);
+  --v5-ink-2: var(--v5-paper-ink-2);
+  --v5-line: var(--v5-paper-line);
+  --v5-line-strong: var(--v5-paper-line-strong);
+  --v5-focus: var(--v5-paper-accent);
+  --v5-error: var(--v5-paper-error);
+  --v5-ok: var(--v5-paper-ok);
+  color-scheme: light;
+}
+
+@media (min-width: 1024px) {
+  .v5-digitdeck,
+  :root:has(.v5-digitdeck) {
+    --sp-section: 128px;
+    --sp-breath: 200px;
+    --header-h: 72px;
+  }
+}
