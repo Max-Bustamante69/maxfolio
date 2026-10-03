@@ -1,0 +1,52 @@
+/* Dirección K · Radiografía. Todos los colores de la dirección viven aquí y en ningún otro archivo.
+   Campo lima de inspección (oklch 0,82 · 0,210 · 128°) con tinta oliva. Contrastes calculados con la fórmula WCAG 2.x
+   (quince/_curaduria/pal-final.mjs, 2026-10-02):
+     texto (mín. 4,5)    tinta/campo 8,02 · tinta-2/campo 5,43 · tinta/superficie 12,25 · tinta-2/superficie 8,29
+                         campo/tinta 8,02 · superficie/tinta 12,25
+     controles y foco (mín. 3)  tinta/campo 8,02 · tinta/superficie 12,25
+   La superficie contra el campo solo da 1,53:1: la superficie lleva SIEMPRE borde de 1 px de tinta.
+   Lo secundario es tinta-2 sólido, nunca opacidad. Sobre las capturas no hay velo: el trazo es doble
+   (3 px de superficie bajo 1 px de tinta) y todo rótulo va en un chip de superficie. */
+
+@font-face {
+  font-family: 'Sofia Sans Extra Condensed';
+  font-style: normal;
+  font-weight: 700 900;
+  font-display: swap;
+  src: url('/fonts/k/sofia-sans-extra-condensed.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Sofia Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/k/sofia-sans.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Azeret Mono';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('/fonts/k/azeret-mono.woff2') format('woff2');
+}
+
+.v5-root.v5-k {
+  /* Roles */
+  --v5-bg: #9CDC17; /* campo: «Lima de inspección» */
+  --v5-surface: #F1FAD0; /* «Película clara»: inspector, formulario, chips de rótulo */
+  --v5-ink: #26340A; /* «Oliva oscuro»: texto, filetes, botón relleno */
+  --v5-ink-2: #3E4F12; /* «Oliva medio»: texto secundario sólido */
+  --v5-line: #26340A; /* borde de control */
+  --v5-focus: #26340A; /* anillo de 3 px desplazado 2 px */
+  --v5-accent: #9CDC17; /* acento = «lo medido»: lima sobre tinta en lo invertido */
+
+  --k-disp: 'Sofia Sans Extra Condensed', 'Arial Narrow', 'Roboto Condensed', Impact, sans-serif;
+  --k-txt: 'Sofia Sans', system-ui, 'Segoe UI', sans-serif;
+  --k-mono: 'Azeret Mono', ui-monospace, Consolas, 'Cascadia Mono', monospace;
+
+  background: var(--v5-bg);
+  color: var(--v5-ink);
+}
+
+/* El fondo del documento mientras la dirección está montada (sobrescroll sin destello de otro color). */
+html.k-activo { background: #9CDC17; }

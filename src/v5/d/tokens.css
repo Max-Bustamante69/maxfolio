@@ -1,0 +1,42 @@
+/* Dirección D · Aluminio. La paleta de plata de Max (#E0E0E0 #BDBDBD #9E9E9E #FFFFFF #CFD8DC) más la tinta fría
+   #263238 (Blue Grey 900, hermana de #CFD8DC), un secundario sólido #455A64 y UN LED en dos tonos. Es el ÚNICO archivo
+   con hexadecimales de la dirección: estilos.css solo usa estos roles.
+
+   Los cinco colores de Max son claros: NINGUNO escribe. Texto, bordes de control y foco salen de la tinta; los grises
+   hacen de superficie, filete y detalle.
+
+   Pares usados (WCAG 2.x, fórmula de luminancia relativa; los medidos con la sonda del paso final están en notas8/d.md):
+   texto   tinta/blanco 13,16 · tinta/bruma 9,97 · tinta/pizarra 9,09 · tinta/plata 7,00
+           tinta-2/blanco 7,24 · tinta-2/bruma 5,49 · tinta-2/pizarra 5,00
+           bruma/tinta 9,97 · blanco/tinta 13,16 · plata/tinta 7,00 (secundario dentro del aparato)
+           LED/tinta 5,28 (texto del LCD) · tinta/LED 5,28 (etiqueta de estado)
+   gráfico LED claro/bruma 3,21 · LED claro/blanco 4,23
+   control tinta/bruma 9,97 · tinta/blanco 13,16 · tinta/pizarra 9,09 · bruma/tinta 9,97 · pizarra/tinta 9,09
+   Descartados: acero/blanco 2,68 · plata/blanco 1,88 · tinta-2/plata 3,85 · tinta-2/acero 2,70 · tinta-2/tinta 1,82 ·
+   LED/bruma 1,89 · LED claro/pizarra 2,92 · filete plata/bruma 1,42 (decorativo: nunca delimita un control). */
+.v5-d {
+  --v5-white: #FFFFFF;
+  --v5-bg: #E0E0E0;
+  --v5-slate: #CFD8DC;
+  --v5-silver: #BDBDBD;
+  --v5-steel: #9E9E9E;
+  --v5-ink: #263238;
+  --v5-ink-2: #455A64;
+  --v5-led: #FF8042;
+  --v5-led-light: #D05418;
+
+  /* Roles del contrato común */
+  --v5-paper: var(--v5-bg);
+  --v5-surface: var(--v5-white);
+  --v5-line: var(--v5-silver);
+  --v5-focus: var(--v5-ink);
+  --v5-accent: var(--v5-led-light);
+
+  /* Tipografía: Geist (títulos y cuerpo), Geist Mono (datos), Doto (solo el LCD). */
+  --d-sans: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --d-mono: 'Geist Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+  --d-dot: 'Doto', 'Geist Mono', ui-monospace, monospace;
+
+  /* Clic mecánico: curva única de toda la dirección (CustomEase "d-snap" en movimiento.ts es la misma). */
+  --d-snap: cubic-bezier(0.3, 0, 0, 1);
+}

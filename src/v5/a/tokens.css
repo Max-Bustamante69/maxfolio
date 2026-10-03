@@ -1,0 +1,21 @@
+/* Dirección A · El Libro. Papel de libreta y tinta cálida: un solo color, el papel. No hay acento.
+   Roles comunes a las seis direcciones (--v5-bg, --v5-ink, --v5-ink-2, --v5-line, --v5-focus, --v5-surface).
+   Este es el ÚNICO archivo de la dirección con hexadecimales. Pares medidos (WCAG 2.x):
+     tinta sobre papel 13,71:1 (texto, filete, borde de control y foco; mínimos 4,5 y 3)
+     tinta-2 sobre papel 8,04:1 (texto secundario; mínimo 4,5)
+     papel sobre tinta 13,71:1 (fila invertida: ahí TODO el texto es papel)
+   Descartado y escrito para que nadie lo reintroduzca: tinta-2 sobre tinta = 1,70:1; tinta al 60 % = 4,26:1
+   (por eso lo secundario es tinta-2 sólido, nunca una opacidad). */
+.v5-a,
+:root:has(.v5-a) {
+  --v5-bg: #fae180;
+  --v5-ink: #1d1707;
+  --v5-ink-2: #4a3f0c;
+  --v5-line: var(--v5-ink);
+  --v5-focus: var(--v5-ink);
+  --v5-surface: var(--v5-bg);
+}
+/* El papel llega hasta el borde (rebote del scroll, barras del sistema). */
+:root:has(.v5-a) {
+  background: var(--v5-bg);
+}

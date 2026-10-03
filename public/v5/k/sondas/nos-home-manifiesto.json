@@ -1,0 +1,411 @@
+{
+ "theme": "DEV - Digitdeck NOS",
+ "docH": 8406,
+ "secs": [
+  {
+   "k": "announcement-bar",
+   "y": 0,
+   "h": 40,
+   "islas": [
+    "announcement-bar"
+   ],
+   "dd": [
+    {
+     "c": "dd-announcement",
+     "x": 0,
+     "y": 0,
+     "w": 1440,
+     "h": 40
+    }
+   ]
+  },
+  {
+   "k": "header",
+   "y": 40,
+   "h": 56,
+   "islas": [
+    "header"
+   ],
+   "dd": [
+    {
+     "c": "dd-nav",
+     "x": 0,
+     "y": 40,
+     "w": 1440,
+     "h": 56
+    },
+    {
+     "c": "dd-language-switcher",
+     "x": 1198,
+     "y": 40,
+     "w": 45,
+     "h": 56
+    }
+   ]
+  },
+  {
+   "k": "hero_YfrPPi",
+   "y": 40,
+   "h": 720,
+   "islas": [
+    "hero"
+   ],
+   "dd": [
+    {
+     "c": "hero",
+     "x": 0,
+     "y": 40,
+     "w": 1440,
+     "h": 720
+    }
+   ]
+  },
+  {
+   "k": "logo-strip",
+   "y": 760,
+   "h": 208,
+   "islas": [
+    "logo-strip"
+   ],
+   "dd": [
+    {
+     "c": "dd-logo-strip",
+     "x": 0,
+     "y": 760,
+     "w": 1440,
+     "h": 208
+    },
+    {
+     "c": "dd-logo-strip",
+     "x": 0,
+     "y": 760,
+     "w": 1440,
+     "h": 208
+    }
+   ]
+  },
+  {
+   "k": "favoritos-carousel",
+   "y": 968,
+   "h": 783,
+   "islas": [
+    "favoritos-carousel"
+   ],
+   "dd": [
+    {
+     "c": "dd-favoritos",
+     "x": 0,
+     "y": 968,
+     "w": 1440,
+     "h": 783
+    },
+    {
+     "c": "dd-favoritos",
+     "x": 0,
+     "y": 968,
+     "w": 1440,
+     "h": 783
+    }
+   ]
+  },
+  {
+   "k": "categorias",
+   "y": 1751,
+   "h": 429,
+   "islas": [
+    "categorias"
+   ],
+   "dd": [
+    {
+     "c": "dd-categorias",
+     "x": 0,
+     "y": 1751,
+     "w": 1440,
+     "h": 429
+    },
+    {
+     "c": "dd-categorias",
+     "x": 0,
+     "y": 1751,
+     "w": 1440,
+     "h": 429
+    }
+   ]
+  },
+  {
+   "k": "why-us",
+   "y": 2180,
+   "h": 777,
+   "islas": [],
+   "dd": [
+    {
+     "c": "dd-whyus",
+     "x": 0,
+     "y": 2180,
+     "w": 1440,
+     "h": 777
+    }
+   ]
+  },
+  {
+   "k": "review-band",
+   "y": 2958,
+   "h": 855,
+   "islas": [
+    "review-band"
+   ],
+   "dd": [
+    {
+     "c": "dd-reviews-band",
+     "x": 0,
+     "y": 2958,
+     "w": 1440,
+     "h": 855
+    }
+   ]
+  },
+  {
+   "k": "comparison-table",
+   "y": 3813,
+   "h": 829,
+   "islas": [],
+   "dd": [
+    {
+     "c": "dd-comparison",
+     "x": 0,
+     "y": 3813,
+     "w": 1440,
+     "h": 829
+    }
+   ]
+  },
+  {
+   "k": "historia",
+   "y": 4642,
+   "h": 709,
+   "islas": [],
+   "dd": [
+    {
+     "c": "dd-historia",
+     "x": 0,
+     "y": 4642,
+     "w": 1440,
+     "h": 709
+    }
+   ]
+  },
+  {
+   "k": "trust-strip",
+   "y": 5350,
+   "h": 196,
+   "islas": [],
+   "dd": [
+    {
+     "c": "dd-trust",
+     "x": 0,
+     "y": 5350,
+     "w": 1440,
+     "h": 196
+    }
+   ]
+  },
+  {
+   "k": "combos-large",
+   "y": 5546,
+   "h": 633,
+   "islas": [],
+   "dd": [
+    {
+     "c": "dd-combos",
+     "x": 0,
+     "y": 5546,
+     "w": 1440,
+     "h": 633
+    }
+   ]
+  },
+  {
+   "k": "faq-band",
+   "y": 6179,
+   "h": 641,
+   "islas": [
+    "faq-band"
+   ],
+   "dd": [
+    {
+     "c": "dd-faq",
+     "x": 0,
+     "y": 6179,
+     "w": 1440,
+     "h": 641
+    }
+   ]
+  },
+  {
+   "k": "blog-band",
+   "y": 6820,
+   "h": 704,
+   "islas": [
+    "blog-band"
+   ],
+   "dd": [
+    {
+     "c": "dd-blog-band",
+     "x": 0,
+     "y": 6820,
+     "w": 1440,
+     "h": 704
+    }
+   ]
+  },
+  {
+   "k": "newsletter",
+   "y": 7523,
+   "h": 330,
+   "islas": [],
+   "dd": [
+    {
+     "c": "dd-newsletter",
+     "x": 0,
+     "y": 7523,
+     "w": 1440,
+     "h": 330
+    }
+   ]
+  },
+  {
+   "k": "footer",
+   "y": 7853,
+   "h": 552,
+   "islas": [
+    "footer"
+   ],
+   "dd": [
+    {
+     "c": "dd-footer",
+     "x": 0,
+     "y": 7853,
+     "w": 1440,
+     "h": 489
+    },
+    {
+     "c": "dd-footer-newsletter",
+     "x": 970,
+     "y": 7959,
+     "w": 420,
+     "h": 62
+    },
+    {
+     "c": "dd-language-switcher",
+     "x": 50,
+     "y": 8342,
+     "w": 1340,
+     "h": 64
+    }
+   ]
+  }
+ ],
+ "ddAll": [
+  {
+   "c": "dd-announcement",
+   "inSection": true
+  },
+  {
+   "c": "dd-nav",
+   "inSection": true
+  },
+  {
+   "c": "dd-language-switcher",
+   "inSection": true
+  },
+  {
+   "c": "hero",
+   "inSection": true
+  },
+  {
+   "c": "dd-logo-strip",
+   "inSection": true
+  },
+  {
+   "c": "dd-logo-strip",
+   "inSection": true
+  },
+  {
+   "c": "dd-favoritos",
+   "inSection": true
+  },
+  {
+   "c": "dd-favoritos",
+   "inSection": true
+  },
+  {
+   "c": "dd-categorias",
+   "inSection": true
+  },
+  {
+   "c": "dd-categorias",
+   "inSection": true
+  },
+  {
+   "c": "dd-whyus",
+   "inSection": true
+  },
+  {
+   "c": "dd-reviews-band",
+   "inSection": true
+  },
+  {
+   "c": "dd-comparison",
+   "inSection": true
+  },
+  {
+   "c": "dd-historia",
+   "inSection": true
+  },
+  {
+   "c": "dd-trust",
+   "inSection": true
+  },
+  {
+   "c": "dd-combos",
+   "inSection": true
+  },
+  {
+   "c": "dd-faq",
+   "inSection": true
+  },
+  {
+   "c": "dd-blog-band",
+   "inSection": true
+  },
+  {
+   "c": "dd-newsletter",
+   "inSection": true
+  },
+  {
+   "c": "dd-footer",
+   "inSection": true
+  },
+  {
+   "c": "dd-footer-newsletter",
+   "inSection": true
+  },
+  {
+   "c": "dd-language-switcher",
+   "inSection": true
+  },
+  {
+   "c": "cart-drawer",
+   "inSection": true
+  },
+  {
+   "c": "search-drawer",
+   "inSection": true
+  },
+  {
+   "c": "mobile-menu-drawer",
+   "inSection": true
+  }
+ ],
+ "fecha": "2026-10-03T03:49:40.597Z"
+}

@@ -1,0 +1,13 @@
+Dirección K · Radiografía: de dónde salen los datos medidos.
+
+capturar-radiografias.mjs  Sonda y captura de esta construcción (2026-10-03). Para cada tienda mide en una sola pasada el DOM
+                           público (cada .shopify-section con clave real, y y alto; data-island; data-dd-component y su caja)
+                           y hace la captura de página completa. Deja public/v5/k/placas/*.webp y src/v5/k/data/radiografias.json
+                           (copia aquí como radiografias.json). Es la que alimenta la dirección.
+sonda-nos.mjs              Sonda de la maqueta aprobada, NOS Café inicio a 1440 (2026-10-02). Método de origen.
+sonda-flota.mjs            Sonda de la maqueta aprobada, 14 tiendas sin scroll (2026-10-02). Método de origen.
+nos-home-manifiesto.json   Resultado de sonda-nos.mjs (2026-10-02): 16 secciones, 8.406 px.
+flota-home.json           Resultado de sonda-flota.mjs (2026-10-02).
+
+Las cifras que muestra la dirección son las de radiografias.json (2026-10-03). Una isla es un data-island montado (incluye los
+cajones); un medido es un elemento con data-dd-component. Nada se calcula en pantalla: las cajas vienen premedidas.
