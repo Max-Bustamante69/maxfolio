@@ -1,0 +1,46 @@
+/* Dirección Apple · tokens de color. Es el ÚNICO archivo de la dirección con hexadecimales; el resto usa var(--v5-*).
+   Roles del contrato v5: --v5-bg, --v5-ink, --v5-ink-2, --v5-line, --v5-focus, --v5-surface (+ acento).
+   Claro (el que Max usa en maxfolio.dev hoy) y oscuro con el mismo vocabulario.
+
+   Contrastes medidos con shots8/apple/contraste.mjs (relación de luminancia WCAG; texto ≥ 4.5, controles y foco ≥ 3):
+   claro  · ink / bg 16.3 · ink-2 / bg 4.9, / surface 4.7, / tile 5.1 · accent / bg 5.4, / surface 5.1 · blanco / accent-fill 4.7, / hover 5.6
+          · error / bg 5.2 · focus / bg 4.5, / surface 4.3 · borde de control (line-strong) / bg 3.5, / tile 3.6 · ok / tile 4.4
+   oscuro · ink / bg 19.3 · ink-2 / bg 8.2, / surface 7.0, / tile 6.5 · accent / bg 7.0, / surface 6.0 · blanco / accent-fill 4.7
+          · error / bg 7.5 · focus / bg 7.0 · borde de control / bg 5.8, / tile 4.7 · ok / tile 8.3 */
+.v5-apple {
+  --v5-bg: #fbfbfd;
+  --v5-surface: #f5f5f7;
+  --v5-tile: #ffffff;
+  --v5-ink: #1d1d1f;
+  --v5-ink-2: #6e6e73;
+  --v5-line: #d2d2d7;
+  --v5-line-strong: #86868b;
+  --v5-focus: #0071e3;
+  --v5-accent: #0066cc;
+  --v5-accent-fill: #0071e3;
+  --v5-accent-fill-hover: #0066cc;
+  --v5-on-accent: #ffffff;
+  --v5-ok: #248a3d;
+  --v5-warn: #ff9f0a;
+  --v5-error: #d70015;
+  --v5-device: #1d1d1f;
+  --v5-shadow: rgb(0 0 0 / 0.1);
+  color-scheme: light;
+}
+
+.v5-apple[data-tema='dark'] {
+  --v5-bg: #000000;
+  --v5-surface: #161617;
+  --v5-tile: #1d1d1f;
+  --v5-ink: #f5f5f7;
+  --v5-ink-2: #a1a1a6;
+  --v5-line: #424245;
+  --v5-line-strong: #86868b;
+  --v5-focus: #2997ff;
+  --v5-accent: #2997ff;
+  --v5-error: #ff6961;
+  --v5-ok: #30d158;
+  --v5-device: #3a3a3c;
+  --v5-shadow: rgb(0 0 0 / 0.6);
+  color-scheme: dark;
+}

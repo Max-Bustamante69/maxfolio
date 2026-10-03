@@ -1,0 +1,42 @@
+/* Dirección C · Mesa de luz. Única fuente de color y tipografía de la dirección: ningún hexadecimal fuera de este archivo.
+   Paleta «aqua de mesa luminosa y lápiz graso» (research/DIRECCIONES.md C.2). Contrastes WCAG 2.x calculados con la misma
+   fórmula de paletas.mjs (los pares descartados quedan escritos para que nadie los reintroduzca):
+     tinta #0A2A31 sobre mesa #7FE3EF 10,18 · tinta-2 #1F4F5A sobre mesa 6,08 · tinta sobre calco #EAFBFD 14,20 · tinta-2 sobre calco 8,48
+     código #BFEFF6 sobre marco #0F171A 14,59 · calco sobre marco (foco) 17,03 · lápiz #A4005C sobre mesa 5,17 y sobre calco 7,21
+     calco sobre lápiz (texto de un chip activo) 7,21 · blanco sobre lápiz 7,68 (único blanco puro, solo el número de un pin)
+   DESCARTADOS: lápiz sobre el marco oscuro 2,36 (por eso el lápiz nunca se apoya sobre el marco: la selección es un aro por
+   FUERA de él, sobre la mesa); tinta sobre lápiz 1,97; el aqua como texto sobre el calco 1,39. */
+.v5-c {
+  --v5-bg: #7fe3ef; /* mesa: el único plano de color */
+  --v5-ink: #0a2a31;
+  --v5-ink-2: #1f4f5a;
+  --v5-line: var(--v5-ink-2); /* borde de control (≥ 3:1 sobre mesa y calco) */
+  --v5-focus: #0a2a31; /* aro de foco sobre la mesa y el calco */
+  --v5-surface: #eafbfd; /* calco: la capa de lectura */
+  --v5-frame: #0f171a; /* marco de cada diapositiva */
+  --v5-frame-ink: #bfeff6; /* códigos de fotograma sobre el marco */
+  --v5-focus-frame: #eafbfd; /* aro de foco sobre el marco oscuro */
+  --v5-pencil: #a4005c; /* el único acento: lo que el visitante señala */
+  --v5-on-pencil: #ffffff;
+  --v5-hair: color-mix(in srgb, var(--v5-ink) 22%, transparent); /* filete decorativo, nunca el único indicio de un control */
+
+  --c-sans: 'Albert Sans', 'Albert Sans Fallback', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --c-mono: 'Martian Mono', 'Martian Mono Fallback', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --c-gutter: 16px;
+  --c-r-calco: 14px;
+  --c-r-rail: 6px;
+  --c-r-slide: 3px;
+  --c-ease: cubic-bezier(0.45, 0.05, 0.2, 1); /* la curva de la dirección: reubicación y vuelos */
+  --c-out: cubic-bezier(0.16, 1, 0.3, 1); /* entradas y estados de interfaz */
+  --c-halo: 0 0 0 1px color-mix(in srgb, var(--v5-ink) 38%, transparent), 0 0 26px 4px color-mix(in srgb, var(--v5-surface) 50%, transparent),
+    0 14px 26px -14px color-mix(in srgb, var(--v5-ink) 55%, transparent);
+  --c-halo-alto: 0 0 0 1px color-mix(in srgb, var(--v5-ink) 45%, transparent), 0 0 30px 6px color-mix(in srgb, var(--v5-surface) 60%, transparent),
+    0 26px 34px -16px color-mix(in srgb, var(--v5-ink) 70%, transparent);
+  --c-sombra-calco: inset 0 1px 0 color-mix(in srgb, var(--v5-surface) 90%, transparent), 0 2px 6px color-mix(in srgb, var(--v5-ink) 12%, transparent),
+    0 30px 60px -30px color-mix(in srgb, var(--v5-ink) 55%, transparent);
+}
+@media (min-width: 900px) {
+  .v5-c {
+    --c-gutter: 28px;
+  }
+}
