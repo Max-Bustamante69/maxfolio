@@ -17,12 +17,17 @@ import { capaEstado, ID, PlatoCtx, registrarCapa, setTono, type ModoVista } from
 import { alScroll, entrada, gsap, registrarCubierta, useIr } from './motion'
 import { Enlace, Flecha, Rod, ruta } from './piezas'
 import { usePublico } from './publico'
+import { useCabeceraLimpia } from './seo'
 import { puedeEscena } from './escena/puerta'
 import { indiceDe } from './escena/sets'
+import { TemasBoton } from './selector/Boton'
 import './tokens.css'
 import './plato.css'
 
 const Lienzo = lazy(() => import('./escena/Lienzo'))
+// El selector de temas («Cambiar de set»): su JS, su CSS y sus imágenes no existen hasta que se abre (se pide el trozo al apuntar al botón).
+const cargarPanelTemas = () => import('./selector/Panel')
+const PanelTemas = lazy(cargarPanelTemas)
 
 /** Si el chunk del 3D no llega o la escena revienta, la portada sigue con su póster y el camino 2D: nunca una pantalla en blanco. */
 class SinEscena extends Component<{ alFallo: () => void; children: ReactNode }, { roto: boolean }> {
@@ -104,11 +109,22 @@ function Cabecera({ en3d, puede3d, setModo }: { en3d: boolean; puede3d: boolean;
   const v = usePublico()
   const { pathname } = useLocation()
   const [abierto, setAbierto] = useState(false)
+  const [temasAbierto, setTemasAbierto] = useState(false)
   const boton = useRef<HTMLButtonElement>(null)
+  const botonTemas = useRef<HTMLButtonElement>(null)
+  const volverATemas = useRef(false)
   const actual = pathname.slice(BASE.length + 1).split('/')[0]
   const textos = [c.nav.inicio, c.nav.obra, c.nav.trayectoria, c.nav.contacto]
   const cerrar = useCallback(() => { setAbierto(false); boton.current?.focus({ preventScroll: true }) }, [])
-  useEffect(() => { setAbierto(false) }, [pathname])
+  useEffect(() => { setAbierto(false); setTemasAbierto(false) }, [pathname])
+  // Abrir el selector cierra el menú; al cerrarlo, el foco vuelve a su botón (el panel ya devolvió el fondo a la vida).
+  const abrirTemas = useCallback(() => { setAbierto(false); setTemasAbierto(true) }, [])
+  const cerrarTemas = useCallback(() => { volverATemas.current = true; setTemasAbierto(false) }, [])
+  useEffect(() => {
+    if (temasAbierto || !volverATemas.current) return
+    volverATemas.current = false
+    botonTemas.current?.focus({ preventScroll: true })
+  }, [temasAbierto])
   return (
     <header className="pl-cab" data-abierto={abierto} data-ruta={actual || 'inicio'}>
       <div className="pl-cab-in">
@@ -133,6 +149,7 @@ function Cabecera({ en3d, puede3d, setModo }: { en3d: boolean; puede3d: boolean;
               <button type="button" aria-pressed={!en3d} onClick={() => setModo('lista')} title={c.modo.aLista}>{c.modo.etqLista}</button>
             </div>
           )}
+          <TemasBoton ref={botonTemas} abierto={temasAbierto} onClick={abrirTemas} alApuntar={() => void cargarPanelTemas().catch(() => {})} />
           <span className="pl-cab-slot">
             <Enlace to={`${BASE}/contacto?motivo=revision`} className="pl-pil pl-pil--osc pl-cab-cta">
               <Rod>{c.revision}</Rod><PuntosPil n={1} />
@@ -147,6 +164,14 @@ function Cabecera({ en3d, puede3d, setModo }: { en3d: boolean; puede3d: boolean;
         </div>
       </div>
       {abierto && <Hoja cerrar={cerrar} actual={actual} />}
+      {temasAbierto && (
+        // Si el trozo del panel no llega (sin red), el panel se cierra en vez de tumbar la página.
+        <SinEscena alFallo={() => setTemasAbierto(false)}>
+          <Suspense fallback={null}>
+            <PanelTemas alCerrado={cerrarTemas} />
+          </Suspense>
+        </SinEscena>
+      )}
     </header>
   )
 }
@@ -228,6 +253,7 @@ function Cortina({ fin }: { fin: () => void }) {
 
 // Dirección «Plató»: un plató de lujo que se recorre. Rutas reales: /v5/plato · /obra · /obra/:slug · /trayectoria · /contacto.
 export default function PlatoApp() {
+  useCabeceraLimpia()
   const v = usePublico()
   const { locale } = useLanguage()
   const { pathname } = useLocation()
@@ -298,7 +324,7 @@ export default function PlatoApp() {
         <a className="pl-saltar" href="#contenido">{c.saltar}</a>
         <Cabecera en3d={en3d} puede3d={puede3d} setModo={setModo} />
         <div className="pl-lienzo" ref={capa} aria-hidden="true" data-listo={listaEscena ? 'si' : 'no'}>
-          {en3d && <img className="pl-poster" src={POSTER} width={1440} height={900} alt="" decoding="async" />}
+          {en3d && pathname === BASE && <img className="pl-poster" src={POSTER} width={1440} height={900} alt="" decoding="async" />}
           {en3d && monta3d && (
             <SinEscena alFallo={() => setPuede3d(false)}>
               <Suspense fallback={null}>

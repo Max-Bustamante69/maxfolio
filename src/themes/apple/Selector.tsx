@@ -22,7 +22,7 @@ const esMovil = () => window.matchMedia('(max-width: 767px)').matches
 const ASENTAR_MS = 230
 /** Red de seguridad: si pasado este tiempo el tema nuevo no ha reemplazado a este (la navegación sin recarga quedó atascada),
  *  se entra al enlace de la miniatura con una carga completa; la cookie del reparto ya está escrita. */
-const RESCATE_MS = 1800
+const RESCATE_MS = 6000
 
 const Equis = () => (
   <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">

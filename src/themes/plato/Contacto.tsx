@@ -5,12 +5,10 @@ import { evento, MOTIVOS, useCopiarCorreo, useEnviarContacto, type Motivo } from
 import { ID, usePlato } from './contexto'
 import { gsap, useVista } from './motion'
 import { Flecha, Rod } from './piezas'
-import { limpioTexto, partirFrase } from './publico'
+import { Seo } from './seo'
+import { limpioTexto } from './publico'
 
 const CORREO_OK = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-/** Los tres modelos de trabajo del vivo, cada uno con el motivo del formulario que le corresponde. */
-const MODELO_MOTIVO: Motivo[] = ['revision', 'proyecto', 'continuo']
-
 function Acordeon({ q, a }: { q: string; a: string }) {
   const [abierto, setAbierto] = useState(false)
   const id = useId()
@@ -40,34 +38,15 @@ export default function Contacto() {
   const { copiar, copiado, correo } = useCopiarCorreo(ID)
   const form = useRef<HTMLFormElement>(null)
   const ok = useRef<HTMLDivElement>(null)
-  const modelos = s.sections.engagement
   const cont = s.sections.contact
-  const [, invitacion = modelos.lead] = partirFrase(modelos.lead)
   const wa = `${personal.whatsappHref}?text=${encodeURIComponent(c.contacto.waTexto)}`
   const proceso = s.sections.process
-  // Los tres puntos donde casi toda tienda pierde ingresos (velocidad, ofertas, checkout), cada uno con lo que ya medí en ese punto y su fuente.
-  const cifra = (id: string) => v.cifras.find((f) => f.id === id)
-  const oferta = v.obra('the-gummy-box')?.facts[0]
-  const pruebas = [
-    cifra('loadTime') && { valor: cifra('loadTime')!.valor, etq: cifra('loadTime')!.etiqueta, fuente: cifra('loadTime')!.fuente },
-    oferta && { valor: oferta.value, etq: oferta.label, fuente: c.contacto.ofertaFuente },
-    cifra('conversion') && { valor: cifra('conversion')!.valor, etq: cifra('conversion')!.etiqueta, fuente: cifra('conversion')!.fuente },
-  ]
 
   const ref = useVista<HTMLElement>([])
   useEffect(() => { evento(ID, 'contact_open') }, [])
   useEffect(() => {
     if (estado === 'ok' && ok.current) gsap.from(ok.current, { opacity: 0, scale: 0.96, y: 18, duration: 0.8, ease: 'pl', clearProps: 'all' })
   }, [estado])
-
-  // Elegir un modelo de trabajo deja el formulario listo con su motivo y lleva hasta él.
-  const elegir = (m: Motivo) => {
-    setMotivo(m)
-    setErrores({})
-    evento(ID, 'contact_click', { canal: `modelo-${m}` })
-    document.getElementById('pl-form')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    window.setTimeout(() => form.current?.querySelector<HTMLInputElement>(m === 'revision' ? '[name=tienda]' : '[name=correo]')?.focus({ preventScroll: true }), 450)
-  }
 
   const alEnviar = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -96,8 +75,7 @@ export default function Contacto() {
 
   return (
     <main id="contenido" tabIndex={-1} ref={ref} className="pl-vista pl-contacto">
-      <title>{`${c.nav.contacto} · ${personal.name}`}</title>
-      <meta name="robots" content="noindex" />
+      <Seo ruta="/plato/contacto" titulo={`${c.nav.contacto} · ${personal.name}`} descripcion={`${sinPuntoFinal(cont.title)}. ${cont.lead}`.slice(0, 158)} />
 
       <section className="pl-pedir" data-tono="oscuro" aria-labelledby="pl-h1">
         <div className="pl-pedir-panel">
@@ -154,13 +132,6 @@ export default function Contacto() {
                   <span className="pl-mono pl-v-n">{String(i + 1).padStart(2, '0')}</span>
                   <h3>{it.k}</h3>
                   <p>{it.t}</p>
-                  {pruebas[i] && (
-                    <p className="pl-v-prueba">
-                      <b>{pruebas[i]!.valor}</b>
-                      <span>{pruebas[i]!.etq}</span>
-                      <small className="pl-mono">{pruebas[i]!.fuente}</small>
-                    </p>
-                  )}
                 </li>
               ))}
             </ol>
@@ -169,47 +140,8 @@ export default function Contacto() {
         </div>
       </section>
 
-      <section className="pl-proceso" id="pl-proceso" data-tono="claro" aria-labelledby="pl-proc-t">
-        <div className="pl-proceso-cab">
-          <p className="pl-mono pl-kicker pl-kicker--claro" data-pl="subir">{proceso.eyebrow}</p>
-          <h2 id="pl-proc-t" className="pl-h-l" data-pl="linea">{proceso.title} <em>{sinPuntoFinal(proceso.titleAccent)}</em></h2>
-          <p className="pl-lista-lead" data-pl="subir" data-pl-retraso="0.15">{limpioTexto(proceso.fix)}</p>
-        </div>
-        <ol className="pl-proceso-l" data-pl="grupo">
-          {proceso.steps.map((p, i) => (
-            <li key={p.title} className="pl-paso-c">
-              <span className="pl-paso-linea" aria-hidden="true" />
-              <span className="pl-mono pl-paso-n">{String(i + 1).padStart(2, '0')} / {String(proceso.steps.length).padStart(2, '0')}</span>
-              <h3>{p.title}</h3>
-              <p>{limpioTexto(p.body)}</p>
-              <p className="pl-paso-r"><span className="pl-mono">{proceso.deliverableLabel}</span> {limpioTexto(p.deliverable)}</p>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      <section className="pl-modelos" data-tono="oscuro" aria-labelledby="pl-mod-t">
-        <div className="pl-modelos-cab">
-          <h2 id="pl-mod-t" className="pl-h-l pl-h-l--osc" data-pl="linea">{modelos.title} <em>{sinPuntoFinal(modelos.titleAccent)}</em></h2>
-          <p className="pl-proc-lead" data-pl="subir" data-pl-retraso="0.1">{invitacion}</p>
-        </div>
-        <ul className="pl-modelos-l" data-pl="grupo">
-          {modelos.models.map((m, i) => (
-            <li key={m.title} className="pl-modelo">
-              <span className="pl-modelo-linea" aria-hidden="true" />
-              <span className="pl-mono pl-modelo-n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-              <h3>{m.title}</h3>
-              <p>{limpioTexto(m.body)}</p>
-              <button type="button" className="pl-pil pl-pil--clara" onClick={() => elegir(MODELO_MOTIVO[i])} aria-controls="pl-form">
-                <Rod>{c.contacto.elegir}</Rod><span className="pl-puntos" aria-hidden="true"><i /></span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
-
       <section className="pl-canales-s" data-tono="claro" aria-labelledby="pl-can-t">
-        <h2 id="pl-can-t" className="pl-h-l" data-pl="linea">{c.contacto.canales}</h2>
+        <h2 id="pl-can-t" className="pl-h-m" data-pl="linea">{c.contacto.canales}</h2>
         <ul className="pl-canales" data-pl="grupo">
           {canales.map((k) => (
             <li key={k.k}>
@@ -232,7 +164,7 @@ export default function Contacto() {
       </section>
 
       <section className="pl-faq" data-tono="claro" aria-labelledby="pl-faq-t">
-        <h2 id="pl-faq-t" className="pl-h-l" data-pl="linea">{c.contacto.faq}</h2>
+        <h2 id="pl-faq-t" className="pl-h-m" data-pl="linea">{c.contacto.faq}</h2>
         <div className="pl-faq-l" data-pl="subir">
           {faq.map((f) => <Acordeon key={f.q} q={f.q} a={f.a} />)}
         </div>

@@ -5,17 +5,22 @@ export interface Objetivo {
   modo: Modo
   /** Inicio: 0 = póster, 1 = la cámara ya entró al plató (estación 0). */
   apertura: number
-  /** Recorrido: estación como número real (0 … N-1). */
+  /** Recorrido y pedestal: estación como número real (0 … N-1). En el pedestal, la del set elegido. */
   t: number
   /** Pedestal: la obra sobre la plataforma y la vista de sus capturas. */
   slug: string | null
   vista: 'home' | 'pdp'
+  /** Pedestal: cuánto de la tienda ha recorrido la pantalla del teléfono, de 0 (arriba) a 1 (abajo). */
+  pantalla: number
 }
 /** Esquina interior del set activo en pantalla (px), su lado (−1 izquierda · +1 derecha), su opacidad y su caja (x0, y0, x1, y1). */
 export interface Ancla { x: number; y: number; ok: boolean; a: number; lado: number; caja: [number, number, number, number] }
+/** La caja del teléfono en pantalla (px) para la zona táctil del DOM. */
+export type CajaTel = { ok: boolean; caja: [number, number, number, number] }
 
-const obj: Objetivo = { modo: 'poster', apertura: 0, t: 0, slug: null, vista: 'home' }
+const obj: Objetivo = { modo: 'poster', apertura: 0, t: 0, slug: null, vista: 'home', pantalla: 0 }
 const subs = new Set<() => void>()
+const subsEstimulo = new Set<() => void>()
 
 export const control = {
   obj,
@@ -26,9 +31,15 @@ export const control = {
     if (cambio) subs.forEach((f) => f())
   },
   subscribe(f: () => void) { subs.add(f); return () => { subs.delete(f) } },
+  /** Un estímulo que no cambia el objetivo (puntero sobre el teléfono, rueda, hover): abre la ventana VIVO del mundo. */
+  estimulo() { subsEstimulo.forEach((f) => f()) },
+  subscribeEstimulo(f: () => void) { subsEstimulo.add(f); return () => { subsEstimulo.delete(f) } },
+  /** Puntero sobre el escenario del pedestal, de −1 a 1 (solo con puntero fino); null al salir. */
+  puntero: null as null | { x: number; y: number },
   /** Salidas del mundo hacia el DOM: el punto de anclaje del rótulo en pantalla y la estación más cercana. */
   alAncla: null as null | ((a: Ancla) => void),
   alEstacion: null as null | ((i: number) => void),
+  alTelefono: null as null | ((c: CajaTel) => void),
   /** La estación a la que vuelve «Fachada» desde una ficha (la ficha la escribe, el recorrido la lee una vez). */
   volver: null as number | null,
 }

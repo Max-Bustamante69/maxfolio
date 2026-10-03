@@ -8,10 +8,13 @@ import { ORDEN } from './escena/sets'
 import { alScroll, useVista } from './motion'
 import { Cruces, Enlace, Flecha, Rod, Tarjeta, ruta } from './piezas'
 import { limpioTexto, partirFrase } from './publico'
+import { Seo } from './seo'
 
 const acota = (x: number, a = 0, b = 1) => Math.min(b, Math.max(a, x))
 const suave = (a: number, b: number, x: number) => { const t = acota((x - a) / (b - a)); return t * t * (3 - 2 * t) }
 const DESTACADAS = ['the-gummy-box', 'nos-cafe', 'millennio', 'origen-vital']
+/** Qué medida de cada destacada va en la portada (cada cifra, una sola vez por página: las dos del descuento 10 → 20 % no se repiten). */
+const MEDIDA_PORTADA: Record<string, number> = { 'nos-cafe': 1 }
 
 export default function Inicio() {
   const { c, v, en3d } = usePlato()
@@ -84,7 +87,6 @@ export default function Inicio() {
 
   const hero = s.hero
   const cifras = s.sections.statBand
-  const proceso = s.sections.process
   const lineasManifiesto = v.manifiesto
   const destacadas = DESTACADAS.map((slug) => v.obra(slug)).filter((o): o is NonNullable<typeof o> => !!o)
   const primerSet = v.obra(ORDEN[0])
@@ -92,7 +94,8 @@ export default function Inicio() {
   const fecha = (iso: string) => fechaCorta(iso, v.intlLocale)
   const [leadUno, leadDos] = partirFrase(limpioTexto(hero.lead))
   const [cierreA, cierreB] = leadDos.split(/(?<=[:：])\s*/)
-  const lh = v.cifras.find((f) => f.id === 'lighthouse')
+  // La cifra de las tiendas ya está en el pliegue («20+ tiendas construidas»): en la banda no se repite.
+  const banda = v.cifras.filter((f) => f.id !== 'storefronts')
   /** A dónde lleva cada cifra de la banda: al cargo del CV que la respalda o a la obra. */
   const respaldo = (id: string) => {
     if (id === 'lighthouse') return { to: `${ruta('trayectoria')}#rh`, txt: c.inicio.verCargo }
@@ -100,15 +103,14 @@ export default function Inicio() {
     if (id === 'modules') return { to: ruta('obra', 'digitdeck-apps'), txt: c.inicio.verObraCifra }
     return { to: ruta('obra'), txt: c.inicio.verObraCifra }
   }
-  const casoTexto = (o: NonNullable<typeof primerSet>) => {
+  const cambioDe = (o: NonNullable<typeof primerSet>) => {
     const ca = CASO[o.slug]
-    return locale === 'ja' || !ca ? { encargo: partirFrase(o.description)[0] || o.tagline, cambio: o.tagline } : { encargo: ca.encargo[k], cambio: ca.cambio[k] }
+    return locale === 'ja' || !ca ? o.tagline : ca.cambio[k]
   }
 
   return (
     <main id="contenido" tabIndex={-1} ref={ref} className="pl-vista pl-inicio">
-      <title>{`${personal.name} · ${hero.eyebrow}`}</title>
-      <meta name="robots" content="noindex" />
+      <Seo ruta="/plato" titulo={`${personal.name} · ${hero.eyebrow}`} descripcion={`${sinPuntoFinal(hero.positioning)}. ${hero.eyebrow}.`} />
 
       <section className={`pl-esc${en3d ? ' pl-esc--3d' : ''}`} data-tono={en3d ? undefined : 'claro'} aria-labelledby="pl-h1">
         <div className="pl-esc-pega">
@@ -136,7 +138,6 @@ export default function Inicio() {
           </div>
           <div className="pl-esc-pie">
             <p className="pl-mono pl-esc-prueba"><b>{v.storeCount}</b> {c.inicio.tiendasConstruidas('').trim()}</p>
-            {lh && <p className="pl-mono pl-esc-prueba"><b>{lh.valor}</b> {c.inicio.lighthouseCorto}</p>}
             <p className="pl-mono pl-esc-disp"><i aria-hidden="true" />{hero.availability}</p>
             {en3d && <p className="pl-mono pl-esc-cue">{c.inicio.scroll}</p>}
           </div>
@@ -158,6 +159,37 @@ export default function Inicio() {
         </div>
       </section>
 
+      <section className="pl-dest" data-tono="claro" aria-labelledby="pl-dest-t">
+        <div className="pl-dest-cab">
+          <h2 id="pl-dest-t" className="pl-h-l" data-pl="linea">{c.inicio.destacada}</h2>
+          <p className="pl-dest-lead" data-pl="subir" data-pl-retraso="0.15">{c.inicio.destacadaLead}</p>
+        </div>
+        <div className="pl-dest-rejilla">
+          {destacadas.map((o) => {
+            const todas = medidasDe(o, locale, fecha, o.period ? v.formatPeriod(o.period.start, o.period.end) : String(o.year))
+            const med = todas[MEDIDA_PORTADA[o.slug] ?? 0] ?? todas[0]
+            return (
+              <article key={o.slug} className="pl-dcard">
+                <Tarjeta o={o} etq={etq(o)} nivel={3} sinHistoria diferida />
+                <div className="pl-dcard-dl" data-pl="subir">
+                  <p className="pl-dcard-c">{cambioDe(o)}</p>
+                  {med && (
+                    <p className="pl-medida">
+                      <b>{med.valor}</b>
+                      <span>{med.etq}</span>
+                      <small className="pl-mono">{med.nota}</small>
+                    </p>
+                  )}
+                </div>
+              </article>
+            )
+          })}
+        </div>
+        <div className="pl-dest-pie" data-pl="subir">
+          <Enlace to={ruta('obra')} className="pl-pil pl-pil--osc"><Rod>{c.inicio.verTodo}</Rod><span className="pl-puntos" aria-hidden="true"><i /></span></Enlace>
+        </div>
+      </section>
+
       <section className="pl-cifras" data-tono="claro" aria-labelledby="pl-cifras-t">
         <div className="pl-cifras-cab">
           <h2 id="pl-cifras-t" className="pl-h-l" data-pl="linea">{cifras.label}</h2>
@@ -167,7 +199,7 @@ export default function Inicio() {
           </div>
         </div>
         <ul className="pl-cifras-l" data-pl="grupo">
-          {v.cifras.map((f) => {
+          {banda.map((f) => {
             const r = respaldo(f.id)
             return (
               <li key={f.id} className="pl-cifra">
@@ -181,86 +213,17 @@ export default function Inicio() {
         </ul>
       </section>
 
-      <section className="pl-dest" data-tono="claro" aria-labelledby="pl-dest-t">
-        <div className="pl-dest-cab">
-          <h2 id="pl-dest-t" className="pl-h-l" data-pl="linea">{c.inicio.destacada}</h2>
-          <p className="pl-dest-lead" data-pl="subir" data-pl-retraso="0.15">{c.inicio.destacadaLead}</p>
-        </div>
-        <div className="pl-dest-rejilla">
-          {destacadas.map((o) => {
-            const t = casoTexto(o)
-            const med = medidasDe(o, locale, fecha, o.period ? v.formatPeriod(o.period.start, o.period.end) : String(o.year)).slice(0, 2)
-            return (
-              <article key={o.slug} className="pl-dcard">
-                <Tarjeta o={o} etq={etq(o)} nivel={3} sinHistoria />
-                <dl className="pl-dcard-dl">
-                  <div data-pl="subir"><dt className="pl-mono">{c.inicio.encargo}</dt><dd>{t.encargo}</dd></div>
-                  <div data-pl="subir" data-pl-retraso="0.06"><dt className="pl-mono">{c.inicio.cambio}</dt><dd>{t.cambio}</dd></div>
-                  <div className="pl-dcard-med" data-pl="subir" data-pl-retraso="0.12">
-                    <dt className="pl-mono">{c.inicio.medido}</dt>
-                    <dd>
-                      {med.map((m) => (
-                        <span key={m.etq} className="pl-medida">
-                          <b>{m.valor}</b>
-                          <span>{m.etq}</span>
-                          <small className="pl-mono">{m.nota}</small>
-                        </span>
-                      ))}
-                    </dd>
-                  </div>
-                </dl>
-              </article>
-            )
-          })}
-        </div>
-        <div className="pl-dest-pie" data-pl="subir">
-          <Enlace to={ruta('obra')} className="pl-pil pl-pil--osc"><Rod>{c.inicio.verTodo}</Rod><span className="pl-puntos" aria-hidden="true"><i /></span></Enlace>
-        </div>
-      </section>
-
-      <section className="pl-cargos" data-tono="oscuro" aria-labelledby="pl-cargos-t">
-        <div className="pl-cargos-cab">
-          <p className="pl-mono pl-kicker" data-pl="subir">{c.inicio.cargosKicker}</p>
-          <h2 id="pl-cargos-t" className="pl-h-l pl-h-l--osc" data-pl="linea">{c.inicio.cargosTitulo}</h2>
-          <p className="pl-proc-lead" data-pl="subir" data-pl-retraso="0.15">{c.inicio.cargosLead}</p>
-        </div>
-        <ol className="pl-cargos-l" data-pl="grupo">
-          {v.trayectoria.map((r) => (
-            <li key={r.id}>
-              <Enlace to={`${ruta('trayectoria')}#${r.id}`} className="pl-cargo-a">
-                <span className="pl-mono pl-cargo-p">{r.period}</span>
-                <span className="pl-cargo-n"><span>{r.title}</span> <em>{r.company}</em></span>
-                <span className="pl-cargo-m">
-                  {r.metrics.slice(0, 3).map((m) => <span key={m.label}><b>{m.value}</b><i className="pl-mono">{m.label}</i></span>)}
-                </span>
-                <span className="pl-cargo-f" aria-hidden="true"><Flecha /></span>
-              </Enlace>
-            </li>
-          ))}
-        </ol>
-        <div className="pl-cargos-pie" data-pl="subir">
-          <Enlace to={ruta('trayectoria')} className="pl-pil pl-pil--clara"><Rod>{c.inicio.verTrayectoria}</Rod><span className="pl-puntos" aria-hidden="true"><i /></span></Enlace>
-        </div>
-      </section>
-
       <section className="pl-cierre" data-tono="claro" aria-labelledby="pl-cierre-t">
         <p className="pl-mono pl-kicker pl-kicker--claro" data-pl="subir">{c.inicio.cierreKicker}</p>
         <h2 id="pl-cierre-t" className="pl-h-cierre" data-pl="linea">
           {cierreB ? <>{cierreA} <em>{sinPuntoFinal(cierreB)}</em></> : sinPuntoFinal(leadDos || hero.positioning)}
         </h2>
-        <ol className="pl-minipasos" data-pl="grupo" aria-label={proceso.eyebrow}>
-          {proceso.steps.map((p, i) => <li key={p.title}><span className="pl-mono">{String(i + 1).padStart(2, '0')}</span>{p.title}</li>)}
-        </ol>
         <div className="pl-cierre-fila">
           <p className="pl-cierre-lead" data-pl="subir">{leadUno}</p>
           <div className="pl-cierre-acc" data-pl="grupo">
-            <Enlace to={ruta('contacto') + '?motivo=revision'} className="pl-pil pl-pil--osc pl-pil--grande"><Rod>{hero.ctaPrimary}</Rod><span className="pl-puntos" aria-hidden="true"><i /></span></Enlace>
-            <Enlace to={`${ruta('contacto')}#pl-proceso`} className="pl-enlace-mono">{c.inicio.pasosLink} <Flecha /></Enlace>
+            <Enlace to={ruta('contacto') + '?motivo=revision'} className="pl-pil pl-pil--osc pl-pil--grande pl-pil--ancha"><Rod>{hero.ctaPrimary}</Rod><span className="pl-puntos" aria-hidden="true"><i /></span></Enlace>
             <p className="pl-cierre-nota">{limpioTexto(hero.ctaNote)}</p>
-            <ul className="pl-cierre-datos pl-mono">
-              <li><i aria-hidden="true" />{hero.availability}</li>
-              <li>{hero.location}</li>
-            </ul>
+            <p className="pl-mono pl-cierre-datos">{hero.location}</p>
           </div>
         </div>
       </section>

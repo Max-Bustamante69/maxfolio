@@ -65,7 +65,7 @@ const es = {
     proxima: 'Siguiente obra',
     vistas: { 'home-desktop': 'Inicio · escritorio', 'pdp-desktop': 'Producto · escritorio', 'home-mobile': 'Inicio · móvil', 'pdp-mobile': 'Producto · móvil' },
     medido: 'Medido, en segundo plano',
-    noExiste: 'Esa obra no existe.',
+    noExiste: 'Esa obra no existe',
   },
   trayectoria: {
     titulo: 'Trayectoria',
@@ -172,7 +172,7 @@ const en: Copy = {
     proxima: 'Next work',
     vistas: { 'home-desktop': 'Home · desktop', 'pdp-desktop': 'Product · desktop', 'home-mobile': 'Home · mobile', 'pdp-mobile': 'Product · mobile' },
     medido: 'Measured, in the background',
-    noExiste: 'That work does not exist.',
+    noExiste: 'That work does not exist',
   },
   trayectoria: {
     titulo: 'Career',
@@ -277,7 +277,7 @@ const ja: Copy = {
     proxima: '次の制作',
     vistas: { 'home-desktop': 'ホーム · デスクトップ', 'pdp-desktop': '商品 · デスクトップ', 'home-mobile': 'ホーム · モバイル', 'pdp-mobile': '商品 · モバイル' },
     medido: '計測値（補足）',
-    noExiste: 'その制作は見つかりません。',
+    noExiste: 'その制作は見つかりません',
   },
   trayectoria: {
     titulo: '経歴',

@@ -68,7 +68,7 @@ const atar: Record<string, Atar> = {
     const lenta = gsap.parseEase('pl')
     const viva = gsap.parseEase('pl-fast')
     SplitText.create(el, {
-      type: 'lines', mask: 'lines', linesClass: 'pl-ln', autoSplit: true,
+      type: 'lines', mask: 'lines', linesClass: 'pl-ln', autoSplit: true, aria: 'none',
       onSplit: (s) => (tw = gsap.from(s.lines, { yPercent: 110, duration: veloz ? 0.66 : 0.8, ease: (p: number) => (veloz ? viva(p) : lenta(p)), stagger: 0.06, delay: espera, paused: !entro })),
     })
     // Al llegar tras el telón el titular ya asoma desde el primer fotograma (arranca al 20 % de su recorrido): no queda un tramo en blanco.
@@ -155,6 +155,12 @@ function activar(raiz: HTMLElement, limpiar: Array<() => void>, base: number) {
   limpiar.push(() => { clearTimeout(seguro); window.removeEventListener('beforeprint', imprimir); io.disconnect() })
 }
 
+/* ------------------------------------------------------------------ View Transitions entre vistas con escena */
+
+/** La View Transition en curso espera a que la vista nueva esté montada Y con su scroll puesto: la vista que llega llama a resolverVT(). */
+let esperaVT: (() => void) | null = null
+export const resolverVT = () => { const f = esperaVT; esperaVT = null; if (f) performance.mark('pl-vt-resuelta'); f?.() }
+
 /** Posición de scroll por ruta, para que Atrás devuelva la lista donde estaba. */
 const posiciones = new Map<string, number>()
 
@@ -185,6 +191,7 @@ export function useVista<T extends HTMLElement = HTMLElement>(deps: unknown[], m
       activar(raiz, limpiar, base)
       montar?.(raiz, limpiar)
     }, raiz)
+    resolverVT() // una View Transition en curso espera a esta vista montada (y con su scroll puesto)
     return () => {
       limpiar.forEach((f) => f())
       ctx.revert()
@@ -211,10 +218,30 @@ const SALIDA = 'polygon(0% 112%, 100% 100%, 100% 100%, 0% 100%)'
 export function useIr() {
   const navigate = useNavigate()
   const { pathname, search } = useLocation()
-  return useCallback((to: string, o: { oscuro?: boolean; directo?: boolean } = {}) => {
+  return useCallback((to: string, o: { oscuro?: boolean; directo?: boolean; vt?: boolean } = {}) => {
     if (to === pathname + search) { window.scrollTo({ top: 0, behavior: 'smooth' }); return }
     if (saliendo) return
     const ir = () => { window.scrollTo({ top: 0, behavior: 'instant' }); navigate(to) }
+    // Entre vistas con escena (obra ↔ ficha ↔ ficha) el lienzo no se desmonta: solo el DOM cambia, con una View Transition. El título de la obra viaja
+    // del rótulo a la ficha como elemento compartido y el lienzo (que sigue vivo) queda fuera de las capturas. Sin soporte, cae al fundido de siempre.
+    if (o.vt && typeof document.startViewTransition === 'function') {
+      saliendo = true
+      posiciones.set(pathname + search, window.scrollY)
+      const raiz = document.documentElement
+      raiz.dataset.plvt = '1'
+      const fin = () => { delete raiz.dataset.plvt; saliendo = false }
+      performance.mark('pl-vt-inicio')
+      const t = document.startViewTransition(() => new Promise<void>((resolver) => {
+        performance.mark('pl-vt-callback')
+        esperaVT = resolver
+        window.setTimeout(resolverVT, 1500) // red de seguridad: si la vista nueva no avisa, la transición no se queda colgada
+        window.scrollTo({ top: 0, behavior: 'instant' })
+        navigate(to)
+      }))
+      t.ready.then(() => performance.mark('pl-vt-lista'), () => {})
+      t.finished.then(fin, fin)
+      return
+    }
     if (o.directo || !cubierta) {
       const vista = document.querySelector<HTMLElement>('.pl-vista')
       if (!vista || to.split('?')[0] === pathname) { ir(); return }

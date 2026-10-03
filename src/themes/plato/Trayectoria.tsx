@@ -1,14 +1,12 @@
-import { useEffect, useId, useState } from 'react'
-import { sinPuntoFinal } from '../data'
-import type { SkillGroupId } from '../../data/registry'
+import { useId, useState } from 'react'
 import { usePlato } from './contexto'
 import { useVista } from './motion'
 import { Enlace, Flecha, Rod, ruta } from './piezas'
 import { partirFrase } from './publico'
+import { Seo } from './seo'
 
-const GRUPOS: SkillGroupId[] = ['shopify', 'frontend', 'backend', 'quality', 'cro', 'ai']
 /** Logros a la vista por cargo en pantallas estrechas; en escritorio se leen todos. */
-const VISTOS = 3
+const VISTOS = 4
 
 function Logros({ logros }: { logros: string[] }) {
   const { c } = usePlato()
@@ -25,41 +23,10 @@ function Logros({ logros }: { logros: string[] }) {
             <div className="pl-logros-in"><ul className="pl-logros">{b.map((l) => <li key={l}>{l}</li>)}</ul></div>
           </div>
           <button type="button" className="pl-enlace-mono pl-logros-b" aria-expanded={abierto} aria-controls={id} onClick={() => setAbierto(!abierto)}>
-            {abierto ? c.tray.menosLogros : c.tray.verLogros(logros.length)} <span className="pl-mas-i pl-mas-i--s" aria-hidden="true" />
+            {abierto ? c.tray.menosLogros : c.tray.verLogros(b.length)} <span className="pl-mas-i pl-mas-i--s" aria-hidden="true" />
           </button>
         </>
       )}
-    </div>
-  )
-}
-
-/** Un grupo de habilidades: en escritorio abierto y sin botón; en móvil plegado (los seis grupos juntos eran 1.700 px de etiquetas). */
-function Grupo({ id, titulo, nota, items }: { id: string; titulo: string; nota: string; items: readonly string[] }) {
-  const [ancho, setAncho] = useState(() => typeof matchMedia === 'function' && matchMedia('(min-width: 900px)').matches)
-  const [abierto, setAbierto] = useState(ancho)
-  const cuerpo = useId()
-  useEffect(() => {
-    const mq = matchMedia('(min-width: 900px)')
-    const f = () => { setAncho(mq.matches); setAbierto(mq.matches) }
-    mq.addEventListener('change', f)
-    return () => mq.removeEventListener('change', f)
-  }, [])
-  return (
-    <div className="pl-hab-g" data-abierto={abierto} data-grupo={id}>
-      <span className="pl-hab-linea" data-pl="trazo" aria-hidden="true" />
-      <h3 className="pl-hab-t">
-        {ancho ? <span>{titulo}</span> : (
-          <button type="button" className="pl-hab-b" aria-expanded={abierto} aria-controls={cuerpo} onClick={() => setAbierto(!abierto)}>
-            <span>{titulo}</span><span className="pl-mas-i pl-mas-i--s" aria-hidden="true" />
-          </button>
-        )}
-      </h3>
-      <div id={cuerpo} className="pl-hab-cuerpo" inert={!abierto}>
-        <div className="pl-hab-in">
-          <p className="pl-hab-n">{nota}</p>
-          <ul className="pl-fichas">{items.map((x) => <li key={x} className="pl-ficha-tag">{x}</li>)}</ul>
-        </div>
-      </div>
     </div>
   )
 }
@@ -68,16 +35,13 @@ export default function Trayectoria() {
   const { c, v } = usePlato()
   const { strings: s, personal } = v
   const ref = useVista<HTMLElement>([])
-  const anios = Object.entries(v.eras).filter(([, e]) => e)
-  const hab = s.sections.skills
   const years = s.sections.years
   // De la época: la primera frase («De componentes React en 2022 a una flota de tiendas Shopify y la plataforma detrás»).
   const [apertura] = partirFrase(years.lead)
 
   return (
     <main id="contenido" tabIndex={-1} ref={ref} className="pl-vista pl-tray">
-      <title>{`${c.tray.h1} · ${personal.name}`}</title>
-      <meta name="robots" content="noindex" />
+      <Seo ruta="/plato/trayectoria" titulo={`${c.tray.h1} · ${personal.name}`} descripcion={`${apertura}`.slice(0, 158)} />
 
       <section className="pl-tr-cab" data-tono="claro">
         <h1 className="pl-h-xl" data-pl="linea">{c.tray.h1}</h1>
@@ -119,25 +83,8 @@ export default function Trayectoria() {
         })}
       </section>
 
-      <section className="pl-anios" data-tono="oscuro" aria-labelledby="pl-anios-t">
-        <div className="pl-anios-cab">
-          <h2 id="pl-anios-t" className="pl-h-l pl-h-l--osc" data-pl="linea">{years.title} <em>{sinPuntoFinal(years.titleAccent)}</em></h2>
-        </div>
-        <ol className="pl-anios-l" data-pl="grupo">
-          {anios.map(([y, e]) => (
-            <li key={y}><span className="pl-anio-y">{y}</span><span className="pl-anio-e">{e}</span></li>
-          ))}
-        </ol>
-      </section>
-
-      <section className="pl-hab" data-tono="claro" aria-labelledby="pl-hab-t">
-        <div className="pl-hab-cab">
-          <h2 id="pl-hab-t" className="pl-h-l" data-pl="linea">{hab.title} <em>{sinPuntoFinal(hab.titleAccent)}</em></h2>
-          <p className="pl-lista-lead" data-pl="subir" data-pl-retraso="0.15">{hab.eyebrow}</p>
-        </div>
-        <div className="pl-hab-rej">
-          {GRUPOS.map((g) => <Grupo key={g} id={g} titulo={hab.groups[g]} nota={hab.groupNote[g]} items={v.habilidades[g]} />)}
-        </div>
+      <section className="pl-tr-cierre" data-tono="claro" aria-label={c.revision}>
+        <Enlace to={ruta('contacto') + '?motivo=revision'} className="pl-pil pl-pil--osc pl-pil--grande"><Rod>{c.inicio.ctaCorto}</Rod><span className="pl-puntos" aria-hidden="true"><i /></span></Enlace>
       </section>
     </main>
   )

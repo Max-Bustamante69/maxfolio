@@ -1,6 +1,6 @@
 import { useState, type KeyboardEvent, type ReactNode } from 'react'
-import { useParams } from 'react-router-dom'
-import { datosDe, type Obra, type Viewport, type Vista } from '../data'
+import { Navigate, useParams } from 'react-router-dom'
+import { datosDe, useV5, type Obra, type Viewport, type Vista } from '../data'
 import { useCopy } from './copy'
 import { casoDe, clausulas, escalaDe, esCifra, fraseDe, frases, limpio, periodoDe, plano, usePublico } from './limpio'
 import { aterrizar, useVista, vuelaHacia } from './motion'
@@ -231,9 +231,13 @@ export default function Ficha() {
   const { slug = '' } = useParams()
   const c = useCopy()
   const { obra, personal } = usePublico()
+  const { obras: registro } = useV5()
   const o = obra(slug)
   const ref = useVista<HTMLElement>([])
   if (o) return <Detalle key={o.slug} o={o} />
+  // Una obra que existe en el registro pero que Tokonoma no cuenta (cargos y el propio portafolio) llega desde el selector de otro tema,
+  // que conserva la vista: se lleva a la sala de obras en vez de dejar un «no existe» sin salida. Un slug desconocido sí muestra el aviso.
+  if (registro.some((x) => x.slug === slug)) return <Navigate to={ruta('obra')} replace />
   return (
     <main id="contenido" tabIndex={-1} ref={ref} className="tk-vista">
       <title>{`${c.ficha.noExiste} · ${personal.name}`}</title>

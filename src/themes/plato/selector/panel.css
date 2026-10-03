@@ -1,0 +1,147 @@
+/* Plató · selector de temas «Cambiar de set» (se descarga con el panel, nunca antes).
+   Una tira de película con perforaciones; el fotograma activo se abre (transform + clip-path por transición de CSS) y los demás quedan como
+   cantos de película con su número y su nombre en vertical. Tungsteno = lo que está encendido: la lámpara, el cono y «En rodaje».
+   Nada se anima en reposo: solo transiciones al cambiar de fotograma y la entrada/salida (GSAP). */
+
+.pl-tm {
+  --ps: calc(2 * var(--px)); --pc: 0px;                      /* con vw hay que descontar el margen a mano; con cqw ya viene descontado */
+  --u: 1vw;                                                 /* 1 % del ancho útil: vw de respaldo; cqw donde hay contenedores (más abajo) */
+  --paso: clamp(76px, calc(var(--u) * 8), 112px);           /* canto de un fotograma cerrado */
+  --W: max(260px, min(calc(min(var(--u) * 100 - var(--ps), 1560px) - (var(--n) - 1) * var(--paso) - 16px), calc((100svh - 520px) * 1.6)));   /* 100cqw ya descuenta el margen lateral */
+  --H: calc(var(--W) * 0.625);                              /* las vistas previas son 720 × 450 */
+  --cw: var(--W);                                           /* ancho del fotograma abierto */
+  --M: 124px;                                               /* franja de rótulo bajo la imagen */
+  --P: 26px;                                                /* banda de perforaciones */
+  --hc: clamp(60px, 10.5svh, 112px);                        /* alto de la lámpara y su cono */
+  --r-f: 8px;
+  position: fixed; inset: 0; z-index: 70; pointer-events: auto;
+  display: flex; flex-direction: column;
+  overflow: hidden auto; overscroll-behavior: contain;
+  padding: var(--py) var(--px) max(16px, env(safe-area-inset-bottom));
+  background: radial-gradient(78% 62% at 50% 62%, rgb(242 176 78 / 0.08), transparent 72%), var(--plato);
+  color: var(--sala);
+  --foco: var(--tungsteno);
+}
+@supports (width: 1cqw) { .pl-tm { container-type: inline-size; --u: 1cqw; --ps: 0px; --pc: var(--px); } }
+.pl-tm:focus { outline: none; }
+
+/* ------------------------------------------------------------------ barra, título y entradilla */
+.pl-tm-cab { position: relative; z-index: 3; flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: var(--pil-h); }
+.pl-tm-x { background: var(--grafito); color: var(--sala); border: 1px solid var(--linea-osc); padding: 0 15.75px 0 22.75px; }
+.pl-tm-intro { position: relative; z-index: 3; flex: none; display: grid; gap: 12px var(--gap); margin-top: clamp(10px, 3.2svh, 38px); }
+.pl-tm-t { font-size: clamp(38px, calc(var(--u) * 5.6), 96px); line-height: 1; letter-spacing: -0.02em; font-weight: 400; }
+.pl-tm-mask { display: block; overflow: hidden; padding: 0.06em 0 0.1em; margin: -0.06em 0 -0.1em; }
+.pl-tm-t-in { display: block; }
+.pl-tm-lead { max-width: 30em; font-size: clamp(15px, calc(var(--u) * 1.35), 20px); line-height: 1.4; color: var(--sala-72); text-wrap: pretty; }
+@media (min-width: 900px) {
+  .pl-tm-intro { grid-template-columns: repeat(12, minmax(0, 1fr)); align-items: end; }
+  .pl-tm-t { grid-column: 1 / 9; }
+  .pl-tm-lead { grid-column: 9 / 13; padding-bottom: 0.4em; }
+}
+
+/* ------------------------------------------------------------------ la película */
+.pl-tm-vista { position: relative; z-index: 1; flex: 1 1 auto; min-height: 0; display: grid; place-items: center; padding-top: var(--hc); overflow-x: clip; }
+.pl-tm-rollo { position: relative; width: calc((var(--n) - 1) * var(--paso) + var(--W) + 16px); padding: var(--P) 8px; background: var(--grafito); border: 1px solid var(--linea-osc); border-radius: var(--r); }
+.pl-tm-perf { position: absolute; left: 0; right: 0; height: var(--P); overflow: hidden; pointer-events: none; }
+.pl-tm-perf--s { top: 0; border-radius: var(--r) var(--r) 0 0; }
+.pl-tm-perf--i { bottom: 0; border-radius: 0 0 var(--r) var(--r); }
+/* Perforaciones: un tramo más ancho que la banda (múltiplo del paso de 20 px) para que la película pueda avanzar al entrar. */
+.pl-tm-perf i { position: absolute; top: 0; bottom: 0; left: -160px; right: -160px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='26'%3E%3Crect x='6' y='9' width='8' height='8' rx='2' fill='%23edeef0' fill-opacity='.2'/%3E%3C/svg%3E") repeat-x 0 50% / 20px 100%; }
+.pl-tm-tira { position: relative; height: calc(var(--H) + var(--M)); margin: 0; padding: 0; list-style: none; }
+
+/* Un fotograma: la «li» mide lo que un canto; lo abierto se desborda dentro del recorte del enlace. */
+.pl-set { position: absolute; top: 0; left: calc(var(--i) * var(--paso)); width: var(--paso); height: 100%; transform: translateX(calc((var(--W) - var(--paso)) * clamp(0, var(--i) - var(--a), 1))); transition: transform 0.62s var(--e-lusion); }
+.pl-set[data-activo='true'] { z-index: 2; }
+.pl-set-a { position: absolute; inset: 0; display: block; color: inherit; cursor: pointer; clip-path: inset(0 3px 0 0 round var(--r-f)); transition: clip-path 0.62s var(--e-lusion); -webkit-tap-highlight-color: transparent; }
+.pl-set[data-activo='true'] .pl-set-a { clip-path: inset(0 calc(var(--paso) - var(--W) + 3px) 0 0 round var(--r-f)); }
+.pl-raiz .pl-set-a:focus-visible { outline: none; }
+.pl-set-in { position: absolute; inset: 0; display: block; }
+.pl-set-cuadro { position: absolute; left: 0; top: 0; display: block; width: var(--cw); height: var(--H); overflow: hidden; border-radius: var(--r-f); background: #0b0c0e; }
+.pl-set-cuadro picture { display: block; width: 100%; height: 100%; }
+.pl-set-cuadro img { display: block; width: 100%; height: 100%; max-width: none; object-fit: cover; object-position: left top; }
+.pl-set-a:focus-visible .pl-set-cuadro::after { content: ''; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 2px var(--tungsteno); pointer-events: none; }
+/* El velo apaga los fotogramas que no están bajo la luz. */
+.pl-set-vel { position: absolute; inset: 0; background: #07080a; opacity: 0.68; transition: opacity 0.55s var(--e-lusion); pointer-events: none; }
+.pl-set[data-activo='true'] .pl-set-vel { opacity: 0; }
+.pl-set-flash { position: absolute; inset: 0; opacity: 0; pointer-events: none; background: radial-gradient(circle at 50% 42%, #fff4dc, #f2b04e 62%); }
+
+/* Rótulo bajo el fotograma abierto: toma, nombre y lema. */
+.pl-set-meta { position: absolute; left: 0; top: var(--H); width: var(--cw); height: var(--M); display: flex; flex-direction: column; gap: 6px; padding: 14px 10px 0 4px; opacity: 0; transition: opacity 0.2s ease; }
+.pl-set[data-activo='true'] .pl-set-meta { opacity: 1; transition: opacity 0.4s ease 0.28s; }
+.pl-set-fila { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--sala-72); }
+.pl-set-rodaje { display: inline-flex; align-items: center; gap: 8px; color: var(--tungsteno); }
+.pl-set-rodaje i, .pl-set-canto i { display: block; flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--tungsteno); }
+.pl-set-entrar { display: inline-flex; align-items: center; gap: 8px; color: var(--sala); }
+.pl-set-entrar .pl-flecha { transition: transform 0.45s var(--e-lusion); }
+@media (hover: hover) { .pl-set-a:hover .pl-set-entrar .pl-flecha { transform: translateX(4px); } }
+.pl-set-nombre { font-size: clamp(24px, calc(var(--u) * 2.5), 38px); line-height: 1.05; letter-spacing: -0.015em; }
+.pl-set-lema { font-size: 15px; line-height: 1.35; color: var(--sala-72); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+
+/* Canto de película: número arriba, nombre en vertical y, en el que está en rodaje, su rótulo en tungsteno. */
+.pl-set-borde { position: absolute; left: 0; top: 0; width: var(--paso); height: 100%; pointer-events: none; opacity: 1; transition: opacity 0.35s ease 0.1s; }
+.pl-set[data-activo='true'] .pl-set-borde { opacity: 0; transition: opacity 0.18s ease; }
+.pl-set-borde::before { content: ''; position: absolute; left: 0; right: 3px; top: 38%; bottom: 0; background: linear-gradient(0deg, rgb(10 11 13 / 0.85), rgb(10 11 13 / 0)); border-radius: 0 0 var(--r-f) var(--r-f); }
+.pl-set-n { position: absolute; left: 14px; top: 13px; color: var(--sala); }
+.pl-set-canto { position: absolute; right: 12px; top: 12px; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 9px 5px; border-radius: 6px; background: rgb(10 11 13 / 0.9); color: var(--tungsteno); writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; }
+.pl-set-canto i { transform: rotate(-180deg); }
+.pl-set-rot { position: absolute; left: 14px; bottom: 16px; writing-mode: vertical-rl; transform: rotate(180deg); font-size: 22px; line-height: 1; letter-spacing: -0.01em; color: var(--sala); white-space: nowrap; }
+.pl-tm[lang='ja'] .pl-set-rot { transform: none; bottom: auto; top: 46%; }
+
+/* La lámpara cuelga sobre el fotograma activo y lo alumbra con un cono de tungsteno. */
+.pl-set-luz { position: absolute; left: 0; width: var(--cw); height: var(--hc); bottom: calc(100% + var(--P) + 2px); pointer-events: none; opacity: 0; transition: opacity 0.22s ease; animation: pl-tm-enciende 0.52s var(--e-luz) 0.82s backwards; }
+.pl-set[data-activo='true'] .pl-set-luz { opacity: 1; transition: opacity 0.4s var(--e-luz) 0.12s; }
+.pl-set-lampara { position: absolute; left: 50%; top: 0; transform: translateX(-50%); }
+.pl-set-luz::before { content: ''; position: absolute; left: 50%; top: -30px; width: 1px; height: 32px; background: linear-gradient(rgb(237 238 240 / 0), rgb(237 238 240 / 0.4)); }
+/* El charco de luz sobre el borde de la película, bajo el cono. */
+.pl-set-luz::after { content: ''; position: absolute; left: 0; right: 0; bottom: -18px; height: 36px; background: radial-gradient(ellipse 50% 50% at 50% 50%, rgb(242 176 78 / 0.3), rgb(242 176 78 / 0)); }
+.pl-set-cono { position: absolute; left: 0; right: 0; top: 30px; bottom: 0; clip-path: polygon(calc(50% - 28px) 0, calc(50% + 28px) 0, 100% 100%, 0 100%); background: linear-gradient(180deg, rgb(242 176 78 / 0.55), rgb(242 176 78 / 0.12) 62%, rgb(242 176 78 / 0.02)); }
+@keyframes pl-tm-enciende { from { opacity: 0; } }
+
+.pl-tm-ayuda { position: relative; z-index: 3; flex: none; margin-top: 10px; text-align: center; color: var(--sala-72); }
+
+/* ------------------------------------------------------------------ elegir: el fotograma elegido se enciende de golpe y el resto se apaga */
+.pl-tm[data-eligiendo] { pointer-events: none; }
+.pl-tm[data-eligiendo] .pl-set[data-eleg='false'] .pl-set-in { opacity: 0; transition: opacity 0.22s ease; }
+.pl-tm[data-eligiendo] :is(.pl-tm-cab, .pl-tm-intro, .pl-tm-ayuda) { opacity: 0; transition: opacity 0.22s ease; }
+.pl-set[data-eleg='true'] .pl-set-flash { animation: pl-tm-claqueta 0.3s ease-out both; }
+@keyframes pl-tm-claqueta { 0% { opacity: 0; } 22% { opacity: 0.92; } 100% { opacity: 0; } }
+
+/* ------------------------------------------------------------------ táctil y pantallas estrechas: una tira que se desliza con imán al centro */
+.pl-tm[data-modo='tira'] {
+  --fh: clamp(190px, calc(100svh - 274px - var(--M)), 460px);
+  --fw: calc(var(--fh) * 390 / 844);
+  --ar: 390 / 844;
+  --cw: var(--fw);
+  --M: 154px;
+  --P: 22px;
+}
+@media (min-width: 768px) {
+  .pl-tm[data-modo='tira'] { --fw: clamp(300px, calc(var(--u) * 46), 440px); --ar: 720 / 450; --M: 124px; }
+}
+.pl-tm[data-modo='tira'] .pl-tm-vista { display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; touch-action: pan-x; margin-inline: calc(var(--px) * -1); }
+.pl-tm[data-modo='tira'] .pl-tm-vista::-webkit-scrollbar { display: none; }
+.pl-tm[data-modo='tira'] .pl-tm-rollo { flex: none; width: max-content; margin-block: auto; padding: var(--P) 0; border-inline: 0; border-radius: 0; }
+.pl-tm[data-modo='tira'] .pl-tm-perf { border-radius: 0; }
+.pl-tm[data-modo='tira'] .pl-tm-tira { display: flex; height: auto; padding-inline: calc(var(--u) * 50 + var(--pc) - var(--fw) / 2); }   /* la tira sangra hasta los bordes: su centro es el de la pantalla */
+.pl-tm[data-modo='tira'] .pl-set { position: relative; top: auto; left: auto; flex: none; width: var(--fw); height: auto; transform: none; scroll-snap-align: center; transition: none; }
+.pl-tm[data-modo='tira'] .pl-set-a { position: relative; inset: auto; clip-path: none; transition: none; }
+.pl-tm[data-modo='tira'] .pl-set-in { position: static; }
+.pl-tm[data-modo='tira'] .pl-set-cuadro { position: relative; left: auto; top: auto; width: auto; height: auto; aspect-ratio: var(--ar); margin-inline: 5px; }
+.pl-tm[data-modo='tira'] .pl-set-meta { position: static; width: auto; height: var(--M); padding: 12px 8px 0 5px; opacity: 0.6; transition: opacity 0.4s ease; }
+.pl-tm[data-modo='tira'] .pl-set[data-activo='true'] .pl-set-meta { opacity: 1; transition: opacity 0.4s ease; }
+.pl-tm[data-modo='tira'] .pl-set-borde { display: none; }
+.pl-tm[data-modo='tira'] .pl-set-luz { left: 5px; width: calc(var(--fw) - 10px); }
+.pl-tm[data-modo='tira'] .pl-set-nombre { font-size: clamp(22px, calc(var(--u) * 6.4), 30px); }
+.pl-tm[data-modo='tira'] .pl-set-lema { font-size: 14px; -webkit-line-clamp: 3; line-clamp: 3; }
+.pl-tm[data-modo='tira'] .pl-set-entrar { display: none; }
+.pl-tm[data-modo='tira'] .pl-set-fila { flex-direction: column; align-items: flex-start; gap: 4px; }
+.pl-tm[data-modo='tira'] .pl-tm-intro { margin-top: clamp(8px, 2.4svh, 24px); }
+.pl-tm[data-modo='tira'] .pl-tm-ayuda { margin-top: 6px; }
+@media (max-width: 767px) {
+  .pl-tm .pl-tm-lead { display: none; }
+  .pl-tm { --hc: clamp(56px, 8.5svh, 76px); }
+}
+@media (max-height: 500px) {
+  .pl-tm .pl-tm-intro { display: none; }
+  .pl-tm[data-modo='tira'] { --fh: clamp(120px, calc(100svh - 300px), 440px); }
+}

@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
+import { useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { useLanguage } from '../../context/LanguageContext'
 import { useSearchParams } from 'react-router-dom'
 import { type Obra as ObraT } from '../data'
@@ -6,9 +6,10 @@ import { fechaCorta, medidasDe } from './casos'
 import { capaEstado, usePlato } from './contexto'
 import { control, type Ancla } from './escena/control'
 import { ORDEN } from './escena/sets'
-import { alScroll, aterrizar, useVista, vueloDe } from './motion'
+import { alScroll, aterrizar, resolverVT, useVista, vueloDe } from './motion'
 import { alcanceDe } from './alcance'
 import { Enlace, Flecha, Rod, Tarjeta, ruta } from './piezas'
+import { Seo } from './seo'
 
 const N = ORDEN.length
 const acota = (x: number, a = 0, b = 1) => Math.min(b, Math.max(a, x))
@@ -49,7 +50,7 @@ function Recorrido() {
   const alcance = actual ? alcanceDe(actual, locale) : ''
   const med = actual ? medidasDe(actual, locale, (iso) => fechaCorta(iso, v.intlLocale), actual.period ? v.formatPeriod(actual.period.start, actual.period.end) : String(actual.year))[0] : null
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const vh = () => window.innerHeight
     const ir = (i: number) => window.scrollTo({ top: acota(i, 0, N - 1) * vh(), behavior: 'smooth' })
     control.set({ modo: 'recorrido', slug: null })
@@ -88,6 +89,7 @@ function Recorrido() {
       capaEstado(y < N * vh() - 2)
       riel.current?.style.setProperty('--p', String(t / (N - 1)))
     })
+    resolverVT() // una View Transition en curso espera a que el scroll de la estación esté puesto
     return () => {
       suelta()
       window.removeEventListener('keydown', tecla)
@@ -215,8 +217,7 @@ export default function Obra() {
 
   return (
     <main id="contenido" tabIndex={-1} ref={ref} className={`pl-vista pl-obra${en3d ? ' pl-obra--3d' : ''}`}>
-      <title>{`${c.obra.h1} · ${v.personal.name}`}</title>
-      <meta name="robots" content="noindex" />
+      <Seo ruta={ruta('obra')} titulo={`${c.obra.h1} · ${v.personal.name}`} descripcion={`${c.obra.lead} ${c.obra.tiendasN(ORDEN.length)}.`} />
 
       {en3d ? (
         <Recorrido />

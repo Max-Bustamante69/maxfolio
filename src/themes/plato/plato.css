@@ -445,10 +445,10 @@ html.pl-snap { scroll-snap-type: y proximity; }
 .pl-fh-h1 { font-size: clamp(46px, 13.6vw, 72px); line-height: 0.95; letter-spacing: -0.015em; font-weight: 300; }
 .pl-fh-sub { font-size: clamp(17px, 1.5vw, 21px); line-height: 1.4; margin-top: clamp(14px, 1.6vw, 22px); max-width: 26em; }
 .pl-fh-linea { margin-top: clamp(14px, 1.6vw, 22px); color: var(--tinta-2); text-transform: none; letter-spacing: 0.03em; }
-.pl-fh-medido { display: flex; flex-wrap: wrap; gap: 20px clamp(24px, 3vw, 44px); width: 100%; max-width: 40em; margin-top: clamp(20px, 2.2vw, 30px); padding-top: 20px; border-top: 1px solid var(--linea); }
-.pl-fh-m { display: grid; gap: 4px; align-content: start; max-width: 13em; }
-.pl-fh-m b { font-size: 30px; font-weight: 400; line-height: 1; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
-.pl-fh-m .pl-mono { color: var(--tinta-2); text-transform: none; letter-spacing: 0.02em; font-size: 12px; line-height: 1.4; }
+/* La cifra principal de la obra: una sola, grande, con su etiqueta y su fecha (el resto de lo medido vive más abajo, en «Qué se midió»). */
+.pl-fh-medido { display: grid; gap: 4px; align-content: start; width: 100%; max-width: 22em; margin-top: clamp(20px, 2.2vw, 30px); padding-top: 20px; border-top: 1px solid var(--linea); }
+.pl-fh-medido b { font-size: clamp(34px, 3vw, 44px); font-weight: 300; line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.pl-fh-medido .pl-mono { color: var(--tinta-2); text-transform: none; letter-spacing: 0.02em; font-size: 12px; line-height: 1.4; }
 .pl-fh-m-nota { opacity: 0.85; }
 .pl-fh-acc { display: flex; flex-wrap: wrap; gap: 10px; margin-top: clamp(24px, 3vw, 40px); }
 .pl-fh--2d { padding: clamp(104px, 11vw, 176px) var(--px) clamp(40px, 5vw, 80px); display: grid; grid-template-columns: 1fr; gap: clamp(36px, 5vw, 64px) var(--gap); background: var(--sala); align-items: center; }
@@ -471,14 +471,26 @@ html.pl-snap { scroll-snap-type: y proximity; }
   .pl-fh-h1 { font-size: clamp(56px, 5.6vw, 96px); }
 }
 /* El pedestal: el teléfono está en el mundo; aquí solo la etiqueta de museo sobre un degradado de plató */
-.pl-fh--3d { min-height: 100svh; display: flex; align-items: center; padding: 130px var(--px) 120px; color: var(--sala); }
-.pl-fh--3d::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgb(10 11 13 / 0.94) 0%, rgb(10 11 13 / 0.9) 26%, rgb(10 11 13 / 0) 64%); pointer-events: none; }
+.pl-fh--3d { color: var(--sala); }
+/* Con recorrido, la escena se queda fija (pegajosa) mientras el lector baja y la pantalla del teléfono recorre la tienda; sin él, es una sola pantalla. */
+.pl-fh--3d:not(.pl-fh--rec) { height: 100svh; }
+.pl-fh--rec { height: calc(100svh + 260svh); }
+.pl-fh-pega { position: sticky; top: 0; height: 100svh; min-height: 560px; display: flex; align-items: center; padding: 130px var(--px) 120px; overflow: hidden; }
+.pl-fh-pega::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgb(10 11 13 / 0.94) 0%, rgb(10 11 13 / 0.9) 26%, rgb(10 11 13 / 0) 64%); pointer-events: none; }
 .pl-fh--3d .pl-fh-texto { max-width: min(540px, 92vw); }
-.pl-fh--3d .pl-fh-lote, .pl-fh--3d .pl-fh-linea, .pl-fh--3d .pl-fh-m .pl-mono { color: var(--sala-72); }
+.pl-fh--3d .pl-fh-lote, .pl-fh--3d .pl-fh-linea, .pl-fh--3d .pl-fh-medido .pl-mono { color: var(--sala-72); }
 .pl-fh--3d .pl-fh-medido { border-top-color: var(--linea-osc); }
-.pl-fh--3d .pl-fh-m b { color: var(--tungsteno); }
+.pl-fh--3d .pl-fh-medido b { color: var(--tungsteno); }
 .pl-fh--3d .pl-fh-sub { color: var(--sala); }
 .pl-fh--3d .pl-fh-h1 { font-size: clamp(46px, 5vw, 76px); }
+/* Zona táctil del teléfono (la sigue el mundo): rueda, arrastre y flechas recorren la tienda. */
+.pl-tel-zona { position: absolute; left: 0; top: 0; width: 0; height: 0; z-index: 3; border-radius: 26px; cursor: grab; touch-action: none; pointer-events: none; outline-offset: 6px; }
+.pl-tel-zona[data-arrastra='si'] { cursor: grabbing; }
+.pl-tel-zona:focus-visible { outline: 2px solid var(--tungsteno); }
+.pl-fh-baja { display: grid; gap: 4px; margin-top: clamp(18px, 2.4vw, 30px); color: var(--sala-72); }
+.pl-fh-baja small { color: var(--sala-55); text-transform: none; letter-spacing: 0.02em; font-size: 12px; }
+.pl-fh-prog { position: absolute; right: calc(var(--px) / 2 - 3px); top: 50%; width: 6px; height: 180px; margin-top: -90px; background: rgb(237 238 240 / 0.12); border-radius: 3px; overflow: hidden; z-index: 3; }
+.pl-fh-prog i { position: absolute; inset: 0; background: var(--tungsteno); transform-origin: 50% 0; transform: scaleY(var(--p, 0)); }
 .pl-fh-ctrl { position: absolute; left: var(--px); right: var(--px); bottom: var(--py); display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
 .pl-fh-vista { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .pl-fh-cont { color: var(--sala-72); }
@@ -772,3 +784,87 @@ html.pl-snap { scroll-snap-type: y proximity; }
   .pl-cifra { padding-bottom: 22px; }
   .pl-cifra-v { font-size: clamp(44px, 12.5vw, 60px); margin: 4px 0 6px; }
 }
+
+/* ------------------------------------------------------------------ ronda 10 · ficha con recorrido, teléfono en CSS, Lighthouse en rejilla */
+/* Teléfono de la ficha 2D (móvil y «Lista»): la home completa de la tienda dentro de un marco, con su propio scroll nativo. */
+.pl-fh-vitrina--tel { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; justify-items: center; padding-bottom: 0; }
+.pl-fh-vitrina--tel .pl-tel2d { order: 1; }
+.pl-fh-vitrina--tel .pl-fh-pantalla { order: 2; width: 100%; }
+.pl-fh-vitrina--tel .pl-fh-conm { order: 3; justify-self: start; }
+.pl-fh-conm .pl-segm { margin-top: 0; }
+.pl-tel2d { position: relative; width: min(100%, 300px); aspect-ratio: 390 / 844; border-radius: 46px; padding: 9px; background: linear-gradient(150deg, #3a3c42 0%, #14161a 38%, #050506 100%); box-shadow: inset 0 0 0 1.5px #5d6068, inset 0 0 0 4px #0b0c0e, 0 30px 60px -20px rgb(10 11 13 / 0.5); }
+.pl-tel2d::before { content: ''; position: absolute; left: 50%; top: 20px; width: 27%; height: 21px; transform: translateX(-50%); border-radius: 999px; background: #000; z-index: 2; pointer-events: none; }
+.pl-tel2d-pant { position: absolute; inset: 9px; border-radius: 37px; overflow-x: hidden; overflow-y: auto; background: #0d0e11; overscroll-behavior: contain; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.pl-tel2d-pant::-webkit-scrollbar { display: none; }
+.pl-tel2d-pant:focus-visible { outline: 2px solid var(--tinta); outline-offset: 4px; }
+.pl-tel2d-pant img { display: block; width: 100%; height: auto; user-select: none; }
+.pl-tel2d-pant img + img { margin-top: calc(-8 / 780 * 100%); } /* las franjas se solapan 8 px: se apilan sin duplicar filas */
+@media (min-width: 900px) {
+  .pl-fh-vitrina--tel { grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr); align-items: end; justify-items: stretch; gap: var(--gap); }
+  .pl-fh-vitrina--tel .pl-tel2d { order: 2; justify-self: center; width: min(100%, 300px); }
+  .pl-fh-vitrina--tel .pl-fh-pantalla { order: 1; }
+  .pl-fh-vitrina--tel .pl-fh-conm { grid-column: 1 / -1; order: 3; }
+}
+
+/* «Qué se midió» dentro del caso: cada medida con su valor, su nombre y su fecha. */
+.pl-beat-m { display: grid; gap: 18px; margin-top: 4px; }
+.pl-beats .pl-beat-m li { display: grid; gap: 3px; padding: 0; border: 0; }
+.pl-beat-m b { font-size: clamp(34px, 3vw, 46px); font-weight: 300; line-height: 1; letter-spacing: -0.025em; font-variant-numeric: tabular-nums; }
+.pl-beat-m span { font-size: 16px; line-height: 1.35; color: var(--tinta-2); max-width: 20em; }
+.pl-beat-m small { color: var(--tinta-2); text-transform: none; letter-spacing: 0.02em; font-size: 12px; }
+.pl-par--solo { grid-template-columns: minmax(0, 1fr); }
+
+/* Lighthouse: dos bloques (escritorio y móvil), cada uno con sus cuatro cifras en rejilla; nada se recorta a 390 px. */
+.pl-lh { display: grid; grid-template-columns: minmax(0, 1fr); gap: 30px; max-width: 62em; margin-bottom: 18px; }
+.pl-lh-d { border-top: 1px solid var(--linea); padding-top: 14px; min-width: 0; }
+.pl-lh-n { color: var(--tinta-2); margin-bottom: 14px; }
+.pl-lh-g { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 12px; }
+.pl-lh-g > div { display: flex; flex-direction: column-reverse; gap: 4px; min-width: 0; }
+.pl-lh-g dt { color: var(--tinta-2); font-size: 11px; }
+.pl-lh-g dd { font-size: clamp(34px, 9.5vw, 54px); line-height: 1; font-weight: 300; letter-spacing: -0.025em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+@media (min-width: 700px) { .pl-lh { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap); } }
+@media (min-width: 1100px) { .pl-lh-g { grid-template-columns: repeat(4, minmax(0, 1fr)); } .pl-lh-g dd { font-size: clamp(40px, 3.6vw, 56px); } }
+.pl-lh-ctx { max-width: 46em; margin-top: 18px; padding-left: 18px; border-left: 2px solid var(--tinta); font-size: 17px; line-height: 1.5; }
+
+/* Inicio: obra destacada más corta (tarjeta, una frase y una cifra) y botones que caben en 390 px */
+.pl-dcard-dl { display: grid; gap: 18px; padding-top: 22px; border-top: 1px solid var(--linea); }
+.pl-dcard-c { font-size: 17px; line-height: 1.5; max-width: 34em; }
+.pl-pil--ancha { max-width: 100%; justify-content: space-between; }
+.pl-cierre-datos { margin-top: 6px; color: var(--tinta); text-transform: none; letter-spacing: 0.02em; font-size: 13px; }
+.pl-tr-cierre { background: var(--sala); padding: 0 var(--px) clamp(64px, 8vw, 120px); }
+@media (max-width: 480px) {
+  .pl-pil--grande { font-size: 13px; letter-spacing: 0; padding: 0 16px 0 20px; }
+  .pl-cierre-acc .pl-pil { width: 100%; }
+}
+/* Fugas de pulido de la ronda 9: la sombra del botón del marco se queda dentro; las cruces «+» no caen sobre la fila de datos; los puntos dejan de ser marrón barroso. */
+@media (min-width: 900px) {
+  .pl-marco-acc .pl-pil { box-shadow: 0 4px 16px rgb(0 0 0 / 0.4); }
+  .pl-esc-pie { margin-top: 34px; }
+}
+.pl-kicker--claro::before, .pl-esc-disp i, .pl-cierre-datos i { background: var(--tinta); }
+
+/* Contacto: titulares de canales y preguntas en una sola línea de lectura */
+.pl-canales-s > .pl-h-m, .pl-faq > .pl-h-m { align-self: start; }
+@media (min-width: 900px) { .pl-canales-s > .pl-h-m { grid-column: 1 / span 5; } .pl-faq > .pl-h-m { grid-column: 1 / span 5; } }
+
+/* View Transitions entre vistas con escena (obra ↔ ficha ↔ ficha): la vista que se va se funde, la que llega sube un poco; el título de la obra viaja. */
+:root[data-plvt] .pl-rotulo-n, :root[data-plvt] .pl-fh-h1 { view-transition-name: pl-nombre; }
+/* La vista que se va queda opaca debajo mientras la nueva sube encima: nunca asoma el fondo claro de la sala (sin destello en blanco). */
+:root[data-plvt]::view-transition-old(root) { animation: none; mix-blend-mode: normal; }
+:root[data-plvt]::view-transition-new(root) { animation: pl-vt-entra 0.5s cubic-bezier(0.4, 0, 0.1, 1) both; mix-blend-mode: normal; }
+:root[data-plvt]::view-transition-group(pl-nombre) { animation-duration: 0.7s; animation-timing-function: cubic-bezier(0.4, 0, 0.1, 1); }
+@keyframes pl-vt-sale { to { opacity: 0; } }
+@keyframes pl-vt-entra { from { opacity: 0; transform: translateY(14px); } }
+
+/* «Ver en 3D» del móvil: el visor del teléfono (pedido solo al tocar) */
+.pl-fh-conm { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.pl-ver3d { margin: 0; }
+.pl-visor { position: fixed; inset: 0; z-index: 85; background: radial-gradient(ellipse at 50% 60%, #2a2118 0%, #0a0b0d 62%); color: var(--sala); --foco: var(--tungsteno); touch-action: none; }
+.pl-visor-lienzo { position: absolute; inset: 0; }
+.pl-visor-lienzo canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity 0.5s ease; touch-action: none; }
+.pl-visor[data-lista='si'] canvas { opacity: 1; }
+.pl-visor-x { position: absolute; right: var(--px); top: var(--py); background: var(--grafito); color: var(--sala); border: 1px solid var(--linea-osc); z-index: 2; }
+.pl-visor-pie { position: absolute; left: var(--px); right: var(--px); bottom: calc(var(--py) + 74px); text-align: center; color: var(--sala-72); pointer-events: none; }
+.pl-visor-rango { position: absolute; left: var(--px); right: var(--px); bottom: var(--py); display: grid; gap: 8px; z-index: 2; }
+.pl-visor-rango span { color: var(--sala-72); }
+.pl-visor-rango input { width: 100%; min-height: 44px; accent-color: var(--tungsteno); touch-action: pan-x; }

@@ -47,6 +47,16 @@ export function partirFrase(s: string): [string, string] {
   return [a, resto.join(/。/.test(s) ? '' : ' ')]
 }
 
+/** Una cifra en el formato del idioma de la página: «$45k/yr» → «45.000 USD/año» y «10,000+» → «10.000+» en español (el cuerpo ya usa el punto de miles). */
+export function formatoLocal(valor: string, locale: 'es' | 'en' | 'ja'): string {
+  if (locale !== 'es') return valor
+  const usd = valor.match(/^\$(\d+)k\/yr$/)
+  if (usd) return `${usd[1]}.000 USD/año`
+  return valor.replace(/(\d{1,3}),(\d{3})(?!\d)/g, '$1.$2')
+}
+/** Los cargos de la línea FUENTE de la banda de cifras, con el mismo nombre que en la trayectoria. */
+const cargoLocal = (fuente: string, locale: 'es' | 'en' | 'ja') => (locale === 'es' ? fuente.replace(/Frontend Developer/g, 'Desarrollador Frontend') : fuente)
+
 /** Eslóganes que dicen algo que la guardia no deja pasar (aquí, el idioma): se sustituyen por lo que la app hace. */
 const ESLOGAN: Record<string, { es: string; en: string; ja: string }> = {
   kotodama: {
@@ -79,15 +89,15 @@ export function usePublico() {
     const cto = v.trayectoria.find((t) => t.id === 'digitdeck-cto')
     // La banda de cifras del vivo con su fuente. «800+ pruebas» no tiene fuente que se pueda contar: en su lugar va el dato del mismo cargo que sí la tiene.
     const cifras = v.cifras.map((f) => {
-      if (!prohibido(f.valor)) return f
+      if (!prohibido(f.valor)) return { ...f, valor: formatoLocal(f.valor, locale), fuente: cargoLocal(f.fuente, locale) }
       const m = cto?.metrics.find((x) => !prohibido(x.value) && /^\d+$/.test(x.value))
-      return m && cto ? { id: 'modules', valor: m.value, etiqueta: m.label, fuente: `${cto.title}, ${cto.company}, ${cto.period}` } : null
+      return m && cto ? { id: 'modules', valor: formatoLocal(m.value, locale), etiqueta: m.label, fuente: `${cto.title}, ${cto.company}, ${cto.period}` } : null
     }).filter((f): f is NonNullable<typeof f> => !!f)
     const trayectoria = v.trayectoria.map((r) => ({
       ...r,
       summary: limpioTexto(r.summary),
       highlights: r.highlights.map(limpioTexto).filter(Boolean),
-      metrics: r.metrics.filter((m) => !prohibido(m.value)),
+      metrics: r.metrics.filter((m) => !prohibido(m.value)).map((m) => ({ ...m, value: formatoLocal(m.value, locale) })),
     }))
     const manifiesto = v.strings.sections.manifesto.lines.map(limpioTexto).filter((l) => l && !DEL_TALLER.test(l))
     return {

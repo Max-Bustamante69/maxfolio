@@ -4,25 +4,25 @@ import type { Obra } from '../data'
 // (taglines, descripciones y hechos de src/content). Nada de recuentos de catálogo ni números de laboratorio como titular.
 type Par = { es: string; en: string }
 const ALCANCE: Record<string, Par> = {
-  'the-gummy-box': { es: 'Armador de kits con descuento automático en el checkout', en: 'Kit builder with an automatic checkout discount' },
+  'the-gummy-box': { es: 'Armador de kits cableado al módulo de Bundles', en: 'Kit builder wired to the Bundles module' },
   'nos-cafe': { es: 'Port de Framer y armador de cajas con descuento por escalera', en: 'Framer port and a box builder with a tiered discount' },
-  millennio: { es: 'Port de Framer con 260+ elementos medidos', en: 'Framer port with 260+ measured elements' },
+  millennio: { es: 'Port de Framer sobre islas React, con tracking en cada tarjeta', en: 'Framer port on React islands, with tracking on every card' },
   nalua: { es: 'Ofertas por cantidad cableadas a descuentos automáticos', en: 'Quantity offers wired to automatic discounts' },
   mindfuel: { es: 'Port completo a React V2, ya en producción', en: 'Full React V2 port, now in production' },
   sebum: { es: 'Reconstrucción V2 con un muro de reseñas extensible', en: 'V2 rebuild with an extensible review wall' },
   'factores-2x2': { es: 'De Framer a Liquid, con pasada de calidad web', en: 'Framer to Liquid, then a web-quality pass' },
   'origen-vital': { es: 'Port de Framer con quiz de producto y landings promo', en: 'Framer port with a product quiz and promo landings' },
-  atmosfera: { es: 'Catálogo sincronizado con las listas del proveedor', en: 'Catalog synced from the supplier price lists' },
+  atmosfera: { es: 'Doble precio, con y sin IVA, y especificaciones en metafields', en: 'Dual pricing, with and without VAT, and specs in metafields' },
   'luxe-shine': { es: 'Hero de video por scroll y retrofit de tracking', en: 'Scroll-driven video hero and a tracking retrofit' },
   pixxiesx: { es: 'Quiz de producto y PDP guiada por metaobjetos', en: 'Product quiz and a metaobject-driven PDP' },
-  'valdo-cafe': { es: 'Transferida a la tienda real y promovida al día siguiente', en: 'Transferred to the real store, promoted the next day' },
+  'valdo-cafe': { es: 'Tema pequeño y plantillas limpias para que el cliente la opere', en: 'Small theme and clean templates so the client can run it' },
   unik: { es: 'Tienda bilingüe en dos monedas, catálogo traducido en bloque', en: 'Bilingual two-currency store, catalog translated in bulk' },
-  peluna: { es: 'Rediseño con pruebas A/B montadas desde el día uno', en: 'Redesign with A/B tests wired from day one' },
-  'en-amor-a-dos': { es: '57 secciones propias sobre islas React', en: '57 custom sections on React islands' },
-  tierramont: { es: 'Tema nuevo para la tienda real, issue por issue', en: 'New theme for the real store, issue by issue' },
+  peluna: { es: 'Rediseño sobre la plantilla Digitdeck, con pruebas A/B', en: 'Redesign on the Digitdeck template, with A/B tests' },
+  'en-amor-a-dos': { es: 'Secciones a medida sobre islas React y base Dawn', en: 'Custom sections on React islands over a Dawn base' },
+  tierramont: { es: 'Tema nuevo para la tienda real, seguido en un tablero compartido', en: 'New theme for the real store, tracked on a shared board' },
   'para-machos': { es: 'Tema Digitdeck nuevo, en construcción', en: 'New Digitdeck theme, in progress' },
-  'alma-de-aviador': { es: 'Woo → Shopify, con el diseño de Framer en 35 secciones', en: 'Woo → Shopify, with the Framer design in 35 sections' },
-  'saint-theory': { es: 'Tema Liquid a medida, publicado desde 2023', en: 'Custom Liquid theme, live since 2023' },
+  'alma-de-aviador': { es: 'Woo → Shopify, con el diseño de Framer componentizado', en: 'Woo → Shopify, with the Framer design componentized' },
+  'saint-theory': { es: 'Tema Liquid a medida, el mismo que sigue publicado hoy', en: 'Custom Liquid theme, still the live one today' },
 }
 
 const palabras = (s: string) => s.split(/\s+/).filter(Boolean).length
