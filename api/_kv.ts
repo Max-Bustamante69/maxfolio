@@ -1,4 +1,4 @@
-// Shared Upstash REST helpers for the KV-backed first-party ledgers (api/ab.ts, api/event.ts). A
+// Shared Upstash REST helpers for the KV-backed first-party ledger (api/event.ts). A
 // missing KV store (no Marketplace integration added to the Vercel project yet) is not an error
 // anywhere that calls this — every caller treats `kv()` returning null as "not configured yet" and
 // no-ops, so the site never depends on either ledger existing. Not itself a route (the leading
