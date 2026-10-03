@@ -48,6 +48,10 @@ const EVENTS: Record<string, EventSpec> = {
     },
   },
   contact_open: { fields: (p) => (isEnum(p.theme, THEMES) ? ['contact_open', `contact_open:${p.theme}`] : ['contact_open']) },
+  // La agenda (src/themes/shared/agenda.ts): calendario visto → franja elegida → llamada reservada, por tema.
+  booking_open: { fields: (p) => (isEnum(p.theme, THEMES) ? ['booking_open', `booking_open:${p.theme}`] : ['booking_open']) },
+  booking_slot: { fields: (p) => (isEnum(p.theme, THEMES) ? ['booking_slot', `booking_slot:${p.theme}`] : ['booking_slot']) },
+  booking_submit: { fields: (p) => (isEnum(p.theme, THEMES) ? ['booking_submit', `booking_submit:${p.theme}`] : ['booking_submit']) },
   contact_click: {
     fields: (p) => (isEnum(p.theme, THEMES) ? ['contact_click', `contact_click:${p.theme}`, ...(isSlug(p.canal, 24) ? [`contact_click:canal:${p.canal}`] : [])] : ['contact_click']),
   },

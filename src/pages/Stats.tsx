@@ -53,6 +53,7 @@ export default function Stats() {
         abreContacto: t[`contact_open:${id}`] ?? 0,
         clicContacto: t[`contact_click:${id}`] ?? 0,
         envios: t[`contact_submit:${id}`] ?? 0,
+        agendas: t[`booking_submit:${id}`] ?? 0,
         llegan: t[`theme_switch:${id}`] ?? 0,
         salidas,
         dias: (datos?.days ?? []).map((d) => datos?.daily?.[d]?.[`theme_view:${id}`] ?? 0),
@@ -91,10 +92,10 @@ export default function Stats() {
         {datos?.configured && (
           <>
             <div className="mt-8 overflow-x-auto rounded-xl border border-[#d5d9de] bg-white">
-              <table className="w-full min-w-[860px] text-left text-sm tabular-nums">
+              <table className="w-full min-w-[960px] text-left text-sm tabular-nums">
                 <thead className="border-b border-[#e3e6ea] text-xs uppercase tracking-wide text-[#5b6168]">
                   <tr>
-                    {['Tema', 'Vistas', 'Interacción', 'Abren obra', 'Abren contacto', 'Clic a un canal', 'Envían', 'Llegan por cambio', 'Se van a otro', '30 días'].map((h) => (
+                    {['Tema', 'Vistas', 'Interacción', 'Abren obra', 'Abren contacto', 'Clic a un canal', 'Envían', 'Agendan', 'Llegan por cambio', 'Se van a otro', '30 días'].map((h) => (
                       <th key={h} className="px-4 py-3 font-medium">{h}</th>
                     ))}
                   </tr>
@@ -109,6 +110,7 @@ export default function Stats() {
                       <td className="px-4 py-3">{f.abreContacto}</td>
                       <td className="px-4 py-3">{f.clicContacto} <span className="text-[#5b6168]">· {pct(f.clicContacto, f.vistas)}</span></td>
                       <td className="px-4 py-3">{f.envios} <span className="text-[#5b6168]">· {pct(f.envios, f.vistas)}</span></td>
+                      <td className="px-4 py-3">{f.agendas} <span className="text-[#5b6168]">· {pct(f.agendas, f.vistas)}</span></td>
                       <td className="px-4 py-3">{f.llegan}</td>
                       <td className="px-4 py-3">{f.salidas} <span className="text-[#5b6168]">· {pct(f.salidas, f.vistas)}</span></td>
                       <td className="px-4 py-3 text-[#16181b]"><Linea valores={f.dias} /></td>
