@@ -1,11 +1,11 @@
 // Última defensa de la capa pública: ciertos textos del registro (taglines, descripciones, datos) afirman algo que el
-// repo no sostiene (plazos, métodos de pago, garantías, cifras sin fuente). Si una cadena los trae, esta dirección NO la
-// imprime. Es la misma lista que vigila la sonda de capturas (v5-shots.mjs) más plazo de respuesta y garantías.
+// repo no sostiene (plazos, métodos de pago, garantías). Si una cadena los trae, esta dirección NO la imprime. Es la misma
+// lista que vigila la sonda de capturas (v5-shots.mjs) más plazo de respuesta y garantías.
+// Las cifras del vivo (800+ pruebas, 70→95+, 260+ elementos medidos) YA NO se filtran: Max pidió el contenido del vivo y
+// cada una llega con su fuente (cargo y periodo del CV) desde useV5().cifras. Ningún testimonio, método de pago, plazo
+// ni garantía pasa; tampoco las alzas de conversión POR TIENDA (el vivo no las tiene).
 const PROHIBIDO = [
-  /800\s*\+/,
   /\b98\s*\+/,
-  /\b9[5-9]\s*\+/,
-  /260\s*\+/,
   /testimoni/i,
   /same[- ]day|mismo d[ií]a/i,
   /cada build|every build|every store here/i,

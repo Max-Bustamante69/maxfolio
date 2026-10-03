@@ -201,7 +201,7 @@ export function Pie() {
 
 /** Lo que el WhatsApp flotante no debe cubrir (S9 del v4): CTA, formulario, miniaturas del índice, pausa de la cinta, canales y los
  *  bloques de lectura (pasos, cargos, datos, preguntas) cuyo borde derecho llega hasta su esquina. */
-const TAPA = '.dd-form, .dd-boton, .dd-fila__mini, .dd-cinta__pausa, .dd-canal, .dd-paso, .dd-cargo__cuerpo, .dd-ficha__texto, .dd-datos, .dd-faq__item'
+const TAPA = '.dd-form, .dd-boton, .dd-fila__mini, .dd-cinta__pausa, .dd-canal, .dd-paso, .dd-cifra, .dd-cargo__cuerpo, .dd-cargo-r, .dd-modelo, .dd-habilidad, .dd-historia, .dd-hecho, .dd-datos, .dd-despues li, .dd-manifiesto li, .dd-faq__item'
 
 export function Fab() {
   const c = useCopy()

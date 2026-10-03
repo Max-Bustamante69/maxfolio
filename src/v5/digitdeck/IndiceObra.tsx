@@ -1,7 +1,8 @@
-// Índice de obra con escenario fijo (arquetipos B + C del v4): filas con filetes (cada fila es UN <a>), nombre grande, y a la
-// derecha una ventana sticky con la captura de la fila enfocada. En móvil no hay escenario: la fila que cruza el centro de la
-// pantalla es la «activa» y cada fila lleva su miniatura. Abrir una obra no usa el disco: la captura viaja a su ficha (FLIP).
-// El disco «Ver obra» del cursor vive solo sobre la ventana del escenario (señala la captura): sobre una fila taparía su nombre.
+// Índice de obra con escenario fijo (arquetipos B + C del v4): filas con filetes (cada fila es UN <a>), nombre grande con su historia en
+// una línea, y a la derecha una ventana sticky con la captura de la fila enfocada (o, si la obra no tiene captura, su historia y su
+// pila). En móvil no hay escenario: la fila que cruza el centro de la pantalla es la «activa» y cada fila lleva su miniatura. Abrir
+// una obra no usa el disco: la captura viaja a su ficha (FLIP). El disco «Ver obra» del cursor vive solo sobre la ventana del
+// escenario (señala la captura): sobre una fila taparía su nombre.
 import { useEffect, useRef, useState } from 'react'
 import { v5path, type Obra } from '../data'
 import { ShotImg, pieDeCaptura } from '../shared/ShotImg'
@@ -9,31 +10,49 @@ import { useCopy } from './copy'
 import { Enlace, useTransicion } from './transicion'
 
 const escritorio = () => matchMedia('(min-width: 1024px)').matches
+/** La historia de una fila: su tagline o, si la defensa de la capa pública lo dejó vacío, su descripción. */
+const historiaDe = (o: Obra) => o.tagline || o.description
 
 function Escenario({ obra, n, abrir }: { obra: Obra | undefined; n: number; abrir: (rect: DOMRect) => void }) {
   const c = useCopy()
-  const [par, setPar] = useState<{ a?: Obra; b?: Obra }>({ a: obra })
+  // La obra actual sale siempre de la prop (un cambio de idioma reemplaza sus textos); solo la previa se recuerda, para fundir la captura.
+  const [previa, setPrevia] = useState<Obra | undefined>()
+  const ultima = useRef(obra)
   const [lista, setLista] = useState<string | null>(null)
-  useEffect(() => setPar((p) => (p.a?.slug === obra?.slug ? p : { a: obra, b: p.a })), [obra])
+  useEffect(() => {
+    if (ultima.current?.slug === obra?.slug) return
+    setPrevia(ultima.current)
+    ultima.current = obra
+  }, [obra])
   const pinta = (o: Obra | undefined, rol: 'actual' | 'previa') =>
     o?.views.includes('home') ? (
       <ShotImg key={`${rol}-${o.slug}`} slug={o.slug} vista="home" vp="desktop" alt="" prioridad loading="eager" decoding="sync" className={`dd-escena__img dd-escena__img--${rol}`} onLoad={() => setLista(o.slug)} data-lista={lista === o.slug || undefined} />
     ) : null
-  const a = par.a
+  const a = obra
+  const conCaptura = !!a?.views.includes('home')
   return (
     <figure className="dd-escena" aria-label={c.obra.escenario}>
       {/* Con el puntero, la ventana abre la ficha (el disco «Ver obra» lo anuncia); con teclado y lector, la fila es el enlace. */}
-      <div className="dd-escena__ventana" data-cursor={a?.views.includes('home') ? 'ver' : undefined} onClick={(e) => a?.views.includes('home') && abrir(e.currentTarget.getBoundingClientRect())}>
-        {pinta(par.b, 'previa')}
+      <div className="dd-escena__ventana" data-cursor={conCaptura ? 'ver' : undefined} onClick={(e) => conCaptura && abrir(e.currentTarget.getBoundingClientRect())}>
+        {pinta(previa, 'previa')}
         {pinta(a, 'actual')}
-        {a && !a.views.includes('home') && (
-          <div className="dd-escena__vacio">
+        {a && !conCaptura && (
+          <div className="dd-escena__vacio" key={a.slug}>
+            <span className="dd-micro">{c.obra.tipos[a.kind]} · {a.year}</span>
             <span className="dd-escena__nombre">{a.name}</span>
-            <span className="dd-micro">{c.obra.sinCaptura}</span>
+            {historiaDe(a) && <span className="dd-escena__historia">{historiaDe(a)}</span>}
+            {a.stack.length > 0 && <span className="dd-micro">{a.stack.slice(0, 5).join(' · ')}</span>}
           </div>
         )}
       </div>
-      <figcaption className="dd-micro">{a?.views.includes('home') ? `Nº ${String(n + 1).padStart(2, '0')} · ${pieDeCaptura(a.name, 'home', 'desktop')}` : a ? `Nº ${String(n + 1).padStart(2, '0')} · ${a.name} · ${c.obra.sinCaptura}` : ''}</figcaption>
+      <figcaption>
+        {a && (
+          <>
+            <span className="dd-escena__pie dd-micro">{c.obra.nombreDe(n + 1)} · {conCaptura ? pieDeCaptura(a.name, 'home', 'desktop') : a.name}</span>
+            {conCaptura && historiaDe(a) && <span className="dd-escena__historia">{historiaDe(a)}</span>}
+          </>
+        )}
+      </figcaption>
     </figure>
   )
 }
@@ -78,6 +97,7 @@ export default function IndiceObra({ obras }: { obras: Obra[] }) {
               <span className="dd-fila__n dd-micro">{c.obra.cuenta(i + 1, obras.length)}</span>
               <span className="dd-fila__nombre">{o.name}</span>
               <span className="dd-fila__meta">{[o.industry ?? c.obra.tipos[o.kind], o.rolLabel, o.year].filter(Boolean).join(' · ')}</span>
+              {historiaDe(o) && <span className="dd-fila__historia">{historiaDe(o)}</span>}
               {o.views.includes('home') && <img className="dd-fila__mini" src={`/v5/digitdeck/mini/${o.slug}.webp`} width={480} height={300} alt="" loading="lazy" decoding="async" />}
             </Enlace>
           </li>

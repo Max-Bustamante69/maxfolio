@@ -1,8 +1,9 @@
-// Obra: el índice completo con escenario fijo. Filtros por tipo (Todo · Tiendas · Productos · Más).
+// Obra: el índice completo con escenario fijo. Filtros por tipo (Todo · Tiendas · Productos · Proyectos).
 import { useState } from 'react'
-import { SHOT_DATE, useV5, type Obra as ObraT } from '../data'
+import { SHOT_DATE, type Obra as ObraT } from '../data'
 import { useCopy } from './copy'
 import IndiceObra from './IndiceObra'
+import { useObras } from './limpio'
 import { Pagina } from './Pagina'
 import { Titulo } from './piezas'
 
@@ -16,7 +17,7 @@ const PASA: Record<Filtro, (o: ObraT) => boolean> = {
 
 export default function Obra() {
   const c = useCopy()
-  const { obras } = useV5()
+  const obras = useObras()
   const [filtro, setFiltro] = useState<Filtro>('todo')
   const visibles = obras.filter(PASA[filtro])
   return (

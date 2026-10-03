@@ -1,4 +1,4 @@
-// Transición de página con disco (EX-7): un disco violeta crece desde el clic (340 ms), la ruta cambia debajo y el disco se
+// Transición de página con disco (EX-7): un disco verde crece desde el clic (340 ms), la ruta cambia debajo y el disco se
 // encoge (380 ms) hasta el punto final del título de la página nueva. Reacción visible ≤150 ms (el enlace se hunde y el disco
 // ya crece), cubierta ≤450 ms, 0 esperas fijas: solo se espera a que la página nueva esté montada (tope de 1,2 s).
 // Abrir una obra desde el índice NO usa la cubierta: la captura viaja a su sitio en la ficha (elemento compartido, FLIP).

@@ -4,16 +4,16 @@ import { datosDe, sinPuntoFinal, v5path, type Obra, type Vista } from '../data'
 import { evento } from '../shared/contacto'
 import { pieDeCaptura, ShotImg } from '../shared/ShotImg'
 import { Cabeza } from './Cabeza'
+import { casoDe } from './caso'
 import { ID, usePersona } from './contexto'
 import { entradaTitulos } from './efectos'
 import { limpio } from './limpio'
 import { Enlace, Fondo, Titulo } from './piezas'
 import { gsap, guardarViaje, leerViaje, memoria, OUT, parallaxFondo, revelarPaneles, useGsap, volarDesde } from './motion'
+import { llenar } from './util'
 
 /** «← Obra» vuelve al índice con el filtro que había (el filtro vive en la URL del índice). */
 const rutaObra = () => v5path(ID, 'obra') + (memoria.filtro !== 'todo' ? `?tipo=${memoria.filtro}` : '')
-
-const llenar = (t: string, v: Record<string, string | number>) => Object.entries(v).reduce((s, [k, x]) => s.replace(`{${k}}`, String(x)), t)
 
 export default function Ficha() {
   const { slug = '' } = useParams()
@@ -50,7 +50,9 @@ function FichaDe({ o }: { o: Obra }) {
   const datos = datosDe(o.slug)
   const conFoto = o.views.length > 0
   const hayMovil = conFoto
-  const tipoAnio = `${c.obra.tipo[o.kind]} · ${o.year}`
+  const estado = o.kind === 'store' && o.status ? v5.strings.badges[o.status] : ''
+  const tipoAnio = [c.obra.tipo[o.kind], o.year, estado].filter(Boolean).join(' · ')
+  const beats = casoDe(v5, o.slug)
   const tagline = limpio(o.tagline)
   const descripcion = limpio(o.description)
   const periodo = o.period ? v5.formatPeriod(o.period.start, o.period.end || null) : null
@@ -97,7 +99,6 @@ function FichaDe({ o }: { o: Obra }) {
 
   // Las tres mediciones con fecha (git, catálogo público, Lighthouse) son cifras grandes: cada una dice cuándo se midió.
   const medidas = [
-    datos.git && { id: 'git', v: String(datos.git.commits), t: c.ficha.commits, s: llenar(c.ficha.gitRango, { first: datos.git.first, last: datos.git.last }), f: llenar(c.ficha.gitMedido, { fecha: datos.git.fecha }) },
     datos.comercio && { id: 'catalogo', v: String(datos.comercio.products), t: c.ficha.productos, s: datos.comercio.collections ? llenar(c.ficha.catalogoColecciones, { n: datos.comercio.collections }) : '', f: llenar(c.ficha.catalogoMedido, { fecha: datos.comercio.fecha }) },
     datos.lighthouse && { id: 'lh', v: `${datos.lighthouse.movil.perf} / ${datos.lighthouse.escritorio.perf}`, t: c.ficha.lhEtiqueta, s: '', f: llenar(c.ficha.lhNota, { fecha: datos.lighthouse.fecha }) },
   ].filter((m): m is { id: string; v: string; t: string; s: string; f: string } => !!m)
@@ -125,7 +126,12 @@ function FichaDe({ o }: { o: Obra }) {
           </Enlace>
           <div className="pr-ficha__cab">
             <Titulo id="pr-ficha" eyebrow={tipoAnio} texto={o.name} lead={tagline || undefined} />
-            {descripcion && <p className="pr-texto pr-ficha__desc pr-ficha-aparece">{descripcion}</p>}
+            {descripcion && (
+              <div className="pr-ficha__desc pr-ficha-aparece">
+                <p className="pr-ficha__desc-r">{c.ficha.casoEyebrow}</p>
+                <p className="pr-texto">{descripcion}</p>
+              </div>
+            )}
           </div>
 
           <div className="pr-ficha__cuerpo">
@@ -161,8 +167,27 @@ function FichaDe({ o }: { o: Obra }) {
                 </div>
               )}
             </div>
+            {beats && beats.length > 0 && (
+              <section className="pr-caso" aria-labelledby="pr-caso-t" data-pr-panel>
+                <h2 id="pr-caso-t" className="pr-subtitulo">
+                  {c.ficha.casoCompleto}
+                </h2>
+                <ol className="pr-beats">
+                  {beats.map((b, i) => (
+                    <li key={b.label} className="pr-beat">
+                      <span className="pr-beat__n" aria-hidden="true">
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <h3>{b.label}</h3>
+                      <p>{b.body}</p>
+                      <span className="pr-etiqueta">{b.metric}</span>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            )}
             {medidas.length > 0 && (
-              <div className="pr-nums" role="group" aria-label={c.ficha.medidas}>
+              <div className={`pr-nums pr-nums--${medidas.length}`} role="group" aria-label={c.ficha.medidas}>
                 {medidas.map((m) => (
                   <div className="pr-num" key={m.id} data-pr-panel>
                     <div className="pr-num__caja">
@@ -182,6 +207,7 @@ function FichaDe({ o }: { o: Obra }) {
                 {fila(c.ficha.anio, String(o.year))}
                 {fila(c.ficha.periodo, periodo)}
                 {fila(c.ficha.rol, limpio(o.rolLabel))}
+                {datos.git && fila(c.ficha.historial, llenar(c.ficha.historialLinea, { n: datos.git.commits, first: datos.git.first, last: datos.git.last, fecha: datos.git.fecha }))}
                 {o.facts.filter((f) => limpio(f.label) && limpio(f.value)).map((f) => fila(f.label, f.value))}
                 {o.stack.length > 0 && (
                   <div className="pr-dl__stack">

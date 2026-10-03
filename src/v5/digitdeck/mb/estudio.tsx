@@ -5,7 +5,7 @@ import * as THREE from 'three'
 /**
  * Estudio de luz del monograma, portado de la rama feat/3d-estudio (ea6c976, `src/three/estudio.tsx`) sin retocar luces:
  * cuatro cajas de luz (espejo con degradado, dos tiras laterales y una superior) más un HDRI de 512×256 servido local.
- * Se omiten los materiales de obsidiana y la perla violeta de Digitdeck: aquí el MB es cromo (ver `pieza.tsx`).
+ * Se omiten los materiales de obsidiana y la perla de Digitdeck: aquí el MB es cromo (ver `pieza.tsx`).
  *
  * Coordenadas: Blender (x, y, z) Z-arriba → three (x, z, -y). La cámara es de 85 mm (fov vertical 18,05° en 4:3),
  * inclinada 3° hacia abajo, y la pieza va de pie mirando a +Z con rotación [tilt, yaw, 0, 'YXZ'].
@@ -104,7 +104,7 @@ export function EntornoEstudio({
     <Environment resolution={resolucion} frames={1}>
       <Lightformer form="rect" map={mapa} intensity={3.2 * realce} position={espejo} scale={[anchoEspejo * s, 1.8 * s, 1]} target={t} />
       <Lightformer form="rect" intensity={26 * realce} color={lin(0.93, 0.95, 1)} position={en(-4.6, 0.8, -2.2)} scale={[0.3 * s, 7 * s, 1]} target={t} />
-      <Lightformer form="rect" intensity={20 * realce} color={lin(0.8, 0.72, 1)} position={en(4.6, 1.0, -2.4)} scale={[0.3 * s, 7 * s, 1]} target={t} />
+      <Lightformer form="rect" intensity={20 * realce} color={lin(0.4, 1, 0.62)} position={en(4.6, 1.0, -2.4)} scale={[0.3 * s, 7 * s, 1]} target={t} />
       <Lightformer form="rect" intensity={10 * realce} position={en(0, 5, -1)} scale={[6 * s, 0.5 * s, 1]} target={t} />
       {/* HDRI a 0.35 como fondo del entorno virtual = el mundo de Cycles */}
       <Environment files={hdri} background backgroundIntensity={0.35} />

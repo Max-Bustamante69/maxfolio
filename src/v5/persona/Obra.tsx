@@ -1,70 +1,33 @@
 import { useEffect, useLayoutEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { v5path, type Obra as ObraT, type ObraKind } from '../data'
-import { ShotImg } from '../shared/ShotImg'
+import { type Obra as ObraT, type ObraKind } from '../data'
 import { Cabeza } from './Cabeza'
-import { ID, usePersona } from './contexto'
+import { usePersona } from './contexto'
 import { entradaTitulos } from './efectos'
-import { limpio } from './limpio'
-import { Enlace, Fondo, Titulo } from './piezas'
-import { enVista, gsap, guardarViaje, memoria, parallaxFondo, revelarPaneles, ScrollTrigger, SLAM, useGsap, viajePendiente, volarDesde } from './motion'
+import { Fondo, Titulo } from './piezas'
+import { conCaptura, Fila, Tarjeta } from './tarjeta'
+import { enVista, gsap, memoria, parallaxFondo, revelarPaneles, ScrollTrigger, SLAM, useGsap, viajePendiente, volarDesde } from './motion'
 
 type Filtro = 'todo' | ObraKind
 const FILTROS: Filtro[] = ['todo', 'store', 'product', 'personal', 'role']
 
-function iniciales(nombre: string) {
-  const p = nombre.replace(/[^\p{L}\p{N} ]/gu, '').split(' ').filter(Boolean)
-  return (p.length > 1 ? p[0][0] + p[1][0] : (p[0] ?? '?').slice(0, 2)).toUpperCase()
-}
-
-function Tarjeta({ o, prioridad, oculto }: { o: ObraT; prioridad: boolean; oculto: boolean }) {
-  const { c } = usePersona()
-  const conFoto = o.views.includes('home')
-  const sub = limpio(o.tagline) || limpio(o.industry)
-  return (
-    <li data-pr-panel data-slug={o.slug} hidden={oculto}>
-      <Enlace
-        to={v5path(ID, 'obra', o.slug)}
-        className="pr-tile"
-        sinBarrido={conFoto}
-        aria-label={c.obra.abrir.replace('{name}', o.name)}
-        onClick={(e) => {
-          const img = e.currentTarget.querySelector('img')
-          if (img) guardarViaje(o.slug, img)
-        }}
-      >
-        <div className="pr-tile__vista">
-          {conFoto ? (
-            <ShotImg slug={o.slug} vista="home" vp="desktop" alt="" className="pr-tile__img" prioridad={prioridad} />
-          ) : (
-            <div className="pr-tile__ph" aria-hidden="true">
-              <b>{iniciales(o.name)}</b>
-              <span>{c.obra.sinCaptura}</span>
-            </div>
-          )}
-        </div>
-        <div className="pr-tile__cuerpo" aria-hidden="true">
-          <p className="pr-tile__meta">
-            {c.obra.tipo[o.kind]} · {o.year}
-          </p>
-          <h3 className="pr-tile__nombre">{o.name}</h3>
-          {sub && <p className="pr-tile__sub">{sub}</p>}
-        </div>
-      </Enlace>
-    </li>
-  )
-}
+const coincide = (o: ObraT, f: Filtro) => f === 'todo' || o.kind === f
 
 export default function Obra() {
   const { v5, c } = usePersona()
   const raiz = useRef<HTMLElement>(null)
-  const lista = useRef<HTMLUListElement>(null)
+  const listas = useRef<HTMLDivElement>(null)
   // El filtro vive en la URL (?tipo=): Atrás y «← Obra» vuelven a la misma rejilla y se puede enlazar «mis apps».
   const [params, setParams] = useSearchParams()
   const tipo = params.get('tipo')
   const filtro: Filtro = FILTROS.includes(tipo as Filtro) ? (tipo as Filtro) : 'todo'
-  const cuenta = filtro === 'todo' ? v5.obras.length : v5.obras.filter((o) => o.kind === filtro).length
+  const cuenta = v5.obras.filter((o) => coincide(o, filtro)).length
   const previo = useRef(filtro) // el filtro del último efecto: StrictMode monta dos veces y esa segunda pasada no es un cambio
+
+  // Lo que tiene captura real va como tarjeta; lo demás, como fila del archivo con su historia (nunca un cuadro vacío).
+  const tarjetas = v5.obras.filter(conCaptura)
+  const filas = v5.obras.filter((o) => !conCaptura(o))
+  const hayFilas = filas.some((o) => coincide(o, filtro))
 
   useGsap(raiz, () => {
     const r = raiz.current
@@ -99,20 +62,20 @@ export default function Obra() {
   useLayoutEffect(() => {
     if (previo.current === filtro) return // StrictMode monta dos veces: la segunda pasada no es un cambio de filtro
     previo.current = filtro
-    const ul = lista.current
-    if (!ul) return
+    const cont = listas.current
+    if (!cont) return
     // Las tarjetas que esperaban su revelado conservan opacity 0 y un disparador calculado con la rejilla completa: en la
     // rejilla filtrada nunca se alcanzaría (la página quedaba en blanco). Se muestran todas, ya, y se animan las del pliegue.
-    const lis = ul.querySelectorAll<HTMLElement>('li')
+    const lis = cont.querySelectorAll<HTMLElement>('li')
     ScrollTrigger.getAll().forEach((t) => {
-      if (t.trigger instanceof Element && ul.contains(t.trigger)) t.kill()
+      if (t.trigger instanceof Element && cont.contains(t.trigger)) t.kill()
     })
     gsap.killTweensOf(lis)
     gsap.set(lis, { opacity: 1, clearProps: 'transform' })
     const arriba = Array.from(lis).filter((li) => !li.hidden && enVista(li))
     const ctx = gsap.context(() => {
       gsap.from(arriba, { opacity: 0, y: 34, rotation: -2.5, scale: 0.96, transformOrigin: '0% 100%', duration: 0.55, ease: SLAM, stagger: 0.05, clearProps: 'transform,opacity' })
-    }, ul)
+    }, cont)
     ScrollTrigger.refresh() // la página cambió de alto: los disparadores del fondo se recalculan
     return () => ctx.revert()
   }, [filtro])
@@ -134,11 +97,22 @@ export default function Obra() {
           <p className="sr-only" role="status">
             {(cuenta === 1 ? c.obra.cuentaUna : c.obra.cuenta).replace('{n}', String(cuenta))}
           </p>
-          <ul className="pr-grid" ref={lista}>
-            {v5.obras.map((o, i) => (
-              <Tarjeta key={o.slug} o={o} prioridad={i < 3} oculto={filtro !== 'todo' && o.kind !== filtro} />
-            ))}
-          </ul>
+          <div ref={listas}>
+            <ul className="pr-grid" aria-label={c.obra.titulo}>
+              {tarjetas.map((o, i) => (
+                <Tarjeta key={o.slug} o={o} prioridad={i < 3} oculto={!coincide(o, filtro)} />
+              ))}
+            </ul>
+            <div className="pr-archivo" hidden={!hayFilas}>
+              <h2 className="pr-subtitulo">{c.obra.archivo}</h2>
+              <p className="pr-archivo__lead">{c.obra.archivoLead}</p>
+              <ul className="pr-filas">
+                {filas.map((o) => (
+                  <Fila key={o.slug} o={o} oculto={!coincide(o, filtro)} />
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       </section>
     </main>

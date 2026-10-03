@@ -10,7 +10,7 @@ import camaraJson from './camara/monograma-mb.camara.json'
 /**
  * Monograma MB en cromo (portado de `src/three/piezas/monograma-mb.tsx`, ea6c976): contornos reales de Inter Bold (OFL).
  * Respecto al original (obsidiana) el material es cromo (receta del PoC de INVENTARIO-3D §7). En esta dirección el nodo
- * `Punto` SÍ se dibuja: la perla violeta es el punto final de la marca (la imitación del sitio de Digitdeck es intencional).
+ * `Punto` SÍ se dibuja: la perla verde eléctrica es el punto final de la marca (la imitación del sitio de Digitdeck es intencional).
  */
 export const camaraDe = (): CamaraAsset => camaraJson as unknown as CamaraAsset
 
@@ -21,14 +21,14 @@ const REPOSO_S = 8
 const FPS = 30
 const GLB = '/3d/monograma-mb/monograma-mb.opt.glb'
 const CROMO: THREE.MeshPhysicalMaterialParameters = { color: lin(0.9, 0.92, 0.95), metalness: 1, roughness: 0.06 }
-/** El violeta de marca en sRGB (145, 95, 243): el MISMO del punto del H1 (tokens.css --v5-violet). */
-const violeta = () => new THREE.Color().setRGB(0.569, 0.373, 0.953, THREE.SRGBColorSpace)
-const PERLA: THREE.MeshPhysicalMaterialParameters = { metalness: 0, roughness: 0.14, clearcoat: 1, clearcoatRoughness: 0.05, emissiveIntensity: 0.32 }
+/** El verde de marca en sRGB (0, 255, 106): el MISMO del punto del H1 (tokens.css --v5-acento). */
+const verde = () => new THREE.Color().setRGB(0, 1, 0.416, THREE.SRGBColorSpace)
+const PERLA: THREE.MeshPhysicalMaterialParameters = { metalness: 0, roughness: 0.14, clearcoat: 1, clearcoatRoughness: 0.05, emissiveIntensity: 0.6 }
 
 export default function Pieza({ yaw, animar, interactiva, puntero, capa = 'todo' }: PropsPieza) {
   const { nodes } = useGLTF(GLB, true, false) as unknown as { nodes: Record<string, THREE.Mesh> }
   const metal = useMemo(() => new THREE.MeshPhysicalMaterial(CROMO), [])
-  const perla = useMemo(() => new THREE.MeshPhysicalMaterial({ ...PERLA, color: violeta(), emissive: violeta() }), [])
+  const perla = useMemo(() => new THREE.MeshPhysicalMaterial({ ...PERLA, color: verde(), emissive: verde() }), [])
   const invalidate = useThree((s) => s.invalidate)
   const g = useRef<THREE.Group>(null)
   const tilt = camaraDe().tilt * DEG

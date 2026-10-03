@@ -1,12 +1,14 @@
-// Ficha de una obra: la captura viaja desde el índice (elemento compartido), nombre con su punto, datos con fecha y fuente.
+// Ficha de una obra: la captura viaja desde el índice (elemento compartido), nombre con su punto, la historia del caso (qué se pidió,
+// qué se hizo), los hechos reales en grande y los datos con fecha y fuente. Nada se mide aquí: todo sale de useV5() y datosDe().
 import { useLayoutEffect, useState, type ReactNode } from 'react'
 import { useParams } from 'react-router-dom'
 import { datosDe, useV5, v5path, type Obra, type Vista } from '../data'
 import { ShotImg, pieDeCaptura } from '../shared/ShotImg'
 import { evento } from '../shared/contacto'
 import { useCopy, type Copy } from './copy'
+import { useObras } from './limpio'
 import { Pagina, retorno } from './Pagina'
-import { Titulo } from './piezas'
+import { Titulo, Valor, formatoCifra } from './piezas'
 import { Enlace } from './transicion'
 
 const OBRA = v5path('digitdeck', 'obra')
@@ -23,25 +25,51 @@ function Dato({ k, children, nota }: { k: string; children: ReactNode; nota?: st
   )
 }
 
+/** El cargo del CV dentro del que se hizo una obra de tipo «entregable» (un sitio, una migración): da su resumen, sus logros y sus cifras. */
+function useCargo(o: Obra) {
+  const { trayectoria } = useV5()
+  return o.kind === 'role' && o.employer ? trayectoria.find((e) => e.id === o.employer) : undefined
+}
+
+/** Los hechos reales de la obra en grande: los del registro, las cifras de su cargo (si es un entregable) y, si la tienda tiene
+ *  catálogo público medido, sus productos y colecciones. */
+function Hechos({ o, c }: { o: Obra; c: Copy }) {
+  const { locale } = useV5()
+  const cargo = useCargo(o)
+  const d = datosDe(o.slug)
+  const cat = d.comercio
+  const cifras = [
+    ...o.facts.map((f) => ({ k: f.label, v: f.value, nota: undefined as string | undefined })),
+    ...(cargo?.metrics ?? []).map((m) => ({ k: m.label, v: formatoCifra(m.value, locale), nota: undefined as string | undefined })),
+    ...(cat ? [{ k: c.ficha.productosU, v: String(cat.products), nota: c.ficha.catalogoNota(cat.fecha) }] : []),
+    ...(cat && cat.collections != null ? [{ k: c.ficha.coleccionesU, v: String(cat.collections), nota: undefined as string | undefined }] : []),
+  ]
+  if (!cifras.length) return null
+  return (
+    <div className="dd-hechos-bloque">
+      <dl className="dd-hechos" aria-label={c.ficha.hechos}>
+        {cifras.map((x) => (
+          <div key={x.k} className="dd-hecho" data-largo={x.v.length > 6 ? 'largo' : 'corto'}>
+            <dt className="dd-micro">{x.k}</dt>
+            <dd><Valor v={x.v} /></dd>
+            {x.nota && <span className="dd-micro dd-hecho__nota">{x.nota}</span>}
+          </div>
+        ))}
+      </dl>
+      {cargo && cargo.metrics.length > 0 && <p className="dd-micro">{c.ficha.cifrasCv(cargo.company, cargo.period)}</p>}
+    </div>
+  )
+}
+
 function Datos({ o, c }: { o: Obra; c: Copy }) {
   const { formatPeriod } = useV5()
-  const d = datosDe(o.slug)
-  const lh = d.lighthouse
+  const lh = datosDe(o.slug).lighthouse
   return (
     <dl className="dd-datos">
       {o.industry && <Dato k={c.ficha.rubro}>{o.industry}</Dato>}
       {o.rolLabel && <Dato k={c.ficha.rol}>{o.rolLabel}</Dato>}
       <Dato k={c.ficha.periodo}>{o.period ? formatPeriod(o.period.start, o.period.end) : o.year}</Dato>
       {o.stack.length > 0 && <Dato k={c.ficha.pila}>{o.stack.join(' · ')}</Dato>}
-      {o.facts.length > 0 && (
-        <Dato k={c.ficha.hechos}>
-          {o.facts.map((f) => (
-            <span key={f.label} className="dd-dato__linea">{f.label}: {f.value}</span>
-          ))}
-        </Dato>
-      )}
-      {d.git && <Dato k={c.ficha.repo} nota={c.ficha.repoNota(d.git.fecha)}>{c.ficha.repoValor(d.git.commits, d.git.sections)}</Dato>}
-      {d.comercio && <Dato k={c.ficha.catalogo} nota={c.ficha.catalogoNota(d.comercio.fecha)}>{c.ficha.catalogoValor(d.comercio.products, d.comercio.collections)}</Dato>}
       {lh && (
         <Dato k={c.ficha.lighthouse} nota={c.ficha.lhNota(lh.fecha)}>
           {([['lhMovil', lh.movil], ['lhEscritorio', lh.escritorio]] as const).map(([k, m]) => (
@@ -55,6 +83,39 @@ function Datos({ o, c }: { o: Obra; c: Copy }) {
         </Dato>
       )}
     </dl>
+  )
+}
+
+/** La historia del caso. The Gummy Box lleva la del vivo (el problema y el plan); las demás, el relato del registro. */
+function Historia({ o, c }: { o: Obra; c: Copy }) {
+  const { strings } = useV5()
+  const cargo = useCargo(o)
+  const caso = o.slug === 'the-gummy-box' ? strings.sections.featuredBuild.beats.slice(0, 2) : []
+  const escalera = o.facts[0]?.value ?? ''
+  if (!caso.length && !o.description && !cargo) return null
+  return (
+    <div className="dd-historia" data-in>
+      <p className="dd-eyebrow">{c.ficha.historia}</p>
+      {caso.length ? (
+        <div className="dd-historia__casos">
+          {caso.map((b) => (
+            <div key={b.label} className="dd-historia__caso">
+              <p className="dd-historia__etiqueta">{b.label}</p>
+              <p className="dd-ficha__texto">{b.body.replace(/\{ladder\}/g, escalera)}</p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="dd-ficha__texto">{o.description || cargo?.summary}</p>
+      )}
+      {cargo && cargo.highlights.length > 0 && (
+        <ul className="dd-cargo__lista">
+          {cargo.highlights.map((h) => (
+            <li key={h}>{h}</li>
+          ))}
+        </ul>
+      )}
+    </div>
   )
 }
 
@@ -78,10 +139,10 @@ function FichaObra({ o, i, anterior, siguiente }: { o: Obra; i: number; anterior
         <p className="dd-eyebrow" data-in>
           <Enlace to={OBRA} etiqueta={c.nav.obra} className="dd-enlace">{c.ficha.volver}</Enlace>
           <span aria-hidden="true"> · </span>
-          {`Nº ${String(i + 1).padStart(2, '0')} · ${c.obra.tipos[o.kind]} · ${o.year}`}
+          {`${c.obra.nombreDe(i + 1)} · ${c.obra.tipos[o.kind]} · ${o.year}`}
         </p>
         <Titulo as="h1" className="dd-display" lineas={[o.name]} />
-        <p className="dd-lede" data-in>{o.tagline}</p>
+        {o.tagline && <p className="dd-lede" data-in>{o.tagline}</p>}
         {o.link && (
           <a className="dd-boton" data-in href={o.link} target="_blank" rel="noopener noreferrer" onClick={() => evento('digitdeck', 'obra_open', { obra: o.slug })}>
             {c.ficha.visitar} <span aria-hidden="true">↗</span>
@@ -113,13 +174,12 @@ function FichaObra({ o, i, anterior, siguiente }: { o: Obra; i: number; anterior
             </figure>
           </div>
         </section>
-      ) : (
-        <p className="dd-micro dd-ficha__sin" data-in>{c.obra.sinCaptura}</p>
-      )}
+      ) : null}
 
       <section className="dd-ficha__cuerpo">
-        {o.description && <p className="dd-ficha__texto" data-in>{o.description}</p>}
-        <div data-in>
+        <Historia o={o} c={c} />
+        <div className="dd-ficha__lado" data-in>
+          <Hechos o={o} c={c} />
           <Datos o={o} c={c} />
         </div>
       </section>
@@ -139,7 +199,7 @@ function FichaObra({ o, i, anterior, siguiente }: { o: Obra; i: number; anterior
 export default function Ficha() {
   const c = useCopy()
   const { slug = '' } = useParams()
-  const { obras } = useV5()
+  const obras = useObras()
   const i = obras.findIndex((o) => o.slug === slug)
   if (i < 0)
     return (

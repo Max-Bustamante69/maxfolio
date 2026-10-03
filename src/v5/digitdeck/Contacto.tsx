@@ -9,9 +9,11 @@ import { useMedellinTime } from '../shared/useMedellinTime'
 import { useCopy } from './copy'
 import { EASE } from './movimiento'
 import { Pagina } from './Pagina'
-import { Titulo } from './piezas'
+import { Titulo, enfasisFinal } from './piezas'
 
 const ORDEN = Object.keys(MOTIVOS) as Motivo[]
+/** Cada modelo de trabajo del vivo, en su orden, es uno de los motivos del formulario. */
+const MODELOS: Motivo[] = ['revision', 'proyecto', 'continuo']
 const emailOk = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)
 
 function Faq() {
@@ -39,6 +41,8 @@ function Faq() {
 export default function Contacto() {
   const c = useCopy()
   const { strings, personal, locale } = useV5()
+  const eng = strings.sections.engagement
+  const siguientes = strings.sections.contact.next.filter((_, k) => k !== 1) // fuera «Recibes respuesta en un día hábil»: un plazo que esta dirección no promete
   const [params] = useSearchParams()
   const inicial = (params.get('motivo') as Motivo | null) ?? 'revision'
   const [motivo, setMotivo] = useState<Motivo>(ORDEN.includes(inicial) ? inicial : 'revision')
@@ -50,6 +54,7 @@ export default function Contacto() {
   const { copiar, copiado } = useCopiarCorreo('digitdeck')
   const hora = useMedellinTime(locale)
   const cae = useRef<HTMLSpanElement>(null)
+  const formRef = useRef<HTMLFormElement>(null)
   const presetPrevio = useRef(mensaje)
 
   useEffect(() => evento('digitdeck', 'contact_open'), [])
@@ -61,6 +66,15 @@ export default function Contacto() {
       presetPrevio.current = c.contacto.preset[m]
       setMensaje(c.contacto.preset[m])
     }
+  }
+
+  // Un modelo de trabajo elige su motivo, lleva el formulario al centro y deja el cursor en el correo.
+  const elegirModelo = (m: Motivo) => {
+    elegir(m)
+    const f = formRef.current
+    if (!f) return
+    f.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    f.querySelector<HTMLInputElement>('input[type="email"]')?.focus({ preventScroll: true })
   }
 
   useEffect(() => {
@@ -84,7 +98,7 @@ export default function Contacto() {
       </header>
 
       <section className="dd-papel" data-tono="papel" aria-label={c.contacto.canales}>
-        <form className="dd-form" onSubmit={alEnviar} noValidate data-in>
+        <form ref={formRef} className="dd-form" onSubmit={alEnviar} noValidate data-in>
           <label className="dd-campo">
             <span className="dd-micro">{c.contacto.tienda}</span>
             <input type="text" inputMode="url" autoComplete="url" placeholder={c.contacto.tiendaEjemplo} value={tienda} onChange={(e) => setTienda(e.target.value)} />
@@ -152,11 +166,41 @@ export default function Contacto() {
             </li>
           </ul>
           <p className="dd-micro">{c.medellin(hora)}</p>
+          <div className="dd-despues">
+            <h2 className="dd-micro dd-canales__t">{strings.sections.contact.nextLabel}</h2>
+            <ol>
+              {siguientes.map((t) => (
+                <li key={t}>{t}</li>
+              ))}
+            </ol>
+          </div>
         </div>
       </section>
 
-      <section className="dd-seccion" aria-labelledby="dd-faq-t">
-        <Titulo id="dd-faq-t" className="dd-h2" lineas={[c.contacto.preguntas]} />
+      <section className="dd-seccion" aria-labelledby="dd-modelos-t">
+        <div className="dd-seccion__cab">
+          <p className="dd-eyebrow" data-in>{eng.eyebrow}</p>
+          <Titulo id="dd-modelos-t" className="dd-h2" lineas={[eng.title, enfasisFinal(eng.titleAccent)]} />
+        </div>
+        <ol className="dd-modelos">
+          {eng.models.map((m, k) => (
+            <li key={m.title} className="dd-modelo" data-in="fila">
+              <span className="dd-micro">{String(k + 1).padStart(2, '0')}</span>
+              <h3 className="dd-modelo__t">{m.title}</h3>
+              <p>{m.body}</p>
+              <button type="button" className="dd-enlace dd-enlace--fuerte dd-modelo__boton" onClick={() => elegirModelo(MODELOS[k])}>
+                {c.contacto.elegir} <span aria-hidden="true">↑</span>
+              </button>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="dd-seccion dd-seccion--dos" aria-labelledby="dd-faq-t">
+        <div className="dd-seccion__cab">
+          <p className="dd-eyebrow" data-in>{strings.sections.faq.eyebrow}</p>
+          <Titulo id="dd-faq-t" className="dd-h2" lineas={[c.contacto.preguntas]} />
+        </div>
         <Faq />
       </section>
     </Pagina>

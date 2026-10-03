@@ -2,9 +2,10 @@
 // serif cursiva y el contador. Ningún título termina en un carácter «.»: el punto es un elemento gráfico aparte.
 import { useRef, type ReactNode } from 'react'
 import { gsap } from 'gsap'
+import { useCopy } from './copy'
 import { D, EASE, useContexto } from './movimiento'
 
-/** El punto: un disco violeta de 0,15 em. Es el signo final de todo título display y el destino del disco de la transición. */
+/** El punto: un disco verde de 0,15 em. Es el signo final de todo título display y el destino del disco de la transición. */
 export const Punto = () => <span className="dd-dot" data-dd-dot="" aria-hidden="true" />
 
 interface PropsTitulo {
@@ -42,6 +43,38 @@ export function enfasis(texto: string, palabra: string): ReactNode {
       {texto.slice(0, i)}
       <em className="dd-serif">{palabra}</em>
       {texto.slice(i + palabra.length)}
+    </>
+  )
+}
+
+/** Segunda parte de un título de dos líneas: la última palabra va en la cursiva serif (UNA por título). El japonés no lleva cursiva: devuelve el texto. */
+export function enfasisFinal(texto: string): ReactNode {
+  if (/[\u3040-\u30ff\u4e00-\u9fff]/.test(texto)) return texto
+  const i = texto.lastIndexOf(' ')
+  return i < 0 ? <em className="dd-serif">{texto}</em> : (
+    <>
+      {texto.slice(0, i + 1)}
+      <em className="dd-serif">{texto.slice(i + 1)}</em>
+    </>
+  )
+}
+
+/** Las cifras del registro vienen en formato inglés («10,000+», «$45k/yr»): en español se muestran con el formato es-CO, sin cambiar el valor. */
+export const formatoCifra = (v: string, locale: string) => {
+  const signo = v.replace(/^-/, '\u2212') // el menos de verdad, no el guion
+  return locale === 'es' ? signo.replace(/(\d),(\d{3})/g, '$1.$2').replace('/yr', '/año') : signo
+}
+
+/** Cifra del registro como texto grande: la flecha «→» de «70→95+» va en la fuente de texto (la display no la dibuja). */
+export function Valor({ v }: { v: string }) {
+  const { flecha } = useCopy()
+  const [a, ...resto] = v.split('→')
+  if (!resto.length) return <>{v}</>
+  return (
+    <>
+      {a}
+      <span className="dd-flecha" role="img" aria-label={flecha}>→</span>
+      {resto.join('→')}
     </>
   )
 }

@@ -1,14 +1,14 @@
 // Los pósters del MB (letras y perla por separado, más el conjunto) salen de la propia escena R3F en su pose de reposo.
 // Con el servidor de la dirección en marcha: node src/v5/digitdeck/herramientas/posters.mjs <puerto> [yaw]
-// Dos capturas (fondo negro y blanco, sin redibujar) recuperan el alfa exacto; salida AVIF + WebP de 1200×900 en public/v5/digitdeck/mb/.
+// Dos capturas (fondo negro y blanco, sin redibujar) recuperan el alfa exacto; salida AVIF + WebP de 1200×576 en public/v5/digitdeck/mb/.
 import { mkdirSync } from 'node:fs'
 import sharp from 'sharp'
 const { chromium } = await import('file:///C:/Users/Usuario/Desktop/P/Github/Digitdeck/node_modules/playwright-core/index.mjs')
 
 const puerto = process.argv[2] ?? '5315'
 const yaw = process.argv[3] ?? '-10'
-const W = 1200
-const H = 900
+const W = 1200 // póster de 1200×576 (mb/encuadre.ts): el 64 % central del encuadre 4:3 original
+const H = 576
 const salida = 'public/v5/digitdeck/mb'
 mkdirSync(salida, { recursive: true })
 

@@ -52,7 +52,7 @@ export default function Entrada() {
           setFin(true)
         },
       })
-      tl.fromTo('.dd-entrada [data-capa="perla"]', { scale: 0 }, { scale: 1, duration: 0.22, ease: EASE.puntual, transformOrigin: '87.3% 68.7%' }, 0)
+      tl.fromTo('.dd-entrada [data-capa="perla"]', { scale: 0 }, { scale: 1, duration: 0.22, ease: EASE.puntual, transformOrigin: '87.3% 79.2%' }, 0)
         .fromTo('.dd-entrada [data-capa="letras"]', { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)', duration: 0.4, ease: EASE.puntual }, 0.1)
         .to('.dd-entrada__placa', { clipPath: 'inset(0 0 100% 0)', duration: 0.42, ease: EASE.cortina }, 0.52)
         .add(liberar, 0.52) // el titular empieza a subir en cuanto la placa arranca

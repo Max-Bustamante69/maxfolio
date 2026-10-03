@@ -1,15 +1,21 @@
-/* Dirección «A la manera de Digitdeck» (la dirección del sitio v4, con el contenido de Max).
-   Tinta casi negra, UN solo acento violeta (el punto) y una banda de papel invertida por página.
+/* Dirección «A la manera de Digitdeck» (la dirección del sitio v4 de Digitdeck, con el contenido de Max).
+   Tinta casi negra, UN solo acento —un verde eléctrico— y una banda de papel invertida por página. El acento es el punto final del
+   titular, los botones, el foco, la perla del MB, el disco de la transición y los estados; nunca un fondo grande salvo el disco.
    Este es el ÚNICO archivo de la dirección con valores de color en bruto: el resto lee estas variables.
    Roles comunes a las direcciones: --v5-bg, --v5-ink, --v5-ink-2, --v5-line, --v5-focus, --v5-surface.
 
-   Pares medidos (WCAG 2.x, shots8/digitdeck/contraste.mjs): 0 fallos.
+   Por qué #00ff6a (Max, 2026-10-03: «un verde llamativo, más agresivo, en vez del morado»): es el verde de mayor croma que cabe
+   en sRGB sin virar a lima (tono ≈ 143°; el lima #b6ff1f se lee deportivo y el menta #2bff88 se lee suave), y sobre la tinta tiene
+   la luminosidad que el violeta no tenía, así que es el único color de la página que brilla. Se compararon cinco candidatos sobre
+   el mismo titular y botón (estilo/digitdeck/swatch.png).
+
+   Pares medidos (WCAG 2.x, shots9/digitdeck/contraste.mjs): 0 fallos.
      tinta sobre bg 17,13 · tinta-2 sobre bg 9,31 y sobre surface 8,78 (texto ≥ 4,5)
-     violeta como texto sobre bg 4,80 y sobre surface 4,53 · tinta sobre relleno violeta 4,80
-     foco violeta sobre bg 4,80 · borde de control sobre bg 3,83 y sobre surface 3,61 (controles y foco ≥ 3)
-     banda de papel: tinta 17,13 · tinta-2 6,65 · violeta profundo como texto y foco 5,94 · borde de control 3,10
-   Descartado, escrito para que nadie lo reintroduzca: blanco sobre violeta 4,09 (no pasa), violeta de marca como
-   texto sobre papel 3,57 (no pasa), texto-3 #7d7a88 bajo 24 px sobre surface. */
+     verde como texto sobre bg 14,51 y sobre surface 13,68 · TINTA sobre relleno verde 14,51 (el texto sobre el verde va en tinta)
+     foco verde sobre bg 14,51 · borde de control sobre bg 3,83 y sobre surface 3,61 (controles y foco ≥ 3)
+     banda de papel: tinta 17,13 · tinta-2 6,65 · verde profundo como punto, texto y foco 5,42 · borde de control 3,10
+   Descartado, escrito para que nadie lo reintroduzca: texto claro sobre el verde 1,18 (no pasa), el verde eléctrico como punto o
+   texto sobre el papel 1,18 (por eso la banda de papel redefine el punto con el verde profundo), texto-3 #7d7a88 bajo 24 px sobre surface. */
 .v5-digitdeck,
 :root:has(.v5-digitdeck) {
   color-scheme: dark;
@@ -20,12 +26,13 @@
   --v5-ink-2: #b4b1bc;
   --v5-line: rgb(242 239 234 / 0.16);
   --v5-line-strong: #6f6c78;
-  --v5-focus: #915ff3;
+  --v5-focus: #00ff6a;
   --v5-surface: #131318;
 
-  /* ---- el punto: el único acento ---- */
-  --v5-violet: #915ff3;
-  --v5-on-violet: #0b0b0f;
+  /* ---- el acento: un verde eléctrico. --v5-punto es el punto final del titular, del riel y de la marca: sobre el papel pasa al verde profundo ---- */
+  --v5-acento: #00ff6a;
+  --v5-on-acento: #0b0b0f;
+  --v5-punto: var(--v5-acento);
 
   /* ---- banda de papel (una por página) ---- */
   --v5-paper: #f2efea;
@@ -33,13 +40,13 @@
   --v5-paper-ink-2: #55525e;
   --v5-paper-line: rgb(11 11 15 / 0.16);
   --v5-paper-line-strong: #8a8693;
-  --v5-paper-accent: #6636d8;
+  --v5-paper-accent: #00703a;
   --v5-paper-error: #c42b3f;
-  --v5-paper-ok: #0b7a4e;
+  --v5-paper-ok: #00703a;
 
   /* ---- estados y velos ---- */
   --v5-error: #ff7a7a;
-  --v5-ok: #4ade9a;
+  --v5-ok: #00ff6a;
   --v5-scrim: rgb(11 11 15 / 0.72);
   --v5-shadow-float: 0 40px 60px rgb(0 0 0 / 0.55);
 
@@ -103,6 +110,7 @@
   --v5-line: var(--v5-paper-line);
   --v5-line-strong: var(--v5-paper-line-strong);
   --v5-focus: var(--v5-paper-accent);
+  --v5-punto: var(--v5-paper-accent);
   --v5-error: var(--v5-paper-error);
   --v5-ok: var(--v5-paper-ok);
   color-scheme: light;

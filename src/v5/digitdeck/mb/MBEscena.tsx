@@ -3,6 +3,7 @@ import { Suspense, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
+import { fovRecortado } from './encuadre'
 import { DEG, EntornoEstudio, camaraDesdeJson } from './estudio'
 import Pieza, { camaraDe } from './pieza'
 import type { Capa, Puntero } from './tipos'
@@ -75,7 +76,7 @@ export default function MBEscena({ yaw, animar, interactiva, alDibujar, capa, vi
       frameloop="demand"
       dpr={[1, Math.min(coarse ? 1.5 : 2, window.devicePixelRatio || 1)]}
       gl={{ alpha: true, antialias: true }}
-      camera={{ fov, near: Math.min(0.1, cam.dist * 0.05), far: cam.dist * 4, position: posicion.toArray(), rotation: [-cam.inclinacion_deg * DEG, 0, 0] }}
+      camera={{ fov: fovRecortado(fov), near: Math.min(0.1, cam.dist * 0.05), far: cam.dist * 4, position: posicion.toArray(), rotation: [-cam.inclinacion_deg * DEG, 0, 0] }}
       onCreated={({ gl }) => {
         gl.toneMapping = THREE.NeutralToneMapping
       }}

@@ -1,6 +1,7 @@
 // Puerta ligera (SIN three): pósters por capas siempre; el 3D solo en escritorio, si el equipo lo merece, la caja está cerca y el navegador está ocioso.
 import { lazy, memo, Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { evaluarEquipo, evaluarWebgl } from './capacidad'
+import { POSTER_H, POSTER_W } from './encuadre'
 import type { Capa } from './tipos'
 
 const Escena = lazy(() => import('./MBEscena'))
@@ -12,7 +13,7 @@ export function CapaPoster({ capa, prioridad = true }: { capa: Exclude<Capa, 'to
   return (
     <picture>
       <source srcSet={`${POSTER[capa]}.avif`} type="image/avif" />
-      <img className="dd-mb__capa" data-capa={capa} src={`${POSTER[capa]}.webp`} width={1200} height={900} alt="" draggable={false} decoding="async" loading={prioridad ? 'eager' : 'lazy'} />
+      <img className="dd-mb__capa" data-capa={capa} src={`${POSTER[capa]}.webp`} width={POSTER_W} height={POSTER_H} alt="" draggable={false} decoding="async" loading={prioridad ? 'eager' : 'lazy'} />
     </picture>
   )
 }

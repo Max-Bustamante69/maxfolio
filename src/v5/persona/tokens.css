@@ -69,6 +69,7 @@
   --v5-on-accent: #ffffff;
   --v5-error: #b3261e;
   --v5-ok: #1a6b3c;
+  --v5-vivo: #55d48e; /* «disponible» sobre tinta (cierre del inicio): 11.5:1 contra la tinta */
 
   --pr-display: 'Anton', 'Anton Fallback', 'Archivo Black', Impact, sans-serif;
   --pr-label: 'Rajdhani', 'Rajdhani Fallback', 'Arial Narrow', Arial, sans-serif;
