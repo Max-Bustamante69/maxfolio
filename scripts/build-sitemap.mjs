@@ -19,14 +19,18 @@ const lastCommitDate = (file) => {
   }
 }
 
+// Solo el tema por defecto (Plató, ab.config.ts) es indexable: los otros siete llevan noindex y `/` redirige por visitante.
+const PLATO = 'src/themes/plato'
+// Fichas: las tiendas del registro con capturas (las mismas que Plató enseña); se leen del fuente para no duplicar la lista.
+const registry = fs.readFileSync(path.join(ROOT, 'src/data/registry.ts'), 'utf8')
+const fichas = [...registry.matchAll(/\{ slug: '([a-z0-9-]+)'[^\n]*gallery: true/g)].map((m) => m[1])
+
 const routes = [
-  { loc: '/', file: 'src/pages/Apple.tsx', changefreq: 'monthly', priority: '1.0' },
-  { loc: '/luxury', file: 'src/pages/Design4.tsx', changefreq: 'monthly', priority: '0.8' },
-  { loc: '/brutalist', file: 'src/pages/Design1.tsx', changefreq: 'monthly', priority: '0.8' },
-  { loc: '/neo', file: 'src/pages/Neo.tsx', changefreq: 'monthly', priority: '0.8' },
-  { loc: '/arcade', file: 'src/pages/Persona.tsx', changefreq: 'monthly', priority: '0.8' },
-  { loc: '/terminal', file: 'src/pages/Terminal.tsx', changefreq: 'monthly', priority: '0.8' },
-  { loc: '/menu', file: 'src/pages/Home.tsx', changefreq: 'monthly', priority: '0.5' },
+  { loc: '/plato', file: `${PLATO}/Inicio.tsx`, changefreq: 'monthly', priority: '1.0' },
+  { loc: '/plato/obra', file: `${PLATO}/Obra.tsx`, changefreq: 'monthly', priority: '0.8' },
+  { loc: '/plato/trayectoria', file: `${PLATO}/Trayectoria.tsx`, changefreq: 'monthly', priority: '0.7' },
+  { loc: '/plato/contacto', file: `${PLATO}/Contacto.tsx`, changefreq: 'yearly', priority: '0.6' },
+  ...fichas.map((slug) => ({ loc: `/plato/obra/${slug}`, file: `${PLATO}/Ficha.tsx`, changefreq: 'monthly', priority: '0.6' })),
 ]
 
 const urls = routes

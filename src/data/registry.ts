@@ -262,7 +262,7 @@ export const personalProjects: PersonalProject[] = [
   { id: 'pagui', name: 'Pagui.co', url: 'https://pagui-kyc.vercel.app/', year: 2025, stack: ['Django', 'Next.js', 'OCR', 'PostgreSQL'] },
   { id: 'scorrea', name: 'Sebastian Correa portfolio', url: 'https://www.scorrea.dev/', year: 2024, stack: ['Astro', 'TypeScript', 'Tailwind'] },
   { id: 'dr-hugo', name: 'Dr. Hugo Diazgranados', url: 'https://drhugodiazgranados.com/', year: 2023, stack: ['WordPress', 'Custom theme'] },
-  { id: 'maxfolio', name: 'Maxfolio', url: 'https://www.maxfolio.dev/', repo: 'https://github.com/Max-Bustamante69/maxfolio', year: 2026, stack: ['React 19', 'Vite', 'Tailwind', 'framer-motion'] },
+  { id: 'maxfolio', name: 'Maxfolio', url: 'https://www.maxfolio.dev/', repo: 'https://github.com/Max-Bustamante69/maxfolio', year: 2026, stack: ['React 19', 'Vite', 'GSAP', 'Three.js'] },
 ]
 
 export type StatId = 'lighthouse' | 'loadTime' | 'conversion' | 'organic' | 'storefronts' | 'tests'
