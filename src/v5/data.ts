@@ -33,8 +33,10 @@ const TAGLINE: Record<string, { es: string; en: string }> = {
   'factores-2x2': { es: 'De Framer a Liquid, con una pasada de calidad web.', en: 'Framer to Liquid, then a web-quality pass.' },
 }
 const STACK_FUERA = new Set(['Web quality 95+'])
-const FACT_FUERA: Record<string, string[]> = { millennio: ['tracked'] }
-const FAQ_PUBLICAS = [0, 1, 2, 4, 5] // la 3 es un universal sobre 23 tiendas y la 6 queda fuera (Q3/Q17)
+const FACT_FUERA: Record<string, string[]> = {}
+// Max (2026-10-03): «quiero que tengas ese contenido [el de maxfolio.dev], mostrar mucho más de mí». La FAQ es la del
+// vivo menos la 6 («¿Lo hizo una IA?» dice «construido a mano», que no es cierto).
+const FAQ_PUBLICAS = [0, 1, 2, 3, 4, 5]
 
 /** Un título compuesto de una frase del registro sin el punto final (LISTON-V4 §4 A3/A5). */
 export const sinPuntoFinal = (s: string) => s.replace(/[.。]\s*$/, '')
@@ -129,25 +131,22 @@ export function useV5() {
         tagline: strings.projects[p.id]?.tagline ?? '', description: strings.projects[p.id]?.description ?? '',
       })),
     ]
-    // Cargos: rotulados por empresa y periodo. El cargo de Digitdeck no lleva el título «CTO» en la fila (la fecha del
-    // cambio de título no está en el registro: Q1) ni la métrica «800+» ni su highlight (sin fuente citable).
+    // Cargos como en el vivo: título, resumen, logros y métricas del CV de Max, cada una dentro de su cargo y su periodo.
     const trayectoria = registry.experience.map((e) => {
       const s = strings.experience[e.id]
-      const esCto = e.id === 'digitdeck-cto'
       return {
         ...e,
-        title: esCto ? null : s.title,
+        title: s.title as string | null,
         summary: s.summary,
-        highlights: esCto ? s.highlights.filter((h) => !/800\+/.test(h)) : s.highlights,
-        metrics: e.metrics.filter((m) => m.id !== 'tests').map((m) => ({ label: s.metricLabels[m.id] ?? m.id, value: m.value })),
+        highlights: s.highlights,
+        metrics: e.metrics.map((m) => ({ label: s.metricLabels[m.id] ?? m.id, value: m.value })),
         period: content.formatPeriod(e.start, e.end),
       }
     })
-    // Épocas por año: 2024 y 2025 nombran el título CTO antes de su fecha confirmada → solo el número (Q1).
-    const eras = Object.fromEntries(
-      Object.entries(strings.sections.years.eras).map(([y, t]) => [y, /\bCTO\b/.test(t) ? null : t]),
-    ) as Record<string, string | null>
+    const eras = strings.sections.years.eras as Record<string, string | null>
     const faq = FAQ_PUBLICAS.map((i) => strings.sections.faq.items[i]).filter(Boolean)
+    // Las cifras de la banda del vivo, cada una con su etiqueta y su FUENTE (el cargo y el periodo del CV de donde sale).
+    const cifras = registry.stats.map((s) => ({ id: s.id, valor: s.value, etiqueta: strings.stats[s.id], fuente: strings.statSources[s.id] }))
     return {
       ...content,
       obras,
@@ -155,6 +154,9 @@ export function useV5() {
       trayectoria,
       eras,
       faq,
+      cifras,
+      /** Habilidades del vivo: grupos del registro y cuántas tiendas usan cada herramienta (skillUsage). */
+      habilidades: registry.skillGroups,
       personal: registry.personal,
       /** Única cifra pública de tiendas (registry.PUBLIC_STORE_COUNT): nunca obras.length. Verbo: «construidas», no «en vivo». */
       storeCount: `${registry.PUBLIC_STORE_COUNT}+`,
