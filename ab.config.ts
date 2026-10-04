@@ -2,13 +2,15 @@
  * Los temas de maxfolio.dev y el reparto de tráfico entre ellos, compartido por el middleware de Vercel (asignación)
  * y el cliente (selector de temas y atribución).
  *
- * Cada tema es una experiencia completa bajo su prefijo (`/plato`, `/apple`, …). Un visitante nuevo de `/` recibe uno
+ * Cada tema es una experiencia completa bajo su prefijo (`/plato`, `/digitdeck`, `/ingenieria`). Un visitante nuevo de `/` recibe uno
  * al azar con la MISMA probabilidad (pedido de Max, 2026-10-03: «servir todos con la misma frecuencia para ver con
  * cuál se interactúa más») y la cookie lo fija 90 días; elegir otro tema en el selector reescribe la cookie. Los
  * rastreadores y las auditorías reciben siempre el tema por defecto (Plató). La atribución sale sola: cada visita
  * vive bajo el prefijo de su tema (Vercel Web Analytics por ruta) y los eventos propios llevan `theme`.
  */
-export const THEMES = ['plato', 'apple', 'persona', 'digitdeck', 'maison', 'tokonoma', 'reportaje', 'ingenieria'] as const
+// Max (2026-10-04): de los ocho quedan tres, elegidos con crítica a ciegas + Lighthouse. La medición proponía Maison en lugar
+// de Plató; Max eligió mantener Plató, y como predeterminado. Los retirados redirigen a la misma vista en Plató (vercel.json).
+export const THEMES = ['plato', 'digitdeck', 'ingenieria'] as const
 export type ThemeId = (typeof THEMES)[number]
 /** El tema por defecto (Max, 2026-10-03): el que ven los rastreadores, Lighthouse y quien llega sin cookie a un enlace roto. */
 export const DEFAULT_THEME: ThemeId = 'plato'

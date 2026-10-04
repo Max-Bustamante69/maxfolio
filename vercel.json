@@ -4,5 +4,27 @@
       "source": "/((?!api/)(?!.*\\.html$).*)",
       "destination": "/"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/(apple|persona|maison|tokonoma|reportaje)",
+      "destination": "/plato",
+      "permanent": true
+    },
+    {
+      "source": "/(apple|persona|maison|tokonoma|reportaje)/:ruta*",
+      "destination": "/plato/:ruta*",
+      "permanent": true
+    },
+    {
+      "source": "/v5/(apple|persona|maison|tokonoma|reportaje)/:ruta*",
+      "destination": "/plato/:ruta*",
+      "permanent": true
+    },
+    {
+      "source": "/arcade",
+      "destination": "/plato",
+      "permanent": true
+    }
   ]
 }
