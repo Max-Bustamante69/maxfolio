@@ -12,29 +12,9 @@ const PUBLICO: Record<ThemeId, { nombre: Record<Locale, string>; lema: Record<Lo
     nombre: { es: 'Plató', en: 'Soundstage', ja: 'スタジオ' },
     lema: { es: 'Un plató de cine: cada tienda es un set con su luz.', en: 'A film set: every store is a lit stage.', ja: '映画のセット。ストアごとに照明が当たる。' },
   },
-  apple: {
-    nombre: { es: 'Clásico', en: 'Classic', ja: 'クラシック' },
-    lema: { es: 'El maxfolio.dev de siempre: claro, limpio y directo.', en: 'The original maxfolio.dev: clean and direct.', ja: 'おなじみのmaxfolio.dev。明快でシンプル。' },
-  },
-  persona: {
-    nombre: { es: 'Arcade', en: 'Arcade', ja: 'アーケード' },
-    lema: { es: 'Un menú de videojuego con barridos y letras recortadas.', en: 'A game menu with diagonal wipes and cut-out letters.', ja: '斜めのワイプと切り抜き文字のゲームメニュー。' },
-  },
   digitdeck: {
     nombre: { es: 'Digitdeck', en: 'Digitdeck', ja: 'Digitdeck' },
     lema: { es: 'Tinta negra y un verde eléctrico, a la manera de Digitdeck.', en: 'Black ink and electric green, the Digitdeck way.', ja: '黒とエレクトリックグリーン、Digitdeck流。' },
-  },
-  maison: {
-    nombre: { es: 'Maison', en: 'Maison', ja: 'メゾン' },
-    lema: { es: 'Una casa de moda: cada tienda, una pieza de colección.', en: 'A fashion house: every store, a collection piece.', ja: 'ファッションハウス。ストアはコレクションの一点。' },
-  },
-  tokonoma: {
-    nombre: { es: 'Tokonoma', en: 'Tokonoma', ja: '床の間' },
-    lema: { es: 'Silencio japonés: cada tienda cuelga sola, como en una galería.', en: 'Japanese quiet: each store hangs alone, as in a gallery.', ja: '静けさの中、ストアを一つずつギャラリーのように。' },
-  },
-  reportaje: {
-    nombre: { es: 'Reportaje', en: 'The Feature', ja: '特集' },
-    lema: { es: 'La carrera contada como un reportaje de revista.', en: 'The career told as a magazine feature.', ja: '雑誌の特集記事として語るキャリア。' },
   },
   ingenieria: {
     nombre: { es: 'Ingeniería', en: 'Engineering', ja: 'エンジニアリング' },
