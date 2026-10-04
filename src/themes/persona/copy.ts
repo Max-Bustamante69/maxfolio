@@ -143,6 +143,7 @@ export const es = {
     paso: 'Paso',
     elegir: 'Elegir esta forma',
     elegida: 'Elegida',
+    escribir: 'O escríbeme un mensaje',
   },
   footer: 'Reconstruido para elegir',
 } as const
@@ -293,6 +294,7 @@ export const en: Copy = {
     paso: 'Step',
     elegir: 'Choose this way',
     elegida: 'Chosen',
+    escribir: 'Or write me a message',
   },
   footer: 'Rebuilt to choose from',
 }

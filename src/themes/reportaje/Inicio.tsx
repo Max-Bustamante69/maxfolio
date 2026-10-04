@@ -110,7 +110,7 @@ export default function Inicio() {
             <span>{s.sections.statBand.asOf}</span>
           </p>
           <div className="rp-acciones" data-rp="subir" data-rp-retraso="0.5">
-            <Enlace to={`${v5path('reportaje', 'contacto')}?motivo=revision`} num={c.capitulo.contacto} titulo={c.nav.contacto} className="rp-btn rp-btn-pri" onClick={() => evento('reportaje', 'contact_click', { canal: 'portada' })}>{s.hero.ctaPrimary}<Flecha /></Enlace>
+            <Enlace to={`${v5path('reportaje', 'contacto')}#agenda`} num={c.capitulo.contacto} titulo={c.nav.contacto} className="rp-btn rp-btn-pri" onClick={() => evento('reportaje', 'contact_click', { canal: 'portada' })}>{s.hero.ctaPrimary}<Flecha /></Enlace>
             <Enlace to={v5path('reportaje', 'obra')} num={c.capitulo.obra} titulo={c.nav.obra} className="rp-enlace">{s.hero.ctaSecondary}<Flecha /></Enlace>
             <a className="rp-enlace" href={personal.cv} download>{s.hero.ctaCv}</a>
           </div>
@@ -263,7 +263,7 @@ export default function Inicio() {
           <div>
             <p className="rp-lead" data-rp="subir" data-rp-retraso="0.18">{porQue.promise}</p>
             <div className="rp-acciones" data-rp="subir" data-rp-retraso="0.26">
-              <Enlace to={`${v5path('reportaje', 'contacto')}?motivo=revision`} num={c.capitulo.contacto} titulo={c.nav.contacto} className="rp-btn rp-btn-pri" onClick={() => evento('reportaje', 'contact_click', { canal: 'cierre' })}>{porQue.cta}<Flecha /></Enlace>
+              <Enlace to={`${v5path('reportaje', 'contacto')}#agenda`} num={c.capitulo.contacto} titulo={c.nav.contacto} className="rp-btn rp-btn-pri" onClick={() => evento('reportaje', 'contact_click', { canal: 'cierre' })}>{porQue.cta}<Flecha /></Enlace>
               <button type="button" className="rp-enlace" onClick={copiar}>{copiado ? c.cierre.copiado : <>{porQue.ctaSecondary}<span className="rp-correo-txt"> · {correo}</span></>}</button>
             </div>
             <p className="rp-estado rp-meta" data-rp="subir" data-rp-retraso="0.3"><i aria-hidden="true" />{s.hero.availability}</p>

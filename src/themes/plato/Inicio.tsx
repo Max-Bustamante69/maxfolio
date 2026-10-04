@@ -130,7 +130,7 @@ export default function Inicio() {
             )}
             <div className="pl-marco-acc">
               <div className="pl-marco-acc-in" data-pl="grupo" data-pl-retraso="0.35">
-                <Enlace to={ruta('contacto') + '?motivo=revision'} className="pl-pil pl-pil--tung pl-pil--grande"><Rod>{c.inicio.ctaCorto}</Rod><span className="pl-puntos" aria-hidden="true"><i /></span></Enlace>
+                <Enlace to={ruta('contacto') + '#agenda'} className="pl-pil pl-pil--tung pl-pil--grande"><Rod>{c.inicio.ctaCorto}</Rod><span className="pl-puntos" aria-hidden="true"><i /></span></Enlace>
                 <Enlace to={ruta('obra')} className="pl-marco-ver"><Rod>{hero.ctaSecondary}</Rod><Flecha /></Enlace>
               </div>
             </div>
@@ -221,7 +221,7 @@ export default function Inicio() {
         <div className="pl-cierre-fila">
           <p className="pl-cierre-lead" data-pl="subir">{leadUno}</p>
           <div className="pl-cierre-acc" data-pl="grupo">
-            <Enlace to={ruta('contacto') + '?motivo=revision'} className="pl-pil pl-pil--osc pl-pil--grande pl-pil--ancha"><Rod>{hero.ctaPrimary}</Rod><span className="pl-puntos" aria-hidden="true"><i /></span></Enlace>
+            <Enlace to={ruta('contacto') + '#agenda'} className="pl-pil pl-pil--osc pl-pil--grande pl-pil--ancha"><Rod>{hero.ctaPrimary}</Rod><span className="pl-puntos" aria-hidden="true"><i /></span></Enlace>
             <p className="pl-cierre-nota">{limpioTexto(hero.ctaNote)}</p>
             <p className="pl-mono pl-cierre-datos">{hero.location}</p>
           </div>

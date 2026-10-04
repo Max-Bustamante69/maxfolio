@@ -72,7 +72,7 @@ export default function Inicio() {
           <div className="ap-hero-texto">
             <p className="ap-posicion" data-ap="linea" data-ap-retraso="0.15">{s.hero.positioning}</p>
             <div className="ap-acciones" data-ap="grupo" data-ap-retraso="0.28">
-              <Enlace className="ap-btn ap-btn-pri" to={`${v5path('apple', 'contacto')}?motivo=revision`}>{s.hero.ctaPrimary}</Enlace>
+              <Enlace className="ap-btn ap-btn-pri" to={`${v5path('apple', 'contacto')}#agenda`}>{s.hero.ctaPrimary}</Enlace>
               <Enlace className="ap-enlace" to={v5path('apple', 'obra')}>{c.verObra}<Chevron /></Enlace>
               <a className="ap-enlace ap-enlace-tenue" href={personal.cv} download>{s.hero.ctaCv}<Chevron /></a>
             </div>
@@ -176,7 +176,7 @@ export default function Inicio() {
             <span className="ap-bloque ap-tenue">{sinPuntoFinal(s.sections.contact.titleAccent)}</span>
           </h2>
           <div className="ap-acciones" data-ap="grupo">
-            <Enlace className="ap-btn ap-btn-pri" to={`${v5path('apple', 'contacto')}?motivo=revision`}>{s.sections.contact.cta}</Enlace>
+            <Enlace className="ap-btn ap-btn-pri" to={`${v5path('apple', 'contacto')}#agenda`}>{s.sections.contact.cta}</Enlace>
             <Enlace className="ap-enlace" to={v5path('apple', 'trayectoria')}>{c.nav.trayectoria}<Chevron /></Enlace>
           </div>
         </div>

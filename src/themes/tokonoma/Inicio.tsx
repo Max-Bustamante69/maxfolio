@@ -161,7 +161,7 @@ export default function Inicio() {
         <div className="tk-portada-pie" data-tk="grupo" data-tk-r="0.1">
           <p className="tk-sub">{limpio(s.hero.lead)}</p>
           <p className="tk-acciones">
-            <Enlace to={`${ruta('contacto')}?motivo=revision`} className="tk-boton" onClick={() => evento(ID, 'contact_click', { canal: 'hero' })}>{s.hero.ctaPrimary}</Enlace>
+            <Enlace to={`${ruta('contacto')}#agenda`} className="tk-boton" onClick={() => evento(ID, 'contact_click', { canal: 'hero' })}>{s.hero.ctaPrimary}</Enlace>
             <Enlace to={ruta('obra')} className="tk-enlace">{s.hero.ctaSecondary}</Enlace>
           </p>
           <p className="tk-nota">{s.hero.ctaNote}</p>
@@ -235,7 +235,7 @@ export default function Inicio() {
         <div className="tk-cierre-pie" data-tk="grupo">
           <p className="tk-sub">{cierre.promise}</p>
           <p className="tk-acciones">
-            <Enlace to={`${ruta('contacto')}?motivo=revision`} className="tk-boton" onClick={() => evento(ID, 'contact_click', { canal: 'cierre' })}>{cierre.cta}</Enlace>
+            <Enlace to={`${ruta('contacto')}#agenda`} className="tk-boton" onClick={() => evento(ID, 'contact_click', { canal: 'cierre' })}>{cierre.cta}</Enlace>
             <Enlace to={ruta('contacto')} className="tk-enlace">{c.inicio.cierreSub}</Enlace>
           </p>
         </div>

@@ -223,7 +223,8 @@ export function useIr() {
   return useCallback((to: string) => {
     if (to === pathname + search) { window.scrollTo({ top: 0, behavior: 'smooth' }); return }
     const vista = document.querySelector<HTMLElement>('.mz-vista')
-    if (!vista || saliendo || to.split('?')[0] === pathname) { if (!saliendo) navigate(to); return }
+    // Misma ruta con otra consulta o con ancla (#agenda): no hay vista que sacar, solo se navega y la vista actual atiende el ancla.
+    if (!vista || saliendo || to.split(/[?#]/)[0] === pathname) { if (!saliendo) navigate(to); return }
     saliendo = true
     posiciones.set(pathname + search, window.scrollY)
     trazarPagina()

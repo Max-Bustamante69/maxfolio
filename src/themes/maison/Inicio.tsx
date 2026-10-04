@@ -120,7 +120,7 @@ export default function Inicio() {
         <h1 id="mz-h1" className="mz-display mz-p-h1" data-mz="linea" data-mz-retraso="0.2">{sinPuntoFinal(s.hero.positioning)}</h1>
         <p className="mz-cuerpo mz-p-lead" data-mz="subir" data-mz-retraso="0.3">{s.hero.lead}</p>
         <div className="mz-acciones mz-p-cta" data-mz="subir" data-mz-retraso="0.4">
-          <Enlace className="mz-btn" to={`${v5path(ID, 'contacto')}?motivo=revision`}>{s.hero.ctaPrimary}</Enlace>
+          <Enlace className="mz-btn" to={`${v5path(ID, 'contacto')}?motivo=revision#agenda`}>{s.hero.ctaPrimary}</Enlace>
           <Enlace className="mz-enlace" to={v5path(ID, 'obra')}>{s.hero.ctaSecondary}<Tri /></Enlace>
         </div>
         <div className="mz-p-foto">
@@ -296,7 +296,7 @@ export default function Inicio() {
       <section className="mz-marco mz-cierre" aria-labelledby="mz-cierre-t">
         <h2 id="mz-cierre-t" className="mz-titulo" data-mz="linea"><span className="mz-bloque">{s.sections.contact.title}</span><em className="mz-bloque">{sinPuntoFinal(s.sections.contact.titleAccent)}</em></h2>
         <div className="mz-acciones">
-          <Enlace className="mz-btn" to={`${v5path(ID, 'contacto')}?motivo=revision`}>{s.sections.contact.cta}</Enlace>
+          <Enlace className="mz-btn" to={`${v5path(ID, 'contacto')}?motivo=revision#agenda`}>{s.sections.contact.cta}</Enlace>
           <Enlace className="mz-enlace" to={v5path(ID, 'trayectoria')}>{c.verTrayectoria}<Tri /></Enlace>
         </div>
       </section>

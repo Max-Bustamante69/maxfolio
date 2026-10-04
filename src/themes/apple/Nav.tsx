@@ -75,7 +75,7 @@ function Hoja({ cerrar, enlaces, cv, escribeme }: { cerrar: () => void; enlaces:
       <div className="ap-hoja-pie">
         <Idioma />
         <a className="ap-enlace" href={cv} download>{c.cvLabel}</a>
-        <Enlace to={`${BASE}/contacto?motivo=revision`} className="ap-btn ap-btn-pri" onClick={cerrar}>{escribeme}</Enlace>
+        <Enlace to={`${BASE}/contacto#agenda`} className="ap-btn ap-btn-pri" onClick={cerrar}>{escribeme}</Enlace>
       </div>
     </div>
   )

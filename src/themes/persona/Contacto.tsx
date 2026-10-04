@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useLocation, useSearchParams } from 'react-router-dom'
 import { sinPuntoFinal } from '../data'
 import { evento, MOTIVOS, useCopiarCorreo, useEnviarContacto, type Motivo } from '../shared/contacto'
+import Agenda from './Agenda'
 import { Cabeza } from './Cabeza'
 import { ID, usePersona } from './contexto'
 import { entradaTitulos } from './efectos'
@@ -16,6 +17,7 @@ const MODELO_MOTIVO: Motivo[] = ['revision', 'proyecto', 'continuo']
 export default function Contacto() {
   const { v5, c } = usePersona()
   const [params] = useSearchParams()
+  const { hash } = useLocation()
   const raiz = useRef<HTMLElement>(null)
   const inicial = params.get('motivo')
   const [motivo, setMotivo] = useState<Motivo>(ORDEN.includes(inicial as Motivo) ? (inicial as Motivo) : 'revision')
@@ -32,6 +34,13 @@ export default function Contacto() {
   useEffect(() => {
     evento(ID, 'contact_open')
   }, [])
+
+  // /contacto#agenda (el CTA principal del tema) aterriza en el calendario.
+  useEffect(() => {
+    if (hash !== '#agenda') return
+    const t = window.setTimeout(() => document.getElementById('agenda')?.scrollIntoView({ block: 'start' }), 160)
+    return () => window.clearTimeout(t)
+  }, [hash])
 
   useGsap(raiz, () => {
     const r = raiz.current
@@ -82,6 +91,10 @@ export default function Contacto() {
             </p>
             <p className="pr-disp__promesa">{k.promise}</p>
           </div>
+
+          {/* El camino principal: elegir día y hora. El formulario de mensaje queda debajo como segunda vía. */}
+          <Agenda />
+          <h2 className="pr-subtitulo">{c.contacto.escribir}</h2>
 
           <div className="pr-dialogo" data-pr-panel>
             <form className="pr-form" id="pr-form" onSubmit={alEnviar} aria-label={c.contacto.formulario}>

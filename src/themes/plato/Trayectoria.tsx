@@ -84,7 +84,7 @@ export default function Trayectoria() {
       </section>
 
       <section className="pl-tr-cierre" data-tono="claro" aria-label={c.revision}>
-        <Enlace to={ruta('contacto') + '?motivo=revision'} className="pl-pil pl-pil--osc pl-pil--grande"><Rod>{c.inicio.ctaCorto}</Rod><span className="pl-puntos" aria-hidden="true"><i /></span></Enlace>
+        <Enlace to={ruta('contacto') + '#agenda'} className="pl-pil pl-pil--osc pl-pil--grande"><Rod>{c.inicio.ctaCorto}</Rod><span className="pl-puntos" aria-hidden="true"><i /></span></Enlace>
       </section>
     </main>
   )

@@ -218,10 +218,11 @@ export function useIr() {
   const navigate = useNavigate()
   const { pathname, search } = useLocation()
   return useCallback((to: string) => {
+    // Misma página: sin ancla sube al inicio; con ancla (#agenda) navega directo y la vista baja sola hasta ella.
     if (to === pathname + search) { window.scrollTo({ top: 0, behavior: 'smooth' }); return }
     const vista = document.querySelector<HTMLElement>('.ap-vista')
-    // Misma ruta con otra búsqueda (filtros) o sin vista que sacar: navegar directo, sin salida.
-    if (!vista || saliendo || to.split('?')[0] === pathname) { if (!saliendo) navigate(to); return }
+    // Misma ruta con otra búsqueda (filtros) o con ancla, o sin vista que sacar: navegar directo, sin salida.
+    if (!vista || saliendo || to.split(/[?#]/)[0] === pathname) { if (!saliendo) navigate(to); return }
     saliendo = true
     posiciones.set(pathname + search, window.scrollY)
     gsap.to(vista, { opacity: 0, y: -10, duration: 0.16, ease: 'power2.out', onComplete: () => { saliendo = false; navigate(to) } })

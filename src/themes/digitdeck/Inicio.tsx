@@ -255,7 +255,7 @@ export default function Inicio() {
             <p className="dd-lede" data-in>{h.lead}</p>
             <div className="dd-acciones" data-in>
               <div className="dd-acciones__primaria">
-                <Enlace to={`${CONTACTO}?motivo=revision`} etiqueta={c.nav.contacto} className="dd-boton dd-boton--grande">{h.ctaPrimary}</Enlace>
+                <Enlace to={`${CONTACTO}?motivo=revision#agenda`} etiqueta={c.nav.contacto} className="dd-boton dd-boton--grande">{h.ctaPrimary}</Enlace>
                 <p className="dd-nota">{h.ctaNote}</p>
               </div>
               <Enlace to={OBRA} etiqueta={c.nav.obra} className="dd-enlace dd-enlace--fuerte">{h.ctaSecondary}</Enlace>
@@ -285,7 +285,7 @@ export default function Inicio() {
           <Titulo id="dd-cierre-t" className="dd-mega" lineas={[c.cierre.titulo]} />
           <p className="dd-lede" data-in>{strings.sections.contact.promise}</p>
           <div className="dd-acciones" data-in>
-            <Enlace to={`${CONTACTO}?motivo=revision`} etiqueta={c.nav.contacto} className="dd-boton dd-boton--grande">{h.ctaPrimary}</Enlace>
+            <Enlace to={`${CONTACTO}?motivo=revision#agenda`} etiqueta={c.nav.contacto} className="dd-boton dd-boton--grande">{h.ctaPrimary}</Enlace>
             <a className="dd-enlace dd-enlace--fuerte" href={personal.cv} download>{h.ctaCv}</a>
           </div>
           <ul className="dd-cierre__datos" data-in>

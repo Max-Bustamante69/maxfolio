@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 'react'
+import { useLocation, useSearchParams } from 'react-router-dom'
 import { useLanguage } from '../../context/LanguageContext'
 import { evento, MOTIVOS, useCopiarCorreo, useEnviarContacto, type Motivo } from '../shared/contacto'
+import Agenda from './Agenda'
 import { useCopy } from './copy'
 import { gsap, useVista } from './motion'
 import { Acordeon, Flecha } from './piezas'
@@ -32,6 +33,29 @@ export default function Contacto() {
 
   const ref = useVista<HTMLElement>([locale])
   useEffect(() => { evento('reportaje', 'contact_open') }, [])
+
+  // «Pedir revisión» llega aquí con #agenda: la vista entra ya en el calendario. La primera vez salta sin animar (la hoja de papel aún
+  // tapa la vista) y se recoloca cuando llegan las fuentes y al cabo de un instante, mientras la persona no haya movido la página;
+  // si ya estaba en Contacto, baja con suavidad.
+  const { hash, key } = useLocation()
+  const ultimaClave = useRef<string | undefined>(undefined)
+  useLayoutEffect(() => {
+    // Inicial = la primera entrada de esta vista (también el segundo disparo de StrictMode, que repite la misma clave de ubicación).
+    const inicial = ultimaClave.current === undefined || ultimaClave.current === key
+    ultimaClave.current = key
+    if (hash !== '#agenda') return
+    const ir = (suave: boolean) => document.getElementById('agenda')?.scrollIntoView({ behavior: suave ? 'smooth' : 'instant', block: 'start' })
+    ir(!inicial)
+    if (!inicial) return
+    let movido = false
+    const marca = () => { movido = true }
+    const eventos = ['wheel', 'touchmove', 'keydown', 'pointerdown'] as const
+    eventos.forEach((e) => window.addEventListener(e, marca, { passive: true, once: true }))
+    const recolocar = () => { if (!movido) ir(false) }
+    void document.fonts?.ready.then(recolocar)
+    const t = window.setTimeout(recolocar, 700)
+    return () => { clearTimeout(t); eventos.forEach((e) => window.removeEventListener(e, marca)) }
+  }, [hash, key])
   // El panel de éxito entra con escala suave (nunca desde 0).
   useEffect(() => {
     if (estado === 'ok' && ok.current) gsap.from(ok.current, { opacity: 0, scale: 0.96, y: 16, duration: 0.8, ease: 'rep', clearProps: 'all' })
@@ -78,17 +102,25 @@ export default function Contacto() {
 
       <div className="rp-contacto rp-marco">
         <header className="rp-contacto-cab">
-          <p className="rp-kicker rp-mono" data-rp="subir">IV · {s.sections.contact.eyebrow}</p>
-          <h1 className="rp-h1 rp-h1-medio" data-rp="linea">{s.sections.contact.title} {sinPunto(s.sections.contact.titleAccent)}</h1>
-          <p className="rp-dek" data-rp="subir" data-rp-retraso="0.2">{s.sections.contact.lead}</p>
-          <p className="rp-nota-cta" data-rp="subir" data-rp-retraso="0.3">{s.sections.contact.promise}</p>
+          <div className="rp-cab-t">
+            <p className="rp-kicker rp-mono" data-rp="subir">IV · {s.sections.contact.eyebrow}</p>
+            <h1 className="rp-h1 rp-h1-medio" data-rp="linea">{s.sections.contact.title} {sinPunto(s.sections.contact.titleAccent)}</h1>
+          </div>
+          <div className="rp-cab-d">
+            <p className="rp-dek" data-rp="subir" data-rp-retraso="0.2">{s.sections.contact.lead}</p>
+            <p className="rp-nota-cta" data-rp="subir" data-rp-retraso="0.3">{s.sections.contact.promise}</p>
+          </div>
         </header>
 
-        {/* El formulario y los canales: a la derecha y a la vista desde el primer pliegue. */}
+        {/* El camino principal: elegir día y hora en el calendario. El formulario de abajo queda como segunda vía. */}
+        <Agenda />
+
+        {/* La segunda vía: escribir con el formulario o por cualquier canal. */}
         <div className="rp-contacto-lado">
           <div className="rp-formulario" id="rp-form" data-rp="subir" data-rp-retraso="0.15">
             <div className="rp-fig-filete" />
             <h2 className="rp-formulario-t">{c.contacto.formulario}</h2>
+            <p className="rp-meta rp-formulario-i">{c.contacto.viaEscrita}</p>
             {estado === 'ok' ? (
               <div className="rp-ok" ref={ok} role="status">
                 <svg viewBox="0 0 24 24" width="36" height="36" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="var(--gold-fill)" stroke="var(--gold-deep)" strokeWidth="1.2" /><path d="m7 12.5 3.2 3.2L17 8.8" fill="none" stroke="var(--ink)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>

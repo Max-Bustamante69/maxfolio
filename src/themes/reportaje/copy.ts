@@ -185,6 +185,7 @@ const es = {
   contacto: {
     kicker: 'Contacto',
     formulario: 'Pide tu revisión',
+    viaEscrita: 'Si prefieres escribir, déjame tu tienda y tu correo.',
     tienda: 'La URL de tu tienda',
     tiendaEj: 'tutienda.com',
     correo: 'Tu correo',
@@ -390,6 +391,7 @@ const en: Copy = {
   contacto: {
     kicker: 'Contact',
     formulario: 'Book your review',
+    viaEscrita: 'Prefer to write? Leave me your store and your email.',
     tienda: 'Your store URL',
     tiendaEj: 'yourstore.com',
     correo: 'Your email',

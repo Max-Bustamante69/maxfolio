@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } fr
 import { useSearchParams } from 'react-router-dom'
 import { sinPuntoFinal, useV5 } from '../data'
 import { evento, MOTIVOS, useCopiarCorreo, useEnviarContacto, type Motivo } from '../shared/contacto'
+import Agenda from './Agenda'
 import { useCopy } from './copy'
 import { dice, limpio } from './limpio'
 import { gsap, useVista } from './motion'
@@ -89,7 +90,11 @@ export default function Contacto() {
         <p className="tk-sub" data-tk="sube" data-tk-r="0.1">{ct.lead} {ct.promise}</p>
       </header>
 
-      <section className="tk-contacto tk-fr tk-12" aria-label={c.contacto.formulario}>
+      {/* El camino principal: elegir una hora y agendar la llamada. El mensaje de abajo es la segunda vía. */}
+      <Agenda />
+
+      <section id="escribeme" className="tk-contacto tk-fr tk-12" aria-labelledby="tk-escribeme-t">
+        <h2 id="tk-escribeme-t" className="tk-h2 tk-escribeme-t" data-tk="titulo">{c.contacto.formulario}</h2>
         <div className="tk-contacto-lado" data-tk="grupo">
           <div>
             <h2 className="tk-h3">{c.contacto.canales}</h2>

@@ -144,7 +144,7 @@ export default function Trayectoria() {
         <h2 id="mz-cierre-t" className="mz-titulo" data-mz="linea"><span className="mz-bloque">{s.sections.contact.title}</span><em className="mz-bloque">{sinPuntoFinal(s.sections.contact.titleAccent)}</em></h2>
         <div className="mz-acciones">
           <a className="mz-btn" href={personal.cv} download>{c.tray.cv}</a>
-          <Enlace className="mz-enlace" to={`${v5path(ID, 'contacto')}?motivo=revision`}>{s.sections.contact.cta}<Tri /></Enlace>
+          <Enlace className="mz-enlace" to={`${v5path(ID, 'contacto')}?motivo=revision#agenda`}>{s.sections.contact.cta}<Tri /></Enlace>
         </div>
       </section>
     </main>

@@ -65,7 +65,7 @@ function Hoja({ cerrar, actual }: { cerrar: () => void; actual: string }) {
       <div className="rp-hoja-pie">
         <Idioma />
         <a className="rp-enlace" href={personal.cv} download>{c.cvLabel}</a>
-        <Enlace to={`${BASE}/contacto?motivo=revision`} num={c.capitulo.contacto} titulo={c.nav.contacto} className="rp-btn rp-btn-pri" onClick={cerrar}>{c.pedir}</Enlace>
+        <Enlace to={`${BASE}/contacto#agenda`} num={c.capitulo.contacto} titulo={c.nav.contacto} className="rp-btn rp-btn-pri" onClick={cerrar}>{c.pedir}</Enlace>
       </div>
     </div>
   )
@@ -125,7 +125,7 @@ export function Nav() {
         <div className="rp-nav-der">
           <Ediciones antes={() => setAbierto(false)} />
           <Idioma clase="rp-idioma-nav" />
-          <Enlace to={`${BASE}/contacto?motivo=revision`} num={c.capitulo.contacto} titulo={c.nav.contacto} className="rp-btn rp-btn-linea rp-btn-chico rp-nav-cta">{c.pedir}</Enlace>
+          <Enlace to={`${BASE}/contacto#agenda`} num={c.capitulo.contacto} titulo={c.nav.contacto} className="rp-btn rp-btn-linea rp-btn-chico rp-nav-cta">{c.pedir}</Enlace>
           <button ref={boton} type="button" className="rp-menu-b" aria-expanded={abierto} aria-label={abierto ? c.menu.cerrar : c.menu.abrir} onClick={() => (abierto ? cerrar() : setAbierto(true))}>
             <span className="rp-mono">{c.menu.etiqueta}</span>
             <span className={abierto ? 'rp-menu-l rp-menu-l-x' : 'rp-menu-l'} aria-hidden="true" />

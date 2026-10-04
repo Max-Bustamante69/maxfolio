@@ -78,7 +78,7 @@ export default function Inicio() {
             <h1 id="ing-h1" className="ing-nombre" data-ing="nombre"><Nombre nombre={personal.firstName} apellido={personal.lastName} /></h1>
             <p className="ing-claim" data-ing="linea" data-ing-retraso="0.25"><span>{primera}</span> <em>{sinPuntoFinal(resto)}</em></p>
             <div className="ing-acciones" data-ing="grupo" data-ing-retraso="0.45">
-              <Enlace className="ing-btn ing-btn-pri" to={`${v5path('ingenieria', 'contacto')}?motivo=revision`}>{s.hero.ctaPrimary}<Flecha /></Enlace>
+              <Enlace className="ing-btn ing-btn-pri" to={`${v5path('ingenieria', 'contacto')}#agenda`}>{s.hero.ctaPrimary}<Flecha /></Enlace>
               <Enlace className="ing-btn ing-btn-sec" to={v5path('ingenieria', 'obra')}>{s.hero.ctaSecondary}</Enlace>
             </div>
           </div>
@@ -224,7 +224,7 @@ export default function Inicio() {
           <h2 id="ing-cierre-t" className="ing-nombre ing-nombre-cierre" data-ing="nombre"><Nombre nombre={personal.firstName} apellido={personal.lastName} /></h2>
           <p className="ing-lead ing-cierre-lead" data-ing="subir">{s.sections.contact.lead}</p>
           <div className="ing-acciones" data-ing="grupo">
-            <Enlace className="ing-btn ing-btn-pri" to={`${v5path('ingenieria', 'contacto')}?motivo=revision`}>{s.sections.contact.cta}<Flecha /></Enlace>
+            <Enlace className="ing-btn ing-btn-pri" to={`${v5path('ingenieria', 'contacto')}#agenda`}>{s.sections.contact.cta}<Flecha /></Enlace>
             <a className="ing-btn ing-btn-sec" href={personal.cv} download>{c.cv}</a>
           </div>
         </div>

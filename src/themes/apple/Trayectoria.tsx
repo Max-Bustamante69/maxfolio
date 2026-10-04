@@ -157,7 +157,7 @@ export default function Trayectoria() {
           ))}
         </div>
         <div className="ap-acciones" data-ap="grupo">
-          <Enlace className="ap-btn ap-btn-pri" to={`${v5path('apple', 'contacto')}?motivo=revision`}>{s.hero.ctaPrimary}</Enlace>
+          <Enlace className="ap-btn ap-btn-pri" to={`${v5path('apple', 'contacto')}#agenda`}>{s.hero.ctaPrimary}</Enlace>
           <Enlace className="ap-enlace" to={v5path('apple', 'obra')}>{c.verObra}<Chevron /></Enlace>
         </div>
       </section>

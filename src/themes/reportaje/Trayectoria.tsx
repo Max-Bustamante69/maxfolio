@@ -178,7 +178,7 @@ export default function Trayectoria() {
           <a className="rp-btn rp-btn-pri" href={v.personal.cv} download>{c.tray.cierre}<Flecha /></a>
           <a className="rp-enlace" href={v.personal.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>
           <a className="rp-enlace" href={v.personal.github} target="_blank" rel="noopener noreferrer">GitHub</a>
-          <Enlace to={`${v5path('reportaje', 'contacto')}?motivo=revision`} num={c.capitulo.contacto} titulo={c.nav.contacto} className="rp-enlace">{c.pedir}<Flecha /></Enlace>
+          <Enlace to={`${v5path('reportaje', 'contacto')}#agenda`} num={c.capitulo.contacto} titulo={c.nav.contacto} className="rp-enlace">{c.pedir}<Flecha /></Enlace>
         </div>
       </section>
 

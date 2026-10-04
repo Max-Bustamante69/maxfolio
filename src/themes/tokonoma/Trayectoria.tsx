@@ -149,7 +149,7 @@ export default function Trayectoria() {
       <section className="tk-cierre tk-fr tk-12" aria-label={c.trayectoria.abrir}>
         <div className="tk-cierre-pie" data-tk="grupo">
           <p className="tk-acciones">
-            <Enlace to={`${ruta('contacto')}?motivo=revision`} className="tk-boton">{c.trayectoria.abrir}</Enlace>
+            <Enlace to={`${ruta('contacto')}#agenda`} className="tk-boton">{c.trayectoria.abrir}</Enlace>
             <a className="tk-enlace" href={personal.cv} download>{c.cv}</a>
           </p>
         </div>

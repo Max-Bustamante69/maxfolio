@@ -360,8 +360,9 @@
 @media (min-width: 800px) { .rp-hab-fila { grid-template-columns: 220px minmax(0, 1fr); gap: 40px; } }
 
 /* ------------------------------------------------------------------ contacto: el formulario a la vista desde el primer pliegue */
-.rp-contacto { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: 'cab' 'lado' 'modelos' 'faq'; padding-bottom: var(--cap); }
+.rp-contacto { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: 'cab' 'agenda' 'lado' 'modelos' 'faq'; padding-bottom: var(--cap); }
 .rp-contacto-cab { grid-area: cab; padding-block: clamp(40px, 7vw, 96px) clamp(28px, 4vw, 48px); }
+.rp-cab-t, .rp-cab-d { min-width: 0; }
 .rp-contacto-lado { grid-area: lado; display: grid; gap: 40px; align-content: start; margin-bottom: clamp(48px, 7vw, 80px); }
 .rp-modelos-bloque { grid-area: modelos; }
 .rp-faq-bloque { grid-area: faq; margin-top: clamp(48px, 7vw, 88px); }
@@ -369,6 +370,7 @@
 .rp-formulario .rp-fig-filete { margin-inline: -1px; }
 .rp-formulario-t, .rp-formulario form, .rp-ok { padding-inline: clamp(18px, 3vw, 36px); }
 .rp-formulario-t { padding-top: 22px; font: 500 clamp(22px, 2vw, 26px)/1.2 var(--serif); margin-bottom: 8px; }
+.rp-formulario-i { padding-inline: clamp(18px, 3vw, 36px); max-width: 44ch; }
 .rp-motivos { border: 0; padding: 0; margin: 18px 0 4px; display: flex; flex-wrap: wrap; gap: 8px; }
 .rp-motivos legend { padding: 0; margin-bottom: 10px; float: left; width: 100%; color: var(--ink-3); }
 .rp-opcion { position: relative; }
@@ -405,9 +407,11 @@
   .rp-canal-a { grid-area: a; }
 }
 @media (min-width: 1000px) {
-  .rp-contacto { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-areas: 'cab lado' 'modelos lado' 'faq lado'; column-gap: clamp(56px, 7vw, 104px); align-items: start; }
-  .rp-contacto-cab { padding-top: clamp(40px, 6vw, 80px); }
-  .rp-contacto-lado { margin: clamp(40px, 6vw, 80px) 0 0; }
+  /* El calendario ocupa todo el ancho (es el camino principal); el formulario y los canales quedan al lado de los modelos. */
+  .rp-contacto { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-areas: 'cab cab' 'agenda agenda' 'modelos lado' 'faq lado'; column-gap: clamp(56px, 7vw, 104px); align-items: start; }
+  .rp-contacto-cab { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); column-gap: clamp(56px, 7vw, 104px); align-items: end; padding-top: clamp(40px, 6vw, 80px); }
+  .rp-cab-d .rp-dek { margin-top: 0; }
+  .rp-contacto-lado { margin: 0; }
 }
 @media (min-width: 1000px) and (min-height: 900px) { .rp-contacto-lado { position: sticky; top: calc(var(--nav) + 24px); } }
 

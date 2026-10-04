@@ -1,7 +1,9 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useLocation, useSearchParams } from 'react-router-dom'
 import { sinPuntoFinal, useV5 } from '../data'
 import { evento, MOTIVOS, useCopiarCorreo, useEnviarContacto, type Motivo } from '../shared/contacto'
+import AgendaSeccion from './Agenda'
+import { useExtra } from './agenda-copy'
 import { useCopy } from './copy'
 import { gsap, useVista } from './motion'
 import { Chevron } from './piezas'
@@ -31,7 +33,9 @@ function Acordeon({ q, a }: { q: string; a: string }) {
 
 export default function Contacto() {
   const c = useCopy()
+  const x = useExtra()
   const { strings: s, personal, faq } = useV5()
+  const { hash } = useLocation()
   const [params] = useSearchParams()
   const pedido = params.get('motivo') as Motivo | null
   const [motivo, setMotivo] = useState<Motivo>(pedido && pedido in MOTIVOS ? pedido : 'revision')
@@ -52,6 +56,24 @@ export default function Contacto() {
   useEffect(() => {
     if (estado === 'ok' && ok.current) gsap.from(ok.current, { opacity: 0, scale: 0.96, y: 18, duration: 0.8, ease: 'apple', clearProps: 'all' })
   }, [estado])
+
+  // /apple/contacto#agenda (los CTA de todo el sitio): el calendario se monta ya y la vista baja hasta él si no está a la vista.
+  const enAgenda = hash === '#agenda'
+  useEffect(() => {
+    if (!enAgenda) return
+    const t = window.setTimeout(() => {
+      const el = document.getElementById('agenda')
+      if (!el) return
+      const r = el.getBoundingClientRect()
+      if (r.top < 64 || r.bottom > window.innerHeight) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 120)
+    return () => window.clearTimeout(t)
+  }, [enAgenda])
+  // Desde el calendario sin huecos o caído: la segunda vía, el mensaje.
+  const irAlMensaje = () => {
+    document.getElementById('ap-form')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    window.setTimeout(() => form.current?.querySelector<HTMLInputElement>('[name=tienda]')?.focus({ preventScroll: true }), 450)
+  }
 
   // Elegir un modelo de trabajo deja el formulario listo con su motivo y lleva hasta él.
   const elegir = (m: Motivo) => {
@@ -104,6 +126,40 @@ export default function Contacto() {
           <p className="ap-contacto-prom" data-ap="subir" data-ap-retraso="0.3">{s.sections.contact.promise}</p>
         </div>
 
+        <AgendaSeccion forzar={enAgenda} alEscribir={irAlMensaje} />
+
+        <div className="ap-contacto-lado">
+          <div className="ap-despues" data-ap="subir" data-ap-retraso="0.3">
+            <h2 className="ap-despues-t">{s.sections.contact.nextLabel}</h2>
+            <ol>{despues.map((p) => <li key={p}>{p}</li>)}</ol>
+          </div>
+          <ul className="ap-canales" data-ap="grupo" data-ap-retraso="0.3">
+            {canales.map((k) => (
+              <li key={k.k}>
+                {k.al ? (
+                  <button type="button" className="ap-canal" onClick={k.al}>
+                    <span className="ap-canal-k">{k.k}</span><span className="ap-canal-v">{k.v}</span>
+                    <span className="ap-canal-a">{k.accion}</span>
+                  </button>
+                ) : (
+                  <a className="ap-canal" href={k.href} target={k.href?.startsWith('/') ? undefined : '_blank'} rel="noopener noreferrer" download={k.href === personal.cv ? true : undefined}
+                    onClick={() => evento('apple', 'contact_click', { canal: k.k === c.contacto.whatsapp ? 'whatsapp' : k.k === c.contacto.linkedin ? 'linkedin' : k.k === c.contacto.github ? 'github' : 'cv' })}>
+                    <span className="ap-canal-k">{k.k}</span><span className="ap-canal-v">{k.v}</span>
+                    <span className="ap-canal-a"><Chevron /></span>
+                  </a>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <p className="ap-sr" role="status">{copiado ? c.contacto.copiado : ''}</p>
+      </section>
+
+      <section className="ap-escribir ap-frame" aria-labelledby="ap-esc-t">
+        <div className="ap-escribir-cab">
+          <h2 id="ap-esc-t" className="ap-subtitulo" data-ap="linea">{x.escribirTitulo}</h2>
+          <p className="ap-escribir-lead" data-ap="subir" data-ap-retraso="0.1">{x.escribirLead}</p>
+        </div>
         <div className="ap-formulario" id="ap-form" data-ap="escala" data-ap-retraso="0.25">
           {estado === 'ok' ? (
             <div className="ap-ok" ref={ok} role="status">
@@ -142,32 +198,6 @@ export default function Contacto() {
             </form>
           )}
         </div>
-
-        <div className="ap-contacto-lado">
-          <div className="ap-despues" data-ap="subir" data-ap-retraso="0.3">
-            <h2 className="ap-despues-t">{s.sections.contact.nextLabel}</h2>
-            <ol>{despues.map((p) => <li key={p}>{p}</li>)}</ol>
-          </div>
-          <ul className="ap-canales" data-ap="grupo" data-ap-retraso="0.3">
-            {canales.map((k) => (
-              <li key={k.k}>
-                {k.al ? (
-                  <button type="button" className="ap-canal" onClick={k.al}>
-                    <span className="ap-canal-k">{k.k}</span><span className="ap-canal-v">{k.v}</span>
-                    <span className="ap-canal-a">{k.accion}</span>
-                  </button>
-                ) : (
-                  <a className="ap-canal" href={k.href} target={k.href?.startsWith('/') ? undefined : '_blank'} rel="noopener noreferrer" download={k.href === personal.cv ? true : undefined}
-                    onClick={() => evento('apple', 'contact_click', { canal: k.k === c.contacto.whatsapp ? 'whatsapp' : k.k === c.contacto.linkedin ? 'linkedin' : k.k === c.contacto.github ? 'github' : 'cv' })}>
-                    <span className="ap-canal-k">{k.k}</span><span className="ap-canal-v">{k.v}</span>
-                    <span className="ap-canal-a"><Chevron /></span>
-                  </a>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <p className="ap-sr" role="status">{copiado ? c.contacto.copiado : ''}</p>
       </section>
 
       <section className="ap-modelos ap-frame" aria-labelledby="ap-mod-t">

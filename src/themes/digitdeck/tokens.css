@@ -54,6 +54,7 @@
   --f-display: 'DD Bricolage', 'DD Bricolage Fallback', system-ui, sans-serif;
   --f-text: 'DD Hanken', 'DD Hanken Fallback', system-ui, sans-serif;
   --f-serif: 'DD Serif', Georgia, serif;
+  --f-mono: ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace; /* solo las horas, las fechas y lo que se teclea en la agenda: la hora se lee como un comando */
   --t-mega: clamp(2.25rem, 0.9rem + 4.9vw, 5.75rem); /* 36 / 85 / 92 px (390 / 1440 / 1920): el H1 de Max es una frase más larga que el de la agencia */
   --t-display: clamp(2rem, 0.6rem + 4vw, 5rem); /* 32 / 67 / 80 */
   --t-figure: clamp(4rem, 1rem + 11vw, 11rem); /* 64 / 174 / 176 */

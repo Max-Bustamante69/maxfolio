@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 'react'
+import { useLocation, useSearchParams } from 'react-router-dom'
 import { sinPuntoFinal } from '../data'
 import { evento, MOTIVOS, useCopiarCorreo, useEnviarContacto, type Motivo } from '../shared/contacto'
+import AgendaSeccion from './Agenda'
 import { useCopy } from './copy'
 import { gsap, useVista } from './motion'
 import { Acordeon, ID, Pieza, Tri } from './piezas'
@@ -33,6 +34,21 @@ export default function Contacto() {
 
   const ref = useVista<HTMLElement>([])
   useEffect(() => { evento(ID, 'contact_open') }, [])
+  // Con #agenda (los llamados a reservar) la vista abre en el libro de citas. Se reintenta cuando llegan las fuentes y al asentarse
+  // el titular, porque el alto de lo de arriba cambia un poco; si la persona ya movió la página, no se le quita de donde está.
+  const { hash, key } = useLocation()
+  useLayoutEffect(() => {
+    if (hash !== '#agenda') return
+    let movido = false
+    const mover = () => { movido = true }
+    const ir = () => { if (!movido) document.getElementById('agenda')?.scrollIntoView({ block: 'start' }) }
+    ir()
+    const eventos = ['wheel', 'touchstart', 'keydown'] as const
+    eventos.forEach((e) => window.addEventListener(e, mover, { passive: true, once: true }))
+    void document.fonts?.ready.then(ir)
+    const t = window.setTimeout(ir, 700)
+    return () => { window.clearTimeout(t); eventos.forEach((e) => window.removeEventListener(e, mover)) }
+  }, [hash, key])
   // El panel de éxito entra con un fundido y una subida corta.
   useEffect(() => {
     if (estado === 'ok' && ok.current) gsap.from(ok.current, { opacity: 0, y: 16, duration: 0.7, ease: 'velo', clearProps: 'all' })
@@ -68,14 +84,20 @@ export default function Contacto() {
       <title>{`${c.contacto.h1} · ${personal.name}`}</title>
       <meta name="robots" content="noindex" />
 
-      <section className="mz-marco mz-contacto" aria-labelledby="mz-h1">
+      <section className="mz-marco mz-contacto mz-contacto-cab" aria-labelledby="mz-h1">
         <div className="mz-contacto-tit">
           <p className="mz-etq" data-mz="subir">{s.sections.contact.eyebrow}</p>
           <h1 id="mz-h1" className="mz-titulo" data-mz="linea"><span className="mz-bloque">{s.sections.contact.title}</span><em className="mz-bloque">{sinPuntoFinal(s.sections.contact.titleAccent)}</em></h1>
           <p className="mz-nota mz-contacto-lead">{s.sections.contact.lead}</p>
         </div>
+      </section>
 
+      <AgendaSeccion />
+
+      <section className="mz-marco mz-contacto mz-contacto-2" aria-labelledby="mz-alt-t">
+        <i className="mz-contacto-2-sep" aria-hidden="true" />
         <div className="mz-formulario" id="mz-form">
+          <h2 id="mz-alt-t" className="mz-display mz-alterna" data-mz="linea">{c.agenda.alterna}</h2>
           {estado === 'ok' ? (
             <div className="mz-ok" ref={ok} role="status">
               <p className="mz-display">{c.contacto.ok}</p>

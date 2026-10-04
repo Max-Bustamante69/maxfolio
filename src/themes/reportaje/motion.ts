@@ -278,7 +278,8 @@ export function useIr() {
     if (saliendo) return
     const vista = document.querySelector<HTMLElement>('.rp-vista')
     posiciones.set(pathname + search, window.scrollY)
-    if (!vista || to.split('?')[0] === pathname) { navigate(to); return }
+    // Misma ruta (aunque cambie la consulta o el #ancla): no hay vista nueva que descubrir, así que no cae la hoja.
+    if (!vista || to.split('#')[0].split('?')[0] === pathname) { navigate(to); return }
     saliendo = true
     gsap.delayedCall(3, () => { saliendo = false }) // seguro: una navegación que no monta nada no deja el enlace muerto
     if (o.hoja === false || !velo) {

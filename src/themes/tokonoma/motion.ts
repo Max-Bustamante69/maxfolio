@@ -217,7 +217,7 @@ export function useIr() {
         return
       }
       const vista = document.querySelector<HTMLElement>('.tk-vista')
-      if (!vista || saliendo || to.split('?')[0] === pathname) {
+      if (!vista || saliendo || to.split(/[?#]/)[0] === pathname) {
         if (!saliendo) navigate(to)
         return
       }

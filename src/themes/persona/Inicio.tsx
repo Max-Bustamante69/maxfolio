@@ -33,7 +33,8 @@ export default function Inicio() {
   const caso = obras.find((o) => o.slug === CASO_SLUG)
   const beats = casoDe(v5, CASO_SLUG)
   const masTiendas = MAS_TIENDAS.map((s) => v5.obra(s)).filter((o): o is NonNullable<typeof o> => !!o)
-  const contacto = `${v5path(ID, 'contacto')}?motivo=revision`
+  // El CTA principal lleva directo al calendario de reservas (el formulario de mensaje queda debajo como segunda vía).
+  const contacto = `${v5path(ID, 'contacto')}#agenda`
 
   useGsap(raiz, () => {
     const r = raiz.current
