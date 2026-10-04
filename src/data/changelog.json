@@ -1,5 +1,35 @@
 [
   {
+    "hash": "f959fa6",
+    "date": "2026-09-11",
+    "subject": "fix(skills): stop the constellation zoom transition overlapping content"
+  },
+  {
+    "hash": "e2a4ef8",
+    "date": "2026-09-11",
+    "subject": "fix(skills): give the rail mobile candidate a filter bar"
+  },
+  {
+    "hash": "c85b5c8",
+    "date": "2026-09-11",
+    "subject": "fix(skills): orbit dots disappear on filter, wire in the mobile switcher"
+  },
+  {
+    "hash": "2814649",
+    "date": "2026-09-11",
+    "subject": "fix(skills): ledger rows disappear on filter instead of dimming"
+  },
+  {
+    "hash": "9c49360",
+    "date": "2026-09-11",
+    "subject": "feat(skills): scaffold mobile-layout ids and strings for ?skillsMobile="
+  },
+  {
+    "hash": "95e99de",
+    "date": "2026-09-11",
+    "subject": "chore(build): regenerated artifacts for round 41 final"
+  },
+  {
     "hash": "67ef77c",
     "date": "2026-09-11",
     "subject": "fix(anchors): hash landing honors scroll-margin and re-lands while lazy chunks mount; one id per section on Apple"
@@ -28,35 +58,5 @@
     "hash": "6117e9d",
     "date": "2026-09-11",
     "subject": "copy(manifesto): four checkable mechanisms instead of slogans; impact tiles 5-up on desktop"
-  },
-  {
-    "hash": "25c060e",
-    "date": "2026-09-11",
-    "subject": "fix(review): stop the nav breathing-room from overflowing tablet widths, sync the neo close-button shadow"
-  },
-  {
-    "hash": "80a8d89",
-    "date": "2026-09-10",
-    "subject": "feat(nav): give the Apple nav bar more breathing room from md up"
-  },
-  {
-    "hash": "8b35aef",
-    "date": "2026-09-10",
-    "subject": "feat(drawer): give ToolDrawer the house spring, blur, and staggered reveal"
-  },
-  {
-    "hash": "c4ba2ff",
-    "date": "2026-09-10",
-    "subject": "feat(review-checklist): visualize the QA run instead of a text ledger"
-  },
-  {
-    "hash": "87629f3",
-    "date": "2026-09-10",
-    "subject": "content(review-checklist): add run caption and status strings"
-  },
-  {
-    "hash": "1f3ab05",
-    "date": "2026-09-10",
-    "subject": "fix(rail): measure slide targets by geometry, not offsetLeft, on the storyboard rail"
   }
 ]
