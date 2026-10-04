@@ -1,5 +1,35 @@
 [
   {
+    "hash": "97f7c78",
+    "date": "2026-09-10",
+    "subject": "fix(featured): gate the Impact strip's real-number tiles on scroll into view"
+  },
+  {
+    "hash": "3c3e0ee",
+    "date": "2026-09-10",
+    "subject": "test(featured): add a data-testid hook to the Impact strip"
+  },
+  {
+    "hash": "540218f",
+    "date": "2026-09-10",
+    "subject": "feat(featured): add shared Impact strip under every featured-build variant"
+  },
+  {
+    "hash": "7cf4c72",
+    "date": "2026-09-10",
+    "subject": "content(featured): rewrite The Gummy Box facts with harder numbers, add impact strings"
+  },
+  {
+    "hash": "6ebef5c",
+    "date": "2026-09-10",
+    "subject": "feat(featured): record blocks and tracked-component counts for The Gummy Box"
+  },
+  {
+    "hash": "46438ad",
+    "date": "2026-09-10",
+    "subject": "chore(terminal): regenerated changelog.json"
+  },
+  {
     "hash": "1e1a6ac",
     "date": "2026-09-10",
     "subject": "fix(orbit): make the Apple center mark visible in dark mode"
@@ -28,35 +58,5 @@
     "hash": "336709e",
     "date": "2026-09-10",
     "subject": "feat(skills): replace the orbit's hover preview with a real ToolDrawer"
-  },
-  {
-    "hash": "fefe7e0",
-    "date": "2026-09-10",
-    "subject": "chore(terminal): regenerated changelog.json"
-  },
-  {
-    "hash": "c91237f",
-    "date": "2026-09-10",
-    "subject": "fix(apple): one element per section id — the wrappers around Experience and Skills no longer duplicate the ids the secti"
-  },
-  {
-    "hash": "08222c6",
-    "date": "2026-09-10",
-    "subject": "fix(skills): 44px tap targets for the orbit/ledger filter bar on mobile"
-  },
-  {
-    "hash": "e250d3c",
-    "date": "2026-09-10",
-    "subject": "refactor(gallery): restructure the case-study Impact block layout"
-  },
-  {
-    "hash": "6edeea0",
-    "date": "2026-09-10",
-    "subject": "feat(skills): orbit hover/press previews, real cross-section links, filters"
-  },
-  {
-    "hash": "e570682",
-    "date": "2026-09-10",
-    "subject": "chore(terminal): regenerated changelog.json"
   }
 ]
