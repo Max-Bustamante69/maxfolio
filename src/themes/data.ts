@@ -155,7 +155,7 @@ export function useV5() {
       eras,
       faq,
       cifras,
-      /** Habilidades del vivo: grupos del registro y cuántas tiendas usan cada herramienta (skillUsage). */
+      /** Habilidades del vivo: los grupos del registro. */
       habilidades: registry.skillGroups,
       personal: registry.personal,
       /** Única cifra pública de tiendas (registry.PUBLIC_STORE_COUNT): nunca obras.length. Verbo: «construidas», no «en vivo». */

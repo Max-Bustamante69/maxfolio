@@ -43,8 +43,6 @@ function App() {
             <Route key={id} path={`/${id}/*`} element={<ThemeRoot id={id} />} />
           ))}
           <Route path="/v5/*" element={<V5Antigua />} />
-          {/* Temas retirados (2026-10-03, decisión de Max): el viejo Persona era /arcade; el resto vuelve al sorteo. */}
-          <Route path="/arcade" element={<Navigate to="/persona" replace />} />
           <Route path="/stats" element={<Stats />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
