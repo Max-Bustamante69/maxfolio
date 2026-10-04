@@ -4,7 +4,7 @@ import { useMedellinTime } from '../shared/useMedellinTime'
 import { casoDe } from './casos'
 import { FigPagina } from './diagramas'
 import { useCopy } from './copy'
-import { escena, gsap, SALE, useVista } from './motion'
+import { enSuMomento, escena, gsap, SALE, useVista } from './motion'
 import { Cabecera, Cinta, Enlace, Flecha, Movil, Retrato, Tarjeta, Ventana } from './piezas'
 import { partirFrase, sinProtocolo, usePublico } from './publico'
 
@@ -37,7 +37,7 @@ export default function Inicio() {
   const lcp = lh ? new Intl.NumberFormat(intlLocale, { maximumFractionDigits: 2 }).format(lh.escritorio.lcp ?? 0) : ''
   const tripleta = lh ? `${lh.escritorio.perf} · ${lh.escritorio.a11y} · ${lh.escritorio.seo}` : ''
 
-  const ref = useVista<HTMLElement>([], (raiz, limpiar) => {
+  const ref = useVista<HTMLElement>([], (raiz, limpiar, ctx) => {
     const q = (sel: string) => raiz.querySelector<HTMLElement>(sel)
     // Entrada del pliegue (≤ 1,2 s): el nombre sube letra a letra, la cinta se dibuja de izquierda a derecha y, sobre ella, la obra sube a su sitio.
     const cinta = q('.ing-escena .ing-cinta')
@@ -54,15 +54,18 @@ export default function Inicio() {
     if (hero && cinta) limpiar.push(escena(hero, gsap.timeline().fromTo(cinta.firstElementChild, { y: 20 }, { y: -90, ease: 'none' }), { rango: [0.5, 1], suave: 0.5 }))
     if (hero && capa) limpiar.push(escena(hero, gsap.timeline().fromTo(capa, { y: 0 }, { y: -34, ease: 'none' }), { rango: [0.5, 1], suave: 0.5 }))
     // El momento firma: las hebras de la cinta corren por dentro de las letras del monograma mientras la página pasa.
+    // Las dos escenas siguientes están por debajo del pliegue: se arman (se miden y escriben su estado inicial) cuando se acercan.
     const persona = q('.ing-persona')
     const hebras = q('.ing-retrato-hebras')
-    if (persona && hebras) limpiar.push(escena(persona, gsap.timeline().fromTo(hebras, { x: 150 }, { x: -110, ease: 'none' }), { rango: [0.05, 0.95], suave: 0.7 }))
+    if (persona && hebras) enSuMomento([persona], (el) => limpiar.push(escena(el, gsap.timeline().fromTo(hebras, { x: 150 }, { x: -110, ease: 'none' }), { rango: [0.05, 0.95], suave: 0.7 })), limpiar, ctx)
     // El eje del método se llena con el scroll.
     const pasos = q('.ing-pasos')
     const eje = pasos?.querySelector('.ing-pasos-eje i')
     if (pasos && eje) {
-      const horizontal = window.matchMedia('(min-width: 1024px)').matches
-      limpiar.push(escena(pasos, gsap.timeline().fromTo(eje, horizontal ? { scaleX: 0 } : { scaleY: 0 }, horizontal ? { scaleX: 1, ease: 'none' } : { scaleY: 1, ease: 'none' }), { rango: [0.25, 0.7], suave: 0.3 }))
+      enSuMomento([pasos], (el) => {
+        const horizontal = window.matchMedia('(min-width: 1024px)').matches
+        limpiar.push(escena(el, gsap.timeline().fromTo(eje, horizontal ? { scaleX: 0 } : { scaleY: 0 }, horizontal ? { scaleX: 1, ease: 'none' } : { scaleY: 1, ease: 'none' }), { rango: [0.25, 0.7], suave: 0.3 }))
+      }, limpiar, ctx)
     }
   })
 

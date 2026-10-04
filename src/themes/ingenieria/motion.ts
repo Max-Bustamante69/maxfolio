@@ -167,8 +167,37 @@ const atar: Record<string, Atar> = {
   },
 }
 
+/** Cuánto antes de entrar en la ventana se prepara un nodo, en alturas de ventana: mucho antes que su revelado (que espera al 6 % dentro). */
+const ADELANTO = 0.6
+
+/**
+ * Corre `fn` sobre cada nodo solo cuando le toca: ya, si está en la primera pantalla y media; si no, cuando se acerca a
+ * `ADELANTO` alturas de la ventana. Lo que está lejos no cuesta nada al montar (ni SplitText, ni medidas, ni estado oculto) y
+ * se prepara dentro del contexto de GSAP de la vista, así que se revierte con ella. La geometría se lee UNA vez, antes de
+ * escribir nada: una lectura por nodo, intercalada con las escrituras de GSAP, fuerza un cálculo de estilo cada vez.
+ */
+export function enSuMomento<T extends Element>(nodos: T[], fn: (el: T) => void, limpiar: Array<() => void>, ctx?: gsap.Context) {
+  const alto = window.innerHeight
+  const ya: T[] = []
+  const luego: T[] = []
+  nodos.forEach((n) => (n.getBoundingClientRect().top < alto * (1 + ADELANTO) ? ya : luego).push(n))
+  ya.forEach(fn)
+  if (!luego.length) return
+  const io = new IntersectionObserver((entradas) => {
+    entradas.forEach((en) => {
+      if (!en.isIntersecting) return
+      io.unobserve(en.target)
+      const n = en.target as T
+      if (ctx) ctx.add(() => fn(n))
+      else fn(n)
+    })
+  }, { rootMargin: `0px 0px ${ADELANTO * 100}% 0px` })
+  luego.forEach((n) => io.observe(n))
+  limpiar.push(() => io.disconnect())
+}
+
 /** Busca [data-ing] dentro de `raiz`, escribe su estado oculto y lo juega cuando entra en la ventana (o ya, si está a la vista). */
-function activar(raiz: HTMLElement, limpiar: Array<() => void>) {
+function activar(raiz: HTMLElement, limpiar: Array<() => void>, ctx?: gsap.Context) {
   const pendientes = new Map<Element, Entrada>()
   const io = new IntersectionObserver((entradas) => {
     let k = 0
@@ -182,7 +211,7 @@ function activar(raiz: HTMLElement, limpiar: Array<() => void>) {
       jugar(base + Math.min(k++, 5) * 0.06)
     })
   }, { rootMargin: '0px 0px -6% 0px' })
-  raiz.querySelectorAll<HTMLElement>('[data-ing]').forEach((el) => {
+  enSuMomento(Array.from(raiz.querySelectorAll<HTMLElement>('[data-ing]')), (el) => {
     try {
       const jugar = atar[el.dataset.ing ?? '']?.(el)
       if (!jugar) return
@@ -191,7 +220,7 @@ function activar(raiz: HTMLElement, limpiar: Array<() => void>) {
     } catch {
       gsap.set(el, { clearProps: 'all' }) // fail-open por nodo
     }
-  })
+  }, limpiar, ctx)
   limpiar.push(() => io.disconnect())
 }
 
@@ -210,7 +239,7 @@ function cerrarPulso() {
  * Raíz de una vista: la entrada de página, los revelados declarativos y, si se pasa `montar`, la coreografía propia.
  * Todo lo que crea queda dentro de un gsap.context y se revierte al desmontar.
  */
-export function useVista<T extends HTMLElement = HTMLElement>(deps: unknown[], montar?: (raiz: T, limpiar: Array<() => void>) => void) {
+export function useVista<T extends HTMLElement = HTMLElement>(deps: unknown[], montar?: (raiz: T, limpiar: Array<() => void>, ctx: gsap.Context) => void) {
   const ref = useRef<T>(null)
   const { pathname, search } = useLocation()
   const tipo = useNavigationType()
@@ -222,12 +251,12 @@ export function useVista<T extends HTMLElement = HTMLElement>(deps: unknown[], m
     // Cada vista nueva empieza arriba; Atrás/Adelante devuelven la lista a donde estaba.
     if (guardada !== undefined) setTimeout(() => window.scrollTo({ top: guardada, behavior: 'instant' }), 0)
     else if (tipo !== 'POP') window.scrollTo({ top: 0, behavior: 'instant' })
-    const ctx = gsap.context(() => {
+    const ctx = gsap.context((self) => {
       gsap.set(raiz, { clearProps: 'transform,opacity' }) // la salida de useIr dejó y:-8 y opacidad 0 si el nodo se reutiliza
       gsap.fromTo(raiz, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: SALE, clearProps: 'transform,opacity' })
       cerrarPulso()
-      activar(raiz, limpiar)
-      montar?.(raiz, limpiar)
+      activar(raiz, limpiar, self as gsap.Context)
+      montar?.(raiz, limpiar, self as gsap.Context)
     }, raiz)
     return () => {
       limpiar.forEach((f) => f())
