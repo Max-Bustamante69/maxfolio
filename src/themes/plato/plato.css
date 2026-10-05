@@ -72,8 +72,9 @@
 .pl-cab-in { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .pl-cab-in > *, .pl-cab-der > * { pointer-events: auto; }
 .pl-logo { display: inline-flex; align-items: center; gap: 12px; height: 45px; min-width: 44px; font-size: 14px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
-.pl-logo-mb { display: grid; place-items: center; width: 45px; height: 45px; border-radius: 50%; border: 1px solid currentColor; font-family: var(--f-mono); font-size: 13px; font-weight: 500; letter-spacing: 0; transition: background-color 0.4s ease, color 0.4s ease; }
-@media (hover: hover) { .pl-logo:hover .pl-logo-mb { background: var(--tungsteno); border-color: var(--tungsteno); color: var(--tinta); } }
+.pl-logo-mb { display: grid; place-items: center; width: 45px; height: 45px; transition: color 0.4s ease; }
+.pl-logo-mb svg { display: block; width: 30px; height: auto; }
+@media (hover: hover) { .pl-logo:hover .pl-logo-mb { color: var(--tungsteno); } }
 .pl-logo-txt { white-space: nowrap; font-size: 13px; }
 .pl-nav { display: none; }
 .pl-cab-der { display: flex; align-items: center; gap: 8px; pointer-events: none; }
@@ -131,7 +132,8 @@
 
 /* ------------------------------------------------------------------ cortina, cubierta y lienzo */
 .pl-cortina { position: fixed; inset: 0; z-index: 90; background: var(--plato); pointer-events: none; }
-.pl-cortina-mb { position: fixed; left: 0; top: 0; z-index: 91; pointer-events: none; font-family: var(--f-mono); font-size: clamp(72px, 9vw, 150px); font-weight: 500; line-height: 1; letter-spacing: -0.02em; color: #fff; mix-blend-mode: difference; will-change: transform, opacity; }
+.pl-cortina-mb { position: fixed; left: 0; top: 0; z-index: 91; pointer-events: none; width: clamp(80px, 10vw, 160px); color: #fff; mix-blend-mode: difference; will-change: transform, opacity; }
+.pl-cortina-mb svg { display: block; width: 100%; height: auto; }
 .pl-entrando .pl-logo-mb { color: transparent; }
 .pl-cubierta { position: fixed; inset: 0; z-index: 40; visibility: hidden; pointer-events: none; background: var(--plato); }
 .pl-cuerpo { position: relative; z-index: 2; }

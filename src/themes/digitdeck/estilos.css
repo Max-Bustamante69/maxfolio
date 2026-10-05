@@ -333,6 +333,12 @@
   color: inherit;
   text-decoration: none;
 }
+.dd-marca__mb {
+  flex: none;
+  width: 1.05em;
+  height: auto;
+  margin-right: 0.34em;
+}
 .dd-marca .dd-dot {
   align-self: flex-end;
   width: 0.2em;
@@ -1360,12 +1366,11 @@
   line-height: 0.74;
   height: 0.74em;
 }
-.dd-pie__letras {
-  font: 800 1em / 0.74 var(--f-display);
-  font-stretch: 90%;
-  letter-spacing: -0.045em;
+.dd-pie__mb {
+  flex: none;
+  height: 0.74em;
+  width: auto;
   color: var(--v5-ink);
-  user-select: none;
 }
 .dd-dot--pie {
   --d: 0.15em;
