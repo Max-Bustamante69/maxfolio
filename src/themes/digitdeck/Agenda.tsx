@@ -1,6 +1,6 @@
 // Agenda de llamadas de la dirección «A la manera de Digitdeck»: una tira de semana tipo comando, las horas como píldoras en
 // monoespaciada con el punto verde, un paso de datos como formulario de terminal y la confirmación con el punto que cae.
-// Todo sobre useAgenda('digitdeck') (la agenda pública de Digitdeck: reservar crea la cita, el evento con Meet y la invitación de Google).
+// Todo sobre useAgenda('digitdeck') (el Google Calendar de Max por api/agenda.ts: reservar crea la cita con Meet y Google envía la invitación).
 //
 // Tres escenas en un mismo panel (elegir → datos → listo). Cada región entra con la gramática de la casa (el filete se dibuja de
 // izquierda a derecha, el contenido baja descubierto por una cortina; las horas y los días se escriben de izquierda a derecha) y sale
@@ -11,6 +11,7 @@ import { useLocation } from 'react-router-dom'
 import { gsap } from 'gsap'
 import { useLanguage } from '../../context/LanguageContext'
 import { PRIVACIDAD, fmtDia, fmtHora, useAgenda, type Dia, type Fallo, type Franja } from '../shared/agenda'
+import ReservaGoogle from '../shared/ReservaGoogle'
 import { useCopiaDD } from './agenda-copy'
 import { EASE } from './movimiento'
 import './agenda.css'
@@ -381,19 +382,20 @@ export function Agenda() {
 
       {estado === 'cargando' && <CuerpoEsqueleto />}
 
-      {(estado === 'error' || (estado === 'vacio' && paso === 'elegir')) && (
+      {/* Sin agenda propia (api/agenda.ts sin credenciales o Google sin responder), la página de reservas de Google ocupa el panel. */}
+      {estado === 'error' && (
+        <div className="dd-ag__respaldo">
+          <ReservaGoogle className="dd-ag__google" />
+        </div>
+      )}
+
+      {estado === 'vacio' && paso === 'elegir' && (
         <Region rf={derRef} className="dd-ag__mensaje">
-          <p data-ag="sube">{estado === 'error' ? x.errorCarga : x.sinHuecos}</p>
+          <p data-ag="sube">{x.sinHuecos}</p>
           <div data-ag="sube">
-            {estado === 'error' ? (
-              <button type="button" className="dd-boton dd-boton--chico" onClick={() => void ag.recargar()}>
-                {x.reintentar}
-              </button>
-            ) : (
-              <button type="button" className="dd-enlace dd-enlace--fuerte dd-ag__texto-boton" onClick={alFormulario}>
-                {x.dejarMensaje}
-              </button>
-            )}
+            <button type="button" className="dd-enlace dd-enlace--fuerte dd-ag__texto-boton" onClick={alFormulario}>
+              {x.dejarMensaje}
+            </button>
           </div>
         </Region>
       )}

@@ -2,14 +2,14 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useLanguage, type Locale } from '../../context/LanguageContext'
 import { track } from '../../lib/track'
 
-// Agenda de llamadas contra el Google Calendar de Max (la cuenta conectada como «agenda de reservas» en la Plataforma,
-// app.digitdeck.co, módulo reservas de la v3). Los huecos son de 20 min, lunes a viernes, menos lo que Max tenga ocupado;
-// reservar crea el evento con Meet y Google envía la invitación. Este archivo es el contrato: cada tema dibuja su
-// propio calendario encima de useAgenda(). La API solo acepta por CORS https://(www.)maxfolio.dev.
+// Agenda de llamadas contra el Google Calendar de Max, sin nadie en medio: api/agenda.ts (función de este mismo sitio) pide a la API de
+// Google Calendar lo ocupado y crea la cita. Los huecos son de 20 min, lunes a viernes, menos lo que Max tenga ocupado; reservar crea el
+// evento con Meet y Google envía la invitación. Este archivo es el contrato: cada tema dibuja su propio calendario encima de useAgenda().
+// Si la API no responde (sin credenciales o Google caído) el estado es 'error' y cada tema muestra <ReservaGoogle> en su marco.
 
-const API = import.meta.env.DEV ? '/agenda-api' : 'https://app.digitdeck.co/api/reservas'
+const API = '/api/agenda'
 /** Aviso de datos que acepta quien reserva (lo exige la API: consentimientoDatos). */
-export const PRIVACIDAD = 'https://app.digitdeck.co/privacy'
+export const PRIVACIDAD = '/privacidad.html'
 const DIAS_VISTA = 21
 
 export interface Franja { inicio: string; fin: string }
@@ -60,7 +60,7 @@ export function useAgenda(tema: string) {
     const desde = new Date()
     const hasta = new Date(desde.getTime() + DIAS_VISTA * 864e5)
     try {
-      const r = await fetch(`${API}/huecos?desde=${desde.toISOString()}&hasta=${hasta.toISOString()}`)
+      const r = await fetch(`${API}?desde=${desde.toISOString()}&hasta=${hasta.toISOString()}`)
       const j = (await r.json()) as { ok: boolean; timezone?: string; slots?: { startAt: string; endAt: string }[] }
       if (!j.ok || !j.slots) throw new Error('slots')
       if (j.timezone) setZonaMax(j.timezone)
@@ -119,7 +119,7 @@ export function useAgenda(tema: string) {
           void cargar()
           return { ok: false, fallo: 'ocupada' }
         }
-        return { ok: false, fallo: r.status === 429 ? 'limite' : 'datos', detalle: j.error }
+        return { ok: false, fallo: r.status === 429 ? 'limite' : r.status >= 500 ? 'red' : 'datos', detalle: j.error }
       } catch {
         return { ok: false, fallo: 'red' }
       }
@@ -153,7 +153,7 @@ const COPIA = {
     marca: 'Marca o tienda (opcional)',
     sitio: 'Sitio web (opcional)',
     mensaje: '¿De qué quieres hablar? (opcional)',
-    consentimiento: 'Acepto que Digitdeck use estos datos para agendar la llamada y contactarme, según su',
+    consentimiento: 'Acepto que Max use estos datos para agendar la llamada y contactarme, según el',
     aviso: 'aviso de privacidad',
     confirmar: 'Confirmar la llamada',
     enviando: 'Reservando…',
@@ -182,7 +182,7 @@ const COPIA = {
     marca: 'Brand or store (optional)',
     sitio: 'Website (optional)',
     mensaje: 'What would you like to talk about? (optional)',
-    consentimiento: 'I agree that Digitdeck may use this data to book the call and contact me, under its',
+    consentimiento: 'I agree that Max may use this data to book the call and contact me, under the',
     aviso: 'privacy notice',
     confirmar: 'Confirm the call',
     enviando: 'Booking…',
@@ -211,7 +211,7 @@ const COPIA = {
     marca: 'ブランド・ストア名（任意）',
     sitio: 'ウェブサイト（任意）',
     mensaje: 'ご相談内容（任意）',
-    consentimiento: '通話の予約と連絡のために、Digitdeckが以下に従ってこの情報を使用することに同意します：',
+    consentimiento: '通話の予約と連絡のために、Maxが以下に従ってこの情報を使用することに同意します：',
     aviso: 'プライバシー通知',
     confirmar: '予約を確定',
     enviando: '予約中…',

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useSta
 import { useLocation } from 'react-router-dom'
 import { useLanguage } from '../../context/LanguageContext'
 import { fmtDia, fmtHora, PRIVACIDAD, useAgenda, zonaVisitante, type Franja } from '../shared/agenda'
+import ReservaGoogle from '../shared/ReservaGoogle'
 import { useCopiaPlato, type CopiaPlato } from './agendaCopy'
 import { ID, usePlato } from './contexto'
 import { gsap } from './motion'
@@ -126,7 +127,7 @@ function Esqueleto({ t }: { t: CopiaPlato }) {
 function Hoja({ t, onDuracion, onEscribir }: { t: CopiaPlato; onDuracion: (m: number) => void; onEscribir: () => void }) {
   const { locale } = useLanguage()
   const { c } = usePlato()
-  const { estado, dias, duracion, zona, zonaMax, recargar, reservar, elegir } = useAgenda(ID)
+  const { estado, dias, duracion, zona, zonaMax, reservar, elegir } = useAgenda(ID)
   const [paso, setPaso] = useState<Paso>('elegir')
   const [diaSel, setDiaSel] = useState<string | null>(null)
   const [elegida, setElegida] = useState<Elegida | null>(null)
@@ -305,11 +306,12 @@ function Hoja({ t, onDuracion, onEscribir }: { t: CopiaPlato; onDuracion: (m: nu
       <p className="pl-sr" role="status" aria-live="polite">{anuncio}</p>
       <div className="pl-ag-paso" ref={pasoEl} data-paso={paso}>
         {paso === 'elegir' && (
-          estado === 'error' || estado === 'vacio' ? (
-            <div className="pl-ag-msj" role={estado === 'error' ? 'alert' : 'status'}>
-              <p>{estado === 'error' ? t.errorCarga : t.sinHuecos}</p>
+          estado === 'error' ? (
+            <ReservaGoogle className="pl-ag-google" />
+          ) : estado === 'vacio' ? (
+            <div className="pl-ag-msj" role="status">
+              <p>{t.sinHuecos}</p>
               <div className="pl-ag-msj-acc">
-                {estado === 'error' && <button type="button" className="pl-pil pl-pil--clara pl-pil--grande" onClick={() => void recargar()}><Rod>{t.reintentar}</Rod></button>}
                 <button type="button" className="pl-pil pl-pil--linea pl-pil--grande" onClick={onEscribir}><Rod>{t.escribir}</Rod></button>
               </div>
             </div>

@@ -190,3 +190,6 @@
 .ing-contacto-top .ing-nota { margin-top: 12px; }
 @media (min-width: 1024px) { .ing-contacto-top { padding-block: 96px 48px; } }
 .ing-escribir .ing-contacto-g { row-gap: 40px; }
+
+/* Respaldo: la página de reservas de Google cuando la agenda propia no carga, sobre el mismo papel blanco. */
+.ag-google { border: 1px solid var(--ing-line); border-radius: var(--ing-r-btn); box-sizing: border-box; }

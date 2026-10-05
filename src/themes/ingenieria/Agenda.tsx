@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ChangeEvent
 import { useLocation } from 'react-router-dom'
 import { useLanguage, type Locale } from '../../context/LanguageContext'
 import { fmtDia, fmtHora, PRIVACIDAD, useAgenda, type Dia, type Franja } from '../shared/agenda'
+import ReservaGoogle from '../shared/ReservaGoogle'
 import { useCopiaIng } from './agenda-copy'
 import { useCopy } from './copy'
 import { gsap, SALE } from './motion'
@@ -129,7 +130,7 @@ function Hoja() {
   const c = useCopiaIng()
   const copy = useCopy()
   const { personal } = usePublico()
-  const { estado, dias, duracion, zona, zonaMax, recargar, reservar, elegir } = useAgenda('ingenieria')
+  const { estado, dias, duracion, zona, zonaMax, reservar, elegir } = useAgenda('ingenieria')
 
   const [paso, setPaso] = useState<Paso>('franja')
   const [diaSel, setDiaSel] = useState<string | null>(null)
@@ -255,7 +256,6 @@ function Hoja() {
     if (estado === 'cargando') setAnuncio(c.cargando)
     else if (estado === 'listo' && dias.length) setAnuncio(c.dias(dias.length))
     else if (estado === 'vacio') setAnuncio(c.sinHuecos)
-    else if (estado === 'error') setAnuncio(c.errorCarga)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [estado])
 
@@ -383,15 +383,10 @@ function Hoja() {
       <div className="ag-cuerpo" data-vista={vista}>
         {vista === 'cargando' && <Cargando />}
 
+        {/* Sin agenda propia (api/agenda.ts sin credenciales o Google sin responder), la página de reservas de Google ocupa la ficha. */}
         {vista === 'error' && (
-          <div className="ag-p ag-p-msg" ref={panel}>
-            <div className="ag-msg">
-              <p className="ag-msg-t" role="alert" data-fila>{c.errorCarga}</p>
-              <div className="ag-msg-a" data-fila>
-                <button type="button" className="ing-btn ing-btn-sec" onClick={() => void recargar()}>{c.reintentar}</button>
-                <button type="button" className="ing-enlace" onClick={irAlFormulario}>{copy.contacto.form}<Flecha /></button>
-              </div>
-            </div>
+          <div ref={panel}>
+            <ReservaGoogle className="ag-google" />
           </div>
         )}
 

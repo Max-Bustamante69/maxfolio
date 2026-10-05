@@ -760,3 +760,19 @@
     gap: 12px;
   }
 }
+
+/* ---- Respaldo: la página de reservas de Google cuando la agenda propia no carga ---- */
+.dd-ag__respaldo {
+  padding: var(--ag-pad);
+}
+.dd-ag__google {
+  border-radius: 12px;
+}
+@media (max-width: 639px) {
+  .dd-ag__respaldo {
+    padding: 0;
+  }
+  .dd-ag__google {
+    border-radius: 0;
+  }
+}

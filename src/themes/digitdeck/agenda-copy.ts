@@ -1,5 +1,5 @@
 // Textos de la agenda con la voz de la dirección «A la manera de Digitdeck»: corta, directa y sin adornos. Parte de los comunes
-// (useCopiaAgenda: es/en/ja, con el consentimiento que nombra a Digitdeck y los fallos de la API) y añade lo que solo esta
+// (useCopiaAgenda: es/en/ja, con el consentimiento y los fallos de la API) y añade lo que solo esta
 // dirección dice: la ruta tipo comando, las etiquetas de lectura de pantalla, los errores por campo y la confirmación.
 import { useLanguage, type Locale } from '../../context/LanguageContext'
 import { useCopiaAgenda } from '../shared/agenda'
