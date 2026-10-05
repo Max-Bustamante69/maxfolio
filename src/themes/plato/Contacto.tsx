@@ -2,6 +2,8 @@ import { useEffect, useId, useRef, useState, type FormEvent } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { sinPuntoFinal } from '../data'
 import { evento, MOTIVOS, useCopiarCorreo, useEnviarContacto, type Motivo } from '../shared/contacto'
+import Agenda from './Agenda'
+import { useCopiaPlato } from './agendaCopy'
 import { ID, usePlato } from './contexto'
 import { gsap, useVista } from './motion'
 import { Flecha, Rod } from './piezas'
@@ -36,6 +38,7 @@ export default function Contacto() {
   const [errores, setErrores] = useState<{ correo?: string; tienda?: string }>({})
   const { estado, enviar } = useEnviarContacto(ID)
   const { copiar, copiado, correo } = useCopiarCorreo(ID)
+  const ag = useCopiaPlato()
   const form = useRef<HTMLFormElement>(null)
   const ok = useRef<HTMLDivElement>(null)
   const cont = s.sections.contact
@@ -43,6 +46,11 @@ export default function Contacto() {
   const proceso = s.sections.process
 
   const ref = useVista<HTMLElement>([])
+  // «Escríbeme» (la agenda vacía o sin conexión) lleva al formulario de mensaje, la segunda vía.
+  const irAlMensaje = () => {
+    document.getElementById('pl-form')?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+    window.setTimeout(() => form.current?.querySelector<HTMLElement>('[name=tienda]')?.focus({ preventScroll: true }), 450)
+  }
   useEffect(() => { evento(ID, 'contact_open') }, [])
   useEffect(() => {
     if (estado === 'ok' && ok.current) gsap.from(ok.current, { opacity: 0, scale: 0.96, y: 18, duration: 0.8, ease: 'pl', clearProps: 'all' })
@@ -82,10 +90,14 @@ export default function Contacto() {
           <div className="pl-pedir-tit">
             <p className="pl-mono pl-kicker pl-pedir-eyebrow" data-pl="subir">{cont.eyebrow}</p>
             <h1 id="pl-h1" className="pl-pedir-h1" data-pl="linea">{cont.title} <em>{sinPuntoFinal(cont.titleAccent)}</em></h1>
+          </div>
+          <div className="pl-pedir-apoyo">
             <p className="pl-pedir-lead" data-pl="subir" data-pl-retraso="0.2">{cont.lead}</p>
             <p className="pl-pedir-prom" data-pl="subir" data-pl-retraso="0.3">{cont.promise}</p>
           </div>
+          <Agenda onEscribir={irAlMensaje} />
           <div className="pl-form" id="pl-form" data-pl="subir" data-pl-retraso="0.2">
+            <h2 className="pl-form-t">{ag.otraVia}</h2>
             {estado === 'ok' ? (
               <div className="pl-ok" ref={ok} role="status">
                 <svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="var(--tungsteno)" /><path d="m7 12.5 3.2 3.2L17 8.8" fill="none" stroke="var(--tinta)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>

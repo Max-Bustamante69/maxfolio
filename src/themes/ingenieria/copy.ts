@@ -175,6 +175,7 @@ const es = {
     cvC: 'CV en PDF',
     faq: 'Preguntas frecuentes',
     form: 'Escríbeme',
+    escribir: { etq: 'Otra vía', titulo: 'Si prefieres escribir,', acento: 'deja tu tienda y tu correo' },
   },
   pie: { medellin: 'Medellín, Colombia', arriba: 'Volver arriba', nav: 'Navegar', sitio: 'Mapa' },
 }
@@ -345,6 +346,7 @@ const en: typeof es = {
     cvC: 'CV as PDF',
     faq: 'Frequently asked questions',
     form: 'Write to me',
+    escribir: { etq: 'Another route', titulo: 'If you would rather write,', acento: 'leave your store and email' },
   },
   pie: { medellin: 'Medellín, Colombia', arriba: 'Back to top', nav: 'Navigate', sitio: 'Map' },
 }

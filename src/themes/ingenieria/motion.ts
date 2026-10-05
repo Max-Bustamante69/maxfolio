@@ -259,12 +259,14 @@ let saliendo = false
  */
 export function useIr() {
   const navigate = useNavigate()
-  const { pathname, search } = useLocation()
+  const { pathname, search, hash } = useLocation()
   return useCallback((to: string) => {
     if (to === pathname + search) { window.scrollTo({ top: 0, behavior: 'smooth' }); return }
+    // Mismo destino con ancla (p. ej. #agenda estando ya en Contacto): se lleva a su sitio sin repetir la salida de la vista.
+    if (hash && to === pathname + search + hash) { document.getElementById(hash.slice(1))?.scrollIntoView({ block: 'start', behavior: 'smooth' }); return }
     const vista = document.querySelector<HTMLElement>('.ing-vista')
     const raiz = document.querySelector<HTMLElement>('.v5-ingenieria')
-    if (!vista || !raiz || saliendo || to.split('?')[0] === pathname) { if (!saliendo) navigate(to); return }
+    if (!vista || !raiz || saliendo || to.split(/[?#]/)[0] === pathname) { if (!saliendo) navigate(to); return }
     saliendo = true
     posiciones.set(pathname + search, window.scrollY)
     const pulso = document.querySelector<HTMLElement>('.ing-pulso')
@@ -286,7 +288,7 @@ export function useIr() {
     navigate(to)
     saliendo = false
     gsap.to(copia, { opacity: 0, duration: 0.34, ease: 'power2.out', delay: 0.03, onComplete: () => copia.remove() })
-  }, [navigate, pathname, search])
+  }, [navigate, pathname, search, hash])
 }
 
 /* ------------------------------------------------------------------ tarjeta ⇄ ficha */

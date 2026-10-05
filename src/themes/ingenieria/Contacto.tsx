@@ -1,7 +1,8 @@
-import { useEffect, useId, useRef, useState, type FormEvent } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useEffect, useId, useLayoutEffect, useRef, useState, type FormEvent } from 'react'
+import { useLocation, useSearchParams } from 'react-router-dom'
 import { sinPuntoFinal } from '../data'
 import { evento, MOTIVOS, useCopiarCorreo, useEnviarContacto, type Motivo } from '../shared/contacto'
+import Agenda from './Agenda'
 import { useCopy } from './copy'
 import { gsap, SALE, useVista } from './motion'
 import { Cabecera, Flecha } from './piezas'
@@ -53,6 +54,25 @@ export default function Contacto() {
 
   const ref = useVista<HTMLElement>([])
   useEffect(() => { evento('ingenieria', 'contact_open') }, [])
+
+  // Llegar con #agenda (los CTA de «Revisión gratis») deja el calendario a la vista: al abrir la página, de golpe y sosteniéndolo
+  // mientras las fuentes y los titulares de arriba asientan su alto (si nadie ha tocado el scroll); si ya se estaba aquí, deslizando.
+  const { hash } = useLocation()
+  const abierta = useRef(performance.now())
+  useLayoutEffect(() => {
+    const el = hash === '#agenda' ? document.getElementById('agenda') : null
+    if (!el) return
+    if (performance.now() - abierta.current > 1200) { el.scrollIntoView({ block: 'start', behavior: 'smooth' }); return }
+    el.scrollIntoView({ block: 'start', behavior: 'instant' })
+    let tocado = false
+    const marca = () => { tocado = true }
+    const eventos = ['wheel', 'touchstart', 'keydown', 'pointerdown'] as const
+    eventos.forEach((e) => window.addEventListener(e, marca, { passive: true, once: true }))
+    const ro = new ResizeObserver(() => { if (!tocado) el.scrollIntoView({ block: 'start', behavior: 'instant' }) })
+    ro.observe(document.body)
+    const t = window.setTimeout(() => ro.disconnect(), 1500)
+    return () => { ro.disconnect(); window.clearTimeout(t); eventos.forEach((e) => window.removeEventListener(e, marca)) }
+  }, [hash])
   useEffect(() => {
     if (estado === 'ok' && ok.current) gsap.from(ok.current, { opacity: 0, y: 18, duration: 0.8, ease: SALE, clearProps: 'all' })
   }, [estado])
@@ -97,20 +117,34 @@ export default function Contacto() {
       <CanonicalPlato />
 
       <section className="ing-contacto" aria-labelledby="ing-h1">
+        <div className="ing-marco ing-contacto-top">
+          <Cabecera
+            id="ing-h1"
+            nivel={1}
+            anim="titular"
+            etq={s.sections.contact.eyebrow}
+            titulo={s.sections.contact.title}
+            acento={sinPuntoFinal(s.sections.contact.titleAccent)}
+            texto={<><p>{s.sections.contact.lead}</p><p className="ing-nota">{s.sections.contact.promise}</p></>}
+          />
+        </div>
+      </section>
+
+      <div className="ing-marco ing-contacto-ag"><Agenda /></div>
+
+      <section className="ing-sec ing-escribir" aria-labelledby="ing-esc-t">
         <div className="ing-marco ing-contacto-g">
           <div className="ing-contacto-izq">
-            <Cabecera id="ing-h1" nivel={1} anim="titular" etq={s.sections.contact.eyebrow} titulo={s.sections.contact.title} acento={sinPuntoFinal(s.sections.contact.titleAccent)} />
-            <p className="ing-lead" data-ing="subir" data-ing-retraso="0.25">{s.sections.contact.lead}</p>
-            <p className="ing-nota" data-ing="subir" data-ing-retraso="0.35">{s.sections.contact.promise}</p>
+            <Cabecera id="ing-esc-t" etq={c.contacto.escribir.etq} titulo={c.contacto.escribir.titulo} acento={c.contacto.escribir.acento} />
           </div>
 
-          <div className="ing-despues" data-ing="subir" data-ing-retraso="0.4">
+          <div className="ing-despues" data-ing="subir" data-ing-retraso="0.1">
             <p className="ing-etq">{s.sections.contact.nextLabel}</p>
             <ol>{despues.map((p, i) => <li key={p}><span aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>{p}</li>)}</ol>
           </div>
 
           <div className="ing-contacto-der">
-            <div className="ing-form" id="ing-form" data-ing="marco" data-ing-retraso="0.2">
+            <div className="ing-form" id="ing-form" data-ing="marco" data-ing-retraso="0.1">
               <p className="ing-etq">{c.contacto.form}</p>
               {estado === 'ok' ? (
                 <div className="ing-ok" ref={ok} role="status">
@@ -150,7 +184,7 @@ export default function Contacto() {
               )}
             </div>
 
-            <div className="ing-canales" data-ing="subir" data-ing-retraso="0.3">
+            <div className="ing-canales" data-ing="subir" data-ing-retraso="0.2">
               <p className="ing-etq">{c.contacto.canales}</p>
               <ul>
                 <li>

@@ -96,7 +96,7 @@ function Hoja({ cerrar, actual }: { cerrar: () => void; actual: string }) {
       <div className="pl-hoja-pie">
         <Idioma />
         <a className="pl-enlace-mono" href={v.personal.cv} download>{c.cv}</a>
-        <Enlace to={`${BASE}/contacto?motivo=revision`} className="pl-pil pl-pil--tung" onClick={cerrar}>
+        <Enlace to={`${BASE}/contacto#agenda`} className="pl-pil pl-pil--tung" onClick={cerrar}>
           <Rod>{c.revision}</Rod><PuntosPil n={1} />
         </Enlace>
       </div>
@@ -152,7 +152,7 @@ function Cabecera({ en3d, puede3d, setModo }: { en3d: boolean; puede3d: boolean;
           )}
           <TemasBoton ref={botonTemas} abierto={temasAbierto} onClick={abrirTemas} alApuntar={() => void cargarPanelTemas().catch(() => {})} />
           <span className="pl-cab-slot">
-            <Enlace to={`${BASE}/contacto?motivo=revision`} className="pl-pil pl-pil--osc pl-cab-cta">
+            <Enlace to={`${BASE}/contacto#agenda`} className="pl-pil pl-pil--osc pl-cab-cta">
               <Rod>{c.revision}</Rod><PuntosPil n={1} />
             </Enlace>
             <a href={v.personal.cv} download className="pl-pil pl-pil--clara pl-cab-cv" tabIndex={-1}>

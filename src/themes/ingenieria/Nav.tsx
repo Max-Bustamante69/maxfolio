@@ -59,7 +59,7 @@ function Hoja({ cerrar, enlaces, cv }: { cerrar: () => void; enlaces: Array<[str
       <div className="ing-hoja-pie">
         <Idioma />
         <a className="ing-enlace" href={cv} download>{c.cv}</a>
-        <Enlace to={`${BASE}/contacto?motivo=revision`} className="ing-btn ing-btn-pri" onClick={cerrar}>{c.revision}<Flecha /></Enlace>
+        <Enlace to={`${BASE}/contacto#agenda`} className="ing-btn ing-btn-pri" onClick={cerrar}>{c.revision}<Flecha /></Enlace>
       </div>
     </div>
   )
@@ -135,7 +135,7 @@ export function Nav({ cv }: { cv: string }) {
         <div className="ing-nav-der">
           <BotonTemas ref={disparador} abierto={temas} alPulsar={abrirTemas} />
           <Idioma clase="ing-seg-idioma" />
-          <Enlace to={`${BASE}/contacto?motivo=revision`} className="ing-btn ing-btn-pri ing-btn-chico ing-nav-cta">{c.revision}<Flecha /></Enlace>
+          <Enlace to={`${BASE}/contacto#agenda`} className="ing-btn ing-btn-pri ing-btn-chico ing-nav-cta">{c.revision}<Flecha /></Enlace>
           <button ref={boton} type="button" className="ing-burger" aria-expanded={abierto} aria-label={abierto ? c.menu.cerrar : c.menu.abrir} onClick={() => (abierto ? cerrar() : setAbierto(true))}>
             <span className="ing-burger-l" aria-hidden="true" />
           </button>

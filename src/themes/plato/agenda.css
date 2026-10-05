@@ -1,0 +1,166 @@
+/* Plató · agenda: la hoja de rodaje (Agenda.tsx). Mismos tokens que el resto de la dirección (tokens.css): grafito sobre plató, filo de
+   tungsteno, Host Grotesk + IBM Plex Mono. El tungsteno solo marca lo encendido (filo del panel y de la fecha elegida, la hora de la toma,
+   el botón primario, el golpe de la claqueta); nunca es color de rótulo. Solo transform, opacity y clip-path se mueven y todo termina:
+   la hoja quieta no pide fotogramas. */
+
+.pl-ag { grid-column: 1 / -1; position: relative; min-width: 0; scroll-margin-top: clamp(84px, 9vw, 116px); background: var(--grafito); color: var(--sala); border: 1px solid var(--linea-osc); border-top: 2px solid var(--tungsteno); border-radius: var(--r); padding: clamp(20px, 2.6vw, 40px); --foco: var(--tungsteno); --tile: 76px; --paso: 84px; }
+@media (min-width: 700px) { .pl-ag { --tile: 92px; --paso: 100px; } }
+
+/* ------------------------------------------------------------------ cabecera: la hoja de rodaje (quién dirige, cuánto dura, dónde y en qué zona) */
+.pl-ag-cab { display: grid; gap: 22px var(--gap); padding-bottom: clamp(20px, 2.4vw, 32px); }
+.pl-ag-tit h2 { margin-top: 12px; font-size: clamp(34px, 8.6vw, 44px); line-height: 1.04; letter-spacing: -0.02em; font-weight: 400; }
+.pl-ag-datos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; margin: 0; background: var(--linea-osc); border: 1px solid var(--linea-osc); border-radius: 12px; overflow: hidden; background-clip: padding-box; }
+.pl-ag-datos > div { background: var(--grafito); padding: 12px 14px 14px; min-width: 0; }
+.pl-ag-datos dt { color: var(--sala-72); }
+.pl-ag-datos dd { margin: 4px 0 0; font-size: 17px; line-height: 1.25; overflow-wrap: anywhere; }
+@media (min-width: 900px) {
+  .pl-ag-cab { grid-template-columns: repeat(12, minmax(0, 1fr)); align-items: end; }
+  .pl-ag-tit { grid-column: 1 / span 5; }
+  .pl-ag-tit h2 { font-size: clamp(38px, 3.5vw, 54px); }
+  .pl-ag-datos { grid-column: 6 / span 7; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+.pl-ag-cuerpo { position: relative; border-top: 1px solid var(--linea-osc); padding-top: clamp(20px, 2.4vw, 32px); }
+.pl-ag-paso { position: relative; animation: pl-ag-aparece 0.5s var(--e-lusion) backwards; }
+@keyframes pl-ag-aparece { from { opacity: 0; } }
+
+/* ------------------------------------------------------------------ paso 1: fecha de rodaje (la tira) y toma */
+.pl-ag-bloque + .pl-ag-bloque { margin-top: clamp(22px, 2.8vw, 36px); }
+.pl-ag-bloque-cab { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 18px; margin-bottom: 12px; min-height: 44px; }
+.pl-ag-bloque-cab .pl-ag-etq { align-self: center; }
+.pl-ag-bloque-cab--toma, .pl-ag-bloque-cab--toma .pl-ag-etq { align-items: baseline; align-self: baseline; }
+.pl-ag-etq { color: var(--sala-72); }
+.pl-ag-dia-largo { font-size: clamp(20px, 2vw, 26px); line-height: 1.2; letter-spacing: -0.01em; }
+.pl-ag-flechas { display: flex; gap: 8px; margin-left: auto; align-self: center; }
+.pl-ag-flecha { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--linea-osc); color: var(--sala); transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.3s var(--e-lusion); }
+.pl-ag-flecha:disabled { opacity: 0.32; cursor: default; }
+.pl-ag-flecha:not(:disabled):active { transform: scale(0.94); }
+@media (hover: hover) { .pl-ag-flecha:not(:disabled):hover { background: var(--sala); color: var(--tinta); border-color: var(--sala); } }
+
+/* La tira de película: perforaciones arriba y abajo que se desplazan con las fechas; los bordes se desvanecen solo si hay más fuera. */
+.pl-ag-tira { overflow-x: auto; overflow-y: hidden; scroll-snap-type: x proximity; scroll-padding-inline: 28px; scrollbar-width: none; overscroll-behavior-x: contain; --mi: 0px; --mf: 0px; -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--mi), #000 calc(100% - var(--mf)), transparent); mask-image: linear-gradient(90deg, transparent, #000 var(--mi), #000 calc(100% - var(--mf)), transparent); }
+.pl-ag-tira::-webkit-scrollbar { display: none; }
+.pl-ag-tira[data-ini] { --mi: 28px; }
+.pl-ag-tira[data-fin] { --mf: 28px; }
+.pl-ag-tira-in { position: relative; display: flex; gap: 8px; width: max-content; min-width: 100%; padding: 22px 2px; }
+.pl-ag-tira-in::before, .pl-ag-tira-in::after { content: ''; position: absolute; left: 0; right: 0; height: 6px; pointer-events: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='6'%3E%3Crect x='6' width='12' height='6' rx='1.6' fill='%23edeef0' fill-opacity='.2'/%3E%3C/svg%3E") 0 0 / calc(var(--paso) / 4) 6px repeat-x; }
+.pl-ag-tira-in::before { top: 7px; }
+.pl-ag-tira-in::after { bottom: 7px; }
+.pl-ag-dia { position: relative; flex: none; display: grid; justify-items: center; align-content: center; gap: 2px; width: var(--tile); min-height: 112px; padding: 10px 4px; border-radius: 10px; border: 1px solid var(--linea-osc); scroll-snap-align: start; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.3s var(--e-lusion); animation: pl-ag-enciende 0.5s var(--e-luz) backwards; animation-delay: calc(min(var(--i), 9) * 32ms); }
+.pl-ag-dia::before { content: ''; position: absolute; left: 14px; right: 14px; top: -1px; height: 2px; border-radius: 2px; background: var(--tungsteno); transform: scaleX(0); transition: transform 0.38s var(--e-luz); }
+.pl-ag-dia-s, .pl-ag-dia-m { color: var(--sala-72); }
+.pl-ag-dia-n { font-size: 40px; line-height: 1.05; font-weight: 300; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.pl-ag-dia[aria-pressed='true'] { background: var(--sala); color: var(--tinta); border-color: var(--sala); }
+.pl-ag-dia[aria-pressed='true'] .pl-ag-dia-s, .pl-ag-dia[aria-pressed='true'] .pl-ag-dia-m { color: var(--tinta-2); }
+.pl-ag-dia[aria-pressed='true']::before { transform: scaleX(1); }
+@media (hover: hover) { .pl-ag-dia[aria-pressed='false']:hover { border-color: var(--sala); } }
+.pl-ag-dia:active, .pl-ag-toma:active { transform: scale(0.97); }
+/* El aro de foco global (.pl-raiz :focus-visible) pone radio de 4 px: aquí cada pieza conserva su forma. */
+.pl-ag .pl-ag-dia:focus-visible, .pl-ag .pl-ag-toma:focus-visible { border-radius: 10px; outline-offset: 2px; }
+.pl-ag .pl-ag-flecha:focus-visible { border-radius: 50%; }
+.pl-ag .pl-pil:focus-visible { border-radius: 999px; }
+
+/* Las tomas (las horas libres del día): se encienden en cascada al elegir fecha (la rejilla se vuelve a montar con cada día). */
+.pl-ag-tomas { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+@media (min-width: 700px) { .pl-ag-tomas { grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); } }
+.pl-ag-toma { position: relative; display: grid; align-content: space-between; gap: 6px; min-height: 76px; padding: 10px 10px 11px; text-align: left; border-radius: 10px; border: 1px solid var(--linea-osc); transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.3s var(--e-lusion); animation: pl-ag-enciende 0.42s var(--e-luz) backwards; animation-delay: calc(min(var(--i), 11) * 24ms); }
+.pl-ag-toma::before { content: ''; position: absolute; left: 10px; right: 10px; top: -1px; height: 2px; border-radius: 2px; background: var(--tungsteno); transform: scaleX(0); transition: transform 0.38s var(--e-luz); }
+.pl-ag-toma-k { display: flex; justify-content: space-between; gap: 6px; color: var(--sala-72); white-space: nowrap; }
+.pl-ag-toma-h { font-size: 26px; line-height: 1; font-weight: 300; letter-spacing: -0.025em; font-variant-numeric: tabular-nums; }
+.pl-ag-toma-max { min-height: 1.2em; font-size: 13px; line-height: 1.2; color: var(--sala-72); white-space: nowrap; }
+.pl-ag-toma[aria-pressed='true'] { background: var(--sala); color: var(--tinta); border-color: var(--sala); }
+.pl-ag-toma[aria-pressed='true'] .pl-ag-toma-k, .pl-ag-toma[aria-pressed='true'] .pl-ag-toma-max { color: var(--tinta-2); }
+.pl-ag-toma[aria-pressed='true']::before { transform: scaleX(1); }
+@media (hover: hover) { .pl-ag-toma[aria-pressed='false']:hover { border-color: var(--sala); } }
+@keyframes pl-ag-enciende { from { opacity: 0; transform: translateY(8px); } }
+.pl-ag .pl-ag-leyenda { margin-top: 14px; color: var(--sala-72); text-transform: none; letter-spacing: 0.02em; line-height: 1.5; }
+
+/* El hueco mientras carga: la misma estructura y las mismas medidas, quieta (la altura no salta al llegar los datos). */
+.pl-ag-esq i { display: block; border-radius: 10px; background: rgb(237 238 240 / 0.06); }
+.pl-ag-esq .pl-ag-esq-dia { flex: none; width: var(--tile); height: 112px; }
+.pl-ag-esq .pl-ag-esq-toma { height: 76px; }
+.pl-ag-esq .pl-ag-tira { -webkit-mask-image: none; mask-image: none; }
+/* Con otra zona, cada toma lleva la hora de Max debajo (95 px) y la leyenda ocupa tres líneas: el hueco ya las reserva. */
+.pl-ag-esq[data-max] .pl-ag-esq-toma { height: 95px; }
+.pl-ag-esq[data-max] .pl-ag-leyenda { min-height: calc(1.5em * 3); }
+
+/* Vacío, error y aviso de toma ocupada (sin agenda propia, la página de reservas de Google ocupa la hoja) */
+.pl-ag-google { border-radius: 10px; }
+.pl-ag-msj { display: grid; gap: 22px; justify-items: start; padding: clamp(8px, 2vw, 24px) 0; }
+.pl-ag-msj p { font-size: clamp(19px, 2vw, 26px); line-height: 1.3; max-width: 28em; }
+.pl-ag-msj-acc { display: flex; flex-wrap: wrap; gap: 10px; }
+.pl-ag-aviso { margin-bottom: 20px; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--linea-osc); border-left: 2px solid var(--tungsteno); font-size: 16px; line-height: 1.4; }
+.pl-pil--linea { background: transparent; color: var(--sala); border: 1px solid var(--sala-55); }
+@media (hover: hover) { .pl-pil--linea:hover { background: var(--sala); color: var(--tinta); border-color: var(--sala); } }
+
+/* ------------------------------------------------------------------ paso 2: la ficha de la toma (resumen a la izquierda, datos a la derecha) */
+.pl-ag-ficha { display: grid; gap: 28px var(--gap); }
+.pl-ag-resumen { display: grid; gap: 8px; align-content: start; }
+.pl-ag-resumen-h { display: flex; align-items: baseline; gap: 10px; margin-top: 6px; font-size: clamp(56px, 7vw, 88px); line-height: 1; font-weight: 300; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; color: var(--tungsteno); }
+.pl-ag-resumen-h small, .pl-ag-listo-hora small { font-size: 14px; letter-spacing: 0.04em; color: var(--sala-72); }
+.pl-ag-resumen-d { font-size: clamp(20px, 2vw, 26px); line-height: 1.2; letter-spacing: -0.01em; }
+.pl-ag-resumen-l { margin: 14px 0 6px; }
+.pl-ag-resumen-l > div { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 12px 0; border-top: 1px solid var(--linea-osc); }
+.pl-ag-resumen-l > div:last-child { border-bottom: 1px solid var(--linea-osc); }
+.pl-ag-resumen-l dt { color: var(--sala-72); flex: none; }
+.pl-ag-resumen-l dd { margin: 0; font-size: 16px; line-height: 1.35; text-align: right; overflow-wrap: anywhere; }
+.pl-ag-volver { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; justify-self: start; font-size: 15px; border-bottom: 1px solid var(--linea-osc); transition: border-color 0.3s; }
+@media (hover: hover) { .pl-ag-volver:hover { border-color: var(--sala); } }
+.pl-ag-campos { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; align-content: start; }
+.pl-ag .pl-campo textarea { width: 100%; min-height: 108px; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--linea-osc); background: var(--plato); font: inherit; font-size: 17px; line-height: 1.45; color: var(--sala); resize: vertical; transition: border-color 0.3s; }
+.pl-ag .pl-campo textarea:focus { outline: none; border-color: var(--sala); }
+.pl-ag .pl-campo textarea:focus-visible { outline: 2px solid var(--tungsteno); outline-offset: 2px; }
+.pl-ag .pl-campo input:focus-visible { border-radius: 12px; }
+@media (min-width: 700px) { .pl-ag-campos { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px var(--gap); } .pl-ag-ancho { grid-column: 1 / -1; } }
+@media (min-width: 900px) { .pl-ag-ficha { grid-template-columns: repeat(12, minmax(0, 1fr)); } .pl-ag-resumen { grid-column: 1 / span 4; } .pl-ag-campos { grid-column: 6 / span 7; } }
+.pl-ag-hp { position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; }
+.pl-ag-envio { display: grid; gap: 12px; }
+
+/* El consentimiento: caja propia (24 px) dentro de una fila de 44 px o más. */
+.pl-ag-consent { display: grid; gap: 6px; }
+.pl-ag-chk { position: relative; display: flex; align-items: flex-start; gap: 14px; min-height: 44px; padding: 8px 0; cursor: pointer; font-size: 15px; line-height: 1.45; color: var(--sala-72); }
+.pl-ag-chk input { position: absolute; left: 0; top: 8px; width: 24px; height: 24px; margin: 0; opacity: 0; cursor: pointer; }
+.pl-ag-chk-caja { flex: none; display: grid; place-items: center; width: 24px; height: 24px; margin-top: 0; border-radius: 6px; border: 1px solid var(--sala-55); color: var(--tinta); background: transparent; transition: background-color 0.25s ease, border-color 0.25s ease; }
+.pl-ag-chk-caja svg { opacity: 0; transform: scale(0.8); transition: opacity 0.2s ease, transform 0.25s var(--e-luz); }
+.pl-ag-chk input:checked + .pl-ag-chk-caja { background: var(--tungsteno); border-color: var(--tungsteno); }
+.pl-ag-chk input:checked + .pl-ag-chk-caja svg { opacity: 1; transform: none; }
+.pl-ag-chk input:focus-visible + .pl-ag-chk-caja { outline: 2px solid var(--tungsteno); outline-offset: 3px; }
+.pl-ag-chk input[aria-invalid='true'] + .pl-ag-chk-caja { border-color: var(--error-osc); }
+.pl-ag-chk-txt a { color: var(--sala); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--sala-55); }
+@media (hover: hover) { .pl-ag-chk-txt a:hover { text-decoration-color: var(--sala); } }
+.pl-ag-err { font-style: normal; color: var(--error-osc); font-size: 14px; }
+.pl-ag .pl-enviar[aria-disabled='true'] { opacity: 0.6; cursor: progress; }
+
+/* ------------------------------------------------------------------ paso 3: rodaje confirmado (la claqueta) */
+.pl-ag-listo { display: grid; gap: 28px var(--gap); align-items: center; padding-top: 44px; }
+.pl-ag-listo-txt { display: grid; gap: 14px; justify-items: start; min-width: 0; }
+.pl-ag-listo-txt h3 { font-size: clamp(40px, 6vw, 80px); line-height: 1; letter-spacing: -0.025em; font-weight: 400; outline: none; }
+.pl-ag-listo-cuando { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; font-size: clamp(20px, 2.2vw, 30px); line-height: 1.2; letter-spacing: -0.01em; }
+.pl-ag-listo-hora { display: inline-flex; align-items: baseline; gap: 8px; color: var(--tungsteno); font-weight: 300; font-variant-numeric: tabular-nums; }
+.pl-ag .pl-ag-listo-zona { color: var(--sala-72); text-transform: none; letter-spacing: 0.02em; line-height: 1.5; overflow-wrap: anywhere; }
+.pl-ag-listo-det { font-size: 17px; line-height: 1.5; color: var(--sala-72); max-width: 30em; }
+.pl-ag-listo-acc { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+.pl-ag .pl-ag-listo-meet { color: var(--sala-72); text-transform: none; letter-spacing: 0.02em; overflow-wrap: anywhere; }
+.pl-ag-listo-meet a { color: var(--sala); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--sala-55); }
+@media (min-width: 900px) { .pl-ag-listo { grid-template-columns: repeat(12, minmax(0, 1fr)); } .pl-ag-clap { grid-column: 1 / span 4; } .pl-ag-listo-txt { grid-column: 6 / span 7; } }
+@media (max-width: 359px) { .pl-ag { padding: 16px; } }
+@media (max-width: 480px) { .pl-ag-listo-acc .pl-pil { width: 100%; justify-content: space-between; } .pl-ag-msj-acc .pl-pil { width: 100%; justify-content: space-between; } }
+
+/* La claqueta: el brazo (a rayas) baja y golpea el cuerpo; en el golpe se enciende el filo de tungsteno. 0,9 s, una vez, y queda quieta. */
+.pl-ag-clap { position: relative; width: min(100%, clamp(220px, 22vw, 300px)); aspect-ratio: 1.1; }
+.pl-ag-clap-cuerpo { position: absolute; inset: 26% 0 0 0; display: grid; align-content: space-evenly; padding: 0 7%; background: var(--plato); border: 1px solid var(--linea-osc); border-radius: 0 0 12px 12px; }
+.pl-ag-clap-cuerpo p { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 0; padding: 9px 0; border-bottom: 1px solid var(--linea-osc); }
+.pl-ag-clap-cuerpo p:last-child { border-bottom: 0; }
+.pl-ag-clap-cuerpo span { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--sala-72); }
+.pl-ag-clap-cuerpo b { font-weight: 400; font-size: 20px; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.pl-ag-clap-brazo { position: absolute; left: 0; right: 0; top: 6%; height: 20%; transform-origin: 2% 100%; border-radius: 8px 8px 0 0; border: 1px solid var(--linea-osc); background: repeating-linear-gradient(-58deg, var(--sala) 0 15px, var(--plato) 15px 30px); animation: pl-ag-clap-cierra 0.9s 0.6s both; }
+.pl-ag-clap-filo { position: absolute; left: 0; right: 0; top: calc(26% - 1px); height: 2px; border-radius: 2px; background: var(--tungsteno); animation: pl-ag-clap-filo 0.9s 0.6s both; }
+@keyframes pl-ag-clap-cierra {
+  0% { transform: rotate(-12deg); animation-timing-function: cubic-bezier(0.6, 0, 1, 0.5); }
+  42% { transform: rotate(0); animation-timing-function: ease-out; }
+  56% { transform: rotate(-2.6deg); animation-timing-function: ease-in; }
+  72%, 100% { transform: rotate(0); }
+}
+@keyframes pl-ag-clap-filo { 0%, 41% { opacity: 0; } 43%, 100% { opacity: 1; } }
+
+/* WCAG 2.4.11 (QA final): al enfocar con el teclado (Inicio/Fin, flechas) la cabecera fija no tapa la toma ni la fecha. */
+.pl-ag :is(.pl-ag-toma, .pl-ag-dia, .pl-ag-flecha) { scroll-margin-top: clamp(84px, 9vw, 116px); scroll-margin-bottom: 24px; }

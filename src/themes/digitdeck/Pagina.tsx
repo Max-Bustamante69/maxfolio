@@ -19,7 +19,7 @@ export const retorno: { slug: string | null } = { slug: null }
 export function Pagina({ titulo, children, className = '' }: { titulo: string; children: ReactNode; className?: string }) {
   const ref = useRef<HTMLElement>(null)
   const t = useTransicion()
-  const { key } = useLocation()
+  const { key, hash } = useLocation()
   const tipo = useNavigationType()
   // El <title> estático del index.html convive con uno hoistado por React: se fija el título del documento a mano.
   useEffect(() => {
@@ -35,6 +35,10 @@ export function Pagina({ titulo, children, className = '' }: { titulo: string; c
     retorno.slug = null
     window.scrollTo({ top: guardada ?? 0, behavior: 'instant' })
     if (guardada === undefined && fila) main.querySelector(`[data-slug="${fila}"]`)?.scrollIntoView({ block: 'center', behavior: 'instant' })
+    // Un enlace con ancla (p. ej. /contacto#agenda) llega a su sección y no arriba: el navegador la habría buscado, pero el scroll a 0 de
+    // arriba la anula. El disco de la transición se asienta entonces en el punto del título de esa sección, que es lo que se ve.
+    const ancla = guardada === undefined && !fila && hash.length > 1 ? main.querySelector<HTMLElement>(`[id="${CSS.escape(hash.slice(1))}"]`) : null
+    ancla?.scrollIntoView({ block: 'start', behavior: 'instant' })
     let ultimo = scrollY // el scroll que se guarda al salir (el último oyente, no el que deja la página nueva al montar)
     const alScroll = () => void (ultimo = scrollY)
     addEventListener('scroll', alScroll, { passive: true })
@@ -43,7 +47,7 @@ export function Pagina({ titulo, children, className = '' }: { titulo: string; c
     const ctx = gsap.context(() => undefined, main) // creado antes para que los observadores puedan registrar sus tweens con ctx.add
     ctx.add(() => {
       const h1 = main.querySelector('h1')
-      const dot = h1?.querySelector<HTMLElement>('[data-dd-dot]') ?? null
+      const dot = (ancla?.querySelector('.dd-titulo') ?? h1)?.querySelector<HTMLElement>('[data-dd-dot]') ?? null
       const r = dot?.getBoundingClientRect()
       const destino = r ? { x: r.left + r.width / 2, y: r.top + r.height / 2, d: r.width } : null
       const lineasH1 = h1 ? lineasDe(h1) : []

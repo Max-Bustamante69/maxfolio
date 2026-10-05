@@ -6,6 +6,8 @@ import { gsap } from 'gsap'
 import { useV5 } from '../data'
 import { MOTIVOS, evento, useCopiarCorreo, useEnviarContacto, type Motivo } from '../shared/contacto'
 import { useMedellinTime } from '../shared/useMedellinTime'
+import { AgendaCarga } from './Agenda'
+import { useCopiaDD } from './agenda-copy'
 import { useCopy } from './copy'
 import { EASE } from './movimiento'
 import { Pagina } from './Pagina'
@@ -40,6 +42,7 @@ function Faq() {
 
 export default function Contacto() {
   const c = useCopy()
+  const ag = useCopiaDD()
   const { strings, personal, locale } = useV5()
   const eng = strings.sections.engagement
   const siguientes = strings.sections.contact.next.filter((_, k) => k !== 1) // fuera «Recibes respuesta en un día hábil»: un plazo que esta dirección no promete
@@ -97,45 +100,58 @@ export default function Contacto() {
         <p className="dd-lede" data-in>{strings.sections.contact.lead}</p>
       </header>
 
-      <section className="dd-papel" data-tono="papel" aria-label={c.contacto.canales}>
-        <form ref={formRef} className="dd-form" onSubmit={alEnviar} noValidate data-in>
-          <label className="dd-campo">
-            <span className="dd-micro">{c.contacto.tienda}</span>
-            <input type="text" inputMode="url" autoComplete="url" placeholder={c.contacto.tiendaEjemplo} value={tienda} onChange={(e) => setTienda(e.target.value)} />
-          </label>
-          <label className="dd-campo">
-            <span className="dd-micro">{c.contacto.correo}</span>
-            <input type="email" autoComplete="email" required aria-invalid={invalido} aria-describedby={invalido ? 'dd-err' : undefined} value={correo} onChange={(e) => setCorreo(e.target.value)} />
-            {invalido && <span id="dd-err" className="dd-campo__error">{c.contacto.correoInvalido}</span>}
-          </label>
-          <fieldset className="dd-motivos">
-            <legend className="dd-micro">{c.contacto.motivo}</legend>
-            {ORDEN.map((m) => (
-              <label key={m} className="dd-motivo">
-                <input type="radio" name="motivo" value={m} checked={motivo === m} onChange={() => elegir(m)} />
-                <span>{c.contacto.motivos[m]}</span>
-              </label>
-            ))}
-          </fieldset>
-          <label className="dd-campo">
-            <span className="dd-micro">{c.contacto.mensaje}</span>
-            <textarea rows={3} value={mensaje} onChange={(e) => setMensaje(e.target.value)} />
-          </label>
-          <div className="dd-form__envio">
-            <button type="submit" className="dd-boton dd-boton--grande" disabled={estado === 'enviando'}>
-              {estado === 'enviando' ? c.contacto.enviando : c.contacto.enviar}
-            </button>
-            <p role="status" className="dd-estado">
-              {estado === 'ok' && (
-                <>
-                  <span ref={cae} className="dd-dot dd-dot--cae" aria-hidden="true" />
-                  <span>{c.contacto.ok}</span>
-                </>
-              )}
-              {estado === 'error' && c.contacto.error}
-            </p>
-          </div>
-        </form>
+      {/* Camino principal: agendar la llamada. El enlace #agenda llega aquí (Pagina lleva el scroll). */}
+      <section id="agenda" className="dd-seccion dd-agenda" aria-labelledby="dd-agenda-t">
+        <div className="dd-seccion__cab">
+          <Titulo id="dd-agenda-t" className="dd-h2" lineas={[ag.titulo]} />
+          <p className="dd-lede" data-in>{ag.lede}</p>
+        </div>
+        <AgendaCarga />
+      </section>
+
+      {/* Segunda vía: el mensaje de siempre. */}
+      <section id="escribir" className="dd-papel" data-tono="papel" aria-labelledby="dd-escribir-t">
+        <div className="dd-papel__form">
+          <Titulo id="dd-escribir-t" className="dd-h2" lineas={[ag.escribir]} />
+          <form ref={formRef} className="dd-form" onSubmit={alEnviar} noValidate data-in>
+            <label className="dd-campo">
+              <span className="dd-micro">{c.contacto.tienda}</span>
+              <input type="text" inputMode="url" autoComplete="url" placeholder={c.contacto.tiendaEjemplo} value={tienda} onChange={(e) => setTienda(e.target.value)} />
+            </label>
+            <label className="dd-campo">
+              <span className="dd-micro">{c.contacto.correo}</span>
+              <input type="email" autoComplete="email" required aria-invalid={invalido} aria-describedby={invalido ? 'dd-err' : undefined} value={correo} onChange={(e) => setCorreo(e.target.value)} />
+              {invalido && <span id="dd-err" className="dd-campo__error">{c.contacto.correoInvalido}</span>}
+            </label>
+            <fieldset className="dd-motivos">
+              <legend className="dd-micro">{c.contacto.motivo}</legend>
+              {ORDEN.map((m) => (
+                <label key={m} className="dd-motivo">
+                  <input type="radio" name="motivo" value={m} checked={motivo === m} onChange={() => elegir(m)} />
+                  <span>{c.contacto.motivos[m]}</span>
+                </label>
+              ))}
+            </fieldset>
+            <label className="dd-campo">
+              <span className="dd-micro">{c.contacto.mensaje}</span>
+              <textarea rows={3} value={mensaje} onChange={(e) => setMensaje(e.target.value)} />
+            </label>
+            <div className="dd-form__envio">
+              <button type="submit" className="dd-boton dd-boton--grande" disabled={estado === 'enviando'}>
+                {estado === 'enviando' ? c.contacto.enviando : c.contacto.enviar}
+              </button>
+              <p role="status" className="dd-estado">
+                {estado === 'ok' && (
+                  <>
+                    <span ref={cae} className="dd-dot dd-dot--cae" aria-hidden="true" />
+                    <span>{c.contacto.ok}</span>
+                  </>
+                )}
+                {estado === 'error' && c.contacto.error}
+              </p>
+            </div>
+          </form>
+        </div>
 
         <div className="dd-canales" data-in>
           <h2 className="dd-micro dd-canales__t">{c.contacto.canales}</h2>
