@@ -1,0 +1,18 @@
+# Max Bustamante
+
+> CTO & Shopify Tech Lead at Digitdeck (Medellín, Colombia). 20+ Shopify storefronts, a production app suite, and the delivery system behind them. Open for Shopify CRO consulting.
+
+The portfolio is served in three visual themes with the same content. Plató (`/plato`) is the canonical one; `/digitdeck` and `/ingenieria` point to it with `rel=canonical`. Pages are available in English, Spanish and Japanese.
+
+## Portfolio
+
+- [Home](https://www.maxfolio.dev/plato): positioning, featured work and how a store review works
+- [Work](https://www.maxfolio.dev/plato/obra): the Shopify storefronts and products, each with real desktop and mobile captures
+- [Career](https://www.maxfolio.dev/plato/trayectoria): roles and timeline
+- [Contact](https://www.maxfolio.dev/plato/contacto): book a call on Max's calendar or send a message
+
+## Optional
+
+- [LinkedIn](https://www.linkedin.com/in/maximiliano-bustamante-998b77173/)
+- [GitHub](https://github.com/Max-Bustamante69)
+- [Sitemap](https://www.maxfolio.dev/sitemap.xml)
