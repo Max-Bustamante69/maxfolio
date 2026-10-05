@@ -2,13 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useLanguage, type Locale } from '../../context/LanguageContext'
 import { track } from '../../lib/track'
 
-// Agenda de llamadas: la MISMA agenda pública de Digitdeck que usa digitdeck.co (Plataforma, app.digitdeck.co).
-// Los huecos salen de las reglas de la agenda más el free/busy del Google Calendar conectado allí; reservar crea la
-// cita con transacción anti-doble-reserva, el contacto en el CRM, el evento en Google con Meet y la invitación de
-// Google. Este archivo es el contrato: cada tema dibuja su propio calendario encima de useAgenda().
-// El origen https://(www.)maxfolio.dev está en PUBLIC_SITE_ORIGINS del servicio (CORS por lista, nunca "*").
+// Agenda de llamadas contra el Google Calendar de Max (la cuenta conectada como «agenda de reservas» en la Plataforma,
+// app.digitdeck.co, módulo reservas de la v3). Los huecos son de 20 min, lunes a viernes, menos lo que Max tenga ocupado;
+// reservar crea el evento con Meet y Google envía la invitación. Este archivo es el contrato: cada tema dibuja su
+// propio calendario encima de useAgenda(). La API solo acepta por CORS https://(www.)maxfolio.dev.
 
-const API = import.meta.env.DEV ? '/agenda-api' : 'https://app.digitdeck.co/api/public/booking'
+const API = import.meta.env.DEV ? '/agenda-api' : 'https://app.digitdeck.co/api/reservas'
 /** Aviso de datos que acepta quien reserva (lo exige la API: consentimientoDatos). */
 export const PRIVACIDAD = 'https://app.digitdeck.co/privacy'
 const DIAS_VISTA = 21
@@ -61,7 +60,7 @@ export function useAgenda(tema: string) {
     const desde = new Date()
     const hasta = new Date(desde.getTime() + DIAS_VISTA * 864e5)
     try {
-      const r = await fetch(`${API}/slots?desde=${desde.toISOString()}&hasta=${hasta.toISOString()}`)
+      const r = await fetch(`${API}/huecos?desde=${desde.toISOString()}&hasta=${hasta.toISOString()}`)
       const j = (await r.json()) as { ok: boolean; timezone?: string; slots?: { startAt: string; endAt: string }[] }
       if (!j.ok || !j.slots) throw new Error('slots')
       if (j.timezone) setZonaMax(j.timezone)
