@@ -1701,7 +1701,7 @@
   padding-top: 18px;
   border-top: 1px solid var(--v5-line);
 }
-.dd-hecho dd {
+.dd-hecho dd:not(.dd-hecho__nota) {
   margin: 0;
   font: 760 clamp(2.75rem, 1rem + 4vw, 4.5rem) / 0.92 var(--f-display);
   font-stretch: 90%;
@@ -1709,7 +1709,7 @@
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }
-.dd-hecho[data-largo='largo'] dd {
+.dd-hecho[data-largo='largo'] dd:not(.dd-hecho__nota) {
   font-size: clamp(1.5rem, 1rem + 1.6vw, 2.25rem);
   line-height: 1.05;
   letter-spacing: -0.02em;
@@ -1722,6 +1722,7 @@
 .dd-hecho__nota {
   order: -1;
   display: block;
+  margin: 0;
 }
 @media (min-width: 1024px) {
   .dd-ficha__cuerpo {
