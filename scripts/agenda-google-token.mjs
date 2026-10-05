@@ -1,16 +1,20 @@
 // Una sola vez: saca el permiso permanente (refresh token) de tu Google Calendar para la agenda de maxfolio.dev (api/agenda.ts) y lo
 // guarda en Vercel, sin que el token pase por ningún chat ni archivo.
-//   node scripts/agenda-google-token.mjs <CLIENT_ID> <CLIENT_SECRET>
+//   node scripts/agenda-google-token.mjs <client_secret_….json descargado de Google Cloud>   (o bien <CLIENT_ID> <CLIENT_SECRET>)
 // El cliente OAuth es de tipo «App de escritorio» en Google Cloud (acepta 127.0.0.1 sin registrarlo). Se abre Google en el navegador,
 // autorizas con maxbustamanteg@gmail.com y el script escribe GOOGLE_AGENDA_CLIENT_ID, GOOGLE_AGENDA_CLIENT_SECRET y
 // GOOGLE_AGENDA_REFRESH_TOKEN en Vercel (producción y vistas previas) con la CLI ya autenticada. Si la CLI falla, imprime los valores
 // para pegarlos a mano en Vercel → max-folio → Settings → Environment Variables.
 import { createServer } from 'node:http'
 import { exec, spawnSync } from 'node:child_process'
+import { readFileSync } from 'node:fs'
 
-const [id, secreto] = process.argv.slice(2)
+const args = process.argv.slice(2)
+// El JSON que descarga Google Cloud al crear el cliente trae los dos valores: así el secreto no se copia a mano.
+const json = args.length === 1 ? JSON.parse(readFileSync(args[0], 'utf8')).installed : null
+const [id, secreto] = json ? [json.client_id, json.client_secret] : args
 if (!id || !secreto) {
-  console.error('uso: node scripts/agenda-google-token.mjs <CLIENT_ID> <CLIENT_SECRET>')
+  console.error('uso: node scripts/agenda-google-token.mjs <client_secret_….json> | <CLIENT_ID> <CLIENT_SECRET>')
   process.exit(2)
 }
 // Solo ver la disponibilidad (no lee tus eventos) y crear o editar los eventos de las citas.
