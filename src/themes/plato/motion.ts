@@ -94,6 +94,19 @@ const atar: Record<string, Atar> = {
       if (dentro) gsap.to(dentro, { scale: 1, duration: rapida ? 1.1 : 1.3, ease: rapida ? 'pl-fast' : 'pl', delay: r, clearProps: 'transform' })
     }
   },
+  /** Lighthouse de la ficha: el bloque sube, cada anillo se traza hasta su valor y la marca del LCP corre hasta su punto (una vez, y termina). */
+  anillos(el) {
+    const arcos = el.querySelectorAll<SVGCircleElement>('.pl-anillo-a')
+    const marcas = el.querySelectorAll<HTMLElement>('.pl-lcp-marca')
+    gsap.set(el, { opacity: 0, y: 22 })
+    gsap.set(arcos, { strokeDashoffset: 100 })
+    gsap.set(marcas, { left: '0%' })
+    return (r, rapida) => {
+      gsap.to(el, juega({ opacity: 1, y: 0, delay: r }, rapida))
+      gsap.to(arcos, { strokeDashoffset: (_: number, a: SVGCircleElement) => 100 - Number(a.dataset.v), duration: 1.3, ease: 'pl', delay: r + 0.15, stagger: 0.07, clearProps: 'strokeDashoffset' })
+      gsap.to(marcas, { left: (_: number, m: HTMLElement) => `${Number(m.dataset.p) * 100}%`, duration: 1.3, ease: 'pl', delay: r + 0.3, clearProps: 'left' })
+    }
+  },
   /** Filete que se traza de izquierda a derecha. */
   trazo(el) {
     gsap.set(el, { scaleX: 0, transformOrigin: '0% 50%' })

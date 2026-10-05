@@ -472,9 +472,8 @@ html.pl-snap { scroll-snap-type: y proximity; }
 }
 /* El pedestal: el teléfono está en el mundo; aquí solo la etiqueta de museo sobre un degradado de plató */
 .pl-fh--3d { color: var(--sala); }
-/* Con recorrido, la escena se queda fija (pegajosa) mientras el lector baja y la pantalla del teléfono recorre la tienda; sin él, es una sola pantalla. */
-.pl-fh--3d:not(.pl-fh--rec) { height: 100svh; }
-.pl-fh--rec { height: calc(100svh + 260svh); }
+/* Una sola pantalla: la del teléfono se recorre con el cursor encima (rueda), el arrastre o las flechas, nunca con el scroll de la página. */
+.pl-fh--3d { height: 100svh; }
 .pl-fh-pega { position: sticky; top: 0; height: 100svh; min-height: 560px; display: flex; align-items: center; padding: 130px var(--px) 120px; overflow: hidden; }
 .pl-fh-pega::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgb(10 11 13 / 0.94) 0%, rgb(10 11 13 / 0.9) 26%, rgb(10 11 13 / 0) 64%); pointer-events: none; }
 .pl-fh--3d .pl-fh-texto { max-width: min(540px, 92vw); }
@@ -539,11 +538,6 @@ html.pl-snap { scroll-snap-type: y proximity; }
 }
 .pl-medido-s { background: var(--sala); padding: 0 var(--px) clamp(56px, 7vw, 110px); }
 .pl-medido-s .pl-h-m { margin-bottom: clamp(20px, 2.6vw, 40px); }
-.pl-lh-t { width: 100%; max-width: 62em; border-collapse: collapse; margin: 0 0 14px; }
-.pl-lh-t th, .pl-lh-t td { text-align: left; padding: 14px 12px 14px 0; border-top: 1px solid var(--linea); font-weight: 400; vertical-align: baseline; }
-.pl-lh-t thead th { color: var(--tinta-2); border-top: 0; padding-bottom: 8px; }
-.pl-lh-t tbody th { color: var(--tinta-2); }
-.pl-lh-t td { font-size: clamp(30px, 6vw, 56px); line-height: 1; font-variant-numeric: tabular-nums; font-weight: 300; letter-spacing: -0.025em; }
 .pl-hoja-d { background: var(--sala); padding: 0 var(--px) clamp(64px, 8vw, 130px); }
 .pl-hoja-d .pl-h-m { margin-bottom: clamp(20px, 2.6vw, 40px); padding-top: 18px; border-top: 1px solid var(--tinta); }
 .pl-datos { max-width: 62em; }
@@ -814,16 +808,46 @@ html.pl-snap { scroll-snap-type: y proximity; }
 .pl-beat-m small { color: var(--tinta-2); text-transform: none; letter-spacing: 0.02em; font-size: 12px; }
 .pl-par--solo { grid-template-columns: minmax(0, 1fr); }
 
-/* Lighthouse: dos bloques (escritorio y móvil), cada uno con sus cuatro cifras en rejilla; nada se recorta a 390 px. */
-.pl-lh { display: grid; grid-template-columns: minmax(0, 1fr); gap: 30px; max-width: 62em; margin-bottom: 18px; }
-.pl-lh-d { border-top: 1px solid var(--linea); padding-top: 14px; min-width: 0; }
-.pl-lh-n { color: var(--tinta-2); margin-bottom: 14px; }
-.pl-lh-g { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 12px; }
-.pl-lh-g > div { display: flex; flex-direction: column-reverse; gap: 4px; min-width: 0; }
-.pl-lh-g dt { color: var(--tinta-2); font-size: 11px; }
-.pl-lh-g dd { font-size: clamp(34px, 9.5vw, 54px); line-height: 1; font-weight: 300; letter-spacing: -0.025em; font-variant-numeric: tabular-nums; white-space: nowrap; }
-@media (min-width: 700px) { .pl-lh { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap); } }
-@media (min-width: 1100px) { .pl-lh-g { grid-template-columns: repeat(4, minmax(0, 1fr)); } .pl-lh-g dd { font-size: clamp(40px, 3.6vw, 56px); } }
+/* Lighthouse: dos tarjetas (escritorio y móvil). Cada una con tres anillos al estilo de Lighthouse (verde ≥ 90, ámbar 50–89, rojo < 50)
+   y la regla del LCP con las zonas de Core Web Vitals (bueno ≤ 2,5 s, mejorable ≤ 4 s). Los anillos se trazan una vez al entrar (motion.ts,
+   «anillos»); sin JS quedan en su valor. Los colores de nivel pasan 3:1 sobre blanco y la cifra va en tinta. */
+.pl-lh { --bien: #0f7f45; --medio: #a96500; --mal: #c0352b; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--gap); max-width: 70em; margin-bottom: 18px; }
+.pl-lh-d { min-width: 0; background: #fff; border: 1px solid var(--linea); border-radius: var(--r); padding: clamp(18px, 2.2vw, 30px); display: grid; gap: clamp(20px, 2.4vw, 30px); align-content: start; }
+.pl-lh-n { display: flex; align-items: center; gap: 10px; color: var(--tinta-2); }
+.pl-lh-ico { flex: none; color: var(--tinta); }
+.pl-lh-g { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0; }
+.pl-anillo { display: flex; flex-direction: column-reverse; align-items: center; gap: 10px; min-width: 0; text-align: center; }
+.pl-anillo dt { color: var(--tinta-2); font-size: 11px; line-height: 1.3; }
+.pl-anillo dd { position: relative; margin: 0; width: min(100%, 132px); aspect-ratio: 1; display: grid; place-items: center; }
+.pl-anillo svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: rotate(-90deg); }
+.pl-anillo circle { fill: none; stroke-width: 7; }
+.pl-anillo-f { stroke: var(--linea); }
+.pl-anillo-a { stroke: var(--c); stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: calc(100 - var(--v)); }
+.pl-anillo[data-nivel='bien'], .pl-lcp[data-nivel='bien'] { --c: var(--bien); }
+.pl-anillo[data-nivel='medio'], .pl-lcp[data-nivel='medio'] { --c: var(--medio); }
+.pl-anillo[data-nivel='mal'], .pl-lcp[data-nivel='mal'] { --c: var(--mal); }
+.pl-anillo dd span { position: relative; font-size: clamp(28px, 7.4vw, 40px); line-height: 1; font-weight: 300; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+/* La regla del LCP: tres zonas en proporción a 0–6 s, la propia encendida, y la marca en la medida. */
+.pl-lcp { display: grid; gap: 10px; border-top: 1px solid var(--linea); padding-top: clamp(16px, 2vw, 22px); }
+.pl-lcp-v { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; }
+.pl-lcp-v .pl-mono { color: var(--tinta-2); }
+.pl-lcp-v b { font-size: clamp(30px, 7vw, 40px); line-height: 1; font-weight: 300; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.pl-lcp-ver { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--c); font-weight: 500; }
+.pl-lcp-ver::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.pl-lcp-barra { position: relative; display: flex; gap: 3px; height: 8px; }
+.pl-lcp-barra i { height: 100%; border-radius: 4px; opacity: 0.22; }
+.pl-lcp-barra i:nth-child(1) { flex: 2.5; background: var(--bien); }
+.pl-lcp-barra i:nth-child(2) { flex: 1.5; background: var(--medio); }
+.pl-lcp-barra i:nth-child(3) { flex: 2; background: var(--mal); }
+.pl-lcp[data-nivel='bien'] i:nth-child(1), .pl-lcp[data-nivel='medio'] i:nth-child(2), .pl-lcp[data-nivel='mal'] i:nth-child(3) { opacity: 1; }
+.pl-lcp-marca { position: absolute; top: 50%; left: calc(var(--p) * 100%); width: 16px; height: 16px; margin: -8px 0 0 -8px; border-radius: 50%; background: var(--tinta); border: 3px solid #fff; box-shadow: 0 0 0 1px var(--linea); }
+.pl-lcp-esc { position: relative; height: 16px; color: var(--tinta-2); font-size: 11px; text-transform: none; }
+.pl-lcp-esc span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.pl-lcp-esc span:nth-child(1) { left: 0; transform: none; }
+.pl-lcp-esc span:nth-child(2) { left: calc(2.5 / 6 * 100%); }
+.pl-lcp-esc span:nth-child(3) { left: calc(4 / 6 * 100%); }
+.pl-lcp-esc span:nth-child(4) { left: auto; right: 0; transform: none; }
+@media (min-width: 900px) { .pl-lh { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .pl-lh-ctx { max-width: 46em; margin-top: 18px; padding-left: 18px; border-left: 2px solid var(--tinta); font-size: 17px; line-height: 1.5; }
 
 /* Inicio: obra destacada más corta (tarjeta, una frase y una cifra) y botones que caben en 390 px */

@@ -12,7 +12,7 @@ import { puedeVisor } from './escena/puerta'
 import { indiceDe, ORDEN } from './escena/sets'
 import { TINTES } from './escena/tintes'
 import { alcanceDe } from './alcance'
-import { aterrizar, alScroll, despegar, gsap, useVista } from './motion'
+import { aterrizar, despegar, gsap, useVista } from './motion'
 import { Cruces, Dato, Enlace, Flecha, PlShot, Rod, ruta } from './piezas'
 import { partirFrase } from './publico'
 import { Seo } from './seo'
@@ -81,16 +81,13 @@ function Ficha({ slug }: { slug: string }) {
 
   const ref = useVista<HTMLElement>([con3d], (raiz, limpiar) => {
     if (con3d) {
-      // La pantalla del teléfono recorre la tienda a medida que se baja por el caso; la rueda, el arrastre y las flechas sobre el teléfono suman lo suyo.
+      // La pantalla del teléfono recorre la tienda solo con el cursor encima (rueda), con el arrastre o con las flechas: el scroll de la página
+      // sigue siendo de la página. La barra lateral lee el mismo objetivo, venga de donde venga.
       const stage = raiz.querySelector<HTMLElement>('.pl-fh--3d')
       const zona = raiz.querySelector<HTMLElement>('.pl-tel-zona')
       const barra = raiz.querySelector<HTMLElement>('.pl-fh-prog')
       if (!stage) return
-      let p = 0
-      let extra = 0
-      const rango = () => Math.max(1, stage.offsetHeight - window.innerHeight)
-      const aplicar = () => { const t = acota(p + extra); extra = t - p; control.set({ pantalla: t }); barra?.style.setProperty('--p', String(t)) }
-      if (recorrido) limpiar.push(alScroll((y) => { p = acota(y / rango()); aplicar() }))
+      if (barra) limpiar.push(control.subscribe(() => barra.style.setProperty('--p', String(control.obj.pantalla))))
       const fino = matchMedia('(hover: hover) and (pointer: fine)').matches
       const mover = (e: PointerEvent) => {
         if (!fino || e.pointerType !== 'mouse') return
@@ -105,10 +102,10 @@ function Ficha({ slug }: { slug: string }) {
       if (zona && recorrido) {
         const rangoFilas = () => Math.max(1, PANTALLAS[slug].h - VENTANA)
         const filasPorPx = () => VENTANA / Math.max(200, zona.offsetHeight)
-        const sumar = (filas: number) => { extra += filas / rangoFilas(); aplicar() }
+        const sumar = (filas: number) => control.set({ pantalla: acota(control.obj.pantalla + filas / rangoFilas()) })
         const rueda = (e: WheelEvent) => {
           const dy = e.deltaY * (e.deltaMode === 1 ? 32 : 1)
-          const t = acota(p + extra)
+          const t = control.obj.pantalla
           if ((dy > 0 && t >= 0.9995) || (dy < 0 && t <= 0.0005)) return // en los extremos la rueda sigue con la página
           e.preventDefault()
           sumar(dy * filasPorPx())
@@ -280,7 +277,7 @@ function Ficha({ slug }: { slug: string }) {
       <Seo ruta={ruta('obra', o.slug)} titulo={`${o.name} · ${v.personal.name}`} descripcion={descripcion} />
 
       {con3d ? (
-        <section className={`pl-fh pl-fh--3d${recorrido ? ' pl-fh--rec' : ''}`} data-tono="oscuro" aria-label={o.name}>
+        <section className="pl-fh pl-fh--3d" data-tono="oscuro" aria-label={o.name}>
           <div className="pl-fh-pega">
             {etiqueta}
             {recorrido && <div className="pl-tel-zona" tabIndex={0} role="group" aria-label={c.ficha.zonaTel} onKeyDown={teclas} />}
@@ -372,16 +369,35 @@ function Ficha({ slug }: { slug: string }) {
       {lhBueno && (
         <section className="pl-medido-s" data-tono="claro" aria-labelledby="pl-med-t">
           <h2 id="pl-med-t" className="pl-h-m" data-pl="linea">{c.ficha.medidoTitulo}</h2>
-          <div className="pl-lh" data-pl="subir">
-            {([[c.ficha.escritorio, lhBueno.escritorio], [c.ficha.movil, lhBueno.movil]] as const).map(([n, m]) => (
-              <section key={n} className="pl-lh-d" aria-label={`${c.ficha.lighthouse} · ${n}`}>
-                <h3 className="pl-mono pl-lh-n">{n}</h3>
+          <div className="pl-lh" data-pl="anillos">
+            {([['escritorio', lhBueno.escritorio], ['movil', lhBueno.movil]] as const).map(([d, m]) => (
+              <section key={d} className="pl-lh-d" aria-label={`${c.ficha.lighthouse} · ${c.ficha[d]}`}>
+                <h3 className="pl-mono pl-lh-n"><Dispositivo d={d} />{c.ficha[d]}</h3>
                 <dl className="pl-lh-g">
-                  <div><dt className="pl-mono">{c.ficha.rend}</dt><dd>{m.perf}</dd></div>
-                  <div><dt className="pl-mono">{c.ficha.acc}</dt><dd>{m.a11y}</dd></div>
-                  <div><dt className="pl-mono">{c.ficha.seo}</dt><dd>{m.seo}</dd></div>
-                  <div><dt className="pl-mono">LCP</dt><dd>{m.lcp != null ? `${nombreLh(m.lcp)} s` : '—'}</dd></div>
+                  {([[c.ficha.rend, m.perf], [c.ficha.acc, m.a11y], [c.ficha.seo, m.seo]] as const).map(([k, n]) => (
+                    <div key={k} className="pl-anillo" data-nivel={nivel(n, 90, 50)}>
+                      <dt className="pl-mono">{k}</dt>
+                      <dd>
+                        <svg viewBox="0 0 120 120" aria-hidden="true">
+                          <circle className="pl-anillo-f" cx="60" cy="60" r="52" pathLength={100} />
+                          <circle className="pl-anillo-a" cx="60" cy="60" r="52" pathLength={100} data-v={n} style={{ '--v': n } as CSSProperties} />
+                        </svg>
+                        <span>{n}</span>
+                      </dd>
+                    </div>
+                  ))}
                 </dl>
+                {m.lcp != null && (
+                  // Umbrales de Core Web Vitals: bueno hasta 2,5 s, mejorable hasta 4 s; la escala llega a 6 s.
+                  <div className="pl-lcp" data-nivel={nivel(-m.lcp, -2.5, -4)}>
+                    <p className="pl-lcp-v"><span className="pl-mono">LCP</span><b>{nombreLh(m.lcp)} s</b><span className="pl-lcp-ver">{c.ficha.lcpNivel[nivel(-m.lcp, -2.5, -4)]}</span></p>
+                    <div className="pl-lcp-barra" aria-hidden="true">
+                      <i /><i /><i />
+                      <b className="pl-lcp-marca" data-p={Math.min(m.lcp, 6) / 6} style={{ '--p': Math.min(m.lcp, 6) / 6 } as CSSProperties} />
+                    </div>
+                    <p className="pl-mono pl-lcp-esc" aria-hidden="true"><span>0</span><span>{nombreLh(2.5)} s</span><span>{nombreLh(4)} s</span><span>6 s</span></p>
+                  </div>
+                )}
               </section>
             ))}
           </div>
@@ -441,3 +457,15 @@ function Ficha({ slug }: { slug: string }) {
     </main>
   )
 }
+
+/** Nivel de una medida contra dos umbrales (los de Lighthouse: 90 y 50). Para «menos es mejor» se pasan negados. */
+const nivel = (v: number, bien: number, medio: number) => (v >= bien ? 'bien' : v >= medio ? 'medio' : 'mal') as 'bien' | 'medio' | 'mal'
+
+/** Glifo de la pantalla medida: monitor o teléfono, a trazo. */
+const Dispositivo = ({ d }: { d: 'escritorio' | 'movil' }) => (
+  <svg className="pl-lh-ico" viewBox="0 0 20 16" width="20" height="16" aria-hidden="true">
+    {d === 'escritorio'
+      ? <><rect x="1.5" y="1.5" width="17" height="10" rx="1.5" fill="none" stroke="currentColor" strokeWidth="1.4" /><path d="M7 14.5h6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" /></>
+      : <><rect x="6" y="0.8" width="8" height="14.4" rx="1.8" fill="none" stroke="currentColor" strokeWidth="1.4" /><path d="M9 12.6h2" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" /></>}
+  </svg>
+)
