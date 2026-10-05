@@ -85,7 +85,8 @@ const lineas = (el: HTMLElement, opts: { y?: number; dur?: number; esc?: number 
   let jugado = false
   let espera = 0
   SplitText.create(el, {
-    type: 'lines', mask: 'lines', linesClass: 'ing-ln', autoSplit: true,
+    // aria 'none': las líneas son envoltorios visuales del mismo texto; 'auto' pondría aria-label en un <p>, donde está prohibido.
+    type: 'lines', mask: 'lines', linesClass: 'ing-ln', autoSplit: true, aria: 'none',
     onSplit: (s) => {
       tw = gsap.from(s.lines, { yPercent: opts.y ?? 110, duration: opts.dur ?? 0.9, ease: SALE, stagger: opts.esc ?? 0.08, delay: espera, paused: !entro, onComplete: () => { jugado = true } })
       if (jugado) tw.progress(1)
@@ -168,7 +169,7 @@ const atar: Record<string, Atar> = {
 }
 
 /** Busca [data-ing] dentro de `raiz`, escribe su estado oculto y lo juega cuando entra en la ventana (o ya, si está a la vista). */
-function activar(raiz: HTMLElement, limpiar: Array<() => void>) {
+function activar(raiz: HTMLElement, limpiar: Array<() => void>, ctx: gsap.Context, perezoso: boolean) {
   const pendientes = new Map<Element, Entrada>()
   const io = new IntersectionObserver((entradas) => {
     let k = 0
@@ -182,7 +183,7 @@ function activar(raiz: HTMLElement, limpiar: Array<() => void>) {
       jugar(base + Math.min(k++, 5) * 0.06)
     })
   }, { rootMargin: '0px 0px -6% 0px' })
-  raiz.querySelectorAll<HTMLElement>('[data-ing]').forEach((el) => {
+  const atarUno = (el: HTMLElement) => {
     try {
       const jugar = atar[el.dataset.ing ?? '']?.(el)
       if (!jugar) return
@@ -191,8 +192,19 @@ function activar(raiz: HTMLElement, limpiar: Array<() => void>) {
     } catch {
       gsap.set(el, { clearProps: 'all' }) // fail-open por nodo
     }
-  })
-  limpiar.push(() => io.disconnect())
+  }
+  // Con `perezoso` (una vista que abre arriba) al montar solo se ata lo que está a menos de 1,5 pantallas del borde inferior: atar es
+  // partir texto y escribir el estado oculto, y hacerlo con la página entera recalculaba estilo y maquetación por cada nodo. Lo demás se
+  // ata al acercarse, aún fuera de la vista (no parpadea), dentro del mismo contexto para que se revierta con la vista.
+  const vh = window.innerHeight
+  const nodos = Array.from(raiz.querySelectorAll<HTMLElement>('[data-ing]')).map((el) => ({ el, top: el.getBoundingClientRect().top }))
+  const vigia = new IntersectionObserver((es) => es.forEach((e) => {
+    if (!e.isIntersecting) return
+    vigia.unobserve(e.target)
+    ctx.add(() => atarUno(e.target as HTMLElement))
+  }), { rootMargin: '0px 0px 150% 0px' })
+  nodos.forEach(({ el, top }) => (!perezoso || top < vh * 2.5 ? atarUno(el) : vigia.observe(el)))
+  limpiar.push(() => { io.disconnect(); vigia.disconnect() })
 }
 
 /** Posición de scroll por ruta, para que Atrás devuelva la lista donde estaba. */
@@ -222,11 +234,11 @@ export function useVista<T extends HTMLElement = HTMLElement>(deps: unknown[], m
     // Cada vista nueva empieza arriba; Atrás/Adelante devuelven la lista a donde estaba.
     if (guardada !== undefined) setTimeout(() => window.scrollTo({ top: guardada, behavior: 'instant' }), 0)
     else if (tipo !== 'POP') window.scrollTo({ top: 0, behavior: 'instant' })
-    const ctx = gsap.context(() => {
+    const ctx = gsap.context((self) => {
       gsap.set(raiz, { clearProps: 'transform,opacity' }) // la salida de useIr dejó y:-8 y opacidad 0 si el nodo se reutiliza
       gsap.fromTo(raiz, { opacity: 0 }, { opacity: 1, duration: 0.3, ease: SALE, clearProps: 'transform,opacity' })
       cerrarPulso()
-      activar(raiz, limpiar)
+      activar(raiz, limpiar, self, guardada === undefined) // con scroll que restaurar se ata todo al montar, como siempre
       montar?.(raiz, limpiar)
     }, raiz)
     return () => {
