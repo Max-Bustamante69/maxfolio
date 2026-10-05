@@ -15,6 +15,7 @@ import { Enlace } from './piezas'
 import Trayectoria from './Trayectoria'
 import './tokens.css'
 import './ingenieria.css'
+import MarcaMB from '../shared/MarcaMB'
 
 const BASE = v5path('ingenieria')
 
@@ -26,7 +27,7 @@ function Pie() {
     <footer className="ing-pie">
       <div className="ing-marco ing-pie-in">
         <div className="ing-pie-marca">
-          <p className="ing-pie-nombre"><span className="ing-marca-sello" aria-hidden="true">MB</span>{personal.name}</p>
+          <p className="ing-pie-nombre"><span className="ing-marca-sello" aria-hidden="true"><MarcaMB /></span>{personal.name}</p>
           <p className="ing-pie-lema">{s.footer.tagline}</p>
           <a className="ing-enlace" href={`mailto:${personal.email}`}>{personal.email}</a>
         </div>

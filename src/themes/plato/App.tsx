@@ -23,6 +23,7 @@ import { indiceDe } from './escena/sets'
 import { TemasBoton } from './selector/Boton'
 import './tokens.css'
 import './plato.css'
+import MarcaMB from '../shared/MarcaMB'
 
 const Lienzo = lazy(() => import('./escena/Lienzo'))
 // El selector de temas («Cambiar de set»): su JS, su CSS y sus imágenes no existen hasta que se abre (se pide el trozo al apuntar al botón).
@@ -129,7 +130,7 @@ function Cabecera({ en3d, puede3d, setModo }: { en3d: boolean; puede3d: boolean;
     <header className="pl-cab" data-abierto={abierto} data-ruta={actual || 'inicio'}>
       <div className="pl-cab-in">
         <Enlace to={BASE} className="pl-logo" aria-label={c.logo}>
-          <span className="pl-logo-mb" aria-hidden="true">MB</span>
+          <span className="pl-logo-mb" aria-hidden="true"><MarcaMB /></span>
           <span className="pl-logo-txt">Max Bustamante</span>
         </Enlace>
         <nav className="pl-nav" aria-label={c.principal}>
@@ -221,12 +222,12 @@ function Cortina({ fin }: { fin: () => void }) {
     const el = ref.current!
     const m = mb.current!
     const raiz = el.closest('.pl-raiz')
-    const logo = raiz?.querySelector<HTMLElement>('.pl-logo-mb')
+    const logo = raiz?.querySelector<SVGElement>('.pl-logo-mb svg')
     const ventana = (w: number, h: number, s: number) =>
       `polygon(evenodd, 0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, ${50 - w + s}% ${50 - h}%, ${50 + w + s}% ${50 - h}%, ${50 + w - s}% ${50 + h}%, ${50 - w - s}% ${50 + h}%, ${50 - w + s}% ${50 - h}%)`
     gsap.set(el, { clipPath: ventana(0.4, 0.4, 0.3) })
     raiz?.classList.add('pl-entrando')
-    // El monograma nace abajo a la izquierda, grande, y aterriza sobre el círculo del encabezado.
+    // El monograma nace abajo a la izquierda, grande, y aterriza exactamente sobre la marca del encabezado (mismo tamaño al llegar).
     const px = parseFloat(getComputedStyle(raiz!).getPropertyValue('--px')) || 40
     const py = parseFloat(getComputedStyle(raiz!).getPropertyValue('--py')) || 30
     const w = m.offsetWidth, h = m.offsetHeight
@@ -237,7 +238,7 @@ function Cortina({ fin }: { fin: () => void }) {
     tl.to(m, { opacity: 1, duration: 0.25, ease: 'pl' }, 0)
       .to(el, { clipPath: ventana(75, 75, 30), duration: 0.85, ease: 'pl' }, 0.2)
     if (dest) {
-      const k = Math.min(1, 14 / h)
+      const k = Math.min(1, dest.height / h)
       tl.to(m, { x: dest.left + dest.width / 2 - w / 2, y: dest.top + dest.height / 2 - h / 2, scale: k, duration: 0.7, ease: 'pl-rod' }, 0.35)
         .to(m, { opacity: 0, duration: 0.15, ease: 'power1.out' }, 1.05)
     } else tl.to(m, { opacity: 0, duration: 0.25 }, 0.5)
@@ -246,7 +247,7 @@ function Cortina({ fin }: { fin: () => void }) {
   return (
     <>
       <div className="pl-cortina" ref={ref} aria-hidden="true" />
-      <span className="pl-cortina-mb" ref={mb} aria-hidden="true">MB</span>
+      <span className="pl-cortina-mb" ref={mb} aria-hidden="true"><MarcaMB /></span>
     </>
   )
 }

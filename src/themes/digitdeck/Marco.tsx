@@ -11,6 +11,7 @@ import { useCopy, useCopyTemas } from './copy'
 import { IconoTemas, IconoWhatsApp } from './iconos'
 import { EASE, distanciaALaBarra, instanteEn } from './movimiento'
 import { Enlace } from './transicion'
+import MarcaMB from '../shared/MarcaMB'
 
 const IDIOMAS: Locale[] = ['es', 'en', 'ja']
 const INICIO = v5path('digitdeck')
@@ -185,6 +186,7 @@ export function Cabecera() {
     <>
       <header ref={cab} className="dd-cab" data-menu={menu} data-vidrio="false">
         <Enlace to={INICIO} etiqueta={c.nav.inicio} className="dd-marca" aria-label={c.marcaAria}>
+          <MarcaMB className="dd-marca__mb" />
           <span>{c.marca}</span>
           <span className="dd-dot" aria-hidden="true" />
         </Enlace>
@@ -252,7 +254,7 @@ export function Pie() {
         <p className="dd-micro dd-pie__legal">© {new Date().getFullYear()} {personal.name} · {strings.footer.rights} · {c.medellin(hora)}</p>
       </div>
       <div className="dd-pie__marca">
-        <span className="dd-pie__letras" aria-hidden="true">MB</span>
+        <MarcaMB className="dd-pie__mb" />
         <button type="button" className="dd-dot dd-dot--pie" aria-label={c.volverArriba} onClick={() => scrollTo({ top: 0, behavior: 'smooth' })} />
       </div>
     </footer>
