@@ -3,6 +3,7 @@ import { useCopy } from './copy'
 import { useVista } from './motion'
 import { Cabecera, Enlace, Flecha, Valor, Ventana } from './piezas'
 import { sinProtocolo, usePublico } from './publico'
+import { CanonicalPlato } from '../shared/canonical'
 
 const GRUPOS = ['shopify', 'frontend', 'backend', 'quality', 'cro', 'ai'] as const
 const DESDE = 2022
@@ -25,7 +26,7 @@ export default function Trayectoria() {
   return (
     <main id="contenido" tabIndex={-1} ref={ref} className="ing-vista">
       <title>{`${c.tray.h1} · ${personal.name}`}</title>
-      <meta name="robots" content="noindex" />
+      <CanonicalPlato />
 
       <section className="ing-cabeza">
         <div className="ing-marco ing-cabeza-in">

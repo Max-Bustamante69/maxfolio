@@ -8,6 +8,7 @@ import { aterrizar, despegar, gsap, SALE, useVista } from './motion'
 import { Fig2 } from './diagramas'
 import { Cabecera, Enlace, Flecha, Movil, Segmentado, Valor, Ventana } from './piezas'
 import { partirFrase, sinProtocolo, usePublico } from './publico'
+import { CanonicalPlato } from '../shared/canonical'
 
 /**
  * La ruta monta una Ficha NUEVA por obra e idioma. «Siguiente» cambia solo el :slug: sin esta llave React reutilizaría el
@@ -96,7 +97,7 @@ function Ficha({ slug }: { slug: string }) {
   return (
     <main id="contenido" tabIndex={-1} ref={ref} className="ing-vista">
       <title>{`${o.name} · ${v.personal.name}`}</title>
-      <meta name="robots" content="noindex" />
+      <CanonicalPlato />
 
       <section className="ing-ficha-cab" aria-labelledby="ing-h1">
         <div className="ing-marco">

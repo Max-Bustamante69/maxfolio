@@ -7,6 +7,7 @@ import { useCopy } from './copy'
 import { aterrizar, gsap, useVista, vueloDe } from './motion'
 import { Cabecera, Enlace, Flecha, Segmentado, Tarjeta } from './piezas'
 import { usePublico } from './publico'
+import { CanonicalPlato } from '../shared/canonical'
 
 type Tipo = 'todo' | 'store' | 'product' | 'mas'
 const TIPOS: Tipo[] = ['todo', 'store', 'product', 'mas']
@@ -89,7 +90,7 @@ export default function Obra() {
   return (
     <main id="contenido" tabIndex={-1} ref={ref} className="ing-vista">
       <title>{`${c.obra.h1} · ${personal.name}`}</title>
-      <meta name="robots" content="noindex" />
+      <CanonicalPlato />
       <section className="ing-cabeza">
         <div className="ing-marco ing-cabeza-in">
           <Cabecera id="ing-h1" nivel={1} anim="titular" etq={c.tiendasConstruidas(storeCount)} titulo={`${c.obra.h1}.`} acento={c.obra.acento} />
