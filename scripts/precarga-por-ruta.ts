@@ -5,12 +5,9 @@
 // el LCP medido (A/B intercalado, móvil: ficha de Plató 92 → 85 con la franja de 197 KB, inicio de Ingeniería 79 → 77 con 72 KB): Lantern
 // reparte el ancho de banda por igual y la imagen le quita bytes al JS que la pinta. La lista de miniaturas sale del disco en cada build:
 // nunca se precarga un archivo que no existe (un 404 sería un error de consola).
-import { existsSync, readdirSync } from 'node:fs'
+import { readdirSync } from 'node:fs'
 import type { Plugin } from 'vite'
 import type { OutputBundle, OutputChunk } from 'rollup'
-
-const conArchivo = (dir: string, sufijo: string) =>
-  existsSync(dir) ? readdirSync(dir).filter((f) => f.endsWith(sufijo)).map((f) => f.slice(0, -sufijo.length)) : []
 
 /** El chunk de `facade` y todo lo que importa estáticamente (sin el entry, que ya pide el <script> del HTML), más su CSS. */
 function cierre(bundle: OutputBundle, chunk: OutputChunk) {
@@ -45,7 +42,7 @@ export function precargaPorRuta(): Plugin {
           if (tema) temas[tema] = cierre(bundle, c)
           if (idioma) idiomas[idioma] = cierre(bundle, c)
         }
-        const minis = conArchivo('public/v5/digitdeck/mini', '.webp')
+        const minis = readdirSync('public/v5/digitdeck/mini').map((f) => f.replace(/\.webp$/, ''))
         // crossorigin='' como los <link> que crea el ayudante de precarga de Vite: si no coinciden, el navegador baja el archivo dos veces.
         const js = `(function(){try{
 var T=${JSON.stringify(temas)},I=${JSON.stringify(idiomas)},N=${JSON.stringify(minis)};
