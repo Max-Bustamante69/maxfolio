@@ -8,6 +8,7 @@ import { v5path } from '../data'
 import { useCopy } from './copy'
 import { IconoPausa } from './iconos'
 import { Enlace } from './transicion'
+import { entradaTerminada } from './Entrada'
 
 const VELOCIDAD = 30 // px/s
 
@@ -20,6 +21,16 @@ export default function Cinta({ obras }: { obras: Obra[] }) {
   const pausadaRef = useRef(false)
   pausadaRef.current = pausada
   const visibles = obras.filter((o) => o.views.includes('home'))
+  // Las capturas se piden al terminar la entrada y con la página ociosa: son decoración bajo el héroe y, pedidas a la vez que él, le
+  // quitaban ancho de banda al LCP (Lantern lo reparte por igual entre todo lo que baja a la vez).
+  const [cargar, setCargar] = useState(false)
+  useEffect(() => {
+    let vivo = true
+    let id = 0
+    const ocio = window.requestIdleCallback ?? ((f: () => void) => window.setTimeout(f, 200))
+    entradaTerminada.then(() => { if (vivo) id = ocio(() => setCargar(true), { timeout: 1500 }) })
+    return () => { vivo = false; (window.cancelIdleCallback ?? window.clearTimeout)(id) }
+  }, [])
 
   useEffect(() => {
     const el = pista.current
@@ -97,7 +108,7 @@ export default function Cinta({ obras }: { obras: Obra[] }) {
     visibles.map((o, i) => (
       <li key={`${segunda ? 'b' : 'a'}-${o.slug}`} className="dd-cinta__item" aria-hidden={segunda || undefined} inert={segunda || undefined}>
         <Enlace to={v5path('digitdeck', 'obra', o.slug)} etiqueta={o.name} className="dd-ventana" aria-label={c.hero.abrir(o.name)} tabIndex={segunda ? -1 : undefined}>
-          <img src={`/v5/digitdeck/cinta/${o.slug}.webp`} width={366} height={792} alt="" loading={i < 4 && !segunda ? 'eager' : 'lazy'} decoding="async" draggable={false} />
+          <img src={cargar ? `/v5/digitdeck/cinta/${o.slug}.webp` : undefined} width={366} height={792} alt="" loading={i < 4 && !segunda ? 'eager' : 'lazy'} decoding="async" draggable={false} />
         </Enlace>
       </li>
     ))

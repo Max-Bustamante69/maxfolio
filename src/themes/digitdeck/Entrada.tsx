@@ -12,6 +12,11 @@ import { useTransicion } from './transicion'
 
 const CLAVE = 'v5-digitdeck-intro'
 
+/** Se cumple al terminar la entrada, o al montar si esta visita no la juega: la decoración bajo el héroe (la cinta) la espera para no
+ *  quitarle ancho de banda al LCP. */
+let terminar!: () => void
+export const entradaTerminada = new Promise<void>((r) => (terminar = r))
+
 function debeJugar(pathname: string) {
   try {
     return pathname === v5path('digitdeck') && !sessionStorage.getItem(CLAVE)
@@ -29,7 +34,7 @@ export default function Entrada() {
 
   useLayoutEffect(() => {
     const r = raiz.current
-    if (!activa || !r) return
+    if (!activa || !r) return terminar()
     let liberar!: () => void
     t.bloquear(new Promise<void>((res) => (liberar = res)))
     const hero = document.querySelector<HTMLElement>('[data-dd-hero-object]')
@@ -50,6 +55,7 @@ export default function Entrada() {
             /* sin almacenamiento: la entrada puede repetirse, no se rompe nada */
           }
           setFin(true)
+          terminar()
         },
       })
       tl.fromTo('.dd-entrada [data-capa="perla"]', { scale: 0 }, { scale: 1, duration: 0.22, ease: EASE.puntual, transformOrigin: '87.3% 79.2%' }, 0)
@@ -67,6 +73,7 @@ export default function Entrada() {
       EVENTOS.forEach((e) => removeEventListener(e, acelerar))
       ctx.revert()
       liberar()
+      terminar()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

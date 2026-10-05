@@ -13,7 +13,7 @@ const escritorio = () => matchMedia('(min-width: 1024px)').matches
 /** La historia de una fila: su tagline o, si la defensa de la capa pública lo dejó vacío, su descripción. */
 const historiaDe = (o: Obra) => o.tagline || o.description
 
-function Escenario({ obra, n, abrir }: { obra: Obra | undefined; n: number; abrir: (rect: DOMRect) => void }) {
+function Escenario({ obra, n, abrir, prioridad }: { obra: Obra | undefined; n: number; abrir: (rect: DOMRect) => void; prioridad?: boolean }) {
   const c = useCopy()
   // La obra actual sale siempre de la prop (un cambio de idioma reemplaza sus textos); solo la previa se recuerda, para fundir la captura.
   const [previa, setPrevia] = useState<Obra | undefined>()
@@ -26,7 +26,7 @@ function Escenario({ obra, n, abrir }: { obra: Obra | undefined; n: number; abri
   }, [obra])
   const pinta = (o: Obra | undefined, rol: 'actual' | 'previa') =>
     o?.views.includes('home') ? (
-      <ShotImg key={`${rol}-${o.slug}`} slug={o.slug} vista="home" vp="desktop" alt="" prioridad loading="eager" decoding="sync" className={`dd-escena__img dd-escena__img--${rol}`} onLoad={() => setLista(o.slug)} data-lista={lista === o.slug || undefined} />
+      <ShotImg key={`${rol}-${o.slug}`} slug={o.slug} vista="home" vp="desktop" alt="" prioridad={prioridad} loading="lazy" decoding="sync" className={`dd-escena__img dd-escena__img--${rol}`} onLoad={() => setLista(o.slug)} data-lista={lista === o.slug || undefined} />
     ) : null
   const a = obra
   const conCaptura = !!a?.views.includes('home')
@@ -57,7 +57,8 @@ function Escenario({ obra, n, abrir }: { obra: Obra | undefined; n: number; abri
   )
 }
 
-export default function IndiceObra({ obras }: { obras: Obra[] }) {
+/** `prioridad`: el escenario es el LCP de escritorio (la página de obra). Siempre diferido: en móvil está oculto y no se descarga. */
+export default function IndiceObra({ obras, prioridad }: { obras: Obra[]; prioridad?: boolean }) {
   const c = useCopy()
   const t = useTransicion()
   const [activa, setActiva] = useState(0)
@@ -104,7 +105,7 @@ export default function IndiceObra({ obras }: { obras: Obra[] }) {
         ))}
       </ol>
       <div className="dd-indice__escena">
-        <Escenario obra={fila} n={Math.min(activa, obras.length - 1)} abrir={(rect) => fila && t.irFicha(v5path('digitdeck', 'obra', fila.slug), rect)} />
+        <Escenario prioridad={prioridad} obra={fila} n={Math.min(activa, obras.length - 1)} abrir={(rect) => fila && t.irFicha(v5path('digitdeck', 'obra', fila.slug), rect)} />
       </div>
     </div>
   )

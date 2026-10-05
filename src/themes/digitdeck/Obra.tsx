@@ -35,7 +35,7 @@ export default function Obra() {
         </div>
       </header>
       <div className="dd-seccion dd-seccion--indice">
-        {visibles.length ? <IndiceObra key={filtro} obras={visibles} /> : <p className="dd-lede">{c.obra.vacio}</p>}
+        {visibles.length ? <IndiceObra key={filtro} obras={visibles} prioridad /> : <p className="dd-lede">{c.obra.vacio}</p>}
         <p className="dd-micro dd-nota-pie" data-in>{c.obra.fechaCapturas(SHOT_DATE)}</p>
       </div>
     </Pagina>
