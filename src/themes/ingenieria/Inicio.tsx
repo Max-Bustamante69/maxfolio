@@ -7,6 +7,7 @@ import { useCopy } from './copy'
 import { escena, gsap, SALE, useVista } from './motion'
 import { Cabecera, Cinta, Enlace, Flecha, Movil, Retrato, Tarjeta, Ventana } from './piezas'
 import { partirFrase, sinProtocolo, usePublico } from './publico'
+import { CanonicalPlato } from '../shared/canonical'
 
 const HISTORIAS = ['nos-cafe', 'digitdeck-apps', 'nalua']
 
@@ -69,7 +70,7 @@ export default function Inicio() {
   return (
     <main id="contenido" tabIndex={-1} ref={ref} className="ing-vista">
       <title>{`${personal.name} · ${c.nav.inicio}`}</title>
-      <meta name="robots" content="noindex" />
+      <CanonicalPlato />
 
       <section className="ing-hero" aria-labelledby="ing-h1">
         <div className="ing-marco ing-hero-in">

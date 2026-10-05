@@ -7,6 +7,7 @@ import { useCopy } from './copy'
 import { gsap, SALE, useVista } from './motion'
 import { Cabecera, Flecha } from './piezas'
 import { partirFrase, prohibido, usePublico } from './publico'
+import { CanonicalPlato } from '../shared/canonical'
 
 const CORREO_OK = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 /** Los tres modelos de trabajo del vivo, cada uno con el motivo del formulario que le corresponde. */
@@ -113,7 +114,7 @@ export default function Contacto() {
   return (
     <main id="contenido" tabIndex={-1} ref={ref} className="ing-vista">
       <title>{`${c.nav.contacto} · ${personal.name}`}</title>
-      <meta name="robots" content="noindex" />
+      <CanonicalPlato />
 
       <section className="ing-contacto" aria-labelledby="ing-h1">
         <div className="ing-marco ing-contacto-top">

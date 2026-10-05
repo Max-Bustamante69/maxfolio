@@ -94,6 +94,19 @@ const atar: Record<string, Atar> = {
       if (dentro) gsap.to(dentro, { scale: 1, duration: rapida ? 1.1 : 1.3, ease: rapida ? 'pl-fast' : 'pl', delay: r, clearProps: 'transform' })
     }
   },
+  /** Lighthouse de la ficha: el bloque sube, cada anillo se traza hasta su valor y la marca del LCP corre hasta su punto (una vez, y termina). */
+  anillos(el) {
+    const arcos = el.querySelectorAll<SVGCircleElement>('.pl-anillo-a')
+    const marcas = el.querySelectorAll<HTMLElement>('.pl-lcp-marca')
+    gsap.set(el, { opacity: 0, y: 22 })
+    gsap.set(arcos, { strokeDashoffset: 100 })
+    gsap.set(marcas, { left: '0%' })
+    return (r, rapida) => {
+      gsap.to(el, juega({ opacity: 1, y: 0, delay: r }, rapida))
+      gsap.to(arcos, { strokeDashoffset: (_: number, a: SVGCircleElement) => 100 - Number(a.dataset.v), duration: 1.3, ease: 'pl', delay: r + 0.15, stagger: 0.07, clearProps: 'strokeDashoffset' })
+      gsap.to(marcas, { left: (_: number, m: HTMLElement) => `${Number(m.dataset.p) * 100}%`, duration: 1.3, ease: 'pl', delay: r + 0.3, clearProps: 'left' })
+    }
+  },
   /** Filete que se traza de izquierda a derecha. */
   trazo(el) {
     gsap.set(el, { scaleX: 0, transformOrigin: '0% 50%' })
@@ -105,7 +118,7 @@ const atar: Record<string, Atar> = {
 export const entrada = { retraso: 0 }
 
 /** Busca [data-pl] dentro de `raiz`, escribe su estado oculto y lo juega cuando entra en la ventana (o ya, si está a la vista). */
-function activar(raiz: HTMLElement, limpiar: Array<() => void>, base: number) {
+function activar(raiz: HTMLElement, limpiar: Array<() => void>, base: number, ctx: gsap.Context, perezoso: boolean) {
   const pendientes = new Map<Element, Entrada>()
   const t0 = performance.now()
   const io = new IntersectionObserver((entradas) => {
@@ -122,7 +135,7 @@ function activar(raiz: HTMLElement, limpiar: Array<() => void>, base: number) {
       jugar(base + extra + Math.min(k++, 5) * (rapida ? 0.045 : 0.06), rapida)
     })
   }, { rootMargin: '0px 0px -6% 0px' })
-  raiz.querySelectorAll<HTMLElement>('[data-pl]').forEach((el) => {
+  const atarUno = (el: HTMLElement) => {
     try {
       const jugar = atar[el.dataset.pl ?? '']?.(el)
       if (!jugar) return
@@ -131,15 +144,29 @@ function activar(raiz: HTMLElement, limpiar: Array<() => void>, base: number) {
     } catch {
       gsap.set(el, { clearProps: 'all' }) // fail-open por nodo
     }
-  })
+  }
+  // Primero se LEEN todas las posiciones (una sola maquetación) y después se escribe: atar y jugar uno por uno, leyendo entre medias,
+  // recalculaba el estilo de la página entera por cada elemento. Con `perezoso` (una vista que abre arriba) al montar solo se ata lo que
+  // está a menos de 1,5 pantallas del borde inferior; lo demás se ata cuando se acerca, aún fuera de la vista (esconderlo no parpadea),
+  // dentro del mismo contexto para que se revierta con la vista. Sin atar, un nodo se ve tal cual.
+  const vh = window.innerHeight
+  const nodos = Array.from(raiz.querySelectorAll<HTMLElement>('[data-pl]')).map((el) => ({ el, r: el.getBoundingClientRect() }))
+  const cerca = perezoso ? nodos.filter((n) => n.r.top < vh * 2.5) : nodos
+  cerca.forEach((n) => atarUno(n.el))
+  const vigia = new IntersectionObserver((es) => es.forEach((e) => {
+    if (!e.isIntersecting) return
+    vigia.unobserve(e.target)
+    ctx.add(() => atarUno(e.target as HTMLElement))
+  }), { rootMargin: '0px 0px 150% 0px' })
+  if (perezoso) nodos.forEach((n) => { if (n.r.top >= vh * 2.5) vigia.observe(n.el) })
   // Lo que ya está a la vista al llegar arranca en el mismo fotograma (sin esperar la primera llamada del observador): es lo primero que se ve tras el telón.
   let k0 = 0
-  pendientes.forEach((jugar, el) => {
-    const r = el.getBoundingClientRect()
-    if (r.bottom <= 0 || r.top >= window.innerHeight * 0.94) return
+  cerca.forEach(({ el, r }) => {
+    const jugar = pendientes.get(el)
+    if (!jugar || r.bottom <= 0 || r.top >= vh * 0.94) return
     pendientes.delete(el)
     io.unobserve(el)
-    jugar(base + Number((el as HTMLElement).dataset.plRetraso ?? 0) + Math.min(k0++, 5) * 0.045, true)
+    jugar(base + Number(el.dataset.plRetraso ?? 0) + Math.min(k0++, 5) * 0.045, true)
   })
   // Fail-open (invariante de la casa): nada se queda escondido. A los 3 s lo que ya quedó a la vista o por encima (salto de ancla, scroll restaurado,
   // Ctrl+F) se muestra, y al imprimir se muestra todo.
@@ -152,7 +179,7 @@ function activar(raiz: HTMLElement, limpiar: Array<() => void>, base: number) {
   const seguro = window.setTimeout(() => liberar(false), 3000)
   const imprimir = () => liberar(true)
   window.addEventListener('beforeprint', imprimir)
-  limpiar.push(() => { clearTimeout(seguro); window.removeEventListener('beforeprint', imprimir); io.disconnect() })
+  limpiar.push(() => { clearTimeout(seguro); window.removeEventListener('beforeprint', imprimir); io.disconnect(); vigia.disconnect() })
 }
 
 /* ------------------------------------------------------------------ View Transitions entre vistas con escena */
@@ -186,9 +213,10 @@ export function useVista<T extends HTMLElement = HTMLElement>(deps: unknown[], m
       const t = window.setTimeout(() => document.getElementById(ancla)?.scrollIntoView({ block: 'start' }), 90)
       limpiar.push(() => clearTimeout(t))
     }
-    const ctx = gsap.context(() => {
+    const ctx = gsap.context((self) => {
       gsap.set(raiz, { clearProps: 'transform,opacity' })
-      activar(raiz, limpiar, base)
+      // Con scroll que restaurar o ancla la vista no abre arriba: se ata todo al montar, como siempre.
+      activar(raiz, limpiar, base, self, guardada === undefined && !ancla)
       montar?.(raiz, limpiar)
     }, raiz)
     resolverVT() // una View Transition en curso espera a esta vista montada (y con su scroll puesto)

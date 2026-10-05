@@ -38,6 +38,8 @@
 
 /* SplitText: la máscara de cada línea o carácter recorta lo que sube; el relleno evita comerse astas y rabillos. */
 .ing-ln-mask { padding-block: 0.14em; margin-block: -0.14em; }
+/* Una línea ya partida no se vuelve a partir al llegar la fuente real: se recorta un instante, no empuja lo de abajo (CLS). */
+.ing-ln { white-space: nowrap; }
 .ing-ch-mask { padding-block: 0.12em; margin-block: -0.12em; padding-right: 0.02em; }
 
 /* ------------------------------------------------------------------ tipografía */
@@ -116,7 +118,8 @@
 .ing-nav::before { content: ''; position: absolute; inset: 0; background: color-mix(in srgb, var(--ing-paper) 88%, transparent); backdrop-filter: saturate(160%) blur(16px); -webkit-backdrop-filter: saturate(160%) blur(16px); border-bottom: 1px solid var(--ing-line); }
 .ing-nav-in { position: relative; z-index: 2; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: 12px; max-width: var(--ing-frame); height: 100%; margin-inline: auto; padding-inline: var(--ing-gutter); }
 .ing-marca { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; font-size: 1.0625rem; font-weight: 500; letter-spacing: -0.015em; }
-.ing-marca-sello { display: inline-grid; place-items: center; flex: none; width: 32px; height: 32px; margin-right: 0; border-radius: var(--ing-r-btn); background: var(--ing-ink); color: var(--ing-paper); font: 500 0.75rem/1 var(--ing-mono); letter-spacing: 0.04em; }
+.ing-marca-sello { display: inline-grid; place-items: center; flex: none; width: 32px; height: 32px; margin-right: 0; border-radius: var(--ing-r-btn); background: var(--ing-ink); color: var(--ing-paper); }
+.ing-marca-sello svg { display: block; width: 19px; height: auto; }
 .ing-nav-links { display: none; position: relative; }
 .ing-nav-links ul { display: flex; gap: 0; }
 .ing-nav-links a { display: inline-flex; align-items: center; height: var(--ing-nav); padding: 0 12px; font-size: 0.875rem; color: var(--ing-ink-2); transition: color var(--ing-d) var(--ing-ease); }

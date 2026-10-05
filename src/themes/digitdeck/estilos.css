@@ -333,6 +333,12 @@
   color: inherit;
   text-decoration: none;
 }
+.dd-marca__mb {
+  flex: none;
+  width: 1.05em;
+  height: auto;
+  margin-right: 0.34em;
+}
 .dd-marca .dd-dot {
   align-self: flex-end;
   width: 0.2em;
@@ -1360,12 +1366,11 @@
   line-height: 0.74;
   height: 0.74em;
 }
-.dd-pie__letras {
-  font: 800 1em / 0.74 var(--f-display);
-  font-stretch: 90%;
-  letter-spacing: -0.045em;
+.dd-pie__mb {
+  flex: none;
+  height: 0.74em;
+  width: auto;
   color: var(--v5-ink);
-  user-select: none;
 }
 .dd-dot--pie {
   --d: 0.15em;
@@ -1696,7 +1701,7 @@
   padding-top: 18px;
   border-top: 1px solid var(--v5-line);
 }
-.dd-hecho dd {
+.dd-hecho dd:not(.dd-hecho__nota) {
   margin: 0;
   font: 760 clamp(2.75rem, 1rem + 4vw, 4.5rem) / 0.92 var(--f-display);
   font-stretch: 90%;
@@ -1704,7 +1709,7 @@
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }
-.dd-hecho[data-largo='largo'] dd {
+.dd-hecho[data-largo='largo'] dd:not(.dd-hecho__nota) {
   font-size: clamp(1.5rem, 1rem + 1.6vw, 2.25rem);
   line-height: 1.05;
   letter-spacing: -0.02em;
@@ -1717,6 +1722,7 @@
 .dd-hecho__nota {
   order: -1;
   display: block;
+  margin: 0;
 }
 @media (min-width: 1024px) {
   .dd-ficha__cuerpo {

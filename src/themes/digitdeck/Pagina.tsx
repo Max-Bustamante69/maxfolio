@@ -6,6 +6,7 @@ import { useLocation, useNavigationType } from 'react-router-dom'
 import { gsap } from 'gsap'
 import { D, DESDE, EASE, aparecer, enPrimerPliegue, ocultarParaEntrar, revelarAlEntrar } from './movimiento'
 import { leerCompartido, soltarCompartido, useTransicion, type InfoPagina } from './transicion'
+import { CanonicalPlato } from '../shared/canonical'
 
 const lineasDe = (el: Element) => [...el.querySelectorAll('.dd-ln > span')]
 
@@ -108,7 +109,7 @@ export function Pagina({ titulo, children, className = '' }: { titulo: string; c
   }, [])
   return (
     <main ref={ref} id="main-content" tabIndex={-1} className={`dd-pagina ${className}`}>
-      <meta name="robots" content="noindex" />
+      <CanonicalPlato />
       {children}
     </main>
   )

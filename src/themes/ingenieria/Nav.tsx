@@ -6,6 +6,7 @@ import { BotonTemas, cargarPanel } from './BotonTemas'
 import { useCopy } from './copy'
 import { gsap } from './motion'
 import { capturasDeObra, Enlace, Flecha, precargar } from './piezas'
+import MarcaMB from '../shared/MarcaMB'
 
 const BASE = v5path('ingenieria')
 const SECCIONES = ['', 'obra', 'trayectoria', 'contacto'] as const
@@ -115,7 +116,7 @@ export function Nav({ cv }: { cv: string }) {
     <header className="ing-nav">
       <div className="ing-nav-in">
         <Enlace to={BASE} className="ing-marca" aria-label="Maxfolio">
-          <span className="ing-marca-sello" aria-hidden="true">MB</span>
+          <span className="ing-marca-sello" aria-hidden="true"><MarcaMB /></span>
           <span className="ing-marca-txt">Maxfolio</span>
         </Enlace>
 
