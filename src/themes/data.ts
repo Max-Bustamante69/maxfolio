@@ -60,7 +60,8 @@ export type Viewport = 'desktop' | 'mobile'
 
 /** Capturas reales en /public/gallery: escritorio 1200×750, móvil 780×1688 (2x de 390×844). */
 export const SHOT_SIZE: Record<Viewport, { w: number; h: number }> = { desktop: { w: 1200, h: 750 }, mobile: { w: 780, h: 1688 } }
-export const shot = (slug: string, vista: Vista, vp: Viewport) => `/gallery/${slug}/${vista}-${vp}.webp`
+/** `ancho`: la variante estrecha (escritorio 720, móvil 400) que genera scripts/variantes-ligeras.mjs; sin él, el original. */
+export const shot = (slug: string, vista: Vista, vp: Viewport, ancho?: number) => `/gallery/${slug}/${vista}-${vp}${ancho ? `-${ancho}` : ''}.webp`
 
 export interface Obra {
   slug: string
