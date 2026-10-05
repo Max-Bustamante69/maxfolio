@@ -7,7 +7,7 @@
 // para pegarlos a mano en Vercel → max-folio → Settings → Environment Variables.
 import { createServer } from 'node:http'
 import { exec, spawnSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 
 const args = process.argv.slice(2)
 // El JSON que descarga Google Cloud al crear el cliente trae los dos valores: así el secreto no se copia a mano.
@@ -71,8 +71,10 @@ for (const [nombre, valor] of Object.entries(valores)) {
   }
 }
 if (fallos) {
-  console.log('\nLa CLI no pudo guardar todo. Pega estos valores en Vercel → max-folio → Settings → Environment Variables (Production y Preview):')
-  for (const [nombre, valor] of Object.entries(valores)) console.log(`${nombre}=${valor}`)
+  // Los valores van a un archivo local, nunca a la salida: la terminal puede acabar en un chat o en un registro.
+  const archivo = `${process.env.USERPROFILE ?? process.env.HOME}/Downloads/maxfolio-agenda-vercel.env`
+  writeFileSync(archivo, Object.entries(valores).map(([n, v]) => `${n}=${v}`).join('\n') + '\n')
+  console.log(`\nLa CLI no pudo guardar todo. Los valores quedaron en ${archivo}: pégalos en Vercel → max-folio → Settings → Environment Variables (Production y Preview) y borra el archivo.`)
 } else {
   console.log('\nGuardado en Vercel. Avísale a Claude para que vuelva a desplegar y pruebe la agenda.')
 }
