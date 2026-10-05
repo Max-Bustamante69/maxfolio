@@ -48,7 +48,7 @@ function TelefonoCss({ o, vista, alt, etiqueta }: { o: Obra; vista: 'home' | 'pd
     <div className="pl-tel2d">
       <div className="pl-tel2d-pant" tabIndex={0} role="group" aria-label={etiqueta} onScroll={alScrollInterno}>
         {altos
-          ? altos.slice(0, n).map((h, i) => <img key={i} src={urlFranja(o.slug, i)} width={780} height={h} alt={i === 0 ? alt : ''} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" draggable={false} />)
+          ? altos.slice(0, n).map((h, i) => <img key={i} src={urlFranja(o.slug, i)} srcSet={`${urlFranja(o.slug, i, 520)} 520w, ${urlFranja(o.slug, i)} 780w`} sizes="282px" width={780} height={h} alt={i === 0 ? alt : ''} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" draggable={false} />)
           : <PlShot slug={o.slug} vista={vista} vp="mobile" alt={alt} draggable={false} />}
       </div>
     </div>

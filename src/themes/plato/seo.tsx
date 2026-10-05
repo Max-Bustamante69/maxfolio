@@ -1,9 +1,9 @@
 import { useLayoutEffect } from 'react'
+import { ORIGEN } from '../shared/canonical'
 
 // Plató es el tema INDEXABLE (el que ven los rastreadores): cada vista lleva su título, su descripción, su canonical exacto y sus og:url / og:title.
 // React 19 sube estas etiquetas al <head>. El index.html trae las suyas (descripción, og:title, og:description, twitter:*): mientras Plató está
 // montado se apartan para que no haya dos descripciones, dos títulos sociales ni dos <title>, y se devuelven al salir del tema.
-export const ORIGEN = 'https://www.maxfolio.dev'
 const APARTAR = 'title, meta[name="description"], meta[property="og:title"], meta[property="og:description"], meta[property="og:url"], meta[name="twitter:title"], meta[name="twitter:description"]'
 
 /** Aparta las etiquetas estáticas del index.html mientras Plató está montado (una vez, desde la raíz del tema). */

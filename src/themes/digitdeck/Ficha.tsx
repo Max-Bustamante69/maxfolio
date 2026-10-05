@@ -52,7 +52,7 @@ function Hechos({ o, c }: { o: Obra; c: Copy }) {
           <div key={x.k} className="dd-hecho" data-largo={x.v.length > 6 ? 'largo' : 'corto'}>
             <dt className="dd-micro">{x.k}</dt>
             <dd><Valor v={x.v} /></dd>
-            {x.nota && <span className="dd-micro dd-hecho__nota">{x.nota}</span>}
+            {x.nota && <dd className="dd-micro dd-hecho__nota">{x.nota}</dd>}
           </div>
         ))}
       </dl>

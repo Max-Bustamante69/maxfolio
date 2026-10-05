@@ -15,7 +15,8 @@ export function precargar(urls: string[]) {
     new Image().src = u
   })
 }
-export const capturasDeObra = (obras: Obra[], n = 6) => obras.filter((o) => o.views.length).slice(0, n).map((o) => shot(o.slug, vistaDe(o), 'desktop'))
+// Las variantes que el srcset de ShotImg elige en escritorio: la tarjeta de la lista (≤ 720 px) y el móvil de la ficha (≤ 300 px).
+export const capturasDeObra = (obras: Obra[], n = 6) => obras.filter((o) => o.views.length).slice(0, n).map((o) => shot(o.slug, vistaDe(o), 'desktop', 720))
 
 /** Enlace interno: un <a> real (clic medio y copiar enlace funcionan) que navega con la salida de la vista. */
 export function Enlace({ to, onClick, children, ...rest }: { to: string } & AnchorHTMLAttributes<HTMLAnchorElement>) {
@@ -199,7 +200,7 @@ export function Tarjeta({ o, resumen, prioridad, compacta, grande, compactaTexto
     const img = marco.current?.querySelector('img')
     if (marco.current && img) despegar(o.slug, marco.current, img)
   }
-  const aviso = () => precargar([shot(o.slug, vista, 'desktop'), shot(o.slug, vista, 'mobile')])
+  const aviso = () => precargar([shot(o.slug, vista, 'desktop'), shot(o.slug, vista, 'mobile', 400)])
   return (
     <Enlace to={v5path('ingenieria', 'obra', o.slug)} onClick={alPulsar} onPointerEnter={aviso} onFocus={aviso} className={`ing-card${compacta ? ' ing-card-chica' : ''}${grande ? ' ing-card-grande' : ''}`} data-slug={o.slug}>
       <div className="ing-card-marco" ref={marco}>

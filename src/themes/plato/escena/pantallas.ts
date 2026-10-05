@@ -23,7 +23,8 @@ export const PANTALLAS: Record<string, { h: number }> = {
 }
 
 export const tieneRecorrido = (slug: string) => slug in PANTALLAS
-export const urlFranja = (slug: string, i: number) => `/v5/plato/scroll/${slug}-${i}.webp`
+/** `ancho` 520: la variante del teléfono 2D (scripts/franjas-520.mjs); sin él, la de 780 que usa el lienzo 3D. */
+export const urlFranja = (slug: string, i: number, ancho?: 520) => `/v5/plato/scroll/${slug}-${i}${ancho ? `-${ancho}` : ''}.webp`
 /** Altos de cada franja: 4 096 salvo la última, que lleva el resto (con el solape de 8 px). */
 export function altosFranjas(h: number): number[] {
   const out: number[] = []

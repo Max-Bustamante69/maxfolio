@@ -38,6 +38,8 @@
 
 /* SplitText: la máscara de cada línea o carácter recorta lo que sube; el relleno evita comerse astas y rabillos. */
 .ing-ln-mask { padding-block: 0.14em; margin-block: -0.14em; }
+/* Una línea ya partida no se vuelve a partir al llegar la fuente real: se recorta un instante, no empuja lo de abajo (CLS). */
+.ing-ln { white-space: nowrap; }
 .ing-ch-mask { padding-block: 0.12em; margin-block: -0.12em; padding-right: 0.02em; }
 
 /* ------------------------------------------------------------------ tipografía */

@@ -161,6 +161,9 @@
 .pl-esc-nombre { font-family: var(--f-mono); font-size: 14px; line-height: 1.4; color: var(--tinta); letter-spacing: 0.08em; font-weight: 500; text-transform: uppercase; }
 .pl-esc-eyebrow { font-family: var(--f-mono); font-size: 13px; line-height: 1.45; color: var(--tinta-2); letter-spacing: 0.02em; }
 .pl-lema { font-size: clamp(27px, 7.4vw, 44px); line-height: 1.12; letter-spacing: -0.015em; font-weight: 400; max-width: 21em; }
+/* Una línea ya partida por SplitText no se vuelve a partir: si se partió con la fuente de respaldo y la real es más ancha, la línea
+   se recorta un instante (hasta que autoSplit la rehace) en vez de saltar a dos y empujar lo de abajo (CLS medido: 0,055). */
+.pl-ln { white-space: nowrap; }
 .pl-marco { position: relative; flex: none; margin-top: 22px; border-radius: var(--r); overflow: hidden; background: var(--grafito); aspect-ratio: 4 / 5; max-height: 62svh; color: var(--tinta); }
 .pl-marco picture, .pl-marco img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .pl-marco .pl-cruces { display: none; }
