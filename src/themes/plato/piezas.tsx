@@ -108,6 +108,7 @@ export function precargar(urls: string[]) {
 export function Tarjeta({ o, etq, nivel = 3, prioridad, className = '', recibe, sinHistoria, texto, medida, diferida }: { o: Obra; etq: string; nivel?: 2 | 3; prioridad?: boolean; className?: string; recibe?: boolean; sinHistoria?: boolean; texto?: string; medida?: Medida; diferida?: boolean }) {
   const Titulo = nivel === 2 ? 'h2' : 'h3'
   const marco = useRef<HTMLDivElement>(null)
+  const { en3d } = usePlato()
   // `diferida`: la imagen se pide cuando la tarjeta está a 300 px de la ventana (el lazy nativo de un móvil lento carga hasta 2 500 px antes y compite con el LCP).
   const [ver, setVer] = useState(!diferida)
   useEffect(() => {
@@ -119,7 +120,8 @@ export function Tarjeta({ o, etq, nivel = 3, prioridad, className = '', recibe, 
   const alPulsar = (e: MouseEvent) => {
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
     const img = marco.current?.querySelector('img')
-    if (marco.current && img) despegar(o.slug, marco.current, img)
+    // Hacia una ficha 3D no vuela nada: allí la cámara entrando al set es la transición y la copia se quedaría congelada en pantalla.
+    if (marco.current && img && !(en3d && indiceDe(o.slug) >= 0)) despegar(o.slug, marco.current, img)
     evento(ID, 'obra_open', { slug: o.slug })
   }
   return (
