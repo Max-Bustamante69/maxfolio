@@ -253,6 +253,12 @@
   padding: 0 32px;
   font-size: 1.0625rem;
 }
+/* De contorno: la segunda acción (el CV del héroe). Al pasar el puntero se llena con el mismo disco de tinta que el botón lleno. */
+.dd-boton--linea {
+  background: transparent;
+  color: var(--v5-ink);
+  box-shadow: inset 0 0 0 1.5px currentColor;
+}
 .dd-boton--chico {
   min-height: 44px;
   padding: 0 20px;

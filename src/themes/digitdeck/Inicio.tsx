@@ -5,6 +5,8 @@ import { gsap } from 'gsap'
 import { SHOT_DATE, sinPuntoFinal, useV5, v5path, type Obra } from '../data'
 import { useLanguage } from '../../context/LanguageContext'
 import { ShotImg } from '../shared/ShotImg'
+import { evento } from '../shared/contacto'
+import IconoDescarga from '../shared/IconoDescarga'
 import { useCopy, type Copy } from './copy'
 import Cifras from './Cifras'
 import Cinta from './Cinta'
@@ -258,6 +260,7 @@ export default function Inicio() {
                 <Enlace to={`${CONTACTO}?motivo=revision#agenda`} etiqueta={c.nav.contacto} className="dd-boton dd-boton--grande">{h.ctaPrimary}</Enlace>
                 <p className="dd-nota">{h.ctaNote}</p>
               </div>
+              <a className="dd-boton dd-boton--grande dd-boton--linea" href={personal.cv} download onClick={() => evento('digitdeck', 'contact_click', { canal: 'cv', donde: 'heroe' })}>{h.ctaCv}<IconoDescarga /></a>
               <Enlace to={OBRA} etiqueta={c.nav.obra} className="dd-enlace dd-enlace--fuerte">{h.ctaSecondary}</Enlace>
             </div>
           </div>
