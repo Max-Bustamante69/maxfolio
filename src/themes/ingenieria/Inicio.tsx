@@ -8,6 +8,8 @@ import { escena, gsap, SALE, useVista } from './motion'
 import { Cabecera, Cinta, Enlace, Flecha, Movil, Retrato, Tarjeta, Ventana } from './piezas'
 import { partirFrase, sinProtocolo, usePublico } from './publico'
 import { CanonicalPlato } from '../shared/canonical'
+import { evento } from '../shared/contacto'
+import IconoDescarga from '../shared/IconoDescarga'
 
 const HISTORIAS = ['nos-cafe', 'digitdeck-apps', 'nalua']
 
@@ -80,6 +82,7 @@ export default function Inicio() {
             <p className="ing-claim" data-ing="linea" data-ing-retraso="0.25"><span>{primera}</span> <em>{sinPuntoFinal(resto)}</em></p>
             <div className="ing-acciones" data-ing="grupo" data-ing-retraso="0.45">
               <Enlace className="ing-btn ing-btn-pri" to={`${v5path('ingenieria', 'contacto')}#agenda`}>{s.hero.ctaPrimary}<Flecha /></Enlace>
+              <a className="ing-btn ing-btn-sec" href={personal.cv} download onClick={() => evento('ingenieria', 'contact_click', { canal: 'cv', donde: 'heroe' })}>{c.cv}<IconoDescarga /></a>
               <Enlace className="ing-btn ing-btn-sec" to={v5path('ingenieria', 'obra')}>{s.hero.ctaSecondary}</Enlace>
             </div>
           </div>

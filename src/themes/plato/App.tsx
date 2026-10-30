@@ -155,7 +155,7 @@ function Cabecera({ en3d, puede3d, setModo }: { en3d: boolean; puede3d: boolean;
             <Enlace to={`${BASE}/contacto#agenda`} className="pl-pil pl-pil--osc pl-cab-cta">
               <Rod>{c.revision}</Rod><PuntosPil n={1} />
             </Enlace>
-            <a href={v.personal.cv} download className="pl-pil pl-pil--clara pl-cab-cv" tabIndex={-1}>
+            <a href={v.personal.cv} download className="pl-pil pl-pil--clara pl-cab-cv">
               <Rod>{c.cv}</Rod><PuntosPil n={1} />
             </a>
           </span>

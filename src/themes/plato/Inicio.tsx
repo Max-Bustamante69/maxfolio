@@ -9,6 +9,8 @@ import { alScroll, useVista } from './motion'
 import { Cruces, Enlace, Flecha, Rod, Tarjeta, ruta } from './piezas'
 import { limpioTexto, partirFrase } from './publico'
 import { Seo } from './seo'
+import { evento } from '../shared/contacto'
+import IconoDescarga from '../shared/IconoDescarga'
 
 const acota = (x: number, a = 0, b = 1) => Math.min(b, Math.max(a, x))
 const suave = (a: number, b: number, x: number) => { const t = acota((x - a) / (b - a)); return t * t * (3 - 2 * t) }
@@ -131,6 +133,7 @@ export default function Inicio() {
             <div className="pl-marco-acc">
               <div className="pl-marco-acc-in" data-pl="grupo" data-pl-retraso="0.35">
                 <Enlace to={ruta('contacto') + '#agenda'} className="pl-pil pl-pil--tung pl-pil--grande"><Rod>{c.inicio.ctaCorto}</Rod><span className="pl-puntos" aria-hidden="true"><i /></span></Enlace>
+                <a href={personal.cv} download className="pl-pil pl-pil--clara pl-pil--grande" onClick={() => evento('plato', 'contact_click', { canal: 'cv', donde: 'heroe' })}><Rod>{c.cv}</Rod><IconoDescarga /></a>
                 <Enlace to={ruta('obra')} className="pl-marco-ver"><Rod>{hero.ctaSecondary}</Rod><Flecha /></Enlace>
               </div>
             </div>

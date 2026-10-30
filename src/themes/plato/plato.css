@@ -80,12 +80,12 @@
 .pl-cab-der { display: flex; align-items: center; gap: 8px; pointer-events: none; }
 .pl-idioma { display: none; }
 .pl-cab-cta { padding: 0 14px 0 18px; transition: opacity 0.3s ease, background-color 0.4s ease, color 0.4s ease, transform 0.4s var(--e-lusion); }
-/* Una sola «Revisión gratis» por pliegue: en el pliegue de la portada ya está dentro del marco, y en el contacto es la propia página. */
+/* Una sola «Revisión gratis» y un solo CV por pliegue: en la portada los dos están dentro del marco; en el contacto la revisión es la propia página. */
 .pl-cab-slot { display: none; }
 .pl-cab-slot > * { grid-area: 1 / 1; }
 .pl-cab-cv { opacity: 0; visibility: hidden; padding: 0 14px 0 18px; }
 .pl-raiz[data-vel='no'] .pl-cab[data-ruta='inicio'] .pl-cab-cta, .pl-cab[data-ruta='contacto'] .pl-cab-cta { opacity: 0; visibility: hidden; }
-.pl-raiz[data-vel='no'] .pl-cab[data-ruta='inicio'] .pl-cab-cv, .pl-cab[data-ruta='contacto'] .pl-cab-cv { opacity: 1; visibility: visible; }
+.pl-cab[data-ruta='contacto'] .pl-cab-cv { opacity: 1; visibility: visible; }
 .pl-raiz[data-tono='oscuro'] .pl-cab-cv { background: var(--grafito); color: var(--sala); border: 1px solid var(--linea-osc); }
 .pl-modo { display: none; height: var(--pil-h); padding: 0; border-radius: 999px; background: var(--pildora-2); color: var(--tinta); transition: background-color 0.4s ease, color 0.4s ease; }
 .pl-modo button { min-width: 46px; min-height: 44px; height: var(--pil-h); padding: 0 14px; border-radius: 999px; font-family: var(--f-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; transition: background-color 0.35s ease, color 0.35s ease; }
@@ -188,9 +188,9 @@
   .pl-marco img { border-radius: var(--r); background: var(--grafito); }
   .pl-marco .pl-cruces { display: block; }
   .pl-marco-acc { left: 28px; right: 28px; bottom: 26px; padding: 0; background: none; }
-  .pl-marco-acc-in { flex-direction: row; align-items: center; justify-content: space-between; gap: 20px; }
+  .pl-marco-acc-in { flex-direction: row; align-items: center; justify-content: flex-start; gap: 12px; }
   .pl-marco-acc .pl-pil { justify-content: flex-start; box-shadow: 0 10px 40px rgb(0 0 0 / 0.45); }
-  .pl-marco-ver { font-size: 13px; height: var(--pil-h); padding: 0 20px; border-radius: 999px; background: var(--grafito); border: 1px solid var(--linea-osc); }
+  .pl-marco-ver { margin-left: auto; font-size: 13px; height: var(--pil-h); padding: 0 20px; border-radius: 999px; background: var(--grafito); border: 1px solid var(--linea-osc); }
   .pl-esc-pie { min-height: 27px; padding-top: 0; margin-top: 18px; gap: 4px 32px; }
   .pl-esc-prueba, .pl-esc-disp { font-size: 13.5px; }
   .pl-esc-cue { margin-left: auto; text-align: right; }
