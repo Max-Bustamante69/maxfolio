@@ -1,0 +1,14 @@
+{
+  "html_balanced": true,
+  "css_unchanged": true,
+  "languages": [
+    "es",
+    "en"
+  ],
+  "headings_each": 7,
+  "mailto_count": 4,
+  "scripts": 0,
+  "https_destinations": 6,
+  "all_links_http_200": true,
+  "html_sha256": "49105351cdefc723a3db5fcc38f7eff540d1c905ac63694489cfb0aadce2e4e7"
+}
