@@ -1,0 +1,32 @@
+[
+  {
+    "url": "https://normativa.colpensiones.gov.co/colpens/docs/decreto_1074_2015_pr026.htm",
+    "status": 200,
+    "final": "https://normativa.colpensiones.gov.co/colpens/docs/decreto_1074_2015_pr026.htm"
+  },
+  {
+    "url": "https://policies.google.com/privacy?hl=en",
+    "status": 200,
+    "final": "https://policies.google.com/privacy?hl=en"
+  },
+  {
+    "url": "https://policies.google.com/privacy?hl=es",
+    "status": 200,
+    "final": "https://policies.google.com/privacy?hl=es"
+  },
+  {
+    "url": "https://relatoria.colombiacompra.gov.co/normativa/ley-1581-de-2012/",
+    "status": 200,
+    "final": "https://relatoria.colombiacompra.gov.co/normativa/ley-1581-de-2012/"
+  },
+  {
+    "url": "https://sedeelectronica.sic.gov.co/atencion-y-servicios-a-la-ciudadania/servicios/quejas-datos-personales",
+    "status": 200,
+    "final": "https://sedeelectronica.sic.gov.co/atencion-y-servicios-a-la-ciudadania/servicios/quejas-datos-personales"
+  },
+  {
+    "url": "https://vercel.com/legal/privacy-notice",
+    "status": 200,
+    "final": "https://vercel.com/legal/privacy-notice"
+  }
+]
